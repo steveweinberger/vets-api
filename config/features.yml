@@ -14,3 +14,8 @@ features:
   mvi_id_parser:
     description: >
       logic changes for parsing IDs from MVI responses
+
+admin_emails:
+  - 'test1@test.com'
+  - 'test2@test.com'
+  - 'test3@test.com'

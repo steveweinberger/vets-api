@@ -51,6 +51,22 @@ GIT
       script_utils (= 0.0.4)
 
 PATH
+  remote: ../flipper
+  specs:
+    flipper (0.17.1)
+    flipper-active_record (0.17.1)
+      activerecord (>= 4.2, < 7)
+      flipper (~> 0.17.1)
+    flipper-active_support_cache_store (0.17.1)
+      activesupport (>= 4.2, < 7)
+      flipper (~> 0.17.1)
+    flipper-ui (0.17.1)
+      erubi (>= 1.0.0, < 2.0.0)
+      flipper (~> 0.17.1)
+      rack (>= 1.4, < 3)
+      rack-protection (>= 1.5.3, < 2.1.0)
+
+PATH
   remote: modules/appeals_api
   specs:
     appeals_api (0.0.1)
@@ -296,7 +312,6 @@ GEM
     encryptor (3.0.0)
     equalizer (0.0.11)
     erubi (1.9.0)
-    erubis (2.7.0)
     et-orbi (1.2.1)
       tzinfo
     ethon (0.10.1)
@@ -326,18 +341,6 @@ GEM
     ffi (1.11.1)
     figaro (1.1.1)
       thor (~> 0.14)
-    flipper (0.16.2)
-    flipper-active_record (0.16.2)
-      activerecord (>= 3.2, < 6)
-      flipper (~> 0.16.2)
-    flipper-active_support_cache_store (0.16.2)
-      activesupport (>= 3.2, < 6)
-      flipper (~> 0.16.2)
-    flipper-ui (0.16.2)
-      erubis (~> 2.7.0)
-      flipper (~> 0.16.2)
-      rack (>= 1.4, < 3)
-      rack-protection (>= 1.5.3, < 2.1.0)
     foreman (0.85.0)
       thor (~> 0.19.1)
     formatador (0.2.5)
@@ -746,7 +749,7 @@ DEPENDENCIES
   flipper
   flipper-active_record
   flipper-active_support_cache_store
-  flipper-ui
+  flipper-ui!
   foreman
   fuubar
   govdelivery-tms (= 2.8.4)
