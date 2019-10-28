@@ -12,13 +12,20 @@ module FlipperExtensions
 
       raise "Template does not exist: #{path}" unless path.exist?
 
-      contents = path.read
-      compiled = Flipper::UI::Eruby.new(contents)
-      compiled.result proc {}.binding
+      eval(Erubi::Engine.new(path.read, escape: true).src)
     end
 
     def custom_views_path
       Flipper::UI.configuration.custom_views_path
+    end
+
+    # Prevent non flipper admins from toggling features
+    def valid_request_method?
+      if @current_user&.flipper_admin?
+        VALID_REQUEST_METHOD_NAMES.include?(request_method_name)
+      else
+        request_method_name == 'get'
+      end
     end
 
     # This is where we store the feature descriptions.

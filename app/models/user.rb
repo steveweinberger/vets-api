@@ -165,11 +165,6 @@ class User < Common::RedisStore
     loa[:current].try(:to_i) == LOA::THREE
   end
 
-  # Checks to see if user's email is in flipperr admin list
-  def flipper_admin?
-    loa3? && FLIPPER_FEATURE_CONFIG['admin_emails'].include?(email)
-  end
-
   def ssn_mismatch?
     return false unless loa3? && identity&.ssn && va_profile&.ssn
 
@@ -296,6 +291,11 @@ class User < Common::RedisStore
 
   def flipper_id
     email || account_uuid
+  end
+
+  # Checks to see if user's flipper_id is in flipper admin list
+  def flipper_admin?
+    loa3? && FLIPPER_FEATURE_CONFIG['admin_emails'].include?(flipper_id)
   end
 
   private
