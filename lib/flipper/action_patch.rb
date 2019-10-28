@@ -20,13 +20,13 @@ module FlipperExtensions
     end
 
     # Prevent non flipper admins from toggling features
-    def valid_request_method?
-      if @current_user&.flipper_admin?
-        VALID_REQUEST_METHOD_NAMES.include?(request_method_name)
-      else
-        request_method_name == 'get'
-      end
-    end
+    # def valid_request_method?
+    #   if @current_user&.flipper_admin?
+    #     VALID_REQUEST_METHOD_NAMES.include?(request_method_name)
+    #   else
+    #     request_method_name == 'get'
+    #   end
+    # end
 
     # This is where we store the feature descriptions.
     # You can choose to store this where it makes sense for you.

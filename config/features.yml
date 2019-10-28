@@ -16,6 +16,9 @@ features:
       logic changes for parsing IDs from MVI responses
 
 admin_emails:
-  - 'test1@test.com'
-  - 'test2@test.com'
-  - 'test3@test.com'
+  - 'anna@adhoc.team'
+  - 'travis.hilton@oddball.io'
+  - 'johnny@oddball.io'
+  - 'rian.fowler@adhocteam.us'
+  - 'eugene@adhocteam.us'
+  - 'jhonny.gonzalez@oddball.io'

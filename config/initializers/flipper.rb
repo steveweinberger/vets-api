@@ -11,6 +11,25 @@ require 'flipper/instrumentation/event_subscriber'
 
 FLIPPER_FEATURE_CONFIG = YAML.safe_load(File.read(Rails.root.join('config', 'features.yml')))
 
+class RestrictedListConstraint
+  def initialize
+    @admins = ['abraham.lincoln@vets.gov', 'vets.gov.user+0@gmail.com']
+  end
+
+  def matches?(request)
+    session_token = request.session[:token]
+    return false unless session_token
+
+    session = Session.find(session_token)
+    return false unless session
+
+    current_user = User.find(session.uuid)
+    return false unless current_user
+
+    @admins.include?(current_user.email) && current_user.loa3?
+  end
+end
+
 Flipper.configure do |config|
   config.default do
     activerecord_adapter = Flipper::Adapters::ActiveRecord.new
