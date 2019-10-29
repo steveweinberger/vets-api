@@ -113,11 +113,11 @@ RSpec.describe 'address', type: :request do
         let(:address) { build(:vet360_address, :override) }
 
         before do
-          Timecop.return
           allow_any_instance_of(User).to receive(:vet360_id).and_return('1')
           allow_any_instance_of(User).to receive(:icn).and_return('1234')
           Settings.virtual_hosts << "www.example.com"
           Timecop.freeze(Time.parse('2019-10-28 18:59:37 -0700'))
+          sign_in_as(user)
         end
 
         it 'should be successful' do
