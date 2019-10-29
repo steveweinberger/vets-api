@@ -118,7 +118,7 @@ RSpec.describe 'address', type: :request do
           Settings.virtual_hosts << "www.example.com"
         end
 
-        it 'should be successful' do
+        it 'should be successful', run_at: "2019-10-28 18:59:37 -0700" do
           # VCR.configure do |c|
           #   c.allow_http_connections_when_no_cassette = true
           # end
