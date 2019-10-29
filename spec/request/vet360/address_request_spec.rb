@@ -119,11 +119,11 @@ RSpec.describe 'address', type: :request do
         end
 
         it 'should be successful' do
-          VCR.configure do |c|
-            c.allow_http_connections_when_no_cassette = true
-          end
-          binding.pry; fail
-          res = Vet360::AddressValidation::Service.new.validate(address)
+          # VCR.configure do |c|
+          #   c.allow_http_connections_when_no_cassette = true
+          # end
+          # binding.pry; fail
+          # res = Vet360::AddressValidation::Service.new.validate(address)
           VCR.use_cassette('vet360/contact_information/put_address_override2', record: :once) do
             put('/v0/profile/addresses', params: address.to_json, headers: headers)
             binding.pry; fail

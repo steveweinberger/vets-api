@@ -51,7 +51,7 @@ FactoryBot.define do
       city { 'Fulton' }
       state_code { 'MS' }
       zip_code { '38843' }
-      validation_key { 1997450416 }
+      validation_key { 713117306 }
       vet360_id { '1' }
       source_system_user { '1234' }
       source_date { Time.now.utc.iso8601 }
