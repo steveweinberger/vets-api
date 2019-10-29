@@ -23,6 +23,7 @@ module AuthenticationAndSSOConcerns
   end
 
   def validate_session
+    binding.pry; fail
     @session_object = Session.find(session[:token])
 
     if @session_object.nil?
