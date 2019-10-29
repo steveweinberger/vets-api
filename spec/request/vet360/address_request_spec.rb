@@ -103,6 +103,7 @@ RSpec.describe 'address', type: :request do
 
       it 'creates a new AsyncTransaction::Vet360::AddressTransaction db record' do
         VCR.use_cassette('vet360/contact_information/put_address_success') do
+          Settings.virtual_hosts << "www.example.com"
           expect do
             put('/v0/profile/addresses', params: address.to_json, headers: headers)
           end.to change(AsyncTransaction::Vet360::AddressTransaction, :count).from(0).to(1)
