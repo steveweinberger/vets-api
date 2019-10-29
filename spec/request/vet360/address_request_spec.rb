@@ -103,7 +103,6 @@ RSpec.describe 'address', type: :request do
 
       it 'creates a new AsyncTransaction::Vet360::AddressTransaction db record' do
         VCR.use_cassette('vet360/contact_information/put_address_success') do
-          Settings.virtual_hosts << "www.example.com"
           expect do
             put('/v0/profile/addresses', params: address.to_json, headers: headers)
           end.to change(AsyncTransaction::Vet360::AddressTransaction, :count).from(0).to(1)
@@ -116,6 +115,7 @@ RSpec.describe 'address', type: :request do
         before do
           allow_any_instance_of(User).to receive(:vet360_id).and_return('1')
           allow_any_instance_of(User).to receive(:icn).and_return('1234')
+          Settings.virtual_hosts << "www.example.com"
         end
 
         it 'should be successful' do
