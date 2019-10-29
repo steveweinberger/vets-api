@@ -120,6 +120,7 @@ RSpec.describe 'address', type: :request do
         it 'should be successful' do
           VCR.use_cassette('vet360/contact_information/put_address_override2', record: :once) do
             put('/v0/profile/addresses', params: address.to_json, headers: headers)
+            binding.pry; fail
           end
         end
       end
