@@ -86,12 +86,9 @@ module VA21686c
     attribute :night_phone, ScrubbedString
     attribute :veteran_social_security_number, ScrubbedString
     attribute :current_marriage, VA21686c::FormCurrentMarriage
-    # attribute :spouse_marriages, Types::Coercible::Array[VA21686c::FormMarriage]
-    # attribute :marriages, Types::Coercible::Array[VA21686c::FormMarriage]
-    # attribute :dependents, Types::Coercible::Array[VA21686c::FormDependent]
-    attribute :spouse_marriages, Types::Params::Array
-    attribute :marriages, Types::Coercible::Array
-    attribute :dependents, Types::Coercible::Array
+    attribute :spouse_marriages, Types::Array.of(VA21686c::FormMarriage)
+    attribute :marriages, Types::Array.of(VA21686c::FormMarriage)
+    attribute :dependents, Types::Array.of(VA21686c::FormDependent)
     attribute :va_file_number, ScrubbedString
     attribute :marital_status, ScrubbedString
   end

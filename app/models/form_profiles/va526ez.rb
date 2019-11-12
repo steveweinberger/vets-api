@@ -25,8 +25,7 @@ module VA526ez
   class FormRatedDisabilities < Dry::Struct
     # include Virtus.model
 
-    # attribute :rated_disabilities, Types::Coercible::Array[FormRatedDisability]
-    attribute :rated_disabilities, Types::Coercible::Array
+    attribute :rated_disabilities, Types::Array.of(FormRatedDisability)
   end
 
   class FormPaymentAccountInformation < Dry::Struct

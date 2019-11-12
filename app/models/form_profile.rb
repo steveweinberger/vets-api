@@ -38,9 +38,9 @@ class FormMilitaryInformation < Dry::Struct
   attribute :currently_active_duty_hash, Hash
   attribute :va_compensation_type, Types::Coercible::String
   attribute :vic_verified, Types::Nominal::Bool
-  attribute :service_branches, Types::Coercible::Array
+  attribute :service_branches, Types::Array.of(Types::Coercible::String)
   attribute :service_periods, Types::Coercible::Array
-  attribute :guard_reserve_service_history, Types::Coercible::Array
+  attribute :guard_reserve_service_history, Types::Array.of(FormDate)
   attribute :latest_guard_reserve_service_period, FormDate
 end
 
