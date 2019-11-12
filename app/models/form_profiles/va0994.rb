@@ -3,13 +3,13 @@
 module VA0994
   FORM_ID = '22-0994'
 
-  class FormPaymentAccountInformation
-    include Virtus.model
+  class FormPaymentAccountInformation < Dry::Struct
+    # include Virtus.model
 
-    attribute :account_type, String
-    attribute :account_number, String
-    attribute :routing_number, String
-    attribute :bank_name, String
+    attribute :account_type, Types::Coercible::String
+    attribute :account_number, Types::Coercible::String
+    attribute :routing_number, Types::Coercible::String
+    attribute :bank_name, Types::Coercible::String
   end
 end
 

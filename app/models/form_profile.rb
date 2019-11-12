@@ -1,83 +1,85 @@
 # frozen_string_literal: true
 
+require 'common/models/type'
+
 # TODO(AJD): Virtus POROs for now, will become ActiveRecord when the profile is persisted
-class FormFullName
-  include Virtus.model
+class FormFullName < Dry::Struct
+  # include Virtus.model
 
-  attribute :first, String
-  attribute :middle, String
-  attribute :last, String
-  attribute :suffix, String
+  attribute :first, Types::Coercible::String
+  attribute :middle, Types::Coercible::String
+  attribute :last, Types::Coercible::String
+  attribute :suffix, Types::Coercible::String
 end
 
-class FormDate
-  include Virtus.model
+class FormDate < Dry::Struct
+  # include Virtus.model
 
-  attribute :from, Date
-  attribute :to, Date
+  attribute :from, Types::Nominal::Date
+  attribute :to, Types::Nominal::Date
 end
 
-class FormMilitaryInformation
-  include Virtus.model
+class FormMilitaryInformation < Dry::Struct
+  # include Virtus.model
 
-  attribute :post_nov_1998_combat, Boolean
-  attribute :last_service_branch, String
-  attribute :hca_last_service_branch, String
-  attribute :last_entry_date, String
-  attribute :last_discharge_date, String
-  attribute :discharge_type, String
-  attribute :post_nov111998_combat, Boolean
-  attribute :sw_asia_combat, Boolean
-  attribute :compensable_va_service_connected, Boolean
-  attribute :is_va_service_connected, Boolean
-  attribute :receives_va_pension, Boolean
-  attribute :tours_of_duty, Array
-  attribute :currently_active_duty, Boolean
+  attribute :post_nov_1998_combat, Types::Nominal::Bool
+  attribute :last_service_branch, Types::Coercible::String
+  attribute :hca_last_service_branch, Types::Coercible::String
+  attribute :last_entry_date, Types::Coercible::String
+  attribute :last_discharge_date, Types::Coercible::String
+  attribute :discharge_type, Types::Coercible::String
+  attribute :post_nov111998_combat, Types::Nominal::Bool
+  attribute :sw_asia_combat, Types::Nominal::Bool
+  attribute :compensable_va_service_connected, Types::Nominal::Bool
+  attribute :is_va_service_connected, Types::Nominal::Bool
+  attribute :receives_va_pension, Types::Nominal::Bool
+  attribute :tours_of_duty, Types::Coercible::Array
+  attribute :currently_active_duty, Types::Nominal::Bool
   attribute :currently_active_duty_hash, Hash
-  attribute :va_compensation_type, String
-  attribute :vic_verified, Boolean
-  attribute :service_branches, Array[String]
-  attribute :service_periods, Array
-  attribute :guard_reserve_service_history, Array[FormDate]
+  attribute :va_compensation_type, Types::Coercible::String
+  attribute :vic_verified, Types::Nominal::Bool
+  attribute :service_branches, Types::Coercible::Array
+  attribute :service_periods, Types::Coercible::Array
+  attribute :guard_reserve_service_history, Types::Coercible::Array
   attribute :latest_guard_reserve_service_period, FormDate
 end
 
-class FormAddress
-  include Virtus.model
+class FormAddress < Dry::Struct
+  # include Virtus.model
 
-  attribute :street
-  attribute :street2
-  attribute :city
-  attribute :state
-  attribute :country
-  attribute :postal_code
+  attribute :street, Types::Coercible::String
+  attribute :street2, Types::Coercible::String
+  attribute :city, Types::Coercible::String
+  attribute :state, Types::Coercible::String
+  attribute :country, Types::Coercible::String
+  attribute :postal_code, Types::Coercible::String
 end
 
-class FormIdentityInformation
-  include Virtus.model
+class FormIdentityInformation < Dry::Struct
+  # include Virtus.model
 
   attribute :full_name, FormFullName
-  attribute :date_of_birth, Date
-  attribute :gender, String
-  attribute :ssn
+  attribute :date_of_birth, Types::Nominal::Date
+  attribute :gender, Types::Coercible::String
+  attribute :ssn, Types::Coercible::String
 
   def hyphenated_ssn
     StringHelpers.hyphenated_ssn(ssn)
   end
 end
 
-class FormContactInformation
-  include Virtus.model
+class FormContactInformation < Dry::Struct
+  # include Virtus.model
 
   attribute :address, FormAddress
-  attribute :home_phone, String
-  attribute :us_phone, String
-  attribute :mobile_phone, String
-  attribute :email, String
+  attribute :home_phone, Types::Coercible::String
+  attribute :us_phone, Types::Coercible::String
+  attribute :mobile_phone, Types::Coercible::String
+  attribute :email, Types::Coercible::String
 end
 
-class FormProfile
-  include Virtus.model
+class FormProfile < Dry::Struct
+  # include Virtus.model
   include SentryLogging
 
   EMIS_PREFILL_KEY = 'emis_prefill'

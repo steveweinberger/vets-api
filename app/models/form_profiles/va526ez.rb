@@ -3,62 +3,63 @@
 module VA526ez
   FORM_ID = '21-526EZ'
 
-  class FormSpecialIssue
-    include Virtus.model
+  class FormSpecialIssue < Dry::Struct
+    # include Virtus.model
 
-    attribute :code, String
-    attribute :name, String
+    attribute :code, Types::Coercible::String
+    attribute :name, Types::Coercible::String
   end
 
-  class FormRatedDisability
-    include Virtus.model
+  class FormRatedDisability < Dry::Struct
+    # include Virtus.model
 
-    attribute :name, String
-    attribute :rated_disability_id, String
-    attribute :rating_decision_id, String
-    attribute :diagnostic_code, Integer
-    attribute :decision_code, String
-    attribute :decision_text, String
-    attribute :rating_percentage, Integer
+    attribute :name, Types::Coercible::String
+    attribute :rated_disability_id, Types::Coercible::String
+    attribute :rating_decision_id, Types::Coercible::String
+    attribute :diagnostic_code, Types::Coercible::Integer
+    attribute :decision_code, Types::Coercible::String
+    attribute :decision_text, Types::Coercible::String
+    attribute :rating_percentage, Types::Coercible::Integer
   end
 
-  class FormRatedDisabilities
-    include Virtus.model
+  class FormRatedDisabilities < Dry::Struct
+    # include Virtus.model
 
-    attribute :rated_disabilities, Array[FormRatedDisability]
+    # attribute :rated_disabilities, Types::Coercible::Array[FormRatedDisability]
+    attribute :rated_disabilities, Types::Coercible::Array
   end
 
-  class FormPaymentAccountInformation
-    include Virtus.model
+  class FormPaymentAccountInformation < Dry::Struct
+    # include Virtus.model
 
-    attribute :account_type, String
-    attribute :account_number, String
-    attribute :routing_number, String
-    attribute :bank_name, String
+    attribute :account_type, Types::Coercible::String
+    attribute :account_number, Types::Coercible::String
+    attribute :routing_number, Types::Coercible::String
+    attribute :bank_name, Types::Coercible::String
   end
 
-  class FormAddress
-    include Virtus.model
+  class FormAddress < Dry::Struct
+    # include Virtus.model
 
-    attribute :country
-    attribute :city
-    attribute :state
-    attribute :zip_code
-    attribute :address_line_1
-    attribute :address_line_2
-    attribute :address_line_3
+    attribute :country, Types::Coercible::String
+    attribute :city, Types::Coercible::String
+    attribute :state, Types::Coercible::String
+    attribute :zip_code, Types::Coercible::String
+    attribute :address_line_1, Types::Coercible::String
+    attribute :address_line_2, Types::Coercible::String
+    attribute :address_line_3, Types::Coercible::String
   end
 
-  class FormContactInformation
-    include Virtus.model
+  class FormContactInformation < Dry::Struct
+    # include Virtus.model
 
     attribute :mailing_address, FormAddress
-    attribute :primary_phone, String
-    attribute :email_address, String
+    attribute :primary_phone, Types::Coercible::String
+    attribute :email_address, Types::Coercible::String
   end
 
-  class FormVeteranContactInformation
-    include Virtus.model
+  class FormVeteranContactInformation < Dry::Struct
+    # include Virtus.model
 
     attribute :veteran, FormContactInformation
   end
