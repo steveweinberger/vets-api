@@ -2,10 +2,10 @@
 <!-- Please include a description of the change. What would a code reviewer, or a future dev, need to know about this PR in order to understand why this PR is necessary. This could include dependencies introduced, changes in behavior, pointers to more detailed documentation -->
 
 ## Testing done
-<!-- Please describe testing done to verify the changes. -->
+<!-- Please describe testing done to verify the changes.  -->
 
 ## Testing planned
-<!-- Please describe testing planned. -->
+<!-- Please describe testing planned.  List any new/updated automated tests that will run in CI/CD pipelines.  -->
 
 ## Acceptance Criteria (Definition of Done)
 
