@@ -4,8 +4,6 @@ require 'common/models/type'
 
 # TODO(AJD): Virtus POROs for now, will become ActiveRecord when the profile is persisted
 class FormFullName < Dry::Struct
-  # include Virtus.model
-
   attribute :first, Types::Coercible::String
   attribute :middle, Types::Coercible::String
   attribute :last, Types::Coercible::String
@@ -13,15 +11,11 @@ class FormFullName < Dry::Struct
 end
 
 class FormDate < Dry::Struct
-  # include Virtus.model
-
   attribute :from, Types::Nominal::Date
   attribute :to, Types::Nominal::Date
 end
 
 class FormMilitaryInformation < Dry::Struct
-  # include Virtus.model
-
   attribute :post_nov_1998_combat, Types::Nominal::Bool
   attribute :last_service_branch, Types::Coercible::String
   attribute :hca_last_service_branch, Types::Coercible::String
@@ -35,7 +29,7 @@ class FormMilitaryInformation < Dry::Struct
   attribute :receives_va_pension, Types::Nominal::Bool
   attribute :tours_of_duty, Types::Coercible::Array
   attribute :currently_active_duty, Types::Nominal::Bool
-  attribute :currently_active_duty_hash, Hash
+  attribute :currently_active_duty_hash, Types::Coercible::Hash
   attribute :va_compensation_type, Types::Coercible::String
   attribute :vic_verified, Types::Nominal::Bool
   attribute :service_branches, Types::Array.of(Types::Coercible::String)
@@ -45,8 +39,6 @@ class FormMilitaryInformation < Dry::Struct
 end
 
 class FormAddress < Dry::Struct
-  # include Virtus.model
-
   attribute :street, Types::Coercible::String
   attribute :street2, Types::Coercible::String
   attribute :city, Types::Coercible::String
@@ -56,8 +48,6 @@ class FormAddress < Dry::Struct
 end
 
 class FormIdentityInformation < Dry::Struct
-  # include Virtus.model
-
   attribute :full_name, FormFullName
   attribute :date_of_birth, Types::Nominal::Date
   attribute :gender, Types::Coercible::String
@@ -69,8 +59,6 @@ class FormIdentityInformation < Dry::Struct
 end
 
 class FormContactInformation < Dry::Struct
-  # include Virtus.model
-
   attribute :address, FormAddress
   attribute :home_phone, Types::Coercible::String
   attribute :us_phone, Types::Coercible::String
@@ -79,7 +67,6 @@ class FormContactInformation < Dry::Struct
 end
 
 class FormProfile < Dry::Struct
-  # include Virtus.model
   include SentryLogging
 
   EMIS_PREFILL_KEY = 'emis_prefill'

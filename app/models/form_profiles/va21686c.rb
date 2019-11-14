@@ -8,8 +8,6 @@ end
 
 module VA21686c
   class FormAddress < Dry::Struct
-    # include Virtus.model
-
     attribute :address_type, ScrubbedString
     attribute :street, ScrubbedString
     attribute :street2, ScrubbedString
@@ -24,16 +22,12 @@ module VA21686c
   end
 
   class FormFullName < Dry::Struct
-    # include Virtus.model
-
     attribute :first, ScrubbedString
     attribute :middle, ScrubbedString
     attribute :last, ScrubbedString
   end
 
   class FormLocation < Dry::Struct
-    # include Virtus.model
-
     attribute :country_dropdown, ScrubbedString
     attribute :country_text, ScrubbedString
     attribute :city, ScrubbedString
@@ -41,8 +35,6 @@ module VA21686c
   end
 
   class FormDependent < Dry::Struct
-    # include Virtus.model
-
     attribute :full_name, VA21686c::FormFullName
     attribute :child_date_of_birth, ScrubbedString
     attribute :child_in_household, Types::Nominal::Bool
@@ -57,16 +49,12 @@ module VA21686c
   end
 
   class FormMarriage < Dry::Struct
-    # include Virtus.model
-
     attribute :date_of_marriage, ScrubbedString
     attribute :location_of_marriage, VA21686c::FormLocation
     attribute :spouse_full_name, VA21686c::FormFullName
   end
 
   class FormCurrentMarriage < Dry::Struct
-    # include Virtus.model
-
     attribute :spouse_social_security_number, ScrubbedString
     attribute :spouse_has_no_ssn, Types::Nominal::Bool
     attribute :spouse_has_no_ssn_reason, ScrubbedString
@@ -77,8 +65,6 @@ module VA21686c
   end
 
   class FormContactInformation < Dry::Struct
-    # include Virtus.model
-
     attribute :veteran_address, VA21686c::FormAddress
     attribute :veteran_full_name, VA21686c::FormFullName
     attribute :veteran_email, ScrubbedString

@@ -4,15 +4,11 @@ module VA526ez
   FORM_ID = '21-526EZ'
 
   class FormSpecialIssue < Dry::Struct
-    # include Virtus.model
-
     attribute :code, Types::Coercible::String
     attribute :name, Types::Coercible::String
   end
 
   class FormRatedDisability < Dry::Struct
-    # include Virtus.model
-
     attribute :name, Types::Coercible::String
     attribute :rated_disability_id, Types::Coercible::String
     attribute :rating_decision_id, Types::Coercible::String
@@ -23,14 +19,10 @@ module VA526ez
   end
 
   class FormRatedDisabilities < Dry::Struct
-    # include Virtus.model
-
     attribute :rated_disabilities, Types::Array.of(FormRatedDisability)
   end
 
   class FormPaymentAccountInformation < Dry::Struct
-    # include Virtus.model
-
     attribute :account_type, Types::Coercible::String
     attribute :account_number, Types::Coercible::String
     attribute :routing_number, Types::Coercible::String
@@ -38,8 +30,6 @@ module VA526ez
   end
 
   class FormAddress < Dry::Struct
-    # include Virtus.model
-
     attribute :country, Types::Coercible::String
     attribute :city, Types::Coercible::String
     attribute :state, Types::Coercible::String
@@ -50,16 +40,12 @@ module VA526ez
   end
 
   class FormContactInformation < Dry::Struct
-    # include Virtus.model
-
     attribute :mailing_address, FormAddress
     attribute :primary_phone, Types::Coercible::String
     attribute :email_address, Types::Coercible::String
   end
 
   class FormVeteranContactInformation < Dry::Struct
-    # include Virtus.model
-
     attribute :veteran, FormContactInformation
   end
 end
