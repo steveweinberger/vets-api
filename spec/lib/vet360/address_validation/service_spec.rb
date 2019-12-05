@@ -16,6 +16,9 @@ describe Vet360::AddressValidation::Service do
 
   let(:invalid_address) do
     base_address.address_line1 = 'sdfdsfsdf'
+    base_address.city = 'Sparks Glencoe'
+    base_address.state_code = 'MD'
+    base_address.zip_code = '21152'
     base_address
   end
 
