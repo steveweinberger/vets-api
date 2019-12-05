@@ -5,7 +5,7 @@ http_interactions:
     uri: https://dev-api.va.gov/services/address_validation/v1/candidate
     body:
       encoding: UTF-8
-      string: '{"requestAddress":{"addressLine1":"sdfdsfsdf","city":"Washington","requestCountry":{"countryCode":"USA"},"stateProvince":{"code":"DC"},"zipCode5":"20011"}}'
+      string: '{"requestAddress":{"addressLine1":"sdfdsfsdf","city":"Sparks Glencoe","requestCountry":{"countryCode":"USA"},"addressPOU":"RESIDENCE/CHOICE","stateProvince":{"code":"MD"},"zipCode5":"21152"}}'
     headers:
       Accept:
       - application/json
@@ -21,15 +21,15 @@ http_interactions:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
   response:
     status:
-      code: 404
+      code: 200
       message: ''
     headers:
       Date:
-      - Thu, 10 Oct 2019 10:45:56 GMT
+      - Thu, 05 Dec 2019 15:58:01 GMT
       Content-Type:
       - application/json;charset=UTF-8
-      Transfer-Encoding:
-      - chunked
+      Content-Length:
+      - '2'
       Connection:
       - keep-alive
       Server:
@@ -40,8 +40,9 @@ http_interactions:
       - '0'
       Pragma:
       - no-cache
+      - no-cache
       Vet360txauditid:
-      - 17acb301-9a6b-497a-bec1-6a8f70429853
+      - c0f64bb7-384f-4488-94ff-be079f238b63
       Via:
       - kong/1.2.2
       X-Content-Type-Options:
@@ -51,7 +52,7 @@ http_interactions:
       X-Kong-Proxy-Latency:
       - '1'
       X-Kong-Upstream-Latency:
-      - '141'
+      - '118'
       X-Ratelimit-Limit-Edge-Gateway-Address-Validation-Vagovli-Address-V1-Candidate-Address:
       - '500'
       X-Ratelimit-Limit-Minute:
@@ -72,10 +73,11 @@ http_interactions:
       - 1; mode=block
       Strict-Transport-Security:
       - max-age=31536000; includeSubDomains; preload
+      Cache-Control:
+      - no-cache, no-store
     body:
-      encoding: ASCII-8BIT
-      string: '{"messages":[{"code":"ADDRVAL108","key":"CandidateAddressNotFound","severity":"INFO","text":"No
-        Candidate Address Found "}]}'
+      encoding: UTF-8
+      string: "{}"
     http_version: 
-  recorded_at: Thu, 10 Oct 2019 10:45:56 GMT
+  recorded_at: Thu, 05 Dec 2019 15:58:01 GMT
 recorded_with: VCR 3.0.3

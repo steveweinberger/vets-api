@@ -115,14 +115,12 @@ describe Vet360::AddressValidation::Service do
 
   describe '#candidate' do
     context 'with an invalid address' do
-      it 'returns an error' do
+      it 'returns an empty hash' do
         VCR.use_cassette(
-          'vet360/address_validation/candidate_no_match2',
-          record: :once
+          'vet360/address_validation/candidate_no_match',
+          VCR::MATCH_EVERYTHING
         ) do
-          expect { described_class.new.candidate(invalid_address) }.to raise_error(
-            Common::Exceptions::BackendServiceException
-          )
+          expect(described_class.new.candidate(invalid_address)).to eq({})
         end
       end
     end
@@ -131,45 +129,32 @@ describe Vet360::AddressValidation::Service do
       context 'with multiple matches' do
         it 'returns suggested addresses for a given address' do
           VCR.use_cassette(
-            'vet360/address_validation/candidate_multiple_matches2',
-            record: :once
+            'vet360/address_validation/candidate_multiple_matches',
+            VCR::MATCH_EVERYTHING
           ) do
             res = described_class.new.candidate(multiple_match_addr)
             expect(res).to eq(
-              'candidate_addresses' =>
-               [{ 'address' =>
-                  { 'county' => { 'name' => 'Kings', 'county_fips_code' => '36047' },
-                    'state_province' => { 'name' => 'New York', 'code' => 'NY' },
-                    'country' => { 'name' => 'USA', 'code' => 'USA',
-                                   'fips_code' => 'US', 'iso2_code' => 'US', 'iso3_code' => 'USA' },
-                    'address_line1' => '37 N 1st St',
-                    'city' => 'Brooklyn',
-                    'zip_code5' => '11249',
-                    'zip_code4' => '3939' },
-                  'geocode' => { 'calc_date' => '2019-10-14T11:21:44+00:00', 'location_precision' => 31.0,
-                                 'latitude' => 40.717018, 'longitude' => -73.964935 },
-                  'address_meta_data' =>
-                  { 'confidence_score' => 100.0, 'address_type' => 'Domestic',
-                    'delivery_point_validation' => 'UNDELIVERABLE',
-                    'validation_key' => -1_384_531_381 } },
-                { 'address' =>
-                  { 'county' => { 'name' => 'Kings', 'county_fips_code' => '36047' },
-                    'state_province' => { 'name' => 'New York', 'code' => 'NY' },
-                    'country' => { 'name' => 'USA', 'code' => 'USA',
-                                   'fips_code' => 'US', 'iso2_code' => 'US', 'iso3_code' => 'USA' },
-                    'address_line1' => '37 S 1st St',
-                    'city' => 'Brooklyn',
-                    'zip_code5' => '11249',
-                    'zip_code4' => '4101' },
-                  'geocode' => { 'calc_date' => '2019-10-14T11:21:44+00:00',
-                                 'location_precision' => 31.0, 'latitude' => 40.715383,
-                                 'longitude' => -73.965421 },
-                  'address_meta_data' =>
-                  { 'confidence_score' => 100.0,
-                    'address_type' => 'Domestic',
-                    'delivery_point_validation' => 'CONFIRMED',
-                    'residential_delivery_indicator' => 'MIXED',
-                    'validation_key' => 2_017_396_678 } }]
+              {"candidate_addresses"=>
+              [{"address"=>
+                 {"county"=>{"name"=>"Kings", "county_fips_code"=>"36047"},
+                  "state_province"=>{"name"=>"New York", "code"=>"NY"},
+                  "country"=>{"name"=>"United States", "code"=>"USA", "fips_code"=>"US", "iso2_code"=>"US", "iso3_code"=>"USA"},
+                  "address_line1"=>"37 N 1st St",
+                  "city"=>"Brooklyn",
+                  "zip_code5"=>"11249",
+                  "zip_code4"=>"3939"},
+                "geocode"=>{"calc_date"=>"2019-12-05T15:59:36+00:00", "location_precision"=>31.0, "latitude"=>40.717029, "longitude"=>-73.964956},
+                "address_meta_data"=>{"confidence_score"=>100.0, "address_type"=>"Domestic", "delivery_point_validation"=>"UNDELIVERABLE", "validation_key"=>-646932106}},
+               {"address"=>
+                 {"county"=>{"name"=>"Kings", "county_fips_code"=>"36047"},
+                  "state_province"=>{"name"=>"New York", "code"=>"NY"},
+                  "country"=>{"name"=>"United States", "code"=>"USA", "fips_code"=>"US", "iso2_code"=>"US", "iso3_code"=>"USA"},
+                  "address_line1"=>"37 S 1st St",
+                  "city"=>"Brooklyn",
+                  "zip_code5"=>"11249",
+                  "zip_code4"=>"4101"},
+                "geocode"=>{"calc_date"=>"2019-12-05T15:59:36+00:00", "location_precision"=>31.0, "latitude"=>40.715367, "longitude"=>-73.965369},
+                "address_meta_data"=>{"confidence_score"=>100.0, "address_type"=>"Domestic", "delivery_point_validation"=>"CONFIRMED", "residential_delivery_indicator"=>"MIXED", "validation_key"=>-646932106}}]}
             )
           end
         end
