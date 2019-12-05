@@ -19,7 +19,7 @@ pipeline {
   }
 
   agent {
-    label 'vetsgov-general-purpose'
+    label 'vetsgov-worker'
   }
 
   stages {
