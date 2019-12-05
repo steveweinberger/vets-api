@@ -131,8 +131,8 @@ describe Vet360::AddressValidation::Service do
       context 'with multiple matches' do
         it 'returns suggested addresses for a given address' do
           VCR.use_cassette(
-            'vet360/address_validation/candidate_multiple_matches',
-            VCR::MATCH_EVERYTHING
+            'vet360/address_validation/candidate_multiple_matches2',
+            record: :once
           ) do
             res = described_class.new.candidate(multiple_match_addr)
             expect(res).to eq(
