@@ -113,8 +113,8 @@ describe Vet360::AddressValidation::Service do
     context 'with an invalid address' do
       it 'returns an empty hash' do
         VCR.use_cassette(
-          'vet360/address_validation/candidate_no_match',
-          VCR::MATCH_EVERYTHING
+          'vet360/address_validation/candidate_no_match2',
+          record: :once
         ) do
           expect(described_class.new.candidate(invalid_address)).to eq({})
         end
