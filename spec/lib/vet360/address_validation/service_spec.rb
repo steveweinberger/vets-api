@@ -14,14 +14,6 @@ describe Vet360::AddressValidation::Service do
     base_address
   end
 
-  let(:invalid_address) do
-    base_address.address_line1 = 'sdfdsfsdf'
-    base_address.city = 'Sparks Glencoe'
-    base_address.state_code = 'MD'
-    base_address.zip_code = '21152'
-    base_address
-  end
-
   let(:multiple_match_addr) do
     build(:vet360_validation_address, :multiple_matches)
   end
@@ -76,11 +68,10 @@ describe Vet360::AddressValidation::Service do
     context 'with an invalid address' do
       it 'returns an error' do
         VCR.use_cassette(
-          'vet360/address_validation/validate_no_match',
-          VCR::MATCH_EVERYTHING
+          'vet360/address_validation/validate_no_match2',
+          record: :once
         ) do
-          binding.pry; fail
-          expect { described_class.new.validate(invalid_address) }.to raise_error(
+          expect { described_class.new.validate(base_address) }.to raise_error(
             Common::Exceptions::BackendServiceException
           )
         end
