@@ -68,8 +68,8 @@ describe Vet360::AddressValidation::Service do
     context 'with an invalid address' do
       it 'returns an error' do
         VCR.use_cassette(
-          'vet360/address_validation/validate_no_match2',
-          record: :once
+          'vet360/address_validation/validate_no_match',
+          VCR::MATCH_EVERYTHING
         ) do
           expect { described_class.new.validate(base_address) }.to raise_error(
             Common::Exceptions::BackendServiceException
