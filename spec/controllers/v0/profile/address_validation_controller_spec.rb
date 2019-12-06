@@ -16,13 +16,11 @@ RSpec.describe V0::Profile::AddressValidationController, type: :controller do
   describe '#create' do
     context 'with an invalid address' do
       it 'returns an error' do
-        address.address_line1 = 'sdfdsfsdf'
-
         VCR.use_cassette(
           'vet360/address_validation/validate_no_match',
           VCR::MATCH_EVERYTHING
         ) do
-          post(:create, params: { address: address.to_h })
+          post(:create, params: { address: build(:vet360_validation_address).to_h })
 
           expect(JSON.parse(response.body)).to eq(
             'errors' =>
