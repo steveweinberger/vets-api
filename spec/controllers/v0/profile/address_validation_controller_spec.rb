@@ -16,42 +16,16 @@ RSpec.describe V0::Profile::AddressValidationController, type: :controller do
   describe '#create' do
     context 'with an invalid address' do
       it 'returns an error' do
-        VCR.use_cassette(
-          'vet360/address_validation/validate_no_match',
-          VCR::MATCH_EVERYTHING
-        ) do
-          post(:create, params: { address: build(:vet360_validation_address).to_h })
+        post(:create, params: { address: build(:vet360_validation_address).to_h })
 
-          expect(JSON.parse(response.body)).to eq(
-            'errors' =>
-             [{ 'title' => 'Address Validation Error',
-                'detail' =>
-                { 'address' =>
-                  { 'state_province' => { 'name' => 'District Of Colunbia', 'code' => 'DC' },
-                    'country' => { 'name' => 'USA', 'code' => 'USA',
-                                   'fips_code' => 'US', 'iso2_code' => 'US', 'iso3_code' => 'USA' },
-                    'address_line1' => 'Sdfdsfsdf',
-                    'city' => 'Washington',
-                    'zip_code5' => '20011' },
-                  'geocode' => { 'calc_date' => '2019-10-15T07:21:23+00:00',
-                                 'location_precision' => 0.0, 'latitude' => 38.9525,
-                                 'longitude' => -77.0202 },
-                  'address_meta_data' =>
-                  { 'confidence_score' => 0.0,
-                    'address_type' => 'Unknown',
-                    'delivery_point_validation' => 'MISSING_ZIP',
-                    'validation_key' => 1_008_171_488 },
-                  'messages' => [
-                    { 'code' => 'ADDRVAL112',
-                      'key' => 'AddressCouldNotBeFound',
-                      'severity' => 'ERROR',
-                      'text' => 'The Address could not be found' }
-                  ] },
-                'code' => 'VET360_AV_ERROR',
-                'status' => '400' }]
-          )
-          expect(response.status).to eq(400)
-        end
+        expect(response.code).to eq('422')
+        expect(JSON.parse(response.body)).to eq(
+          {"errors"=>
+            [{"title"=>"Address line1 can't be blank", "detail"=>"address-line1 - can't be blank", "code"=>"100", "source"=>{"pointer"=>"data/attributes/address-line1"}, "status"=>"422"},
+             {"title"=>"City can't be blank", "detail"=>"city - can't be blank", "code"=>"100", "source"=>{"pointer"=>"data/attributes/city"}, "status"=>"422"},
+             {"title"=>"State code can't be blank", "detail"=>"state-code - can't be blank", "code"=>"100", "source"=>{"pointer"=>"data/attributes/state-code"}, "status"=>"422"},
+             {"title"=>"Zip code can't be blank", "detail"=>"zip-code - can't be blank", "code"=>"100", "source"=>{"pointer"=>"data/attributes/zip-code"}, "status"=>"422"}]}
+        )
       end
     end
 
