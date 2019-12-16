@@ -97,8 +97,7 @@ Rails.application.routes.draw do
     get 'limited', to: 'example#limited', as: :limited
     get 'status', to: 'admin#status'
 
-    get 'dalc/hab/:id', to: 'dalc#hab', as: :dalc
-
+    get 'dlc/orderstatus/:id/:type', to: 'dlc#OrderStatus'
 
     get 'ppiu/payment_information', to: 'ppiu#index'
     put 'ppiu/payment_information', to: 'ppiu#update'
