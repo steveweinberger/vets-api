@@ -34,7 +34,7 @@ module V0
        else
           h = h["data"]["atrributes"].select {|h1| h1['Recipient']== participandID}
        end
-        h = "{\"data\":{\"atrributes\":" + h.to_json + "}}"
+        #h = "{\"data\":{\"atrributes\":" + h.to_json + "}}"
         render json: h
         #render participandID
     end
