@@ -15,6 +15,8 @@ module BipClaims
           'veteranFullName',
           'veteranDateOfBirth'
         )
+      else
+        raise ArgumentError, "Unsupported form id: #{claim.form_id}"
       end
 
       BipClaims::Veteran.new(
@@ -28,10 +30,13 @@ module BipClaims
 
     def lookup_veteran_from_mvi(claim)
       veteran = MVI::AttrService.new.find_profile(veteran_attributes(claim))
-      mvi_stats_key = veteran&.participantId ? 'hit' : 'miss'
-      StatsD.increment("api.bip_claims.mvi_lookup_#{mvi_stats_key}")
-    rescue MVI::Errors::Base
-      StatsD.increment("api.bip_claims.mvi_lookup_error")
+
+      if veteran.profile&.participant_id
+        StatsD.increment("#{STATSD_KEY_PREFIX}.mvi_lookup_hit")
+        veteran.profile
+      else
+        StatsD.increment("#{STATSD_KEY_PREFIX}.mvi_lookup_miss")
+      end
     end
 
     def create_claim(form_data)
