@@ -123,7 +123,9 @@ module AuthenticationAndSSOConcerns
       'myhealthevet' => 'my_healthe_vet',
       'dslogon' => 'ds_logon',
       'idme' => 'id_me',
-      'ssoe' => 'ssoe'
+      # SSOe is not a credential, so this doesn't really make sense here.
+      # TODO see if there's other similar logic that can be stripped from SSOe login
+      # 'ssoe' => 'ssoe'
     }.fetch(@current_user.identity.sign_in.fetch(:service_name))
   end
 
