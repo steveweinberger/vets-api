@@ -42,6 +42,22 @@ RSpec.describe 'Disability Rating API endpoint', type: :request, skip_emis: true
         end
       end
     end
+
+    it 'signs the response with the jwt stuff', focus: true do
+      with_okta_configured do
+        VCR.use_cassette('evss/disability_compensation_form/rated_disabilities') do
+          get '/services/veteran_verification/v0/disability_rating', params: nil, headers: auth_header.merge({'Accept' => 'application/jwt'})
+          rsa_public = OpenSSL::PKey::RSA.new(File.read(Rails.root.join('jwt_test_key.pub')))
+
+          decoded_response = JWT.decode(response.body, rsa_public, true, { algorithm: 'RS256' })
+          expect(decoded_response.first.keys.include?('cty')).to be_truthy
+          expect(response).to have_http_status(:ok)
+          expect(response.body).to be_a(String)
+          expect(response).to match_response_schema('disability_rating_response')
+        end
+      end
+    end
+
   end
 
   context 'with a 500 response' do

@@ -5,13 +5,23 @@ require_dependency 'veteran_verification/application_controller'
 module VeteranVerification
   module V0
     class DisabilityRatingController < ApplicationController
+      include ActionController::MimeResponds
+
       before_action { authorize :evss, :access? }
       before_action { permit_scopes %w[disability_rating.read] }
 
       def index
         response = service.get_rated_disabilities
-        render json: response.rated_disabilities,
+
+        respond_to do |format|
+          format.json do
+            render json: response.rated_disabilities,
                each_serializer: VeteranVerification::DisabilityRatingSerializer
+          end
+          format.jwt do
+            render jwt: 
+          end
+        end
       end
 
       private
