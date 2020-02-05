@@ -22,12 +22,12 @@ module Search2
     end
 
     # GETs a list of search results from Search.gov web results API
-    # @return [Search::ResultsResponse] wrapper around results data
+    # @return results data
     #
     def search(query, page = 1)
       with_monitoring do
         response = perform(:get, 'search', search_params(query, params))
-        # Search::ResultsResponse.from(response)
+        # return response as Hash (or something else json-able)
       end
     end
 
