@@ -310,6 +310,13 @@ Rails.application.routes.draw do
     mount VeteranConfirmation::Engine, at: '/veteran_confirmation'
   end
 
+  scope '/services', module: 'external_api' do
+    scope '/search' do
+      # resource :search, only: [:show]
+      get 'search', to: 'search#show'
+    end
+  end
+
   mount VAOS::Engine, at: '/v0/vaos'
 
   if Rails.env.development? || Settings.sidekiq_admin_panel
