@@ -145,6 +145,10 @@ module SAML
       @query_params[:RelayState] = relay_state_params
       new_url_settings = url_settings
       new_url_settings.authn_context = link_authn_context
+      # if link_authn_context == LOA::IDME_LOA3
+      #   new_url_settings.force_authn = true
+      #   binding.pry
+      # end
       saml_auth_request = OneLogin::RubySaml::Authrequest.new
       saml_auth_request.create(new_url_settings, query_params)
     end
