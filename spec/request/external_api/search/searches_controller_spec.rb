@@ -9,10 +9,10 @@ RSpec.describe "ExternalApi::Search::SearchesController", type: :request do
 
   describe 'GET /services/search/search' do
     context 'with a 200 response' do
-      it 'matches the search schema', :aggregate_failures do
+      fit 'matches the search schema', :aggregate_failures do
         VCR.use_cassette('search/success') do
           get '/services/search/search', params: { query: 'benefits' }
-
+          results = JSON.parse(response.body)
           expect(response).to have_http_status(:ok)
           expect(response).to match_response_schema('search')
         end

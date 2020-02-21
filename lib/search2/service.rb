@@ -26,12 +26,20 @@ module Search2
     #
     def search(query, page = 1)
       with_monitoring do
-        # pass on the json response
-        perform(:get, 'search', search_params(query, params)).body
+        response = perform(:get, search_path, search_params(query, page))
+        # TODO - WIP need type and id key, can check in search_request_spec
+        {
+          data: { attributes: { body: response.body } },
+          meta: { pagination: 1 }
+        }
       end
     end
 
     private
+
+    def search_path
+      config.base_path
+    end
 
     # Required params [affiliate, access_key, query]
     # Optional params [enable_highlighting, limit, offset, sort_by]

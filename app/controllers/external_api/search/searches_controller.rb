@@ -2,6 +2,8 @@
 
 module ExternalApi::Search
   class SearchesController < ApplicationController
+    skip_before_action :authenticate
+
     def show
       search_result = search_service.search(params['query'])
       render json: search_result
