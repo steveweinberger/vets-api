@@ -26,8 +26,8 @@ module Search2
     #
     def search(query, page = 1)
       with_monitoring do
-        response = perform(:get, 'search', search_params(query, params))
-        # return response as Hash (or something else json-able)
+        # pass on the json response
+        perform(:get, 'search', search_params(query, params)).body
       end
     end
 
