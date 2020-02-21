@@ -3,17 +3,17 @@
 require 'rails_helper'
 require 'support/error_details'
 
-RSpec.describe ExternalApi::SearchController, type: :request do
+RSpec.describe "ExternalApi::SearchController", type: :request do
   include SchemaMatchers
   include ErrorDetails
 
+  xit 'TODO "uninitialized constant ExternalApi::SearchController" :('
 
-
-  describe 'GET /v0/search' do
+  describe 'GET /services/search/search' do
     context 'with a 200 response' do
       it 'matches the search schema', :aggregate_failures do
         VCR.use_cassette('search/success') do
-          get '/v0/search', params: { query: 'benefits' }
+          get '/services/search/search', params: { query: 'benefits' }
 
           expect(response).to have_http_status(:ok)
           expect(response).to match_response_schema('search')
@@ -22,7 +22,7 @@ RSpec.describe ExternalApi::SearchController, type: :request do
 
       it 'returns an array of hash search results in its body', :aggregate_failures do
         VCR.use_cassette('search/success') do
-          get '/v0/search', params: { query: 'benefits' }
+          get '/services/search/search', params: { query: 'benefits' }
 
           body    = JSON.parse response.body
           results = body.dig('data', 'attributes', 'body', 'web', 'results')
@@ -38,7 +38,7 @@ RSpec.describe ExternalApi::SearchController, type: :request do
     context 'with an empty query string' do
       it 'matches the errors schema', :aggregate_failures do
         VCR.use_cassette('search/empty_query') do
-          get '/v0/search', params: { query: '' }
+          get '/services/search/search', params: { query: '' }
 
           expect(response).to have_http_status(:bad_request)
           expect(response).to match_response_schema('errors')
@@ -54,7 +54,7 @@ RSpec.describe ExternalApi::SearchController, type: :request do
 
           expect(Search::Service).to receive(:new).with(sanitized_params, '2')
 
-          get '/v0/search', params: { query: dirty_params, page: 2 }
+          get '/services/search/search', params: { query: dirty_params, page: 2 }
         end
       end
     end
@@ -67,7 +67,7 @@ RSpec.describe ExternalApi::SearchController, type: :request do
           it 'passes the page request to the search service object' do
             expect(Search::Service).to receive(:new).with(query_term, '2')
 
-            get '/v0/search', params: { query: query_term, page: 2 }
+            get '/services/search/search', params: { query: query_term, page: 2 }
           end
         end
 
@@ -75,7 +75,7 @@ RSpec.describe ExternalApi::SearchController, type: :request do
           it 'passes page=nil to the search service object' do
             expect(Search::Service).to receive(:new).with(query_term, nil)
 
-            get '/v0/search', params: { query: query_term }
+            get '/services/search/search', params: { query: query_term }
           end
         end
       end
