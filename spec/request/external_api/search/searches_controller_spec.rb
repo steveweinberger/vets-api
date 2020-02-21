@@ -3,11 +3,9 @@
 require 'rails_helper'
 require 'support/error_details'
 
-RSpec.describe "ExternalApi::SearchController", type: :request do
+RSpec.describe "ExternalApi::Search::SearchesController", type: :request do
   include SchemaMatchers
   include ErrorDetails
-
-  xit 'TODO "uninitialized constant ExternalApi::SearchController" :('
 
   describe 'GET /services/search/search' do
     context 'with a 200 response' do
@@ -52,7 +50,7 @@ RSpec.describe "ExternalApi::SearchController", type: :request do
           dirty_params     = '<script>alert(document.cookie);</script>'
           sanitized_params = 'alert(document.cookie);'
 
-          expect(Search::Service).to receive(:new).with(sanitized_params, '2')
+          expect(Search2::Service).to receive(:new).with(sanitized_params, '2')
 
           get '/services/search/search', params: { query: dirty_params, page: 2 }
         end
@@ -65,7 +63,7 @@ RSpec.describe "ExternalApi::SearchController", type: :request do
       context 'when the endpoint is being called' do
         context 'with a page' do
           it 'passes the page request to the search service object' do
-            expect(Search::Service).to receive(:new).with(query_term, '2')
+            expect(Search2::Service).to receive(:new).with(query_term, '2')
 
             get '/services/search/search', params: { query: query_term, page: 2 }
           end
@@ -73,7 +71,7 @@ RSpec.describe "ExternalApi::SearchController", type: :request do
 
         context 'with no page present' do
           it 'passes page=nil to the search service object' do
-            expect(Search::Service).to receive(:new).with(query_term, nil)
+            expect(Search2::Service).to receive(:new).with(query_term, nil)
 
             get '/services/search/search', params: { query: query_term }
           end

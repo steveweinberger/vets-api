@@ -1,9 +1,8 @@
 # frozen_string_literal: true
 
-module ExtrnalApi
-  class SearchController < ApplicationController
+module ExternalApi::Search
+  class SearchesController < ApplicationController
     def show
-      # call `search` on a service object
       search_result = search_service.search(params['query'])
       render json: search_result
     end

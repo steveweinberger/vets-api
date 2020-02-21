@@ -311,9 +311,9 @@ Rails.application.routes.draw do
   end
 
   scope '/services', module: 'external_api' do
-    scope '/search' do
-      # resource :search, only: [:show]
-      get 'search', to: 'search#show'
+    scope '/search', module: 'search' do
+      resource :search, only: [:show]
+      # get 'search', to: 'search#show'
     end
   end
 
