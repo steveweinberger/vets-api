@@ -33,8 +33,14 @@ module Search2
             type: 'search_results_responses',
             attributes: { body: response.body }
           },
-          # TODO figure out what the pagination object is
-          meta: { pagination: 1 }
+          meta: {
+            pagination: {
+              current_page: page,
+              per_page: RESULT_LIMIT,
+              total_pages: 99, # REVIEW can i pull this data from the response?
+              total_entries: 999 # REVIEW can i pull this data from the response?
+            }
+          }
         }
       end
     end
