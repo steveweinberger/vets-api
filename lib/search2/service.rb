@@ -27,9 +27,13 @@ module Search2
     def search(query, page = 1)
       with_monitoring do
         response = perform(:get, search_path, search_params(query, page))
-        # TODO - WIP need type and id key, can check in search_request_spec
         {
-          data: { attributes: { body: response.body } },
+          data: {
+            id: '',
+            type: 'search_results_responses',
+            attributes: { body: response.body }
+          },
+          # TODO figure out what the pagination object is
           meta: { pagination: 1 }
         }
       end
