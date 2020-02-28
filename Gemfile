@@ -109,6 +109,8 @@ gem 'virtus'
 gem 'will_paginate'
 gem 'zero_downtime_migrations'
 
+gem 'vets_api_common', git: 'https://github.com/erluti/vets-api-common', branch: 'master'
+
 group :development do
   gem 'benchmark-ips'
   gem 'guard-rubocop'

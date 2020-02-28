@@ -42,6 +42,31 @@ GIT
       script_utils (= 0.0.4)
 
 GIT
+  remote: https://github.com/erluti/vets-api-common
+  revision: 9a027890c6f2a9814494ec80ff98664b443aaf3d
+  branch: master
+  specs:
+    vets_api_common (0.0.1)
+      actionpack (~> 5.2.4.1)
+      activemodel (~> 5.2.4.1)
+      breakers (~> 0.3.0)
+      carrierwave (~> 0.11)
+      dry-struct (~> 1.2.0)
+      dry-types (~> 1.2.2)
+      faraday (~> 0.17.0)
+      httpclient (~> 2.8.3)
+      mini_magick (~> 4.10.1)
+      oj (~> 3.9.0)
+      ox (= 2.12.0)
+      redis (~> 3.3.5)
+      redis-namespace (~> 1.7.0)
+      sentry-raven (= 2.9.0)
+      statsd-instrument (~> 2.6.0)
+      vcr (~> 5.1.0)
+      virtus (~> 1.0.5)
+      webrick (= 1.6.0)
+
+GIT
   remote: https://github.com/rack/rack.git
   revision: f690bb71425aa31d7b9b3113829af773950d8ab5
   ref: f690bb71425aa31d7b9b3113829af773950d8ab5
@@ -891,6 +916,7 @@ DEPENDENCIES
   veteran!
   veteran_confirmation!
   veteran_verification!
+  vets_api_common!
   vets_json_schema!
   virtus
   web-console
