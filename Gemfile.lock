@@ -43,7 +43,7 @@ GIT
 
 GIT
   remote: https://github.com/erluti/vets-api-common
-  revision: cd41f7068d8f1144c823f9e86ab6728248613dc5
+  revision: a5020437f47f2dbd289003b9b66732958641ad16
   branch: master
   specs:
     vets_api_common (0.0.1)
@@ -499,7 +499,7 @@ GEM
     newrelic_rpm (6.9.0.363)
     nio4r (2.5.2)
     no_proxy_fix (0.1.2)
-    nokogiri (1.10.8)
+    nokogiri (1.10.9)
       mini_portile2 (~> 2.4.0)
     nori (2.6.0)
     notiffany (0.1.3)
@@ -519,7 +519,7 @@ GEM
     overcommit (0.52.1)
       childprocess (>= 0.6.3, < 4)
       iniparse (~> 1.4)
-    ox (2.13.2)
+    ox (2.12.0)
     paper_trail (10.3.1)
       activerecord (>= 4.2)
       request_store (~> 1.1)
