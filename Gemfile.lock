@@ -43,7 +43,7 @@ GIT
 
 GIT
   remote: https://github.com/erluti/vets-api-common
-  revision: a5020437f47f2dbd289003b9b66732958641ad16
+  revision: f2147b25cca858815745e4402b65cea7c1f26de1
   branch: master
   specs:
     vets_api_common (0.0.1)
