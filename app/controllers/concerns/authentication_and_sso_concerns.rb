@@ -7,15 +7,11 @@ module AuthenticationAndSSOConcerns
   include ActionController::RequestForgeryProtection
   include ActionController::Cookies
 
-  def validate_csrf_token?
-    false
-  end
-
   included do
-    before_action :validate_csrf_token!, if: -> { validate_csrf_token? && request.method != 'GET' }
+    before_action :validate_csrf_token!, if: -> { request.method != 'GET' }
     before_action :authenticate
     before_action :set_session_expiration_header
-    after_action :set_csrf_cookie
+    after_action :set_csrf_cookie, if: -> { request.method == 'GET' }
   end
 
   protected
