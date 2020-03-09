@@ -4,14 +4,11 @@
 # to this responsibility alone.
 module AuthenticationAndSSOConcerns
   extend ActiveSupport::Concern
-  include ActionController::RequestForgeryProtection
   include ActionController::Cookies
 
   included do
-    before_action :validate_csrf_token!, if: -> { request.method != 'GET' }
     before_action :authenticate
     before_action :set_session_expiration_header
-    after_action :set_csrf_cookie, if: -> { request.method == 'GET' }
   end
 
   protected
