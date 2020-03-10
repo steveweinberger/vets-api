@@ -6,7 +6,7 @@ require 'saml/responses/login'
 require 'saml/responses/logout'
 
 module V0
-  class SessionsController < VetsApiController
+  class SessionsController < ApplicationController
     REDIRECT_URLS = %w[signup mhv dslogon idme mfa verify slo].freeze
 
     STATSD_SSO_NEW_KEY = 'api.auth.new'
