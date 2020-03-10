@@ -13,16 +13,6 @@ module AuthenticationAndSSOConcerns
 
   protected
 
-  def set_csrf_cookie
-    cookies['X-CSRF-Token'] = form_authenticity_token
-  end
-
-  def validate_csrf_token!
-    if request.headers['X-CSRF-Token'].nil? || request.headers['X-CSRF-Token'] != cookies['X-CSRF-Token']
-      raise ActionController::InvalidAuthenticityToken
-    end
-  end
-
   def authenticate
     validate_session || render_unauthorized
   end
