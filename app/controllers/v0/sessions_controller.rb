@@ -17,9 +17,6 @@ module V0
     STATSD_LOGIN_STATUS = 'api.auth.login'
     STATSD_LOGIN_SHARED_COOKIE = 'api.auth.sso_shared_cookie'
 
-    # REVIEW required should sessions controller set a CSRF token
-    skip_before_action :validate_csrf_token!
-
     # Collection Action: auth is required for certain types of requests
     # @type is set automatically by the routes in config/routes.rb
     # For more details see SAML::SettingsService and SAML::URLService
