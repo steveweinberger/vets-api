@@ -3,7 +3,9 @@
 class VetsApiController < ApplicationController
   include ActionController::RequestForgeryProtection
 
-  before_action :validate_csrf_token!, if: -> { request.method != 'GET' }
+  before_action :validate_csrf_token!, if: -> do
+    ActionController::Base.allow_forgery_protection && request.method != 'GET'
+  end
   after_action :set_csrf_cookie, if: -> { request.method == 'GET' } # REVIEW should this be on all responses?
 
   protected
