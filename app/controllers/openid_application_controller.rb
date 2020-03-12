@@ -8,7 +8,7 @@ require 'sentry_logging'
 require 'oidc/key_service'
 require 'jwt'
 
-class OpenidApplicationController < VetsApiController
+class OpenidApplicationController < ApplicationController
   before_action :authenticate
   TOKEN_REGEX = /Bearer /.freeze
 

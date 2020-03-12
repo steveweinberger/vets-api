@@ -11,7 +11,6 @@ class VetsApiController < ApplicationController
   protected
 
   def set_csrf_cookie
-    byebug
     cookies['X-CSRF-Token'] = form_authenticity_token
   end
 
