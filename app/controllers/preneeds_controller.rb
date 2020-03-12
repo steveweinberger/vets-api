@@ -2,7 +2,7 @@
 
 require 'preneeds/service'
 
-class PreneedsController < ApplicationController
+class PreneedsController < VetsApiController
   skip_before_action(:authenticate)
 
   protected

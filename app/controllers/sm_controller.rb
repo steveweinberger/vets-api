@@ -2,7 +2,7 @@
 
 require 'sm/client'
 
-class SMController < ApplicationController
+class SMController < VetsApiController
   include ActionController::Serialization
   include MHVControllerConcerns
 

@@ -2,7 +2,7 @@
 
 require 'rx/client'
 
-class RxController < ApplicationController
+class RxController < VetsApiController
   include ActionController::Serialization
   include MHVControllerConcerns
 

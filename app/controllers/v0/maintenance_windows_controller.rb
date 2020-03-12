@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module V0
-  class MaintenanceWindowsController < ApplicationController
+  class MaintenanceWindowsController < VetsApiController
     skip_before_action :authenticate
 
     def index

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class GIDSController < ApplicationController
+class GIDSController < VetsApiController
   skip_before_action :authenticate
 
   private

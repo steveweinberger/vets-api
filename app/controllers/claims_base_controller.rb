@@ -10,7 +10,7 @@
 
 # Current subclasses are PensionClaim and BurialClaim.
 
-class ClaimsBaseController < ApplicationController
+class ClaimsBaseController < VetsApiController
   skip_before_action(:authenticate)
 
   # Creates and validates an instance of the class, removing any copies of

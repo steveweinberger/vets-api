@@ -2,7 +2,7 @@
 
 require 'bb/client'
 
-class BBController < ApplicationController
+class BBController < VetsApiController
   include ActionController::Serialization
   include MHVControllerConcerns
 

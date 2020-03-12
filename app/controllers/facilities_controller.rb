@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class FacilitiesController < ApplicationController
+class FacilitiesController < VetsApiController
   skip_before_action :authenticate
 
   def validate_params

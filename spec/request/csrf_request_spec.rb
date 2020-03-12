@@ -18,7 +18,7 @@ RSpec.describe 'CSRF scenarios', type: :request do
     ActionController::Base.allow_forgery_protection = original_val
   end
 
-  before do 
+  before do
     get(v0_maintenance_windows_path)
     @token = response.cookies['X-CSRF-Token']
   end
@@ -31,7 +31,6 @@ RSpec.describe 'CSRF scenarios', type: :request do
           params: { hca_attachment: { file_data: fixture_file_upload('pdf_fill/extras.pdf') } },
           headers: { 'X-CSRF-Token' => @token }
         )
-
         expect(JSON.parse(response.body)['data']['attributes']['guid']).to eq HcaAttachment.last.guid
       end
     end
