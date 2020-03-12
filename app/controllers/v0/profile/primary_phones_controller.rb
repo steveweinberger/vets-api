@@ -2,7 +2,7 @@
 
 module V0
   module Profile
-    class PrimaryPhonesController < ApplicationController
+    class PrimaryPhonesController < VetsApiController
       include EVSS::Authorizeable
 
       before_action :authorize_evss!

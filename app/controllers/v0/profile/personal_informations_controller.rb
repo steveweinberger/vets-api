@@ -2,7 +2,7 @@
 
 module V0
   module Profile
-    class PersonalInformationsController < ApplicationController
+    class PersonalInformationsController < VetsApiController
       before_action { authorize :mvi, :queryable? }
 
       # Fetches the personal information for the current user.

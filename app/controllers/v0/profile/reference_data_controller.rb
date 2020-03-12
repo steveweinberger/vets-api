@@ -2,7 +2,7 @@
 
 module V0
   module Profile
-    class ReferenceDataController < ApplicationController
+    class ReferenceDataController < VetsApiController
       def countries
         render json: service.countries,
                serializer: CountriesSerializer

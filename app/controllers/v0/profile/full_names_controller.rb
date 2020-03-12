@@ -2,7 +2,7 @@
 
 module V0
   module Profile
-    class FullNamesController < ApplicationController
+    class FullNamesController < VetsApiController
       # Fetches the full name details for the current user.
       # Namely their first/middle/last name, and suffix.
       #

@@ -2,7 +2,7 @@
 
 module V0
   module Profile
-    class PersonsController < ApplicationController
+    class PersonsController < VetsApiController
       include Vet360::Transactionable
 
       after_action :invalidate_mvi_cache

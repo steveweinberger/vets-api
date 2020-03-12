@@ -2,7 +2,7 @@
 
 module V0
   module MDOT
-    class SuppliesController < ApplicationController
+    class SuppliesController < VetsApiController
       before_action { authorize :mdot, :access? }
 
       def index

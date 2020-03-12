@@ -2,7 +2,7 @@
 
 module V0
   module Profile
-    class TransactionsController < ApplicationController
+    class TransactionsController < VetsApiController
       include Vet360::Transactionable
       include Vet360::Writeable
 

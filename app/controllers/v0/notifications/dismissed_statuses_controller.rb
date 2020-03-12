@@ -7,7 +7,7 @@ module V0
     #
     # For any conventional read/unread notification use cases, use the notifications_controller.rb
     #
-    class DismissedStatusesController < ApplicationController
+    class DismissedStatusesController < VetsApiController
       include Accountable
       include ::Notifications::Validateable
 

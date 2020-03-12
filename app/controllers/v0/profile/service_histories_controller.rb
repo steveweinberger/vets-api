@@ -2,7 +2,7 @@
 
 module V0
   module Profile
-    class ServiceHistoriesController < ApplicationController
+    class ServiceHistoriesController < VetsApiController
       before_action :check_authorization
 
       # Fetches the service history for the current user.

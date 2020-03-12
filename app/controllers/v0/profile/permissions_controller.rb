@@ -2,7 +2,7 @@
 
 module V0
   module Profile
-    class PermissionsController < ApplicationController
+    class PermissionsController < VetsApiController
       include Vet360::Writeable
 
       before_action { authorize :vet360, :access? }

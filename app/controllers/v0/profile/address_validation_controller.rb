@@ -2,7 +2,7 @@
 
 module V0
   module Profile
-    class AddressValidationController < ApplicationController
+    class AddressValidationController < VetsApiController
       def create
         address = Vet360::Models::ValidationAddress.new(address_params)
         raise Common::Exceptions::ValidationErrors, address unless address.valid?
