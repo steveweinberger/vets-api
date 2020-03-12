@@ -6,7 +6,7 @@ module V0
   # For any `status` and `status_effective_at` related updates and use cases, use the
   # notifications/dismissed_statuses_controller.rb
   #
-  class NotificationsController < ApplicationController
+  class NotificationsController < VetsApiController
     include Accountable
     include ::Notifications::Validateable
 

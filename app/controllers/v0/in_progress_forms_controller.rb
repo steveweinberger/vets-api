@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module V0
-  class InProgressFormsController < ApplicationController
+  class InProgressFormsController < VetsApiController
     include IgnoreNotFound
 
     def index

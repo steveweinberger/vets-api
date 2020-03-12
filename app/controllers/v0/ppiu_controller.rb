@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module V0
-  class PPIUController < ApplicationController
+  class PPIUController < VetsApiController
     before_action { authorize :evss, :access? }
     before_action { authorize :ppiu, :access? }
     before_action :validate_pay_info, only: :update

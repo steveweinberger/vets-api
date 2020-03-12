@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module V0
-  class PreferencesController < ApplicationController
+  class PreferencesController < VetsApiController
     before_action :set_preference, only: :show
 
     def index

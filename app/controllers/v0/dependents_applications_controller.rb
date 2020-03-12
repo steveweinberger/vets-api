@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module V0
-  class DependentsApplicationsController < ApplicationController
+  class DependentsApplicationsController < VetsApiController
     def create
       dependents_application = DependentsApplication.new(
         params.require(:dependents_application).permit(:form).merge(

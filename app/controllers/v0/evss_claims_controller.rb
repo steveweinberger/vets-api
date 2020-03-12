@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module V0
-  class EVSSClaimsController < ApplicationController
+  class EVSSClaimsController < VetsApiController
     include IgnoreNotFound
 
     before_action { authorize :evss, :access? }

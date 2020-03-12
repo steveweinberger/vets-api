@@ -2,7 +2,7 @@
 
 module V0
   module VIC
-    class BaseController < ApplicationController
+    class BaseController < VetsApiController
       before_action :tag_sentry
 
       def tag_sentry

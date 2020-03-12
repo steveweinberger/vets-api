@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module V0
-  class HealthCareApplicationsController < ApplicationController
+  class HealthCareApplicationsController < VetsApiController
     FORM_ID = '1010ez'
 
     skip_before_action(:authenticate)

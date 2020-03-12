@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module V0
-  class DisabilityCompensationFormsController < ApplicationController
+  class DisabilityCompensationFormsController < VetsApiController
     before_action { authorize :evss, :access? }
     before_action :validate_name_part, only: [:suggested_conditions]
 

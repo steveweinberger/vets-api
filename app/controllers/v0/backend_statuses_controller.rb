@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module V0
-  class BackendStatusesController < ApplicationController
+  class BackendStatusesController < VetsApiController
     skip_before_action :authenticate
 
     # Note: this endpoint is somewhat misleading.  Index gets data from PagerDuty and

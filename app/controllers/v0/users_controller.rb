@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module V0
-  class UsersController < ApplicationController
+  class UsersController < VetsApiController
     def show
       pre_serialized_profile = Users::Profile.new(current_user).pre_serialize
 

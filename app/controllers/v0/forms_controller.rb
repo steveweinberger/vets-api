@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module V0
-  class FormsController < ApplicationController
+  class FormsController < VetsApiController
     include ActionView::Helpers::SanitizeHelper
 
     skip_before_action :authenticate

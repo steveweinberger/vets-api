@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module V0
-  class MhvAccountsController < ApplicationController
+  class MhvAccountsController < VetsApiController
     CREATE_ERROR = 'You are not eligible for creating an MHV account'
     UPGRADE_ERROR = 'You are not eligible for upgrading an MHV account'
     include ActionController::Serialization

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module V0
-  class BetaRegistrationsController < ApplicationController
+  class BetaRegistrationsController < VetsApiController
     def show
       reg = BetaRegistration.find_by(user_uuid: current_user.uuid, feature: params[:feature])
       raise Common::Exceptions::RecordNotFound, current_user.uuid if reg.nil?

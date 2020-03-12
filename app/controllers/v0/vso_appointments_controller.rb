@@ -3,7 +3,7 @@
 require 'vsopdf/vso_appointment_form'
 
 module V0
-  class VsoAppointmentsController < ApplicationController
+  class VsoAppointmentsController < VetsApiController
     include ActionController::ParamsWrapper
 
     wrap_parameters VsoAppointment, format: :json

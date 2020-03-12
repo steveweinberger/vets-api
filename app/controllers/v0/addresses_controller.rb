@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module V0
-  class AddressesController < ApplicationController
+  class AddressesController < VetsApiController
     before_action { authorize :evss, :access? }
 
     def show

@@ -2,7 +2,7 @@
 
 # rubocop:disable Layout/LineLength
 module V0
-  class PerformanceMonitoringsController < ApplicationController
+  class PerformanceMonitoringsController < VetsApiController
     skip_before_action :authenticate
 
     # Calls StatsD.measure for a given whitelisted path, and set of metrics data.

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module V0
-  class DocumentsController < ApplicationController
+  class DocumentsController < VetsApiController
     before_action { authorize :evss, :access? }
 
     def create

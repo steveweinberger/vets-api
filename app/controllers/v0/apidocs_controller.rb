@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module V0
-  class ApidocsController < ApplicationController
+  class ApidocsController < VetsApiController
     include Swagger::Blocks
 
     skip_before_action :authenticate

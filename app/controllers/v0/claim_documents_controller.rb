@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module V0
-  class ClaimDocumentsController < ApplicationController
+  class ClaimDocumentsController < VetsApiController
     skip_before_action(:authenticate)
 
     def create

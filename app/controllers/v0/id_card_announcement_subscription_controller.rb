@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module V0
-  class IdCardAnnouncementSubscriptionController < ApplicationController
+  class IdCardAnnouncementSubscriptionController < VetsApiController
     skip_before_action :authenticate
 
     def create

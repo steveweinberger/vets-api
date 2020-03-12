@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module V0
-  class Form526OptInsController < ApplicationController
+  class Form526OptInsController < VetsApiController
     before_action { authorize :evss, :access? }
 
     def create

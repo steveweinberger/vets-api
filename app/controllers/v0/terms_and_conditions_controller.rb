@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module V0
-  class TermsAndConditionsController < ApplicationController
+  class TermsAndConditionsController < VetsApiController
     include ActionController::Serialization
 
     skip_before_action :authenticate, only: %i[index latest]

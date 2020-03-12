@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class AppealsBaseController < ApplicationController
+class AppealsBaseController < VetsApiController
   include ActionController::Serialization
   before_action { authorize :appeals, :access? }
 

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module V0
-  class IntentToFilesController < ApplicationController
+  class IntentToFilesController < VetsApiController
     before_action { authorize :evss, :access? }
     before_action :validate_type_param, only: %i[active submit]
 

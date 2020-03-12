@@ -3,7 +3,7 @@
 # example controller to show use of logging in with sessions controller
 
 module V0
-  class ExampleController < ApplicationController
+  class ExampleController < VetsApiController
     before_action :authenticate, only: [:welcome]
 
     def index

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module V0
-  class AdminController < ApplicationController
+  class AdminController < VetsApiController
     skip_before_action :authenticate, only: :status
 
     def status

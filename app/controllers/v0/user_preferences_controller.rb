@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module V0
-  class UserPreferencesController < ApplicationController
+  class UserPreferencesController < VetsApiController
     include Accountable
 
     before_action :set_account
