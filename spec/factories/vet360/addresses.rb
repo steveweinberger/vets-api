@@ -2,20 +2,6 @@
 
 FactoryBot.define do
   factory :vet360_address, class: 'Vet360::Models::Address' do
-    address_line1 { '140 Rock Creek Rd' }
-    address_pou { Vet360::Models::Address::RESIDENCE }
-    address_type { Vet360::Models::Address::DOMESTIC }
-    city { 'Washington' }
-    country_name { 'USA' }
-    country_code_iso3 { 'USA' }
-    state_code { 'DC' }
-    zip_code { '20011' }
-    sequence(:transaction_id, 100) { |n| "c2fab2b5-6af0-45e1-a9e2-394347af9#{n}" }
-    source_date          { '2018-04-09T11:52:03-06:00' }
-    created_at           { '2017-04-09T11:52:03-06:00' }
-    updated_at           { '2017-04-09T11:52:03-06:00' }
-    vet360_id { '12345' }
-
     trait :mailing do
       address_pou { Vet360::Models::Address::CORRESPONDENCE }
       address_line1 { '1515 Broadway' }
@@ -44,14 +30,12 @@ FactoryBot.define do
     end
 
     trait :override do
-      address_pou { Vet360::Models::Address::CORRESPONDENCE }
-      id { 108_347 }
-      address_line1 { '1494 Martin Luther King Rd' }
-      address_line2 { 'c/o foo' }
-      city { 'Fulton' }
-      state_code { 'MS' }
-      zip_code { '38843' }
-      validation_key { 713_117_306 }
+      address_pou { Vet360::Models::Address::RESIDENCE }
+      id { 15035 }
+      address_line1 { 'abc' }
+      city { 'tokyo' }
+      province { 'province' }
+      international_postal_code { '12345' }
       vet360_id { '1' }
       source_system_user { '1234' }
       source_date { Time.now.utc.iso8601 }
