@@ -35,6 +35,7 @@ FactoryBot.define do
       address_line1 { 'abc' }
       city { 'tokyo' }
       province { 'province' }
+      country_code_iso3 { 'JPN' }
       international_postal_code { '12345' }
       vet360_id { '1' }
       source_system_user { '1234' }
