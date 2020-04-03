@@ -16,6 +16,14 @@ module AuthenticationAndSSOConcerns
 
   protected
 
+  def permit_scopes(scopes, actions: [])
+    return false unless token.payload
+
+    if actions.empty? || Array.wrap(actions).map(&:to_s).include?(action_name)
+      render_unauthorized if (Array.wrap(scopes) & token.payload['scp']).empty?
+    end
+  end
+
   def authenticate_token
     return false if token.blank?
 
