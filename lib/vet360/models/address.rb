@@ -55,6 +55,7 @@ module Vet360
       # @return [Vet360::Models::Address] the model built from the response body
       # rubocop:disable Metrics/MethodLength
       def self.build_from(body)
+        binding.pry; fail
         Vet360::Models::Address.new(
           address_line1: body['address_line1'],
           address_line2: body['address_line2'],
