@@ -11,10 +11,60 @@ module AuthenticationAndSSOConcerns
     before_action :set_session_expiration_header
   end
 
+  TOKEN_REGEX = /Bearer /.freeze
+
+
   protected
 
+  def authenticate_token
+    return false if token.blank?
+
+    @session = Session.find(token)
+    establish_session if @session.nil?
+    return false if @session.nil?
+
+    @current_user = OpenidUser.find(@session.uuid)
+  end
+
+  def token_from_request
+    auth_request = request.authorization.to_s
+    return unless auth_request[TOKEN_REGEX]
+
+    Token.new(auth_request.sub(TOKEN_REGEX, '').gsub(/^"|"$/, ''))
+  end
+
+  def token
+    @token ||= token_from_request
+  end
+
+  def establish_session
+    ttl = token.payload['exp'] - Time.current.utc.to_i
+    profile = fetch_profile(token.identifiers.okta_uid)
+    user_identity = OpenidUserIdentity.build_from_okta_profile(uuid: token.identifiers.uuid, profile: profile, ttl: ttl)
+    @current_user = OpenidUser.build_from_identity(identity: user_identity, ttl: ttl)
+    @session = build_session(ttl)
+    @session.save && user_identity.save && @current_user.save
+  end
+
+  def fetch_profile(uid)
+    profile_response = Okta::Service.new.user(uid)
+    if profile_response.success?
+      Okta::UserProfile.new(profile_response.body['profile'])
+    else
+      log_message_to_sentry('Error retrieving profile for OIDC token', :error,
+                            body: profile_response.body)
+      raise 'Unable to retrieve user profile'
+    end
+  end
+
+  def build_session(ttl)
+    session = Session.new(token: token.to_s, uuid: token.identifiers.uuid)
+    session.expire(ttl)
+    session
+  end
+
   def authenticate
-    validate_session || render_unauthorized
+    authenticate_token || validate_session || render_unauthorized
   end
 
   def render_unauthorized
