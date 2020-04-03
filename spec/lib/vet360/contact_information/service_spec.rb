@@ -139,11 +139,13 @@ describe Vet360::ContactInformation::Service, skip_vet360: true do
           c.allow_http_connections_when_no_cassette = true
         end
         addr = build(:vet360_validation_address, :multiple_matches)
-        binding.pry; fail
         res = Vet360::AddressValidation::Service.new.address_suggestions(addr)
         address.validation_key = JSON.parse(res.to_json)['validation_key']
-        binding.pry; fail
         response = subject.put_address(address)
+
+        binding.pry; fail
+        subject.get_address_transaction_status(response.transaction.id)
+
         VCR.use_cassette(
           'vet360/contact_information/put_address_override',
           VCR::MATCH_EVERYTHING
