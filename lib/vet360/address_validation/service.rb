@@ -12,6 +12,7 @@ module Vet360
       # @return [Vet360::AddressValidation::AddressSuggestionsResponse] response wrapper around address suggestions data
       def address_suggestions(address)
         candidate_res = candidate(address)
+        binding.pry; fail
 
         AddressSuggestionsResponse.new(candidate_res)
       end
