@@ -138,8 +138,8 @@ describe Vet360::ContactInformation::Service, skip_vet360: true do
         # VCR.configure do |c|
         #   c.allow_http_connections_when_no_cassette = true
         # end
-        VCR.use_cassette('vet360/contact_information/person_intl_addr', record: :new_episodes) do
-          subject.get_person
+        VCR.configure do |c|
+          c.allow_http_connections_when_no_cassette = true
         end
         binding.pry; fail
         addr = build(:vet360_validation_address, :multiple_matches)
