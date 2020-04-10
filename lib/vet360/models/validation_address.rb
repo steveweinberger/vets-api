@@ -8,7 +8,10 @@ module Vet360
         super
 
         if address_type == INTERNATIONAL
-          self.province ||= state_code if state_code.present?
+          if state_code.present? && province.blank?
+            self.province = state_code
+            self.state_code = nil
+          end
         end
       end
       # Convert a ValidationAddress into a hash that can be sent to the address validation
