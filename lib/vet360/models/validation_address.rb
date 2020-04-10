@@ -4,6 +4,13 @@ module Vet360
   module Models
     # Model for addresses sent and received from the VA profile address validation API
     class ValidationAddress < BaseAddress
+      def initialize(*args)
+        super
+
+        if address_type == INTERNATIONAL
+          self.province ||= state_code if state_code.present?
+        end
+      end
       # Convert a ValidationAddress into a hash that can be sent to the address validation
       # API
       # @return [Hash] hash that is formatted for POSTing to address validation API
