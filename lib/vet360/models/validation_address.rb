@@ -47,6 +47,7 @@ module Vet360
           county_code: address_hash.dig('county', 'county_fips_code'),
           county_name: address_hash.dig('county', 'name'),
           state_code: address_hash['state_province']['code'],
+          international_postal_code: address_hash['international_postal_code'],
           zip_code: address_hash['zip_code5'],
           zip_code_suffix: address_hash['zip_code4']
         )
