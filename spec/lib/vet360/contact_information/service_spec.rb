@@ -141,9 +141,15 @@ describe Vet360::ContactInformation::Service, skip_vet360: true do
         VCR.configure do |c|
           c.allow_http_connections_when_no_cassette = true
         end
+        VCR.use_cassette(
+          'vet360/address_validation/candidate_international',
+          record: :new_episodes
+        ) do
+          addr = build(:vet360_validation_address, :multiple_matches)
+          res = Vet360::AddressValidation::Service.new.address_suggestions(addr)
+        end
         binding.pry; fail
-        addr = build(:vet360_validation_address, :multiple_matches)
-        res = Vet360::AddressValidation::Service.new.address_suggestions(addr)
+        
         address.validation_key = JSON.parse(res.to_json)['validation_key']
         response = subject.put_address(address)
 
