@@ -3,14 +3,14 @@
 FactoryBot.define do
   factory :vet360_validation_address, class: 'Vet360::Models::ValidationAddress' do
     address_pou { Vet360::Models::Address::RESIDENCE }
-    address_type { Vet360::Models::Address::INTERNATIONAL }
-    country_code_iso3 { 'JPN' }
 
     trait :multiple_matches do
-      address_line1 { 'abc' }
-      city { 'tokyo' }
-      province { 'province' }
-      international_postal_code { '12345' }
+      address_type { Vet360::Models::Address::INTERNATIONAL }
+      address_line1 { '898 W Broaadway' }
+      city { 'Vancouver' }
+      province { 'BC' }
+      international_postal_code { 'V5Z 1J8' }
+      country_code_iso3 { 'CAN' }
     end
 
     trait :override do
