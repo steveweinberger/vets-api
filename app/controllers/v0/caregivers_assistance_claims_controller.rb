@@ -6,7 +6,11 @@ module V0
     skip_before_action(:authenticate)
 
     def create
-      submission = service.submit_claim!(claim_params)
+      claim = SavedClaim::CaregiversAssistanceClaim.new(claim_params)
+      claim.valid? || raise(Common::Exceptions::ValidationErrors, claim)
+
+      submission = service.submit_claim!(claim)
+
       render json: submission, serializer: ::Form1010cg::SubmissionSerializer
     end
 
