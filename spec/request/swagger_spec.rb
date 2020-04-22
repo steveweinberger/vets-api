@@ -222,6 +222,59 @@ RSpec.describe 'the API documentation', type: %i[apivore request], order: :defin
       end
     end
 
+    context 'MDOT tests' do
+      let(:user_details) do
+        {
+          first_name: 'Greg',
+          last_name: 'Anderson',
+          middle_name: 'A',
+          birth_date: '1991-04-05',
+          ssn: '000550237'
+        }
+      end
+
+      let(:user) { build(:user, :loa3, user_details) }
+      let(:headers) do
+        {
+          '_headers' => {
+            'Cookie' => sign_in(user, nil, true),
+            'accept' => 'application/json',
+            'content-type' => 'application/json'
+          }
+        }
+      end
+
+      let(:body) do
+        {
+          'permanent_address' => {
+            'street' => '101 Example Street',
+            'street2' => 'Apt 2',
+            'city' => 'Kansas City',
+            'state' => 'MO',
+            'country' => 'USA',
+            'postal_code' => '64117'
+          },
+          'use_permanent_address' => true,
+          'use_temporary_address' => false,
+          'order' => [{ 'product_id' => '1' }, { 'product_id' => '4' }],
+          'additional_requests' => ''
+        }
+      end
+
+      it 'supports creating a MDOT order' do
+        expect(subject).to validate(:post, '/v0/mdot/supplies', 401)
+
+        VCR.use_cassette('mdot/submit_order', VCR::MATCH_EVERYTHING) do
+          expect(subject).to validate(
+            :post,
+            '/v0/mdot/supplies',
+            200,
+            headers.merge('_data' => body.to_json)
+          )
+        end
+      end
+    end
+
     it 'supports adding a preneed claim' do
       VCR.use_cassette('preneeds/burial_forms/creates_a_pre_need_burial_form') do
         expect(subject).to validate(
@@ -1350,8 +1403,10 @@ RSpec.describe 'the API documentation', type: %i[apivore request], order: :defin
         end
 
         it 'supports getting a single facility' do
-          create :vha_648A4
-          expect(subject).to validate(:get, '/v0/facilities/va/{id}', 200, 'id' => 'vha_648A4')
+          VCR.use_cassette('/lighthouse/facilities', match_requests_on: %i[path query]) do
+            create :vha_648A4
+            expect(subject).to validate(:get, '/v0/facilities/va/{id}', 200, 'id' => 'vha_648A4')
+          end
         end
 
         it '404s on non-existent facility' do
@@ -1552,28 +1607,6 @@ RSpec.describe 'the API documentation', type: %i[apivore request], order: :defin
         it 'returns a 502 with error details' do
           expect(subject).to validate(:get, '/v0/appointments', 502, headers)
         end
-      end
-    end
-
-    describe 'performance monitoring' do
-      it 'supports posting performance monitoring data' do
-        whitelisted_path = Benchmark::Whitelist::WHITELIST.first
-        body = {
-          data: {
-            page_id: whitelisted_path,
-            metrics: [
-              { metric: 'totalPageLoad', duration: 1234.56 },
-              { metric: 'firstContentfulPaint', duration: 123.45 }
-            ]
-          }.to_json
-        }
-
-        expect(subject).to validate(
-          :post,
-          '/v0/performance_monitorings',
-          200,
-          headers.merge('_data' => body.as_json)
-        )
       end
     end
 

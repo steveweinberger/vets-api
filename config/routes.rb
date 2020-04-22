@@ -70,7 +70,7 @@ Rails.application.routes.draw do
     resource :hca_attachments, only: :create
 
     # Excluding this feature until external service (CARMA) is connected
-    resources :caregivers_assistance_claims, only: :create if Rails.env.test?
+    resources :caregivers_assistance_claims, only: :create
 
     resources :dependents_applications, only: %i[create show] do
       collection do
@@ -182,6 +182,10 @@ Rails.application.routes.draw do
       resource :announcement_subscription, only: [:create], controller: 'id_card_announcement_subscription'
     end
 
+    namespace :mdot do
+      resources :supplies, only: %i[create]
+    end
+
     namespace :preneeds do
       resources :cemeteries, only: :index, defaults: { format: :json }
       resources :states, only: :index, defaults: { format: :json }
@@ -207,8 +211,6 @@ Rails.application.routes.draw do
         get 'states', to: 'addresses#states'
       end
     end
-
-    resources :performance_monitorings, only: :create
 
     namespace :profile do
       resource :alternate_phone, only: %i[show create]
@@ -283,6 +285,10 @@ Rails.application.routes.draw do
         only: %i[show create destroy],
         defaults: { feature: feature }
       )
+    end
+
+    namespace :coronavirus_chatbot do
+      resource :tokens, only: :create
     end
   end
 
