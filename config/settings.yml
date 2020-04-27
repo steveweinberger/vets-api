@@ -56,11 +56,11 @@ review_instance_slug: ~
 sidekiq_admin_panel: false
 
 salesforce-gibft:
-  url: 'https://va--rdtcddev.cs33.my.salesforce.com/'
+  url: "https://va--rdtcddev.cs33.my.salesforce.com/"
 
 salesforce:
   env: dev
-  signing_key_path: 'spec/fixtures/vic/private.key'
+  signing_key_path: "spec/fixtures/vic/private.key"
   consumer_key: d669f7d339fd25af442bf75bb643c4c45f0f05fb3cb39cc77521e2011c6bb84086bb624d7ef14d715736
 
 # Settings for Education Benefits
@@ -72,17 +72,16 @@ edu:
     user: ~
     port: ~
 
-
 pension_burial:
   prefill: true
   sftp:
-    relative_path: '../VETSGOV_PENSION'
+    relative_path: "../VETSGOV_PENSION"
 
 central_mail:
   upload:
     enabled: true
-    host: 'icmhs-api-test.csrarad.com'
-    token: '<PENSIONS_TOKEN>'
+    host: "icmhs-api-test.csrarad.com"
+    token: "<PENSIONS_TOKEN>"
 
 # Settings for BIP Services
 bip:
@@ -98,8 +97,8 @@ vet360:
     timeout: 30
     mock: false
   address_validation:
-    hostname: 'dev-api.va.gov'
-    api_key: '<AV_KEY>'
+    hostname: "dev-api.va.gov"
+    api_key: "<AV_KEY>"
 
 # Settings for IHub
 ihub:
@@ -167,7 +166,7 @@ evss:
     key: fake_key
   reference_data_service:
     enabled: false
-  international_postal_codes: 'config/evss/international_postal_codes.json'
+  international_postal_codes: "config/evss/international_postal_codes.json"
 
 # Settings for GI Bill Data Service
 gids:
@@ -189,14 +188,14 @@ hca:
   cert_path: /fake/client/cert/path
   key_path: /fake/client/key/path
   ee:
-    endpoint: 'http://example.com'
+    endpoint: "http://example.com"
     user: "HCASvcUsr"
     pass: "password"
   ca:
-    - 'VA Internal Root CA.pem'
-    - 'VA Internal Subordinate CA 1.pem'
-    - 'VA-Internal-S2-ICA1-v1.pem'
-    - 'VA-Internal-S2-RCA1-v1.pem'
+    - "VA Internal Root CA.pem"
+    - "VA Internal Subordinate CA 1.pem"
+    - "VA-Internal-S2-ICA1-v1.pem"
+    - "VA-Internal-S2-RCA1-v1.pem"
 
 # Settings for the facility locator
 locators:
@@ -220,8 +219,8 @@ ppms:
 # Settings for MyHealthEVet
 mhv:
   # include ranges first, then individual exceptions to the ranges last.
-  facility_range: [[358,718],[720,740],[742,758]]
-  facility_specific: [['741MM']] # 741 is excluded, but 741MM is included
+  facility_range: [[358, 718], [720, 740], [742, 758]]
+  facility_specific: [["741MM"]] # 741 is excluded, but 741MM is included
   rx:
     host: https://mhv-api.example.com
     app_token: fake-app-token
@@ -306,28 +305,28 @@ vic:
   signing_key_path: /fake/signing/key/path
   prefill: true
   s3:
-    aws_access_key_id: 'aws_access_key_id'
-    aws_secret_access_key: 'aws_secret_access_key'
-    region: 'region'
-    bucket: 'bucket'
+    aws_access_key_id: "aws_access_key_id"
+    aws_secret_access_key: "aws_secret_access_key"
+    region: "region"
+    bucket: "bucket"
 
 # Settings for (preneeds) burials.
 preneeds:
   host: http://some.fakesite.com
-  wsdl: 'config/preneeds/wsdl/preneeds.wsdl'
+  wsdl: "config/preneeds/wsdl/preneeds.wsdl"
 
 # Settings for VBA Document upload service module
 vba_documents:
   unsuccessful_report_enabled: false
   location:
-    prefix:  http://some.fakesite.com/path
+    prefix: http://some.fakesite.com/path
     replacement: http://another.fakesite.com/rewrittenpath
   s3:
     enabled: false
-    aws_access_key_id: 'aws_access_key_id'
-    aws_secret_access_key: 'aws_secret_access_key'
-    region: 'region'
-    bucket: 'bucket'
+    aws_access_key_id: "aws_access_key_id"
+    aws_secret_access_key: "aws_secret_access_key"
+    region: "region"
+    bucket: "bucket"
   sns:
     topic_arn: ~
 
@@ -426,7 +425,7 @@ search:
   url: https://search.usa.gov/api/v2
 
 bing:
-  base_api_url: 'https://dev.virtualearth.net/REST/v1'
+  base_api_url: "https://dev.virtualearth.net/REST/v1"
   key: fake_key
 
 flipper:
@@ -450,16 +449,16 @@ flipper:
     - zurbergram@gmail.com
 
 bgs:
-  application: VAgovAPI
-  client_station_id: 281
-  client_username: VAgovAPI
+  application: ~
+  client_station_id: ~
+  client_username: ~
   env: ~
-  mock_response_location: /cache/bgs
-  mock_responses: true
-  ssl_verify_mode: 'peer'
+  mock_response_location: ~
+  mock_responses: ~
+  ssl_verify_mode: "peer"
 
 va_mobile:
-  url: 'https://veteran.apps.va.gov/'
+  url: "https://veteran.apps.va.gov/"
   mock: false
   key_path: /fake/client/key/path
   timeout: 15
