@@ -450,12 +450,12 @@ flipper:
     - zurbergram@gmail.com
 
 bgs:
-  application: ~
-  client_station_id: ~
-  client_username: ~
+  application: VAgovAPI
+  client_station_id: 281
+  client_username: VAgovAPI
   env: ~
-  mock_response_location: ~
-  mock_responses: ~
+  mock_response_location: /cache/bgs
+  mock_responses: true
   ssl_verify_mode: 'peer'
 
 va_mobile:
