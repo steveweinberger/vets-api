@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'sidekiq-pro'
+
 class Form526Submission < ApplicationRecord
   # A 526 disability compensation form record. This class is used to persist the post transformation form
   # and track submission workflow steps.
@@ -51,6 +53,7 @@ class Form526Submission < ApplicationRecord
   # @return [String] the job id of the first job in the batch, i.e the 526 submit job
   #
   def start(klass)
+    # Note: Sidekiq::Batch requies sidekiq-pro
     workflow_batch = Sidekiq::Batch.new
     workflow_batch.on(
       :success,
