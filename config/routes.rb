@@ -23,6 +23,7 @@ Rails.application.routes.draw do
     resources :in_progress_forms, only: %i[index show update destroy]
     resource :claim_documents, only: [:create]
     resource :claim_attachments, only: [:create], controller: :claim_documents
+    resources :debts, only: :index
 
     resource :form526_opt_in, only: :create
 
@@ -69,7 +70,6 @@ Rails.application.routes.draw do
 
     resource :hca_attachments, only: :create
 
-    # Excluding this feature until external service (CARMA) is connected
     resources :caregivers_assistance_claims, only: :create
 
     resources :dependents_applications, only: %i[create show] do
@@ -200,7 +200,6 @@ Rails.application.routes.draw do
     namespace :vic do
       resources :profile_photo_attachments, only: %i[create show]
       resources :supporting_documentation_attachments, only: :create
-      resources :vic_submissions, only: %i[create show]
     end
 
     resources :gi_bill_feedbacks, only: %i[create show]
@@ -297,6 +296,10 @@ Rails.application.routes.draw do
       post :saml_callback, to: 'sessions#saml_callback'
       post :saml_slo_callback, to: 'sessions#saml_slo_callback'
     end
+
+    namespace :facilities, module: 'facilities' do
+      resources :va, only: %i[index show]
+    end
   end
 
   root 'v0/example#index', module: 'v0'
@@ -316,7 +319,7 @@ Rails.application.routes.draw do
     mount VeteranConfirmation::Engine, at: '/veteran_confirmation'
   end
 
-  mount VAOS::Engine, at: '/v0/vaos'
+  mount VAOS::Engine, at: '/vaos'
 
   if Rails.env.development? || Settings.sidekiq_admin_panel
     require 'sidekiq/web'

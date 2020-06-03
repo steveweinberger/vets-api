@@ -10,10 +10,20 @@ describe AppealsApi::HigherLevelReviewPdfConstructor do
     expect(constructor.pdf_options).to eq(valid_pdf_options)
   end
 
+  it 'builds the extra pdf options' do
+    higher_level_review = create(:extra_higher_level_review)
+    constructor = AppealsApi::HigherLevelReviewPdfConstructor.new(higher_level_review.id)
+    options = valid_pdf_options.merge(additional_page: "Issue: sleep apnea - Decision Date: 1900-01-07\n")
+    expect(constructor.pdf_options).to eq(options)
+  end
+
   private
 
   # rubocop:disable Metrics/MethodLength
   def valid_pdf_options
+    no_address_provided = AppealsApi::HigherLevelReview::NO_ADDRESS_PROVIDED_SENTENCE
+    date_signed = AppealsApi::HigherLevelReview.new(form_data:
+      { data: { attributes: { veteran: { timezone: 'America/Chicago' } } } }.as_json).date_signed
     {
       'F[0].#subform[2].VeteransFirstName[0]': 'Jane',
       'F[0].#subform[2].VeteransMiddleInitial1[0]': 'Z',
@@ -27,16 +37,16 @@ describe AppealsApi::HigherLevelReviewPdfConstructor do
       'F[0].#subform[2].VAFileNumber[0]': '987654321',
       'F[0].#subform[2].VeteransServiceNumber[0]': '876543210',
       'F[0].#subform[2].InsurancePolicyNumber[0]': '987654321123456789',
-      'F[0].#subform[2].CurrentMailingAddress_NumberAndStreet[0]': '401 Kansas Avenue',
-      'F[0].#subform[2].CurrentMailingAddress_ApartmentOrUnitNumber[0]': 'Apt 7',
-      'F[0].#subform[2].CurrentMailingAddress_City[0]': 'Atchison',
-      'F[0].#subform[2].CurrentMailingAddress_StateOrProvince[0]': 'KS',
-      'F[0].#subform[2].CurrentMailingAddress_Country[0]': 'NL',
-      'F[0].#subform[2].CurrentMailingAddress_ZIPOrPostalCode_FirstFiveNumbers[0]': '66002',
-      'F[0].#subform[2].CurrentMailingAddress_ZIPOrPostalCode_LastFourNumbers[0]': '2410',
+      'F[0].#subform[2].CurrentMailingAddress_NumberAndStreet[0]': no_address_provided,
+      'F[0].#subform[2].CurrentMailingAddress_ApartmentOrUnitNumber[0]': '',
+      'F[0].#subform[2].CurrentMailingAddress_City[0]': '',
+      'F[0].#subform[2].CurrentMailingAddress_StateOrProvince[0]': '',
+      'F[0].#subform[2].CurrentMailingAddress_Country[0]': '',
+      'F[0].#subform[2].CurrentMailingAddress_ZIPOrPostalCode_FirstFiveNumbers[0]': '',
+      'F[0].#subform[2].CurrentMailingAddress_ZIPOrPostalCode_LastFourNumbers[0]': '',
       'F[0].#subform[2].TELEPHONE[0]': '+34-555-800-1111 ex2',
       'F[0].#subform[2].EMAIL[0]': 'josie@example.com',
-      'F[0].#subform[2].BenefitType[0]': 9,
+      'F[0].#subform[2].BenefitType[0]': 'Off',
       'F[0].#subform[2].BenefitType[1]': 'Off',
       'F[0].#subform[2].BenefitType[2]': 'Off',
       'F[0].#subform[2].BenefitType[3]': 'Off',
@@ -44,7 +54,7 @@ describe AppealsApi::HigherLevelReviewPdfConstructor do
       'F[0].#subform[2].BenefitType[5]': 'Off',
       'F[0].#subform[2].BenefitType[6]': 'Off',
       'F[0].#subform[2].BenefitType[7]': 'Off',
-      'F[0].#subform[2].BenefitType[8]': 'Off',
+      'F[0].#subform[2].BenefitType[8]': 1,
       'F[0].#subform[2].HIGHERLEVELREVIEWCHECKBOX[0]': 1,
       'F[0].#subform[2].INFORMALCONFERENCECHECKBOX[0]': 1,
       'F[0].#subform[2].TIME8TO10AM[0]': 'Off',
@@ -53,7 +63,7 @@ describe AppealsApi::HigherLevelReviewPdfConstructor do
       'F[0].#subform[2].TIME2TO430PM[0]': 1,
       'F[0].#subform[2].REPRESENTATIVENAMEANDTELEPHONENUMBER[0]': 'Helen Holly +6-555-800-1111 ext2',
       'F[0].#subform[3].SIGNATUREOFVETERANORCLAIMANT[0]': 'Jane Z Doe',
-      'F[0].#subform[3].DateSigned[0]': Time.zone.now.strftime('%m/%d/%Y'),
+      'F[0].#subform[3].DateSigned[0]': date_signed,
       'F[0].#subform[3].SPECIFICISSUE1[1]': 'tinnitus',
       'F[0].#subform[3].DateofDecision[5]': '1900-01-01',
       'F[0].#subform[3].SPECIFICISSUE1[0]': 'left knee',
