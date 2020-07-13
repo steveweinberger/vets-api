@@ -41,6 +41,7 @@ class YearToDateReportMailer < ApplicationMailer
       matthew.ziolkowski@va.gov
       Michael.Johnson19@va.gov
       Ricardo.DaSilva@va.gov
+      shawkey_daniel@bah.com
       sonntag_adam@bah.com
     ]
   }.freeze
