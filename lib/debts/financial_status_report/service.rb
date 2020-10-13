@@ -4,15 +4,20 @@ require 'common/client/base'
 require 'common/client/concerns/monitoring'
 require 'debts/financial_status_report/configuration'
 
-module Debts
-  class FinancialStatusReportService < Common::Client::Base
+module FinancialStatusReport
+  class Response
     include Common::Client::Concerns::Monitoring
 
-    configuration Debts::Configuration
+    configuration FinancialStatusReport::Configuration
 
-    STATSD_KEY_PREFIX = 'api.debts'
+    STATSD_KEY_PREFIX = 'api.financial_status_report'
 
-    def submit
+    def submit(request_body)
+      with_monitoring_and_error_handling do
+        FinancialStatusReport::Response.new(
+          perform(:post, 'submit', request_body).body
+        )
+      end
     end
   end
 end

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Debts
+module FinancialStatusReport
   class Configuration < Common::Client::Configuration::REST
     def self.base_request_headers
       super.merge(
