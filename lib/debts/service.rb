@@ -31,6 +31,9 @@ module Debts
       @debts.any? { |debt| debt['payeeNumber'] != '00' }
     end
 
+    def submit_financial_status_report
+    end
+
     private
 
     def init_file_number
