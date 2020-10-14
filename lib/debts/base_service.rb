@@ -9,7 +9,17 @@ module Debts
 
     SERVICE_NAME = 'DEBTS'
 
+    def initialize(user)
+      @user = user
+      @file_number = init_file_number
+    end
+
     private
+
+    def init_file_number
+      bgs_file_number = BGS::PeopleService.new(@user).find_person_by_participant_id[:file_nbr]
+      bgs_file_number.presence || @user.ssn
+    end
 
     def with_monitoring_and_error_handling
       with_monitoring(2) do

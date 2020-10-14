@@ -15,8 +15,7 @@ module Debts
     STATSD_KEY_PREFIX = 'api.debts'
 
     def initialize(user)
-      @user = user
-      @file_number = init_file_number
+      super(user)
       @debts = init_debts
     end
 
