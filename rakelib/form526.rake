@@ -6,13 +6,12 @@ require 'set'
 namespace :form526 do
   desc 'Get all submissions within a date period. [<start date: yyyy-mm-dd>,<end date: yyyy-mm-dd>]'
   task :submissions, %i[start_date end_date] => [:environment] do |_, args|
-    # rubocop:disable Style/FormatStringToken
     # This forces string token formatting. Our examples don't match
     # what this style is enforcing
     # rubocop: format('%<greeting>s', greeting: 'Hello')
     # vets-api example: printf "%-20s %s\n", header, total
 
-    def print_row(created_at, updated_at, id, c_id, p_id, complete, version) # rubocop:disable Metrics/ParameterLists
+    def print_row(created_at, updated_at, id, c_id, p_id, complete, version)
       printf "%-24s %-24s %-15s %-10s %-15s %-18s %s\n", created_at, updated_at, id, c_id, p_id, complete, version
     end
 
@@ -77,7 +76,6 @@ namespace :form526 do
   task :errors, %i[start_date end_date flag] => [:environment] do |_, args|
     def print_row(sub_id, p_id, created_at, is_bdd, job_class)
       printf "%-15s %-16s  %-25s %-10s %-20s\n", sub_id, p_id, created_at, is_bdd, job_class
-      # rubocop:enable Style/FormatStringToken
     end
 
     def print_errors(errors)
@@ -231,5 +229,67 @@ namespace :form526 do
       puts "reuploaded files for saved_claim_id #{form_submission.saved_claim_id}"
     end
     puts "reuploaded files for #{form_submissions.count} submissions"
+  end
+
+  desc 'form 526 stats  [<start date: yyyy-mm-dd>,<end date: yyyy-mm-dd>]'
+  task :stats, %i[start_date end_date] => [:environment] do |_, _args|
+    # start_date = args[:start_date]&.to_date || 31.days.ago.utc
+    # end_date = args[:end_date]&.to_date || 1.day.ago.utc
+
+    def percent_of(n, d)
+      return '0%' if n.zero?
+
+      "#{n / d * 100.0}%"
+    end
+
+    start_date = 31.days.ago.utc
+    end_date = 1.day.ago.utc
+
+    submissions = Form526Submission.where(
+      'created_at BETWEEN ? AND ?', start_date.beginning_of_day, end_date.end_of_day
+    )
+
+    in_progress_forms = InProgressForm.where('updated_at BETWEEN ? AND ?',
+                                             start_date.beginning_of_day,
+                                             end_date.end_of_day)
+                                      .where(form_id: '21-526EZ')
+    in_progress_forms_count = in_progress_forms.count
+    return_url_data = in_progress_forms
+                      .select("CAST(metadata -> 'return_url' AS text) as return_url, count(*) as the_count")
+                      .group('return_url')
+                      .order('the_count')
+    return_urls = return_url_data.collect { |r| [r.the_count, r.return_url] }.sort_by { |s| s[0] }.join("\n")
+
+    failed_submissions = submissions.where(workflow_complete: false)
+    successful_submissions = submissions.where(workflow_complete: true)
+    unique_submission_count = submissions.distinct(:user_uuid).count
+    uniq_success_subs = successful_submissions.distinct(:user_uuid).count
+    unique_failed_submissions = failed_submissions.distinct(:user_uuid).count
+    ultimately_successful = unique_failed_submissions + uniq_success_subs - unique_submission_count
+    ultimately_blocked =  unique_failed_submissions - ultimately_successful
+    completion_rate = percent_of(successful_submissions.count, in_progress_forms_count + successful_submissions.count)
+
+    puts '-- Form526Submission Totals ----------------------------------------------------------'
+    puts "* Counts between #{start_date} - #{end_date} *"
+    puts "Total Submissions: #{submissions.count}"
+    puts "Successful Submissions: #{successful_submissions.count} "\
+      "#{percent_of(successful_submissions.count, submissions.count)}"
+    puts "Failed Submissions: #{failed_submissions.count} #{percent_of(failed_submissions.count, submissions.count)}"
+    puts '-- Form526Submission Totals by Unique Veterans ----------------------------------------------------------'
+    puts "Total Submissions: #{unique_submission_count}"
+    puts "Successful Submissions: #{uniq_success_subs} #{percent_of(uniq_success_subs, unique_submission_count)}"
+    puts "Failed Submissions: #{unique_failed_submissions}  "\
+        "#{percent_of(unique_failed_submissions, unique_submission_count)}"
+    puts "Users who succeded after a failed submission #{ultimately_successful} "\
+         "#{percent_of(ultimately_successful, unique_submission_count)}"
+    puts "Users who did not have a successful submission #{ultimately_blocked} "\
+         "#{percent_of(ultimately_blocked, unique_submission_count)}"
+    puts '------------------------------------------------------------'
+
+    puts "21-526EZ InProgressForm Count: #{in_progress_forms_count}"
+
+    puts "Completion rate #{completion_rate}"
+
+    puts "Last page before abandon \n #{return_urls}"
   end
 end
