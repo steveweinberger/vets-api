@@ -231,19 +231,31 @@ namespace :form526 do
     puts "reuploaded files for #{form_submissions.count} submissions"
   end
 
+  desc 'data for return_url  [<return_url: "/review-veteran-details/military-service-history">, <limit: 10>]'
+  task :return_url, %i[return_url limit] => [:environment] do |_, _args|
+    return_url = args[:return_url]
+    limit = args[:limit] || 10
+
+    in_progress_forms = InProgressForm.where(form_id: '21-526EZ').order(updated_at: :desc).limit(limit)
+    in_progress_forms_by_url = in_progress_forms.where("CAST(metadata -> 'return_url' AS text) = '#{return_url}'")
+
+    in_progress_forms_by_url.each do |f|
+      puts JSON.pretty_generate(f.form_data)
+    end
+  end
+
   desc 'form 526 stats  [<start date: yyyy-mm-dd>,<end date: yyyy-mm-dd>]'
   task :stats, %i[start_date end_date] => [:environment] do |_, _args|
     # start_date = args[:start_date]&.to_date || 31.days.ago.utc
     # end_date = args[:end_date]&.to_date || 1.day.ago.utc
+    start_date = 31.days.ago.utc
+    end_date = 1.day.ago.utc
 
     def percent_of(n, d)
       return '0%' if n.zero?
 
       "#{n / d * 100.0}%"
     end
-
-    start_date = 31.days.ago.utc
-    end_date = 1.day.ago.utc
 
     submissions = Form526Submission.where(
       'created_at BETWEEN ? AND ?', start_date.beginning_of_day, end_date.end_of_day
@@ -258,6 +270,7 @@ namespace :form526 do
                       .select("CAST(metadata -> 'return_url' AS text) as return_url, count(*) as the_count")
                       .group('return_url')
                       .order('the_count')
+
     return_urls = return_url_data.collect { |r| [r.the_count, r.return_url] }.sort_by { |s| s[0] }.join("\n")
 
     failed_submissions = submissions.where(workflow_complete: false)
