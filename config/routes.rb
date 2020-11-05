@@ -293,6 +293,7 @@ Rails.application.routes.draw do
 
     namespace :ask do
       resource :asks, only: :create
+      resource :inquiry_documents, only: :create
     end
   end
 
