@@ -20,8 +20,12 @@ module V0
       def klass
         case form_id
         when '0873'
-          PersistentAttachments::InquiryAttachments
+          ::PersistentAttachments::InquiryAttachment
         end
+      end
+
+      def form_id
+        params[:form_id].upcase
       end
     end
   end
