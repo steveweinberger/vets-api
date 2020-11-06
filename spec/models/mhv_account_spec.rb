@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe MhvAccount, type: :model do
+RSpec.describe MHVAccount, type: :model do
   let(:mvi_profile) do
     build(:mvi_profile,
           icn: '1012667122V019349',
@@ -46,7 +46,7 @@ RSpec.describe MhvAccount, type: :model do
   let(:vha_facility_ids) { ['450'] }
 
   before do
-    stub_mvi(mvi_profile)
+    stub_mpi(mvi_profile)
   end
 
   around do |example|
@@ -184,7 +184,7 @@ RSpec.describe MhvAccount, type: :model do
 
           context 'nothing has been persisted with current mhv id' do
             before do
-              allow_any_instance_of(MhvAccountTypeService)
+              allow_any_instance_of(MHVAccountTypeService)
                 .to receive(:mhv_account_type).and_return(account_type)
             end
 

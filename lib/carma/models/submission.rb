@@ -1,9 +1,13 @@
 # frozen_string_literal: true
 
+require 'carma/client/client'
+require_relative 'base'
+require_relative 'metadata'
+
 module CARMA
   module Models
     class Submission < Base
-      attr_reader :metadata
+      attr_reader :metadata, :request_body
       attr_accessor :data, :carma_case_id, :submitted_at
 
       request_payload_key :data, :metadata
@@ -45,11 +49,9 @@ module CARMA
       def submit!(client)
         raise 'This submission has already been submitted to CARMA' if submitted?
 
-        response =  if Flipper.enabled?(:stub_carma_responses)
-                      client.create_submission_stub(to_request_payload)
-                    else
-                      client.create_submission(to_request_payload)
-                    end
+        @request_body = to_request_payload
+
+        response = client.create_submission(request_body)
 
         @carma_case_id = response['data']['carmacase']['id']
         @submitted_at = response['data']['carmacase']['createdAt']

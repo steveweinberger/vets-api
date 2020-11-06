@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'central_mail/upload_error'
+
 module CentralMail
   class UploadError < StandardError
     attr_accessor :code
@@ -9,7 +11,7 @@ module CentralMail
     DOC101 = 'Invalid multipart payload'
     DOC102 = 'Invalid metadata part'
     DOC103 = 'Invalid content part'
-    DOC104 = 'Upload rejected by downstream system'
+    DOC104 = 'Upload rejected by upstream system'
     DOC105 = 'Invalid or unknown id'
     DOC106 = 'Maximum document size exceeded. Limit is 100MB per document'
     DOC107 = 'Empty payload'

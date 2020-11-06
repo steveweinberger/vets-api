@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Power of Attorney ', type: :request do
   let(:headers) do
-    { 'X-VA-SSN': '796043735',
+    { 'X-VA-SSN': '796-04-3735',
       'X-VA-First-Name': 'WESLEY',
       'X-VA-Last-Name': 'FORD',
       'X-VA-EDIPI': '1007697216',
@@ -42,8 +42,8 @@ RSpec.describe 'Power of Attorney ', type: :request do
       expect(newly_parsed['data']['id']).to eq(parsed['data']['id'])
     end
 
-    it 'returns a unsuccessful response without mvi' do
-      allow_any_instance_of(ClaimsApi::Veteran).to receive(:mvi_record?).and_return(false)
+    it 'returns a unsuccessful response without mpi' do
+      allow_any_instance_of(ClaimsApi::Veteran).to receive(:mpi_record?).and_return(false)
       post path, params: data, headers: headers
       expect(response.status).to eq(404)
     end
@@ -108,6 +108,27 @@ RSpec.describe 'Power of Attorney ', type: :request do
         power_of_attorney.reload
         expect(power_of_attorney.file_data).not_to be_nil
         expect(power_of_attorney.status).to eq('submitted')
+      end
+    end
+
+    describe '#validate' do
+      it 'returns a response when valid' do
+        post "#{path}/validate", params: data, headers: headers
+        parsed = JSON.parse(response.body)
+        expect(parsed['data']['attributes']['status']).to eq('valid')
+        expect(parsed['data']['type']).to eq('powerOfAttorneyValidation')
+      end
+
+      it 'returns a response when invalid' do
+        post "#{path}/validate", params: { data: { attributes: nil } }.to_json, headers: headers
+        parsed = JSON.parse(response.body)
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(parsed['errors']).not_to be_empty
+      end
+
+      it 'responds properly when JSON parse error' do
+        post "#{path}/validate", params: 'hello', headers: headers
+        expect(response).to have_http_status(:unprocessable_entity)
       end
     end
   end

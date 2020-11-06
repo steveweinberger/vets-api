@@ -10,6 +10,8 @@ RSpec.describe 'vaos appointments', type: :request, skip_mvi: true do
     allow_any_instance_of(VAOS::UserService).to receive(:session).and_return('stubbed_token')
   end
 
+  let(:inflection_header) { { 'X-Key-Inflection' => 'camel' } }
+
   context 'loa1 user' do
     let(:current_user) { build(:user, :loa1) }
 
@@ -60,7 +62,7 @@ RSpec.describe 'vaos appointments', type: :request, skip_mvi: true do
       end
 
       context 'without icn' do
-        before { stub_mvi_not_found }
+        before { stub_mpi_not_found }
 
         let(:current_user) { build(:user, :mhv, mhv_icn: nil) }
 
@@ -142,12 +144,31 @@ RSpec.describe 'vaos appointments', type: :request, skip_mvi: true do
         end
       end
 
+      it 'has access and returns va appointments when camel-inflected' do
+        VCR.use_cassette('vaos/appointments/get_appointments', match_requests_on: %i[method uri]) do
+          get '/vaos/v0/appointments', params: params, headers: inflection_header
+
+          expect(response).to have_http_status(:success)
+          expect(response.body).to be_a(String)
+          expect(response).to match_camelized_response_schema('vaos/va_appointments', { strict: false })
+        end
+      end
+
       it 'has access and returns cc appointments' do
         VCR.use_cassette('vaos/appointments/get_cc_appointments', match_requests_on: %i[method uri]) do
           get '/vaos/v0/appointments', params: params.merge(type: 'cc')
           expect(response).to have_http_status(:success)
           expect(response.body).to be_a(String)
           expect(response).to match_response_schema('vaos/cc_appointments')
+        end
+      end
+
+      it 'has access and returns cc appointments when camel-inflected' do
+        VCR.use_cassette('vaos/appointments/get_cc_appointments', match_requests_on: %i[method uri]) do
+          get '/vaos/v0/appointments', params: params.merge(type: 'cc'), headers: inflection_header
+          expect(response).to have_http_status(:success)
+          expect(response.body).to be_a(String)
+          expect(response).to match_camelized_response_schema('vaos/cc_appointments')
         end
       end
 
@@ -170,6 +191,25 @@ RSpec.describe 'vaos appointments', type: :request, skip_mvi: true do
             expect(response).to match_response_schema('vaos/va_appointments')
           end
         end
+
+        it 'returns an empty list when camel-inflected' do
+          VCR.use_cassette('vaos/appointments/get_appointments_empty', match_requests_on: %i[method uri]) do
+            get '/vaos/v0/appointments', params: params, headers: inflection_header
+            expect(response).to have_http_status(:success)
+            expect(JSON.parse(response.body)).to eq(
+              'data' => [],
+              'meta' => {
+                'pagination' => {
+                  'currentPage' => 0,
+                  'perPage' => 0,
+                  'totalEntries' => 0,
+                  'totalPages' => 0
+                }
+              }
+            )
+            expect(response).to match_camelized_response_schema('vaos/va_appointments')
+          end
+        end
       end
 
       context 'with a response that includes blank providers' do
@@ -178,6 +218,14 @@ RSpec.describe 'vaos appointments', type: :request, skip_mvi: true do
             get '/vaos/v0/appointments', params: params
             expect(response).to have_http_status(:success)
             expect(response).to match_response_schema('vaos/va_appointments', { strict: false })
+          end
+        end
+
+        it 'parses the data and does not throw an undefined method error when camel-inflected' do
+          VCR.use_cassette('vaos/appointments/get_appointments_map_error', match_requests_on: %i[method uri]) do
+            get '/vaos/v0/appointments', params: params, headers: inflection_header
+            expect(response).to have_http_status(:success)
+            expect(response).to match_camelized_response_schema('vaos/va_appointments', { strict: false })
           end
         end
       end
@@ -305,6 +353,22 @@ RSpec.describe 'vaos appointments', type: :request, skip_mvi: true do
               .to eq('This appointment cannot be cancelled using VA Online Scheduling.  Please contact the site direc' \
                 'tly to cancel your appointment. <a class="external-link" href="https://www.va.gov/find-locations/">V' \
                 'A Facility Locator</a>')
+          end
+        end
+
+        it 'returns bad request with detail in errors (TEMPORARY PATCH)' do
+          VCR.use_cassette('vaos/appointments/put_cancel_appointment_500', match_requests_on: %i[method uri]) do
+            expect(Rails.logger).to receive(:warn).with('VAOS service call failed!', any_args)
+            expect(Rails.logger).to receive(:warn).with(
+              'Clinic does not support VAOS appointment cancel',
+              clinic_id: request_body[:clinic_id],
+              site_code: request_body[:facility_id]
+            )
+            put '/vaos/v0/appointments/cancel', params: request_body
+
+            expect(response).to have_http_status(:bad_request)
+            expect(JSON.parse(response.body)['errors'].first['detail'])
+              .to eq('Could not cancel appointment from VistA Scheduling Service')
           end
         end
       end

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'bip_claims/service'
+
 module StructuredData
   class ProcessDataJob
     include Sidekiq::Worker
@@ -17,7 +19,7 @@ module StructuredData
         @claim = SavedClaim.find(saved_claim_id)
 
         relationship_type = @claim.parsed_form['relationship']&.fetch('type', nil)
-        veteran = BipClaims::Service.new.lookup_veteran_from_mvi(@claim)
+        veteran = BipClaims::Service.new.lookup_veteran_from_mpi(@claim)
       ensure
         @claim.process_attachments! # upload claim and attachments to Central Mail
 

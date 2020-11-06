@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module VaForms
+module VAForms
   module Forms
     class Form
       include Swagger::Blocks
@@ -60,7 +60,7 @@ module VaForms
             property :valid_pdf do
               key :description, I18n.t('va_forms.field_descriptions.valid_pdf')
               key :type, :boolean
-              key :example, 3
+              key :example, true
             end
 
             property :sha256 do
@@ -80,6 +80,10 @@ module VaForms
               key :description, I18n.t('va_forms.field_descriptions.form_tool_url')
               key :type, :string
             end
+            property :form_details_url do
+              key :description, I18n.t('va_forms.field_descriptions.form_details_url')
+              key :type, :string
+            end
             property :form_type do
               key :description, I18n.t('va_forms.field_descriptions.form_type')
               key :type, :string
@@ -90,7 +94,12 @@ module VaForms
               key :type, :string
               key :example, 'en'
             end
-
+            property :deleted_at do
+              key :description, I18n.t('va_forms.field_descriptions.deleted_at')
+              key :type, :string
+              key :example, '2018-07-30T17:31:15.958Z'
+              key :format, 'date-time'
+            end
             property :related_forms do
               key :description, I18n.t('va_forms.field_descriptions.related_forms')
               key :type, :array
@@ -188,6 +197,10 @@ module VaForms
 
             property :form_tool_url do
               key :description, I18n.t('va_forms.field_descriptions.form_tool_url')
+              key :type, :string
+            end
+            property :form_details_url do
+              key :description, I18n.t('va_forms.field_descriptions.form_details_url')
               key :type, :string
             end
             property :form_type do

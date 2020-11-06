@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-require 'sm/client'
 require 'support/sm_client_helpers'
 require 'support/shared_examples_for_mhv'
 
@@ -54,6 +53,16 @@ RSpec.describe 'Triage Teams Integration', type: :request do
       expect(response).to be_successful
       expect(response.body).to be_a(String)
       expect(response).to match_response_schema('triage_teams')
+    end
+
+    it 'responds to GET #index when camel-inflected' do
+      VCR.use_cassette('sm_client/triage_teams/gets_a_collection_of_triage_team_recipients') do
+        get '/v0/messaging/health/recipients', headers: { 'X-Key-Inflection' => 'camel' }
+      end
+
+      expect(response).to be_successful
+      expect(response.body).to be_a(String)
+      expect(response).to match_camelized_response_schema('triage_teams')
     end
   end
 end

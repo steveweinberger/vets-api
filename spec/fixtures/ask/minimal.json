@@ -1,0 +1,18 @@
+{
+  "topic": {
+    "levelOne": "Caregiver Support Program",
+    "levelTwo": "VA Supportive Services"
+  },
+  "veteranStatus": {
+    "veteranStatus": "general"
+  },
+  "inquiryType": "Question",
+  "query": "Some question?",
+  "fullName": {
+    "first": "Jane",
+    "last": "Doe"
+  },
+  "preferredContactMethod": "email",
+  "email": "jane.doe@va.gov",
+  "privacyAgreementAccepted": true
+}

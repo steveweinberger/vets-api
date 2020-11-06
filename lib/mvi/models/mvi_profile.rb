@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'common/models/attribute_types/date_time_string'
+require_relative 'mvi_profile_address'
 
 module MVI
   module Models
@@ -24,6 +25,7 @@ module MVI
       attribute :edipi, String
       attribute :participant_id, String
       attribute :birls_id, String
+      attribute :birls_ids, Array[String]
       attribute :sec_id, String
       attribute :vet360_id, String
       attribute :historical_icns, Array[String]

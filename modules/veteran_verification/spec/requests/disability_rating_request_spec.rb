@@ -29,6 +29,7 @@ RSpec.describe 'Disability Rating API endpoint', type: :request do
   before do
     allow(JWT).to receive(:decode).and_return(jwt)
     Session.create(uuid: user.uuid, token: token)
+    Settings.vet_verification.mock_bgs = false
   end
 
   context 'with valid bgs responses' do
@@ -39,6 +40,20 @@ RSpec.describe 'Disability Rating API endpoint', type: :request do
           expect(response).to have_http_status(:ok)
           expect(response.body).to be_a(String)
           expect(response).to match_response_schema('disability_rating_response')
+        end
+      end
+    end
+
+    it 'returns all the current user disability ratings and ' \
+       'overall service connected combined degree when camel-inflected' do
+      with_okta_configured do
+        VCR.use_cassette('bgs/rating_web_service/rating_data') do
+          get '/services/veteran_verification/v0/disability_rating',
+              params: nil,
+              headers: auth_header.merge('X-Key-Inflection' => 'camel')
+          expect(response).to have_http_status(:ok)
+          expect(response.body).to be_a(String)
+          expect(response).to match_camelized_response_schema('disability_rating_response')
         end
       end
     end

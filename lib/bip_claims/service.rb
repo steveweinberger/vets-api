@@ -1,5 +1,10 @@
 # frozen_string_literal: true
 
+require 'common/client/base'
+require 'common/client/concerns/monitoring'
+require_relative 'configuration'
+require_relative 'veteran'
+
 module BipClaims
   class Service < Common::Client::Base
     STATSD_KEY_PREFIX = 'api.bip_claims'
@@ -28,7 +33,7 @@ module BipClaims
       )
     end
 
-    def lookup_veteran_from_mvi(claim)
+    def lookup_veteran_from_mpi(claim)
       veteran = MVI::AttrService.new.find_profile(veteran_attributes(claim))
       if veteran.profile&.participant_id
         StatsD.increment("#{STATSD_KEY_PREFIX}.mvi_lookup_hit")

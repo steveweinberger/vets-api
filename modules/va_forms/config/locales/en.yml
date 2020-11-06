@@ -7,10 +7,12 @@ en:
       benefit_categories: 'Listing of categories and match'
       benefit_category_name: 'Name of the benefit category of the form'
       benefit_category_description: 'Description of the benefit category of the form'
+      deleted_at: "The timestamp at which the form was deleted"
       first_issued_on: 'The date the form first became available'
       form_name: 'Name of the VA Form'
       form_tool_intro: 'Introductionary text describing the VA online tool for this form'
       form_tool_url: 'Location of the online tool for this form'
+      form_details_url: 'Location on www.va.gov of the info page for this form'
       form_type: 'VA Type of the form'
       form_usage: 'A description of how the form is to be used'
       language: 'Language code of the form'

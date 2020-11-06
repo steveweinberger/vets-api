@@ -2,6 +2,7 @@
 
 require 'active_model'
 require 'common/models/form'
+require 'common/exceptions'
 
 module VAOS
   class AppointmentForm < Common::Form
@@ -98,8 +99,8 @@ module VAOS
 
     def name
       {
-        first_name: @user.mvi&.profile&.given_names&.first,
-        last_name: @user.mvi&.profile&.family_name
+        first_name: @user.mpi&.profile&.given_names&.first,
+        last_name: @user.mpi&.profile&.family_name
       }
     end
   end

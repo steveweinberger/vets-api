@@ -23,6 +23,8 @@ require 'rails/test_unit/railtie'
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
+require_relative '../lib/olive_branch_patch'
+
 module VetsAPI
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
@@ -42,10 +44,6 @@ module VetsAPI
 
     # This prevents rails from escaping html like & in links when working with JSON
     config.active_support.escape_html_entities_in_json = false
-
-    paths_name = Rails.env.development? ? 'autoload' : 'eager_load'
-    config.public_send("#{paths_name}_paths") << Rails.root.join('lib')
-    config.eager_load_paths << Rails.root.join('app')
 
     # CORS configuration; see also cors_preflight route
     config.middleware.insert_before 0, Rack::Cors, logger: (-> { Rails.logger }) do

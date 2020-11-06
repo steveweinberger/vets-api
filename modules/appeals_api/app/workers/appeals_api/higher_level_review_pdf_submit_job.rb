@@ -3,6 +3,9 @@
 require 'sidekiq'
 require 'appeals_api/higher_level_review_pdf_constructor'
 require 'appeals_api/upload_error'
+require 'central_mail/utilities'
+require 'central_mail/service'
+require 'pdf_info'
 
 module AppealsApi
   class HigherLevelReviewPdfSubmitJob
@@ -51,7 +54,7 @@ module AppealsApi
       if response.success? || response.body.match?(NON_FAILING_ERROR_REGEX)
         higher_level_review.update!(status: 'submitted')
       else
-        map_downstream_error(response.status, response.body, AppealsApi::UploadError)
+        map_error(response.status, response.body, AppealsApi::UploadError)
       end
     end
   end

@@ -20,6 +20,7 @@ module SpoolHelpers
         end
 
         before do
+          allow(Flipper).to receive(:enabled?).with(:stem_text_message_question).and_return(true)
           allow(education_benefits_claim).to receive(:id).and_return(1)
           education_benefits_claim.instance_variable_set(:@application, nil)
         end

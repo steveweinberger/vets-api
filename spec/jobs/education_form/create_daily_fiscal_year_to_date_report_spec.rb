@@ -14,7 +14,7 @@ RSpec.describe EducationForm::CreateDailyFiscalYearToDateReport, type: :aws_help
   let(:date) { Time.zone.today - 1.day }
 
   before do
-    Flipper.enable('edu_benefits_stem_scholarship')
+    allow(Flipper).to receive(:enabled?).with(:education_reports_cleanup).and_return(true)
     allow_any_instance_of(EducationBenefitsClaim).to receive(:create_education_benefits_submission)
   end
 

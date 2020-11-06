@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 require 'common/client/base'
-require 'lighthouse/facilities/response'
+require_relative 'response'
+require_relative 'configuration'
 
 module Lighthouse
   module Facilities
@@ -32,7 +33,9 @@ module Lighthouse
       #
       def get_facilities(params)
         response = perform(:get, '/services/va_facilities/v0/facilities', params)
-        Lighthouse::Facilities::Response.new(response.body, response.status).facilities
+        facilities = Lighthouse::Facilities::Response.new(response.body, response.status).facilities
+        facilities.reject!(&:mobile?) if params['exclude_mobile']
+        facilities
       end
     end
   end

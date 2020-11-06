@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Intent to file', type: :request do
   let(:headers) do
-    { 'X-VA-SSN': '796104437',
+    { 'X-VA-SSN': '796-10-4437',
       'X-VA-First-Name': 'WESLEY',
       'X-VA-Last-Name': 'FORD',
       'X-VA-EDIPI': '1007697216',
@@ -15,12 +15,17 @@ RSpec.describe 'Intent to file', type: :request do
   end
   let(:scopes) { %w[claim.write] }
   let(:path) { '/services/claims/v1/forms/0966' }
-  let(:data) { { 'data': { 'attributes': { 'type': 'compensation' } } } }
+  let(:data) { { data: { attributes: { type: 'compensation' } } } }
+  let(:extra) do
+    { type: 'compensation',
+      participant_claimant_id: 123_456_789,
+      received_date: '2015-01-05T17:42:12.058Z' }
+  end
   let(:schema) { File.read(Rails.root.join('modules', 'claims_api', 'config', 'schemas', '0966.json')) }
 
   before do
     stub_poa_verification
-    stub_mvi
+    stub_mpi
   end
 
   describe '#0966' do
@@ -32,12 +37,33 @@ RSpec.describe 'Intent to file', type: :request do
       end
     end
 
-    it 'returns a payload with an expiration date' do
+    it 'posts a minimum payload and returns a payload with an expiration date' do
       with_okta_user(scopes) do |auth_header|
-        VCR.use_cassette('evss/intent_to_file/create_compensation') do
+        VCR.use_cassette('bgs/intent_to_file_web_service/insert_intent_to_file') do
           post path, params: data.to_json, headers: headers.merge(auth_header)
           expect(response.status).to eq(200)
-          expect(JSON.parse(response.body)['data']['attributes']['status']).to eq('active')
+          expect(JSON.parse(response.body)['data']['attributes']['status']).to eq('duplicate')
+        end
+      end
+    end
+
+    it 'posts a maximum payload and returns a payload with an expiration date' do
+      with_okta_user(scopes) do |auth_header|
+        VCR.use_cassette('bgs/intent_to_file_web_service/insert_intent_to_file') do
+          data['attributes'] = extra
+          post path, params: data.to_json, headers: headers.merge(auth_header)
+          expect(response.status).to eq(200)
+          expect(JSON.parse(response.body)['data']['attributes']['status']).to eq('duplicate')
+        end
+      end
+    end
+
+    it 'posts a 422 error with detail when BGS returns a 500 response' do
+      with_okta_user(scopes) do |auth_header|
+        VCR.use_cassette('bgs/intent_to_file_web_service/insert_intent_to_file_500') do
+          data['attributes'] = { type: 'pension' }
+          post path, params: data.to_json, headers: headers.merge(auth_header)
+          expect(response.status).to eq(422)
         end
       end
     end
@@ -52,27 +78,23 @@ RSpec.describe 'Intent to file', type: :request do
 
     it 'fails if none is passed in' do
       with_okta_user(scopes) do |auth_header|
-        VCR.use_cassette('evss/intent_to_file/create_compensation') do
-          post path, headers: headers.merge(auth_header)
-          expect(response.status).to eq(422)
-        end
+        post path, headers: headers.merge(auth_header)
+        expect(response.status).to eq(422)
       end
     end
 
     it 'fails if none is passed in as non-poa request' do
       with_okta_user(scopes) do |auth_header|
-        VCR.use_cassette('evss/intent_to_file/create_compensation') do
-          post path, headers: auth_header, params: ''
-          expect(response.status).to eq(422)
-        end
+        post path, headers: auth_header, params: ''
+        expect(response.status).to eq(422)
       end
     end
   end
 
   describe '#active' do
-    it 'returns the latest itf of a type' do
+    it 'returns the latest itf of a compensation type' do
       with_okta_user(scopes) do |auth_header|
-        VCR.use_cassette('evss/intent_to_file/active_compensation') do
+        VCR.use_cassette('bgs/intent_to_file_web_service/get_intent_to_file') do
           get "#{path}/active", params: { type: 'compensation' }, headers: headers.merge(auth_header)
           expect(response.status).to eq(200)
           expect(JSON.parse(response.body)['data']['attributes']['status']).to eq('active')
@@ -80,21 +102,44 @@ RSpec.describe 'Intent to file', type: :request do
       end
     end
 
+    it 'returns the latest itf of a pension type' do
+      with_okta_user(scopes) do |auth_header|
+        VCR.use_cassette('bgs/intent_to_file_web_service/get_intent_to_file') do
+          get "#{path}/active", params: { type: 'pension' }, headers: headers.merge(auth_header)
+          expect(response.status).to eq(200)
+          expect(JSON.parse(response.body)['data']['attributes']['status']).to eq('active')
+        end
+      end
+    end
+
+    it 'returns the latest itf of a burial type' do
+      with_okta_user(scopes) do |auth_header|
+        VCR.use_cassette('bgs/intent_to_file_web_service/get_intent_to_file') do
+          get "#{path}/active", params: { type: 'burial' }, headers: headers.merge(auth_header)
+          expect(response.status).to eq(200)
+          expect(JSON.parse(response.body)['data']['attributes']['status']).to eq('active')
+        end
+      end
+    end
+
+    it 'fails if passed with wrong type' do
+      with_okta_user(scopes) do |auth_header|
+        get "#{path}/active", params: { type: 'test' }, headers: headers.merge(auth_header)
+        expect(response.status).to eq(422)
+      end
+    end
+
     it 'fails if none is passed in for poa request' do
       with_okta_user(scopes) do |auth_header|
-        VCR.use_cassette('evss/intent_to_file/active_compensation') do
-          get "#{path}/active", headers: headers.merge(auth_header)
-          expect(response.status).to eq(400)
-        end
+        get "#{path}/active", headers: headers.merge(auth_header)
+        expect(response.status).to eq(400)
       end
     end
 
     it 'fails if none is passed in for non-poa request' do
       with_okta_user(scopes) do |auth_header|
-        VCR.use_cassette('evss/intent_to_file/active_compensation') do
-          get "#{path}/active", headers: auth_header, params: ''
-          expect(response.status).to eq(400)
-        end
+        get "#{path}/active", headers: auth_header, params: ''
+        expect(response.status).to eq(400)
       end
     end
   end
@@ -121,7 +166,6 @@ RSpec.describe 'Intent to file', type: :request do
     it 'responds properly when JSON parse error' do
       with_okta_user(scopes) do |auth_header|
         post "#{path}/validate", params: 'hello', headers: headers.merge(auth_header)
-        pp JSON.parse(response.body)
         expect(response.status).to eq(422)
       end
     end

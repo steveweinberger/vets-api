@@ -1,5 +1,10 @@
 # frozen_string_literal: true
 
+require 'pdf_fill/hash_converter'
+require 'pdf_fill/forms/form_base'
+require 'pdf_fill/forms/form_helper'
+require 'string_helpers'
+
 # rubocop:disable Metrics/ClassLength
 module PdfFill
   module Forms
@@ -197,14 +202,41 @@ module PdfFill
           }
         },
         'claimantAddress' => {
-          always_overflow: true,
-          first_key: 'street',
-          'fullAddress' => {
-            question_num: 5,
-            question_text: 'CURRENT MAILING ADDRESS'
-          },
           'street' => {
-            key: 'form1[0].#subform[36].CurrentMailingAddress_NumberAndStreet[0]'
+            key: 'form1[0].#subform[36].CurrentMailingAddress_NumberAndStreet[0]',
+            limit: 30,
+            question_num: 5,
+            question_text: "CLAIMANT'S ADDRESS - STREET"
+          },
+          'street2' => {
+            key: 'form1[0].#subform[36].CurrentMailingAddress_ApartmentOrUnitNumber[0]',
+            limit: 5,
+            question_num: 5,
+            question_text: "CLAIMANT'S ADDRESS - APT/UNIT NO."
+          },
+          'city' => {
+            key: 'form1[0].#subform[36].CurrentMailingAddress_City[0]',
+            limit: 18,
+            question_num: 5,
+            question_text: "CLAIMANT'S ADDRESS - CITY"
+          },
+          'state' => {
+            key: 'form1[0].#subform[36].CurrentMailingAddress_StateOrProvince[0]',
+            limit: 2,
+            question_num: 5,
+            question_text: "CLAIMANT'S ADDRESS - STATE"
+          },
+          'country' => {
+            key: 'form1[0].#subform[36].CurrentMailingAddress_Country[0]',
+            limit: 2,
+            question_num: 5,
+            question_text: "CLAIMANT'S ADDRESS - COUNTRY"
+          },
+          'postalCode' => {
+            key: 'form1[0].#subform[36].CurrentMailingAddress_ZIPOrPostalCode_FirstFiveNumbers[0]',
+            limit: 5,
+            question_num: 5,
+            question_text: "CLAIMANT'S ADDRESS - POSTAL CODE"
           }
         },
         'relationship' => {
@@ -399,17 +431,6 @@ module PdfFill
         expand_checkbox_as_hash(@form_data['burialAllowanceRequested'], 'value')
       end
 
-      def expand_claimant_addr
-        return if @form_data['claimantAddress'].blank?
-
-        combine_both_addr(@form_data, 'claimantAddress')
-        @form_data['claimantAddress'] = [
-          {
-            'fullAddress' => @form_data['claimantAddress']
-          }
-        ]
-      end
-
       # VA file number can be up to 10 digits long; An optional leading 'c' or 'C' followed by
       # 7-9 digits. The file number field on the 4142 form has space for 9 characters so trim the
       # potential leading 'c' to ensure the file number will fit into the form without overflow.
@@ -420,7 +441,7 @@ module PdfFill
       end
 
       # rubocop:disable Metrics/MethodLength
-      def merge_fields
+      def merge_fields(_options = {})
         expand_signature(@form_data['claimantFullName'])
 
         %w[veteranFullName claimantFullName].each do |attr|
@@ -449,8 +470,6 @@ module PdfFill
         expand_firm
 
         expand_checkbox_as_hash(@form_data['locationOfDeath'], 'location')
-
-        expand_claimant_addr
 
         %w[
           previouslyReceivedAllowance

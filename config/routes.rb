@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'flipper/admin_user_constraint'
+
 Rails.application.routes.draw do
   match '/v0/*path', to: 'application#cors_preflight', via: [:options]
   match '/services/*path', to: 'application#cors_preflight', via: [:options]
@@ -17,6 +19,8 @@ Rails.application.routes.draw do
       to: 'v1/sessions#new',
       constraints: ->(request) { V1::SessionsController::REDIRECT_URLS.include?(request.path_parameters[:type]) }
   get '/v1/sessions/ssoe_logout', to: 'v1/sessions#ssoe_slo_callback'
+  # don't use the word "tracker" in the url, as some ad blockers will prevent the call
+  get '/v1/sessions/trace', to: 'v1/sessions#tracker'
 
   namespace :v0, defaults: { format: 'json' } do
     resources :appointments, only: :index
@@ -25,8 +29,7 @@ Rails.application.routes.draw do
     resource :claim_attachments, only: [:create], controller: :claim_documents
     resources :debts, only: :index
     resources :debt_letters, only: %i[index show]
-
-    resource :form526_opt_in, only: :create
+    resources :education_career_counseling_claims, only: :create
 
     resources :letters, only: [:index] do
       collection do
@@ -47,7 +50,7 @@ Rails.application.routes.draw do
       get 'separation_locations'
     end
 
-    post '/mvi_users/:id', to: 'mvi_users#submit'
+    post '/mvi_users/:id', to: 'mpi_users#submit'
 
     resource :upload_supporting_evidence, only: :create
 
@@ -89,6 +92,8 @@ Rails.application.routes.draw do
       resources :burial_claims, only: %i[create show]
     end
 
+    resources :efolder, only: %i[index show]
+
     resources :evss_claims, only: %i[index show] do
       post :request_decision, on: :member
       resources :documents, only: [:create]
@@ -124,13 +129,12 @@ Rails.application.routes.draw do
       get :show, controller: 'health_record_contents', on: :collection
     end
 
-    resources :appeals, only: :index do
-      collection do
-        resources :higher_level_reviews, only: %i[show create]
-        resources :intake_statuses, only: :show
-        resources :contestable_issues, only: :index
-      end
+    resources :appeals, only: :index
+
+    namespace :higher_level_reviews do
+      get 'contestable_issues(/:benefit_type)', to: 'contestable_issues#index'
     end
+    resources :higher_level_reviews, only: %i[create show]
 
     scope :messaging do
       scope :health do
@@ -226,6 +230,7 @@ Rails.application.routes.draw do
       resource :service_history, only: :show
       resources :connected_applications, only: %i[index destroy]
       resource :valid_va_file_number, only: %i[show]
+      resources :payment_history, only: %i[index]
 
       # Vet360 Routes
       resource :addresses, only: %i[create update destroy]
@@ -237,6 +242,9 @@ Rails.application.routes.draw do
       get 'person/status/:transaction_id', to: 'persons#status', as: 'person/status'
       get 'status/:transaction_id', to: 'transactions#status'
       get 'status', to: 'transactions#statuses'
+
+      resources :ch33_bank_accounts, only: %i[index]
+      put 'ch33_bank_accounts', to: 'ch33_bank_accounts#update'
     end
 
     resources :search, only: :index
@@ -288,9 +296,15 @@ Rails.application.routes.draw do
     namespace :coronavirus_chatbot do
       resource :tokens, only: :create
     end
+
+    namespace :ask do
+      resource :asks, only: :create
+    end
   end
 
   namespace :v1, defaults: { format: 'json' } do
+    resources :apidocs, only: [:index]
+
     resource :sessions, only: [] do
       post :saml_callback, to: 'sessions#saml_callback'
       post :saml_slo_callback, to: 'sessions#saml_slo_callback'
@@ -300,6 +314,9 @@ Rails.application.routes.draw do
       resources :va, only: %i[index show]
       resources :ccp, only: %i[index show] do
         get 'specialties', on: :collection, to: 'ccp#specialties'
+      end
+      resources :va_ccp, only: [] do
+        get 'urgent_care', on: :collection
       end
     end
   end
@@ -311,17 +328,20 @@ Rails.application.routes.draw do
   end
 
   scope '/services' do
+    mount AppsApi::Engine, at: '/apps'
     mount VBADocuments::Engine, at: '/vba_documents'
     mount AppealsApi::Engine, at: '/appeals'
     mount ClaimsApi::Engine, at: '/claims'
-    mount VaFacilities::Engine, at: '/va_facilities'
     mount Veteran::Engine, at: '/veteran'
-    mount VaForms::Engine, at: '/va_forms'
+    mount VAForms::Engine, at: '/va_forms'
     mount VeteranVerification::Engine, at: '/veteran_verification'
     mount VeteranConfirmation::Engine, at: '/veteran_confirmation'
   end
 
+  mount HealthQuest::Engine, at: '/health_quest'
   mount VAOS::Engine, at: '/vaos'
+  mount CovidResearch::Engine, at: '/covid-research'
+  mount Mobile::Engine, at: '/mobile'
 
   if Rails.env.development? || Settings.sidekiq_admin_panel
     require 'sidekiq/web'

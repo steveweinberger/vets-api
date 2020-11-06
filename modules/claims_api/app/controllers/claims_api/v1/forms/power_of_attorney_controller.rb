@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-require_dependency 'claims_api/concerns/poa_verification'
-require_dependency 'claims_api/concerns/document_validations'
+require 'bgs/power_of_attorney_verifier'
 
 module ClaimsApi
   module V1
@@ -10,7 +9,7 @@ module ClaimsApi
         include ClaimsApi::DocumentValidations
 
         before_action { permit_scopes %w[claim.write] }
-        before_action :validate_json_schema, only: %i[submit_form_2122]
+        before_action :validate_json_schema, only: %i[submit_form_2122 validate]
         before_action :validate_documents_content_type, only: %i[upload]
         before_action :validate_documents_page_size, only: %i[upload]
         before_action :find_poa_by_id, only: %i[upload status]
@@ -54,7 +53,7 @@ module ClaimsApi
           @power_of_attorney.reload
 
           # This job will trigger whether submission is from a Veteran or Representative when a document is sent.
-          ClaimsApi::VbmsUploadJob.perform_async(@power_of_attorney.id)
+          ClaimsApi::VBMSUploadJob.perform_async(@power_of_attorney.id)
           render json: @power_of_attorney, serializer: ClaimsApi::PowerOfAttorneySerializer
         end
 
@@ -72,10 +71,14 @@ module ClaimsApi
           end
         end
 
+        def validate
+          render json: validation_success
+        end
+
         private
 
         def current_poa
-          @current_poa ||= EVSS::PowerOfAttorneyVerifier.new(target_veteran).current_poa
+          @current_poa ||= BGS::PowerOfAttorneyVerifier.new(target_veteran).current_poa
         end
 
         def header_md5
@@ -105,6 +108,17 @@ module ClaimsApi
 
         def render_poa_not_found
           render json: { errors: [{ status: 404, detail: 'POA not found' }] }, status: :not_found
+        end
+
+        def validation_success
+          {
+            data: {
+              type: 'powerOfAttorneyValidation',
+              attributes: {
+                status: 'valid'
+              }
+            }
+          }
         end
       end
     end

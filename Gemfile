@@ -10,9 +10,12 @@ gem 'websocket-extensions', '>= 0.1.5'
 
 # Modules
 gem 'appeals_api', path: 'modules/appeals_api'
+gem 'apps_api', path: 'modules/apps_api'
 gem 'claims_api', path: 'modules/claims_api'
+gem 'covid_research', path: 'modules/covid_research'
+gem 'health_quest', path: 'modules/health_quest'
+gem 'mobile', path: 'modules/mobile'
 gem 'openid_auth', path: 'modules/openid_auth'
-gem 'va_facilities', path: 'modules/va_facilities'
 gem 'va_forms', path: 'modules/va_forms'
 gem 'vaos', path: 'modules/vaos'
 gem 'vba_documents', path: 'modules/vba_documents'
@@ -27,7 +30,6 @@ gem 'rails', '~> 6.0.2'
 
 # Gems with special version/repo needs
 gem 'active_model_serializers', git: 'https://github.com/department-of-veterans-affairs/active_model_serializers', branch: 'master'
-gem 'carrierwave', '~> 0.11' # TODO: explanation
 gem 'sidekiq-scheduler', '~> 3.0' # TODO: explanation
 
 gem 'aasm'
@@ -40,6 +42,7 @@ gem 'aws-sdk-sns', '~> 1'
 gem 'betamocks', git: 'https://github.com/department-of-veterans-affairs/betamocks', branch: 'master'
 gem 'bgs_ext', git: 'https://github.com/department-of-veterans-affairs/bgs-ext.git', require: 'bgs'
 gem 'breakers'
+gem 'carrierwave'
 gem 'carrierwave-aws'
 gem 'clam_scan'
 gem 'combine_pdf'
@@ -79,7 +82,6 @@ gem 'notifications-ruby-client', '~> 5.1'
 gem 'oj' # Amazon Linux `json` gem causes conflicts, but `multi_json` will prefer `oj` if installed
 gem 'olive_branch'
 gem 'operating_hours'
-gem 'origami'
 gem 'ox'
 gem 'paper_trail'
 gem 'pdf-forms'
@@ -106,7 +108,6 @@ gem 'staccato'
 gem 'statsd-instrument', '~> 2.6.0' # versions beyond 2.6 deprecate config and change logging messages
 gem 'swagger-blocks'
 gem 'typhoeus'
-gem 'upsert'
 gem 'utf8-cleaner'
 gem 'vets_json_schema', git: 'https://github.com/department-of-veterans-affairs/vets-json-schema', branch: 'master'
 gem 'virtus'
@@ -131,19 +132,18 @@ group :test do
   gem 'apivore', git: 'https://github.com/department-of-veterans-affairs/apivore', branch: 'master'
   gem 'awrence'
   gem 'fakeredis'
-  gem 'pact', git: 'https://github.com/f1337/pact-ruby', branch: 'f1337/bump-thor-dependency', require: false
+  gem 'pact', require: false
   gem 'pact-mock_service', require: false
   gem 'pdf-inspector'
   gem 'rspec-retry'
   gem 'rspec_junit_formatter'
   gem 'rubocop-junit-formatter'
-  gem 'shrine-memory'
   # < 0.18 required due to bug with reporting to CodeClimate
   # https://github.com/codeclimate/test-reporter/issues/418
   gem 'simplecov', '< 0.18', require: false
   gem 'super_diff'
   gem 'vcr'
-  gem 'webrick'
+  gem 'webrick', '>= 1.6.1'
 end
 
 # rubocop:disable Metrics/BlockLength

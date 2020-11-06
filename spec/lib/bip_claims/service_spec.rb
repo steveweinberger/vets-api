@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require 'bip_claims/service'
 
 RSpec.describe BipClaims::Service do
   let(:service) { described_class.new }
@@ -33,7 +34,7 @@ RSpec.describe BipClaims::Service do
       )
       expect(mvi_service).to receive(:find_profile)
 
-      service.lookup_veteran_from_mvi(claim)
+      service.lookup_veteran_from_mpi(claim)
     end
   end
 end

@@ -10,11 +10,17 @@ ActiveSupport::Inflector.inflections do |inflect|
   inflect.acronym 'DOD'
   inflect.acronym 'EMIS'
   inflect.acronym 'EVSS'
+  inflect.acronym 'FHIR'
   inflect.acronym 'GIDS'
   inflect.acronym 'GI'
+  inflect.acronym 'HCA'
+  inflect.acronym 'IAM'
   inflect.acronym 'IHub'
   inflect.acronym 'MDOT'
+  inflect.acronym 'MHV' # My HealtheVet
+  inflect.acronym 'MPI' # Master Persons Index (formerly MVI for Veteran instead of Persons)
   inflect.acronym 'NCA' # National Cemetery Administration
+  inflect.acronym 'OAuth'
   inflect.acronym 'PagerDuty'
   inflect.acronym 'PPIU'
   inflect.acronym 'PPMS'
@@ -25,7 +31,10 @@ ActiveSupport::Inflector.inflections do |inflect|
   inflect.acronym 'SSOe'
   inflect.acronym 'SSO'
   inflect.acronym 'VAOS'
+  inflect.acronym 'VAR' # an older term for what is now VAOS
+  inflect.acronym 'VA'
   inflect.acronym 'VBA'
+  inflect.acronym 'VBMS'
   inflect.acronym 'VC'
   inflect.acronym 'VHA'
   inflect.acronym 'VIC'

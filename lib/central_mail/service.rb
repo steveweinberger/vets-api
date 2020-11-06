@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+require 'common/client/base'
+require 'common/client/concerns/monitoring'
+require_relative 'configuration'
+
 module CentralMail
   class Service < Common::Client::Base
     STATSD_KEY_PREFIX = 'api.central_mail'
@@ -55,8 +59,10 @@ module CentralMail
     def self.current_breaker_outage?
       last_cm_outage = Breakers::Outage.find_latest(service: CentralMail::Configuration.instance.breakers_service)
       if last_cm_outage.present? && last_cm_outage.end_time.blank?
-        CentralMail::Service.new.status('').try(:status) != 200
+        return CentralMail::Service.new.status('').try(:status) != 200
       end
+
+      false
     end
   end
 end

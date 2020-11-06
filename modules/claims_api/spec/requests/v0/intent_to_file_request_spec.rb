@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Intent to file', type: :request do
   let(:headers) do
-    { 'X-VA-SSN': '796104437',
+    { 'X-VA-SSN': '796-10-4437',
       'X-VA-First-Name': 'WESLEY',
       'X-VA-Last-Name': 'FORD',
       'X-VA-EDIPI': '1007697216',
@@ -15,7 +15,13 @@ RSpec.describe 'Intent to file', type: :request do
       'X-VA-Gender': 'M' }
   end
   let(:path) { '/services/claims/v0/forms/0966' }
-  let(:data) { { 'data': { 'attributes': { 'type': 'compensation' } } } }
+  let(:data) { { data: { attributes: { type: 'compensation' } } } }
+  let(:extra) do
+    { type: 'compensation',
+      participant_claimant_id: 123_456_789,
+      participant_vet_id: 987_654_321,
+      received_date: '2015-01-05T17:42:12.058Z' }
+  end
   let(:schema) { File.read(Rails.root.join('modules', 'claims_api', 'config', 'schemas', '0966.json')) }
 
   describe '#0966' do
@@ -25,11 +31,28 @@ RSpec.describe 'Intent to file', type: :request do
       expect(json_schema).to eq(JSON.parse(schema))
     end
 
-    it 'returns a payload with an expiration date' do
-      VCR.use_cassette('evss/intent_to_file/create_compensation') do
+    it 'posts a minimum payload and returns a payload with an expiration date' do
+      VCR.use_cassette('bgs/intent_to_file_web_service/insert_intent_to_file') do
         post path, params: data.to_json, headers: headers
         expect(response.status).to eq(200)
-        expect(JSON.parse(response.body)['data']['attributes']['status']).to eq('active')
+        expect(JSON.parse(response.body)['data']['attributes']['status']).to eq('duplicate')
+      end
+    end
+
+    it 'posts a maximum payload and returns a payload with an expiration date' do
+      VCR.use_cassette('bgs/intent_to_file_web_service/insert_intent_to_file') do
+        data['attributes'] = extra
+        post path, params: data.to_json, headers: headers
+        expect(response.status).to eq(200)
+        expect(JSON.parse(response.body)['data']['attributes']['status']).to eq('duplicate')
+      end
+    end
+
+    it 'posts a 422 error with detail when BGS returns a 500 response' do
+      VCR.use_cassette('bgs/intent_to_file_web_service/insert_intent_to_file_500') do
+        data['attributes'] = { type: 'pension' }
+        post path, params: data.to_json, headers: headers
+        expect(response.status).to eq(422)
       end
     end
 
@@ -40,27 +63,44 @@ RSpec.describe 'Intent to file', type: :request do
     end
 
     it 'fails if none is passed in' do
-      VCR.use_cassette('evss/intent_to_file/create_compensation') do
-        post path, headers: headers
-        expect(response.status).to eq(422)
-      end
+      post path, headers: headers
+      expect(response.status).to eq(422)
     end
   end
 
   describe '#active' do
-    it 'returns the latest itf of a type' do
-      VCR.use_cassette('evss/intent_to_file/active_compensation') do
+    it 'returns the latest itf of a compensation type' do
+      VCR.use_cassette('bgs/intent_to_file_web_service/get_intent_to_file') do
         get "#{path}/active", params: { type: 'compensation' }, headers: headers
         expect(response.status).to eq(200)
         expect(JSON.parse(response.body)['data']['attributes']['status']).to eq('active')
       end
     end
 
-    it 'fails if none is passed in' do
-      VCR.use_cassette('evss/intent_to_file/active_compensation') do
-        get "#{path}/active", headers: headers
-        expect(response.status).to eq(400)
+    it 'returns the latest itf of a pension type' do
+      VCR.use_cassette('bgs/intent_to_file_web_service/get_intent_to_file') do
+        get "#{path}/active", params: { type: 'pension' }, headers: headers
+        expect(response.status).to eq(200)
+        expect(JSON.parse(response.body)['data']['attributes']['status']).to eq('active')
       end
+    end
+
+    it 'returns the latest itf of a burial type' do
+      VCR.use_cassette('bgs/intent_to_file_web_service/get_intent_to_file') do
+        get "#{path}/active", params: { type: 'burial' }, headers: headers
+        expect(response.status).to eq(200)
+        expect(JSON.parse(response.body)['data']['attributes']['status']).to eq('active')
+      end
+    end
+
+    it 'fails if passed wrong type' do
+      get "#{path}/active", params: { type: 'test' }, headers: headers
+      expect(response.status).to eq(422)
+    end
+
+    it 'fails if none is passed in' do
+      get "#{path}/active", headers: headers
+      expect(response.status).to eq(400)
     end
   end
 
@@ -81,7 +121,6 @@ RSpec.describe 'Intent to file', type: :request do
 
     it 'responds properly when JSON parse error' do
       post "#{path}/validate", params: 'hello', headers: headers
-      pp JSON.parse(response.body)
       expect(response.status).to eq(422)
     end
   end

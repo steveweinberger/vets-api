@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+require 'json_marshal/marshaller'
+require 'central_mail/service'
+require 'common/exceptions'
+
 module AppealsApi
   class HigherLevelReview < ApplicationRecord
     include SentryLogging
@@ -95,6 +99,8 @@ module AppealsApi
 
     INFORMAL_CONFERENCE_REP_NAME_AND_PHONE_NUMBER_MAX_LENGTH = 100
     NO_ADDRESS_PROVIDED_SENTENCE = 'USE ADDRESS ON FILE'
+    NO_EMAIL_PROVIDED_SENTENCE = 'USE EMAIL ON FILE'
+    NO_PHONE_PROVIDED_SENTENCE = 'USE PHONE ON FILE'
 
     # the controller applies the JSON Schemas in modules/appeals_api/config/schemas/
     # further validations:

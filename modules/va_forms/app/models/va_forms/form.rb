@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module VaForms
+module VAForms
   class Form < ApplicationRecord
     has_paper_trail only: ['sha256']
 
@@ -11,10 +11,9 @@ module VaForms
     validates :valid_pdf, inclusion: { in: [true, false] }
 
     before_save :set_revision
-    scope :active, -> { where(deleted_at: nil) }
 
     def self.search(search_term: nil)
-      query = Form.active
+      query = Form.all
       if search_term.present?
         search_term.strip!
         terms = search_term.split(' ').map { |term| "%#{term}%" }

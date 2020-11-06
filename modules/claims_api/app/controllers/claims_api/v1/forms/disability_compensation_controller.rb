@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 require_dependency 'claims_api/base_disability_compensation_controller'
-require_dependency 'claims_api/concerns/poa_verification'
-require_dependency 'claims_api/concerns/document_validations'
 require 'jsonapi/parser'
 
 module ClaimsApi
@@ -17,8 +15,9 @@ module ClaimsApi
         before_action { permit_scopes %w[claim.write] }
         before_action :validate_json_schema, only: %i[submit_form_526 validate_form_526]
         before_action :validate_initial_claim, only: %i[submit_form_526 validate_form_526]
-        before_action :validate_documents_content_type, only: %i[upload_supporting_documents]
-        before_action :validate_documents_page_size, only: %i[upload_supporting_documents]
+        # TODO: Fix methods in document_validations to work correctly before uncommenting, add broader range of tests
+        # before_action :validate_documents_content_type, only: %i[upload_supporting_documents]
+        # before_action :validate_documents_page_size, only: %i[upload_supporting_documents]
         before_action :find_claim, only: %i[upload_supporting_documents]
         skip_before_action :validate_json_format, only: %i[upload_supporting_documents]
 
@@ -64,7 +63,7 @@ module ClaimsApi
               errors: [
                 {
                   status: 422,
-                  details: 'Veteran has no claims, autoCestPDFGenerationDisabled requires true for Initial Claim'
+                  detail: 'Veteran has no claims, autoCestPDFGenerationDisabled requires true for Initial Claim'
                 }
               ]
             }
@@ -77,7 +76,7 @@ module ClaimsApi
 
           unless @claim
             render(
-              json: { errors: [{ status: 404, details: "Claim not found: #{params[:id]}" }] },
+              json: { errors: [{ status: 404, detail: "Claim not found: #{params[:id]}" }] },
               status: :not_found
             )
           end

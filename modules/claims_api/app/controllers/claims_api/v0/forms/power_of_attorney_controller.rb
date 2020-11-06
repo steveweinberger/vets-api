@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require_dependency 'claims_api/base_form_controller'
-require_dependency 'claims_api/concerns/document_validations'
 require 'jsonapi/parser'
 
 module ClaimsApi
@@ -13,7 +12,7 @@ module ClaimsApi
         FORM_NUMBER = '2122'
 
         skip_before_action(:authenticate)
-        before_action :validate_json_schema, only: %i[submit_form_2122]
+        before_action :validate_json_schema, only: %i[submit_form_2122 validate]
         before_action :validate_documents_content_type, only: %i[upload]
         before_action :validate_documents_page_size, only: %i[upload]
 
@@ -36,8 +35,6 @@ module ClaimsApi
           end
 
           ClaimsApi::PoaUpdater.perform_async(power_of_attorney.id)
-          data = power_of_attorney.form_data
-          ClaimsApi::PoaFormBuilderJob.perform_async(power_of_attorney.id) if data['signatureImages'].present?
 
           render json: power_of_attorney, serializer: ClaimsApi::PowerOfAttorneySerializer
         end
@@ -48,7 +45,7 @@ module ClaimsApi
           power_of_attorney.status = 'submitted'
           power_of_attorney.save!
           power_of_attorney.reload
-          ClaimsApi::VbmsUploadJob.perform_async(power_of_attorney.id)
+          ClaimsApi::VBMSUploadJob.perform_async(power_of_attorney.id)
           render json: power_of_attorney, serializer: ClaimsApi::PowerOfAttorneySerializer
         end
 
@@ -60,6 +57,10 @@ module ClaimsApi
         def active
           power_of_attorney = ClaimsApi::PowerOfAttorney.find_by(header_md5: header_md5)
           render json: power_of_attorney, serializer: ClaimsApi::PowerOfAttorneySerializer
+        end
+
+        def validate
+          render json: validation_success
         end
 
         private
@@ -76,6 +77,17 @@ module ClaimsApi
             name: request.headers['X-Consumer-Username'],
             icn: Settings.bgs.external_uid,
             email: Settings.bgs.external_key
+          }
+        end
+
+        def validation_success
+          {
+            data: {
+              type: 'powerOfAttorneyValidation',
+              attributes: {
+                status: 'valid'
+              }
+            }
           }
         end
       end

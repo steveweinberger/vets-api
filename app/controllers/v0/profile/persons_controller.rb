@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'vet360/person/service'
+
 module V0
   module Profile
     class PersonsController < ApplicationController
@@ -21,7 +23,7 @@ module V0
       private
 
       def invalidate_mvi_cache
-        mvi_cache = @current_user.mvi
+        mvi_cache = @current_user.mpi
         mvi_cache.mvi_response
         mvi_cache.destroy
       end

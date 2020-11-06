@@ -9,7 +9,7 @@ RSpec.describe TransactionalEmailAnalyticsJob, type: :job do
 
   before do
     Settings.govdelivery.token = 'asdf'
-    Settings.google_analytics_tracking_id = 'UA-XXXXXXXXX-1'
+    Settings.google_analytics.tracking_id = 'UA-XXXXXXXXX-1'
   end
 
   describe '#perform', run_at: '2018-05-30 18:18:56' do
@@ -22,7 +22,7 @@ RSpec.describe TransactionalEmailAnalyticsJob, type: :job do
 
     context 'Google Analytics tracking ID is missing from settings' do
       it 'raises an error' do
-        Settings.google_analytics_tracking_id = nil
+        Settings.google_analytics.tracking_id = nil
         expect { subject.perform }.to raise_error(Common::Exceptions::ParameterMissing)
       end
     end
@@ -76,6 +76,17 @@ RSpec.describe TransactionalEmailAnalyticsJob, type: :job do
         @emails.collection.delete_at(0)
         expect(subject.send(:we_should_break?)).to be true
       end
+    end
+  end
+
+  describe '.mailers' do
+    it 'returns all the possible TransactionalEmailMailer descendants' do
+      # constantize all mailers so they are loaded
+      Dir['app/mailers/*.rb']
+        .collect { |mailer| %r{app/mailers/(.*)\.rb}.match(mailer)[1] }
+        .map { |mailer_name| mailer_name.camelize.constantize }
+
+      expect(TransactionalEmailAnalyticsJob.mailers).to match_array(TransactionalEmailMailer.descendants)
     end
   end
 end

@@ -81,6 +81,10 @@ module V0
         key :description, 'In-progress form operations'
       end
       tag do
+        key :name, 'claim_status_tool'
+        key :description, 'Claim Status Tool'
+      end
+      tag do
         key :name, 'site'
         key :description, 'Site service availability and feedback'
       end
@@ -117,15 +121,17 @@ module V0
     SWAGGERED_CLASSES = [
       Swagger::Requests::Address,
       Swagger::Requests::Appeals::Appeals,
-      Swagger::Requests::Appeals::ContestableIssues,
       Swagger::Requests::Appointments,
+      Swagger::Requests::Asks,
       Swagger::Requests::BackendStatuses,
       Swagger::Requests::BB::HealthRecords,
       Swagger::Requests::BurialClaims,
+      Swagger::Requests::ClaimStatus,
       Swagger::Requests::DebtLetters,
       Swagger::Requests::DependentsApplications,
       Swagger::Requests::DisabilityCompensationForm,
       Swagger::Requests::EducationBenefitsClaims,
+      Swagger::Requests::Efolder,
       Swagger::Requests::FeatureToggles,
       Swagger::Requests::Forms,
       Swagger::Requests::Gibct::CalculatorConstants,
@@ -133,7 +139,7 @@ module V0
       Swagger::Requests::Gibct::InstitutionPrograms,
       Swagger::Requests::Gibct::YellowRibbonPrograms,
       Swagger::Requests::HealthCareApplications,
-      Swagger::Requests::HcaAttachments,
+      Swagger::Requests::HCAAttachments,
       Swagger::Requests::InProgressForms,
       Swagger::Requests::IntentToFile,
       Swagger::Requests::Letters,
@@ -160,6 +166,7 @@ module V0
       Swagger::Requests::VAFacilities,
       Swagger::Requests::CCProviders,
       Swagger::Requests::CaregiversAssistanceClaims,
+      Swagger::Requests::EducationCareerCounselingClaims,
       Swagger::Responses::AuthenticationError,
       Swagger::Responses::ForbiddenError,
       Swagger::Responses::RecordNotFoundError,
@@ -167,10 +174,8 @@ module V0
       Swagger::Responses::UnprocessableEntityError,
       Swagger::Schemas::Address,
       Swagger::Schemas::Appeals::Requests,
-      Swagger::Schemas::Appeals::HigherLevelReviewRequest,
       Swagger::Schemas::Appeals::HigherLevelReview,
-      Swagger::Schemas::Appeals::IntakeStatus,
-      Swagger::Schemas::Appeals::ContestableIssues,
+      Swagger::Schemas::Asks,
       Swagger::Schemas::AsyncTransaction::Vet360,
       Swagger::Schemas::BB::HealthRecords,
       Swagger::Schemas::Countries,
@@ -221,7 +226,8 @@ module V0
       Swagger::Schemas::CCProviders,
       Swagger::Schemas::UserInternalServices,
       Swagger::Schemas::Permission,
-      Swagger::Schemas::ValidVaFileNumber,
+      Swagger::Schemas::ValidVAFileNumber,
+      Swagger::Schemas::PaymentHistory,
       Swagger::Schemas::Vet360::Address,
       Swagger::Schemas::Vet360::Email,
       Swagger::Schemas::Vet360::Telephone,

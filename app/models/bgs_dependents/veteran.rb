@@ -7,7 +7,6 @@ module BGSDependents
     attribute :first_name, String
     attribute :middle_name, String
     attribute :last_name, String
-    attribute :icn, String
 
     def initialize(proc_id, user)
       @proc_id = proc_id
@@ -35,7 +34,7 @@ module BGSDependents
       vet_info.to_h
     end
 
-    def veteran_response(participant, va_file_number, address, end_product)
+    def veteran_response(participant, va_file_number, address, end_product, location_id)
       {
         vnp_participant_id: participant[:vnp_ptcpnt_id],
         first_name: first_name,
@@ -50,7 +49,8 @@ module BGSDependents
         address_city: address[:city_nm],
         address_zip_code: address[:zip_prefix_nbr],
         type: 'veteran',
-        benefit_claim_type_end_product: end_product
+        benefit_claim_type_end_product: end_product,
+        location_id: location_id
       }
     end
 
@@ -62,15 +62,12 @@ module BGSDependents
         ssn: @user.ssn,
         first_name: @user.first_name,
         middle_name: @user.middle_name,
-        last_name: @user.last_name,
-        icn: @user.icn
+        last_name: @user.last_name
       }
     end
 
     def marital_status(dependents_application)
       spouse_lives_with_vet = dependents_application.dig('does_live_with_spouse', 'spouse_does_live_with_veteran')
-
-      return 'Never Married' if dependents_application.dig('veteran_was_married_before') == false
 
       return nil if spouse_lives_with_vet.nil?
 
