@@ -108,7 +108,7 @@ gem 'statsd-instrument', '~> 2.6.0' # versions beyond 2.6 deprecate config and c
 gem 'swagger-blocks'
 gem 'typhoeus'
 gem 'utf8-cleaner'
-gem 'vets_json_schema', git: 'https://github.com/department-of-veterans-affairs/vets-json-schema', branch: 'master'
+gem 'vets_json_schema', git: 'https://github.com/department-of-veterans-affairs/vets-json-schema', branch: 'orchid-121'
 gem 'virtus'
 gem 'will_paginate'
 gem 'zero_downtime_migrations'

@@ -20,7 +20,7 @@ module V0
       def klass
         case form_id
         when '0873'
-          ::PersistentAttachments::InquiryAttachment
+          ::PersistentAttachments::InquiryDocument
         end
       end
 
