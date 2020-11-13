@@ -63,7 +63,7 @@ module PdfFill
             question_suffix: 'A',
             question_text: 'VA FILE NUMBER'
           },
-          'dob' => {
+          'birth_date' => {
             'month' => {
               key: 'VBA281900[0].#subform[0].DOBmonth[0]',
               limit: 2,
@@ -89,56 +89,26 @@ module PdfFill
         }, # end veteran_information
         'veteran_address' => {
           'address_line1' => {
-            key: '',
+            key: 'VBA281900[0].#subform[0].Address1[1]',
             limit: 30,
             question_num: 5,
             question_suffix: 'A',
             question_text: 'MAILING ADDRESS'
           },
           'address_line2' => {
-            key: '',
-            limit: 5,
+            key: 'VBA281900[0].#subform[0].Address2[1]',
+            limit: 30,
             question_num: 5,
             question_suffix: 'B',
             question_text: 'MAILING ADDRESS'
           },
-          'city' => {
-            key: '',
-            limit: 18,
+          'address_line3' => {
+            key: 'VBA281900[0].#subform[0].Address3[1]',
+            limit: 30,
             question_num: 5,
             question_suffix: 'C',
             question_text: 'MAILING ADDRESS'
-          },
-          'state_code' => {
-            key: '',
-            limit: 2,
-            question_num: 5,
-            question_suffix: 'D',
-            question_text: 'MAILING ADDRESS'
-          },
-          'country_name' => {
-            key: '',
-            limit: 2,
-            question_num: 5,
-            question_suffix: 'E',
-            question_text: 'MAILING ADDRESS'
-          },
-          'zip_code' => {
-            'firstFive' => {
-              key: '',
-              limit: 5,
-              question_num: 5,
-              question_suffix: 'F',
-              question_text: 'MAILING ADDRESS'
-            },
-            'lastFour' => {
-              key: '',
-              limit: 4,
-              question_num: 5,
-              question_suffix: 'G',
-              question_text: 'MAILING ADDRESS'
-            }
-          } # end zip_code
+          }
         }, # end veteran_address
         'main_phone' => {
           'phone_area_code' => {
@@ -163,7 +133,7 @@ module PdfFill
             question_text: 'MAIN TELEPHONE NUMBER'
           }
         },
-        'email_address' => {
+        'email' => {
           key: 'VBA281900[0].#subform[0].EmailAddress[0]',
           limit: 30,
           question_num: 7,
@@ -195,92 +165,56 @@ module PdfFill
         },
         'new_address' => {
           'address_line1' => {
-            key: '',
+            key: 'VBA281900[0].#subform[0].Address1[0]',
             limit: 30,
             question_num: 9,
             question_suffix: 'A',
             question_text: 'NEW ADDRESS IF MOVING WITHIN THE NEXT 30 DAYS'
           },
           'address_line2' => {
-            key: '',
-            limit: 5,
+            key: 'VBA281900[0].#subform[0].Address2[0]',
+            limit: 30,
             question_num: 9,
             question_suffix: 'B',
             question_text: 'NEW ADDRESS IF MOVING WITHIN THE NEXT 30 DAYS'
           },
-          'city' => {
-            key: '',
-            limit: 18,
+          'address_line3' => {
+            key: 'VBA281900[0].#subform[0].Address3[0]',
+            limit: 30,
             question_num: 9,
             question_suffix: 'C',
             question_text: 'NEW ADDRESS IF MOVING WITHIN THE NEXT 30 DAYS'
-          },
-          'state_code' => {
-            key: '',
-            limit: 2,
-            question_num: 9,
-            question_suffix: 'D',
-            question_text: 'NEW ADDRESS IF MOVING WITHIN THE NEXT 30 DAYS'
-          },
-          'country_name' => {
-            key: '',
-            limit: 2,
-            question_num: 9,
-            question_suffix: 'E',
-            question_text: 'NEW ADDRESS IF MOVING WITHIN THE NEXT 30 DAYS'
-          },
-          'zip_code' => {
-            'firstFive' => {
-              key: '',
-              limit: 5,
-              question_num: 9,
-              question_suffix: 'F',
-              question_text: 'NEW ADDRESS IF MOVING WITHIN THE NEXT 30 DAYS'
-            },
-            'lastFour' => {
-              key: '',
-              limit: 4,
-              question_num: 9,
-              question_suffix: 'G',
-              question_text: 'NEW ADDRESS IF MOVING WITHIN THE NEXT 30 DAYS'
-            }
-          } # end zip_code
+          }
         }, # end new_address
-        # @TODO REMOVE ME
-        # "is_moving" => true,
-        'education_level' => {
+        'years_of_education' => {
           key: 'VBA281900[0].#subform[0].EducationYR[0]',
           limit: 2,
           question_num: 10,
           question_suffix: 'A',
           question_text: 'NUMBER OF YEARS OF EDUCATION'
-        }
-        # @TODO
-        # 11A. SIGNATURE OF CLAIMANT
-        # 11B. DATE SIGNED (MM-DD-YYYY)
+        },
+        'signature' => {
+          key: 'signature'
+        },
+        'date_signed' => {
+          'month' => {
+            key: 'VBA281900[0].#subform[0].DOBmonth[1]'
+          },
+          'day' => {
+            key: 'VBA281900[0].#subform[0].DOBday[1]'
+          },
+          'year' => {
+            key: 'VBA281900[0].#subform[0].DOByear[1]'
+          }
+        } # end date_signed
       }.freeze
 
-    # {
-    #   "vocational_readiness_employment_form" => {
-    #     "education_level" => "BACHELORS",
-    #     "is_moving" => true,
-    #     "new_address" => {
-    #       "country_name" => "USA", "address_line1" => "9417 Princess Palm", "city" => "Tampa", "state_code" => "FL", "zip_code" => "33928"
-    #     },
-    #     "veteran_address" => {
-    #       "country_name" => "USA", "address_line1" => "9417 Princess Palm", "city" => "Tampa", "state_code" => "FL", "zip_code" => "33928"
-    #     },
-    #     "main_phone" => "5555555555",
-    #     "email_address" => "cohnjesse@gmail.xom",
-    #     "veteran_information" => {
-    #       "full_name" => {
-    #         "first" => "JERRY", "middle" => "M", "last" => "BROOKS"
-    #       }, "dob" => "1947-09-25"
-    #     }
-    #   }
-    # }
-      def merge_fields
+      def merge_fields(_options = {})
         merge_veteran_helpers
+        merge_address_helpers
+
+        expand_signature(@form_data['veteran_information']['full_name'])
+        @form_data['date_signed'] = split_date(@form_data['signatureDate'])
 
         @form_data
       end
@@ -288,19 +222,27 @@ module PdfFill
       def merge_veteran_helpers
         veteran_information = @form_data['veteran_information']
 
+        # extract middle initial
+        veteran_information['full_name'] = extract_middle_i(veteran_information, 'full_name')
+
         # extract ssn
         ssn = veteran_information['ssn']
-        veteran_information['ssn'] = split_ssn(ssn.delete('-')) if ssn.present?
+        if ssn.present?
+          ssn = ssn.delete('-')
+          veteran_information['ssn'] = split_ssn(ssn)
+          va_file_number = veteran_information['va_file_number']
+          veteran_information['va_file_number'] = '' if ssn == va_file_number
+        end
 
         # extract birth date
-        veteran_information['dob'] = split_date(veteran_information['dob'])
+        veteran_information['birth_date'] = split_date(veteran_information['birth_date'])
 
         expand_phone_number('main_phone')
         expand_phone_number('cell_phone')
       end
 
       def expand_phone_number(phone_type)
-        phone_number = @form_data[phone_type]
+        phone_number = @form_data[phone_type] # ie. "main_phone", "cell_phone"
         if phone_number.present?
           phone_number = phone_number.delete('^0-9')
           @form_data[phone_type] = {
@@ -309,6 +251,33 @@ module PdfFill
             'phone_last_four_numbers' => phone_number[6..9]
           }
         end
+      end
+
+      def merge_address_helpers
+        # @TODO multiple address lines, foreign address, etc?
+        format_address(@form_data['veteran_address'])
+        format_address(@form_data['new_address']) if @form_data['is_moving']
+      end
+
+      def format_address(address)
+        street1 = address['street'] || ''
+        street2 = address['street2'] || ''
+        street3 = address['street3'] || ''
+        city = address['city'] || ''
+        state = address['state'] || ''
+        postal_code = address['postal_code'] || ''
+        country = address['country'] || ''
+        line_length = street1.length + street2.length + street3.length
+
+        if line_length > 28
+          #xyz
+        else
+          #address['address_line1'] = street1 + ' ' + street2 + ' ' + street3
+        end
+
+        address['address_line1'] = street1 + ' ' + street2 + ' ' + street3
+        address['address_line2'] = city + ' ' + state + ' ' + postal_code
+        address['address_line3'] = country
       end
     end
   end
