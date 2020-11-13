@@ -38,7 +38,7 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :vocational_readiness_employment_form, only: [:create]
+    resources :veteran_readiness_employment_claims, only: [:create]
 
     resource :disability_compensation_form, only: [] do
       get 'rated_disabilities'
