@@ -70,6 +70,8 @@ class InProgressForm < ApplicationRecord
     @expires_after ||=  case form_id
                         when '21-526EZ'
                           1.year
+                        when /HC-QSTNR/
+                          JSON.parse(form_data).fetch('daysTillExpires', '60').to_i.days
                         else
                           60.days
                         end
