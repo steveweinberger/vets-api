@@ -299,6 +299,7 @@ Rails.application.routes.draw do
 
     namespace :contact_us do
       resources :inquiries, only: %i[index create]
+      resources :topic, only: :index
     end
   end
 
