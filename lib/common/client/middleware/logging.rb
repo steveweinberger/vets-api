@@ -10,6 +10,7 @@ module Common
         end
 
         def call(env)
+          binding.pry
           request_body = Base64.encode64(env.body) if env.body
 
           @app.call(env).on_complete do |response_env|

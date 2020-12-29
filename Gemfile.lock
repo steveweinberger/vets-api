@@ -73,39 +73,84 @@ GIT
       script_utils (= 0.0.4)
 
 PATH
-  remote: modules
+  remote: modules/appeals_api
   specs:
     appeals_api (0.0.1)
       sidekiq
+
+PATH
+  remote: modules/apps_api
+  specs:
     apps_api (0.0.1)
       faraday
       sidekiq
+
+PATH
+  remote: modules/claims_api
+  specs:
     claims_api (0.0.1)
+
+PATH
+  remote: modules/covid_research
+  specs:
     covid_research (0.1.0)
       rails (~> 6.0.3, >= 6.0.3.2)
       sidekiq
-    covid_vaccine (0.1.0)
-      sidekiq
+
+PATH
+  remote: modules/health_quest
+  specs:
     health_quest (0.1.0)
+
+PATH
+  remote: modules/mobile
+  specs:
     mobile (0.1.0)
+
+PATH
+  remote: modules/openid_auth
+  specs:
     openid_auth (0.0.1)
+
+PATH
+  remote: modules/va_forms
+  specs:
     va_forms (0.0.1)
       faraday
       nokogiri
       paper_trail
       sidekiq
+
+PATH
+  remote: modules/vaos
+  specs:
     vaos (0.1.0)
       sidekiq
+
+PATH
+  remote: modules/vba_documents
+  specs:
     vba_documents (0.0.1)
       aws-sdk-s3 (~> 1)
       sidekiq
-    veteran (0.0.1)
+
+PATH
+  remote: modules/veteran_confirmation
+  specs:
     veteran_confirmation (0.0.1)
+
+PATH
+  remote: modules/veteran_verification
+  specs:
     veteran_verification (0.0.1)
+
+PATH
+  remote: modules/veteran
+  specs:
+    veteran (0.0.1)
 
 GEM
   remote: https://rubygems.org/
-  remote: https://enterprise.contribsys.com/
   specs:
     Ascii85 (1.0.3)
     aasm (5.0.6)
@@ -209,8 +254,6 @@ GEM
       i18n
     benchmark-ips (2.8.2)
     bindex (0.8.1)
-    bootsnap (1.5.1)
-      msgpack (~> 1.0)
     brakeman (4.9.0)
     breakers (0.4.0)
       faraday (>= 0.7.4, < 0.18)
@@ -332,7 +375,6 @@ GEM
     e2mmap (0.1.0)
     ecma-re-validator (0.2.0)
       regexp_parser (~> 1.2)
-    einhorn (0.7.4)
     encryptor (3.0.0)
     equalizer (0.0.11)
     erubi (1.9.0)
@@ -503,7 +545,6 @@ GEM
     mini_mime (1.0.2)
     mini_portile2 (2.4.0)
     minitest (5.14.2)
-    msgpack (1.3.3)
     multi_json (1.15.0)
     multi_xml (0.6.0)
     multipart-post (2.1.1)
@@ -587,9 +628,6 @@ GEM
       ruby-rc4
       ttfunk
     pg (1.2.3)
-    pg_query (1.2.0)
-    pghero (2.7.3)
-      activerecord (>= 5)
     prawn (2.2.2)
       pdf-core (~> 0.7.0)
       ttfunk (~> 1.5)
@@ -768,13 +806,6 @@ GEM
       rack (~> 2.0)
       rack-protection (>= 1.5.0)
       redis (>= 3.3.5, < 4.2)
-    sidekiq-ent (1.8.1)
-      einhorn (= 0.7.4)
-      sidekiq (>= 5.2.3)
-      sidekiq-pro (>= 4.0.4)
-    sidekiq-pro (5.0.0)
-      concurrent-ruby (>= 1.0.5)
-      sidekiq (>= 5.2.7)
     sidekiq-scheduler (3.0.1)
       e2mmap
       redis (>= 3, < 5)
@@ -886,7 +917,6 @@ DEPENDENCIES
   benchmark-ips
   betamocks!
   bgs_ext!
-  bootsnap
   brakeman (~> 4.7)
   breakers
   bundler-audit
@@ -899,7 +929,6 @@ DEPENDENCIES
   config
   connect_vbms!
   covid_research!
-  covid_vaccine!
   danger
   database_cleaner
   date_validator
@@ -958,8 +987,6 @@ DEPENDENCIES
   pdf-inspector
   pdf-reader
   pg
-  pg_query (>= 0.9.0)
-  pghero
   prawn
   pry-byebug
   puma (~> 4.3.7)
@@ -997,8 +1024,6 @@ DEPENDENCIES
   sentry-raven
   shrine
   sidekiq (~> 5.0)
-  sidekiq-ent!
-  sidekiq-pro!
   sidekiq-scheduler (~> 3.0)
   simplecov (< 0.18)
   spring

@@ -33,7 +33,6 @@ module VAOS
             # service_name: service_name || 'VAOS Generic', # Need to figure out a clean way to do this with headers
             url: "(#{env.method.upcase}) #{env.url}"
           }
-
           if response_env.status.between?(200, 299)
             log(:info, 'VAOS service call succeeded!', log_tags)
           else
@@ -51,6 +50,7 @@ module VAOS
       # @param tags [Hash] key value pairs of semantically relevant tags needed for debugging
       # @return [Boolean] returns true or false
       def log(type, message, tags)
+        binding.pry
         Rails.logger.send(type, message, tags)
       end
 
