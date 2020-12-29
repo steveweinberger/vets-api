@@ -38,7 +38,6 @@ module ExceptionHandling
         when ActionController::ParameterMissing
           Common::Exceptions::ParameterMissing.new(exception.param)
         when Common::Exceptions::BaseError
-          binding.pry
           exception
         when Breakers::OutageException
           Common::Exceptions::ServiceOutage.new(exception.outage)

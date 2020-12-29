@@ -50,7 +50,6 @@ module VAOS
       # @param tags [Hash] key value pairs of semantically relevant tags needed for debugging
       # @return [Boolean] returns true or false
       def log(type, message, tags)
-        binding.pry
         Rails.logger.send(type, message, tags)
       end
 

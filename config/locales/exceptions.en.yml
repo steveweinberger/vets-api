@@ -583,7 +583,7 @@ en:
         code: 'VAOS_409A'
         detail: # deliberately left nil to reference response.body which is unparsable string (not json)
         status: 409
-        sentry_type: 'none'
+        sentry_type: 'warn'
       VAOS_400:
         <<: *external_defaults
         title: Bad Request
