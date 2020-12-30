@@ -30,6 +30,7 @@ RSpec.describe BGS::Service do
       VCR.config do |c|
         c.allow_http_connections_when_no_cassette = true
       end
+      res = bgs_service.send(:service).ddeft.find_bank_name_by_routng_trnsit_nbr('122400724')
       binding.pry; fail
     end
 
