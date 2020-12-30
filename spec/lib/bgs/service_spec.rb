@@ -27,6 +27,9 @@ RSpec.describe BGS::Service do
     end
 
     it 'f' do
+      VCR.config do |c|
+        c.allow_http_connections_when_no_cassette = true
+      end
       binding.pry; fail
     end
 
