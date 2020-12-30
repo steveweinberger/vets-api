@@ -15,5 +15,11 @@ module BGS
     def self.service_name
       'ddeft'
     end
+
+    def find_bank_name_by_routng_trnsit_nbr(routing_number)
+      response = request(:find_bank_name_by_routng_trnsit_nbr, routngTrnsitNbr: routing_number)
+
+      response.body || []
+    end
   end
 end

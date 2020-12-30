@@ -26,6 +26,10 @@ RSpec.describe BGS::Service do
       end
     end
 
+    it 'f' do
+      binding.pry; fail
+    end
+
     it 'retrieves a users dd eft info' do
       VCR.use_cassette('bgs/service/find_ch33_dd_eft', VCR::MATCH_EVERYTHING) do
         response = bgs_service.find_ch33_dd_eft
