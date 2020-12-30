@@ -1,0 +1,37 @@
+inherit_from: .rubocop_todo.yml
+
+require:
+  - rubocop-thread_safety
+
+AllCops:
+  TargetRubyVersion: 2.5
+  Include:
+    - '**/lib/**/*.rb'
+    - '**/spec/**/*.rb'
+
+Style/StringLiterals:
+  EnforcedStyle: single_quotes
+
+Style/Documentation:
+  Enabled: false
+
+Naming:
+  Enabled: false
+
+Layout/LineLength:
+  Max: 120
+
+Metrics/MethodLength:
+  Description: Avoid methods longer than 20 lines of code.
+  StyleGuide: https://github.com/bbatsov/ruby-style-guide#short-methods
+  Enabled: true
+  CountComments: false
+  Max: 20
+
+Metrics/ParameterLists:
+  Enabled: false
+  Max: 5
+  CountKeywordArgs: true
+
+ThreadSafety/ClassAndModuleAttributes:
+  Enabled: false

@@ -1,0 +1,9 @@
+bgs*gem
+*swp
+vendor/
+Gemfile.lock
+.DS_Store
+.idea/
+coverage
+.byebug_history
+docs/
