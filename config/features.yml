@@ -172,6 +172,11 @@ features:
     enable_in_development: true
     description: >
       Enables Project Cheetah discovery work
+  va_online_scheduling_new_thing:
+    actor_type: user
+    enable_in_development: true
+    description: >
+      Enables something
   va_global_downtime_notification:
     actor_type: user
     description: >
