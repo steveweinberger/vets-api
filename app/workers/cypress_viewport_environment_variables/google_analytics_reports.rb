@@ -42,7 +42,7 @@ module CypressViewportEnvironmentVariables
                    metrics: [metric_user],
                    dimensions: [dimension_device_category, dimension_screen_resolution],
                    order_bys: [{ field_name: "ga:users", sort_order: "DESCENDING" }],
-                   page_size: 500,
+                   page_size: 100,
                  )])
 
       response = analytics.batch_get_reports(request)
