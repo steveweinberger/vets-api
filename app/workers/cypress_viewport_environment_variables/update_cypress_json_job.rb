@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative './google_analytics_report'
+require_relative './google_analytics_reports'
 require_relative './viewport_collection'
 
 module CypressViewportEnvironmentVariables
@@ -11,10 +11,10 @@ module CypressViewportEnvironmentVariables
     END_DATE = Date.today.prev_month.end_of_month
 
     def perform
-      report = CypressViewportEnvironmentVariables::
-                 GoogleAnalyticsReport.new(START_DATE, END_DATE)
-      user_report = report.user_report
-      viewport_report = report.viewport_report
+      reports = CypressViewportEnvironmentVariables::
+                 GoogleAnalyticsReports.new(START_DATE, END_DATE)
+      user_report = reports.user_report
+      viewport_report = reports.viewport_report
 
       # create viewport collections
       # get cypress file
