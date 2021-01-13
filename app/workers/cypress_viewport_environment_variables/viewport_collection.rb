@@ -50,20 +50,14 @@ module CypressViewportEnvironmentVariables
       device, resolution = dimensions[0], dimensions[1]
       width, height = resolution.split('x')
 
-      # exmple viewport object:
-      # {
-      #   "list": "VA Top Mobile Viewports",
-      #   "rank": 2,
-      #   "devicesWithViewport": "iPhone X, iPhone XS, iPhone 11 Pro",
-      #   "percentTraffic": 4.11,
-      #   "percentTrafficPeriod": "December, 2020",
-      #   "viewportPreset": "va-top-mobile-2",
-      #   "width": 375,
-      #   "height": 812
-      # }
-
       {
-        width: width
+        list: "VA Top #{device.capitalize} Viewports",
+        rank: nil,
+        devicesWithViewport: nil, # create device lookup table based on width and height
+        percentTraffic: nil, # oops, i forgot to get that from GA!
+        percentTrafficPeriod: "#{start_date}--#{end_date}",
+        viewportPreset: "va-top-#{device.capitalize}-",
+        width: width,
         height: height
       }
     end
