@@ -1,16 +1,15 @@
 require 'google/apis/analyticsreporting_v4'
 
 module CypressViewportEnvironmentVariables
-  class GoogleAnalyticsViewportReport
+  class GoogleAnalyticsReport
     include Google::Apis::AnalyticsreportingV4
     include Google::Auth
 
-    VIEW_ID = "176188361"
-    SCOPE = "https://www.googleapis.com/auth/analytics.readonly"
     JSON_CREDENTIALS = File.open('./app/workers/cypress_viewport_environment_variables/analytics-api-key.json')
+    SCOPE = "https://www.googleapis.com/auth/analytics.readonly"
+    VIEW_ID = "176188361"
 
-    attr_reader :analytics, :get_report_request, :report_request,
-                :start_date, :end_date
+    attr_reader :start_date, :end_date, :analytics, :user_report, :viewport_report
 
     def initialize(start_date, end_date)
       @start_date = start_date
@@ -19,56 +18,51 @@ module CypressViewportEnvironmentVariables
       analytics.authorization = ServiceAccountCredentials.make_creds(
                                   json_key_io: JSON_CREDENTIALS,
                                   scope: SCOPE)
-      @get_report_request = GetReportsRequest.new
-      @report_request = ReportRequest.new
-    end
-
-    def get
-      make_report
+      @user_report = nil
+      @viewport_report = nil
+      create_reports
     end
 
     private
 
-    def make_report
-      add_view_id
-      add_metric
-      add_date_range
-      add_dimensions
-      add_sort
-      add_limit
-      get_report_request.report_requests = [report_request]
-      analytics.batch_get_reports(get_report_request).reports.first
+    attr_writer :response, :user_report, :viewport_report
+
+    def create_reports
+      request = GetReportsRequest.new(report_requests: [
+                 # reports number of users
+                 ReportRequest.new(
+                   view_id: VIEW_ID,
+                   date_ranges: [date_range],
+                   metrics: [metric_user],
+                 ),
+                 # reports number of users using different screen resolutions
+                 ReportRequest.new(
+                   view_id: VIEW_ID,
+                   date_ranges: [date_range],
+                   metrics: [metric_user],
+                   dimensions: [dimension_device_category, dimension_screen_resolution],
+                   order_bys: [{ field_name: "ga:users", sort_order: "DESCENDING" }],
+                   page_size: 500,
+                 )])
+
+      response = analytics.batch_get_reports(request)
+      self.user_report, self.viewport_report = response.reports[0], response.reports[1]
     end
 
-    def add_view_id
-      report_request.view_id = VIEW_ID
+    def date_range
+      DateRange.new(start_date: start_date, end_date: end_date)
     end
 
-    def add_metric
-      metric = Metric.new
-      metric.expression = "ga:users"
-      report_request.metrics = [metric]
+    def metric_user
+      Metric.new(expression: 'ga:users')
     end
 
-    def add_date_range
-      range = DateRange.new
-      range.start_date = start_date
-      range.end_date = end_date
-      report_request.date_ranges = [range]
+    def dimension_device_category
+      Dimension.new(name: 'ga:deviceCategory')
     end
 
-    def add_dimensions
-      primary_dimension = Dimension.new(name: 'ga:deviceCategory')
-      secondary_dimension = Dimension.new(name: 'ga:screenResolution')
-      report_request.dimensions = [primary_dimension, secondary_dimension]
-    end
-
-    def add_sort
-      report_request.order_bys = [{ field_name: "ga:users", sort_order: "DESCENDING" }]
-    end
-
-    def add_limit
-      report_request.page_size = 500
+    def dimension_screen_resolution
+      Dimension.new(name: 'ga:screenResolution')
     end
   end
 end
