@@ -1,6 +1,8 @@
 module CypressViewportEnvironmentVariables
   class ViewportCollection
 
+    NUMBER_OF_TOP_VIEWPORTS = 5
+
     attr_reader :start_date, :end_date, :google_analytics_report,
                  :top_mobile_viewports, :top_tablet_viewports, :top_desktop_viewports
     
@@ -22,22 +24,24 @@ module CypressViewportEnvironmentVariables
 
         case device
         when 'mobile'
-          if top_mobile_viewports.size < 5
+          if top_mobile_viewports.size < NUMBER_OF_TOP_VIEWPORTS
             top_mobile_viewports << create_viewport_hash(row)
           end
         when 'tablet'
-          if top_tablet_viewports.size < 5
+          if top_tablet_viewports.size < NUMBER_OF_TOP_VIEWPORTS
             top_tablet_viewports << create_viewport_hash(row)
           end
         when 'desktop'
-          if top_desktop_viewports.size < 5
+          if top_desktop_viewports.size < NUMBER_OF_TOP_VIEWPORTS
             top_desktop_viewports << create_viewport_hash(row)
           end
         end
 
         break if [top_mobile_viewports,
                   top_tablet_viewports,
-                  top_desktop_viewports].all? { |array| array.size >= 5 }
+                  top_desktop_viewports].all? do |array|
+                    array.size >= NUMBER_OF_TOP_VIEWPORTS
+                  end
       end
     end
 
