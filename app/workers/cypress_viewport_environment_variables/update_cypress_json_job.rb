@@ -12,6 +12,13 @@ module CypressViewportEnvironmentVariables
     def perform
       report = CypressViewportEnvironmentVariables::
                  GoogleAnalyticsViewportReport.new(START_DATE, END_DATE).get
+      # create viewport collections
+      # get cypress file
+      # edit file
+      # save file
+      # create new git branch
+      # commit file
+      # submit pr
     end
   end
 end
