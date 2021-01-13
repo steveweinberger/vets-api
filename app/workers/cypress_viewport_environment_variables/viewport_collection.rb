@@ -11,8 +11,7 @@ module CypressViewportEnvironmentVariables
       @start_date = start_date
       @end_date = end_date
       @google_analytics_report = report
+      parse_report
     end
-
-    def get; end
   end
 end
