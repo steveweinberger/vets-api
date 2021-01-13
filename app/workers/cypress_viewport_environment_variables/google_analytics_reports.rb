@@ -25,7 +25,7 @@ module CypressViewportEnvironmentVariables
 
     private
 
-    attr_writer :response, :user_report, :viewport_report
+    attr_writer :user_report, :viewport_report
 
     def create_reports
       request = GetReportsRequest.new(report_requests: [
