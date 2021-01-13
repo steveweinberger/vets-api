@@ -25,15 +25,15 @@ module CypressViewportEnvironmentVariables
         case device
         when 'mobile'
           if top_mobile_viewports.size < NUMBER_OF_TOP_VIEWPORTS
-            top_mobile_viewports << create_viewport_hash(row)
+            top_mobile_viewports << create_viewport(row)
           end
         when 'tablet'
           if top_tablet_viewports.size < NUMBER_OF_TOP_VIEWPORTS
-            top_tablet_viewports << create_viewport_hash(row)
+            top_tablet_viewports << create_viewport(row)
           end
         when 'desktop'
           if top_desktop_viewports.size < NUMBER_OF_TOP_VIEWPORTS
-            top_desktop_viewports << create_viewport_hash(row)
+            top_desktop_viewports << create_viewport(row)
           end
         end
 
@@ -45,7 +45,7 @@ module CypressViewportEnvironmentVariables
       end
     end
 
-    def create_viewport_hash(row)
+    def create_viewport(row)
       dimensions = row.dimensions
       device, resolution = dimensions[0], dimensions[1]
       width, height = resolution.split('x')
