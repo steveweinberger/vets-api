@@ -40,5 +40,28 @@ module CypressViewportEnvironmentVariables
                   top_desktop_viewports].all? { |array| array.size >= 5 }
       end
     end
+
+    def create_viewport_hash(row)
+      dimensions = row.dimensions
+      device, resolution = dimensions[0], dimensions[1]
+      width, height = resolution.split('x')
+
+      # exmple viewport object:
+      # {
+      #   "list": "VA Top Mobile Viewports",
+      #   "rank": 2,
+      #   "devicesWithViewport": "iPhone X, iPhone XS, iPhone 11 Pro",
+      #   "percentTraffic": 4.11,
+      #   "percentTrafficPeriod": "December, 2020",
+      #   "viewportPreset": "va-top-mobile-2",
+      #   "width": 375,
+      #   "height": 812
+      # }
+
+      {
+        width: width
+        height: height
+      }
+    end
   end
 end
