@@ -2,7 +2,7 @@ module CypressViewportEnvironmentVariables
   class ViewportCollection
 
     NUMBER_OF_TOP_VIEWPORTS = 5
-    DEVICES = ""
+    DEVICES = "" # create device lookup table based on width and height
 
     attr_reader :start_date, :end_date, :google_analytics_report,
                  :top_mobile_viewports, :top_tablet_viewports, :top_desktop_viewports
@@ -54,8 +54,8 @@ module CypressViewportEnvironmentVariables
       {
         list: "VA Top #{device.capitalize} Viewports",
         rank: nil,
-        devicesWithViewport: DEVICES, # create device lookup table based on width and height
-        percentTraffic: nil, # oops, i forgot to get that from GA!
+        devicesWithViewport: DEVICES,
+        percentTraffic: nil, # oops, i forgot to get this from GA!
         percentTrafficPeriod: "#{start_date}--#{end_date}",
         viewportPreset: "va-top-#{device.capitalize}-",
         width: width,
