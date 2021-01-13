@@ -13,7 +13,7 @@ module CypressViewportEnvironmentVariables
     def perform
       report = CypressViewportEnvironmentVariables::
                  GoogleAnalyticsViewportReport.new(START_DATE, END_DATE).get
-      viewport_collection = ViewportCollection.new(START_DATE, END_DATE, report).get
+      viewport_collection = ViewportCollection.new(START_DATE, END_DATE, report)
       # create viewport collections
       # get cypress file
       # edit file
