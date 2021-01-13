@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative './google_analytics_viewport_report'
+require_relative './viewport_collection'
 
 module CypressViewportEnvironmentVariables
   class UpdateCypressJsonJob
@@ -12,6 +13,7 @@ module CypressViewportEnvironmentVariables
     def perform
       report = CypressViewportEnvironmentVariables::
                  GoogleAnalyticsViewportReport.new(START_DATE, END_DATE).get
+      viewport_collection = ViewportCollection.new(report).get
       # create viewport collections
       # get cypress file
       # edit file
