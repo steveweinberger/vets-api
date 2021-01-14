@@ -86,7 +86,6 @@ PATH
       sidekiq
     covid_vaccine (0.1.0)
       sidekiq
-    dror_test (0.1.0)
     health_quest (0.1.0)
     mobile (0.1.0)
     openid_auth (0.0.1)
@@ -910,7 +909,6 @@ DEPENDENCIES
   database_cleaner
   date_validator
   debase
-  dror_test!
   dry-struct
   dry-types
   factory_bot_rails (> 5)

@@ -10,7 +10,6 @@ gem 'websocket-extensions', '>= 0.1.5'
 
 # Modules
 path 'modules' do
-	gem 'dror_test'
   gem 'appeals_api'
   gem 'apps_api'
   gem 'claims_api'
