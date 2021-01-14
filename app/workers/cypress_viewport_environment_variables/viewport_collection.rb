@@ -1,8 +1,9 @@
+require_relative './viewport'
+
 module CypressViewportEnvironmentVariables
   class ViewportCollection
 
     NUMBER_OF_TOP_VIEWPORTS = 5
-    DEVICES = "" # create device lookup table based on width and height
 
     attr_reader :start_date, :end_date, :total_users,
                 :google_analytics_viewport_report, :top_mobile_viewports,
@@ -32,15 +33,15 @@ module CypressViewportEnvironmentVariables
         case device
         when 'mobile'
           if top_mobile_viewports.size < NUMBER_OF_TOP_VIEWPORTS
-            top_mobile_viewports << create_viewport(row)
+            top_mobile_viewports << make_new_viewport(row)
           end
         when 'tablet'
           if top_tablet_viewports.size < NUMBER_OF_TOP_VIEWPORTS
-            top_tablet_viewports << create_viewport(row)
+            top_tablet_viewports << make_new_viewport(row)
           end
         when 'desktop'
           if top_desktop_viewports.size < NUMBER_OF_TOP_VIEWPORTS
-            top_desktop_viewports << create_viewport(row)
+            top_desktop_viewports << make_new_viewport(row)
           end
         end
 
@@ -52,26 +53,12 @@ module CypressViewportEnvironmentVariables
       end
     end
 
-    def create_viewport(row)
-      dimensions = row.dimensions
-      device, resolution = dimensions[0], dimensions[1]
-      width, height = resolution.split('x')
-      number_of_users = row.metrics.first.values.first.to_f
-
-      {
-        list: "VA Top #{device.capitalize} Viewports",
-        rank: nil,
-        devicesWithViewport: DEVICES,
-        percentTraffic: "#{calculate_percentage_of_users_who_use_viewport(number_of_users)}%",
-        percentTrafficPeriod: "from #{start_date} to #{end_date}",
-        viewportPreset: "va-top-#{device}-",
-        width: width,
-        height: height
-      }
-    end
-
-    def calculate_percentage_of_users_who_use_viewport(number_of_users)
-      (number_of_users / total_users * 100).round(2)
+    def make_new_viewport(row)
+      CypressViewportEnvironmentVariables::
+        Viewport.new(start_date: start_date,
+                     end_date: end_date,
+                     row: row,
+                     total_users: total_users)
     end
   end
 end
