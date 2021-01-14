@@ -18,6 +18,7 @@ module CypressViewportEnvironmentVariables
       @total_users = parse_user_report_for_total_users(user_report)
       @google_analytics_viewport_report = viewport_report
       parse_google_analytics_viewport_report_to_create_top_viewport_collections
+      update_viewport_rank_attributes_in_each_top_viewport_collection
     end
 
     private
@@ -58,8 +59,20 @@ module CypressViewportEnvironmentVariables
     end
 
     def all_top_viewport_collections_full?
-      viewport_collections = [top_mobile_viewports, top_tablet_viewports, top_desktop_viewports]
       viewport_collections.all? { |viewports| viewports.count >= NUMBER_OF_TOP_VIEWPORTS }
+    end
+
+    def update_viewport_rank_attributes_in_each_top_viewport_collection
+      viewport_collections.each do |collection|
+        collection.each_with_index do |viewport, index|
+          puts viewport.inspect
+          viewport.update_rank_attributes(index)
+        end
+      end
+    end
+
+    def viewport_collections
+      [top_mobile_viewports, top_tablet_viewports, top_desktop_viewports]
     end
   end
 end
