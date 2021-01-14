@@ -67,8 +67,8 @@ module CypressViewportEnvironmentVariables
     def update_viewport_rank_attributes_in_each_top_viewport_collection
       viewport_collections.each do |collection|
         collection.each_with_index do |viewport, index|
-          puts viewport.inspect
-          viewport.update_rank_attributes(index)
+          rank = (index + 1).to_s
+          viewport.update_attributes_that_reference_rank(rank)
         end
       end
     end

@@ -17,8 +17,7 @@ module CypressViewportEnvironmentVariables
       @width, @height = resolution.split('x')
     end
 
-    def update_rank_attributes(index)
-      rank = (index + 1).to_s
+    def update_attributes_that_reference_rank(rank)
       update_rank(rank)
       update_viewport_preset(rank)
     end
