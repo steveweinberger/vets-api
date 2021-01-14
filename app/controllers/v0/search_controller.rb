@@ -30,7 +30,7 @@ module V0
       url = params[:url]
       query = params[:query]
       user_agent = params[:user_agent]
-      client_ip = nil # todo - how to get "client_ip?"
+      client_ip = nil # todo - how to get "client_ip?"? Is this okay w/VSP security? (PII concerns?)
 
       Search::Service.new(nil, nil).track_click(url, query, user_agent, client_ip)
 
@@ -42,10 +42,6 @@ module V0
 
     def search_params
       params.permit(:query, :page)
-    end
-
-    def track_click_params
-      params.permit(:url, :query, :user_agent, :client_ip)
     end
 
     # Returns a sanitized, permitted version of the passed query params.
