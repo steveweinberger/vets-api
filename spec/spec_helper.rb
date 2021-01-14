@@ -47,8 +47,6 @@ unless ENV['NOCOVERAGE']
     add_filter 'version.rb'
 
     # Modules
-	add_group 'DrorTest',
-      'modules/dror_test/'
     add_group 'Policies', 'app/policies'
     add_group 'Serializers', 'app/serializers'
     add_group 'Services', 'app/services'

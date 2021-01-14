@@ -2,6 +2,9 @@
 
 require 'rails_helper'
 
+# outputs debug string into specs
+# "D, [2021-01-14T20:26:08.449720 #29] DEBUG -- : HTTPI /peer GET request to internal-dsva-vagov-dev-fwdproxy-1893365470.us-gov-west-1.elb.amazonaws.com (net_http)\n"
+
 RSpec.describe BGS::PeopleService do
   let(:user) { FactoryBot.create(:evss_user, :loa3) }
 
