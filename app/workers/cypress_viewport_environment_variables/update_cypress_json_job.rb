@@ -4,7 +4,7 @@ require_relative './google_analytics_reports'
 require_relative './viewport_collection'
 
 module CypressViewportUpdater
-  class UpdateCypressJsonJob
+  class UpdateCypressViewportsJob
     include Sidekiq::Worker
 
     START_DATE = Date.today.prev_month.beginning_of_month
