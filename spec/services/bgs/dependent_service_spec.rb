@@ -2,6 +2,9 @@
 
 require 'rails_helper'
 
+
+# has outputs?
+
 RSpec.describe BGS::DependentService do
   let(:user) { FactoryBot.create(:evss_user, :loa3) }
   let(:claim) { double('claim') }

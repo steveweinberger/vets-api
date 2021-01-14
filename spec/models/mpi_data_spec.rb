@@ -27,6 +27,7 @@ describe MPIData, skip_mvi: true do
     )
   end
   let(:add_response_error) { MPI::Responses::AddPersonResponse.with_server_error(server_error_exception) }
+  # review this to_s
   let(:default_ttl) { REDIS_CONFIG[MPIData::REDIS_CONFIG_KEY.to_s]['each_ttl'] }
   let(:failure_ttl) { REDIS_CONFIG[MPIData::REDIS_CONFIG_KEY.to_s]['failure_ttl'] }
 

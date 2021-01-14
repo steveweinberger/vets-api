@@ -47,6 +47,8 @@ unless ENV['NOCOVERAGE']
     add_filter 'version.rb'
 
     # Modules
+	add_group 'DrorTest',
+      'modules/dror_test/'
     add_group 'Policies', 'app/policies'
     add_group 'Serializers', 'app/serializers'
     add_group 'Services', 'app/services'
@@ -162,4 +164,29 @@ RSpec.configure do |config|
   config.after(:all, :enable_csrf_protection) do
     ActionController::Base.allow_forgery_protection = @original_allow_forgery_protection
   end
+  config.before(:all) do
+    # temp to discover which specs are dropping output
+    # def $stderr.puts(string)
+    #   super(Kernel.caller)
+    #   super
+    # end
+
+    def $stdout.write(string)
+      # super(Kernel.caller)
+      binding.pry unless string == "\e[32m.\e[0m"
+      super
+    end
+  end
+
+  # original_stderr = $stderr
+  # original_stdout = $stdout
+  # config.before(:all) do
+  #   # Redirect stderr and stdout
+  #   $stderr = File.open(File::NULL, "w")
+  #   $stdout = File.open(File::NULL, "w")
+  # end
+  # config.after(:all) do
+  #   $stderr = original_stderr
+  #   $stdout = original_stdout
+  # end
 end

@@ -1,0 +1,10 @@
+= DrorTest
+TODO: Short description and motivation.
+
+== Installation
+Ensure the following line is in the root project's Gemfile:
+
+  gem 'drortest', path: 'modules/drortest'
+
+== License
+This module is open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).

@@ -3,6 +3,17 @@
 require 'rails_helper'
 require 'bgs/vnp_veteran'
 
+# has outputs?
+# could it be in bgs?
+# "/usr/local/bundle/bundler/gems/bgs-ext-4da926722554/lib/bgs/base.rb:170:in `request'",
+# "/usr/local/bundle/bundler/gems/bgs-ext-4da926722554/lib/bgs/services/vnp_ptcpnt.rb:22:in `vnp_ptcpnt_create'",
+# "/srv/vets-api/src/lib/bgs/service.rb:59:in `block in create_participant'",
+# "/srv/vets-api/src/lib/bgs/exceptions/bgs_errors.rb:12:in `with_multiple_attempts_enabled'",
+# "/srv/vets-api/src/lib/bgs/service.rb:58:in `create_participant'",
+
+# tries to print things like:
+# D, [2021-01-14T15:57:43.782489 #29] DEBUG -- : HTTPI /peer GET request to internal-dsva-vagov-dev-fwdproxy-1893365470.us-gov-west-1.elb.amazonaws.com (net_http)
+
 RSpec.describe BGS::VnpVeteran do
   let(:user_object) { FactoryBot.create(:evss_user, :loa3) }
   let(:all_flows_payload) { FactoryBot.build(:form_686c_674) }
