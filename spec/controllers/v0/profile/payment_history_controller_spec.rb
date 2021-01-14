@@ -2,6 +2,9 @@
 
 require 'rails_helper'
 
+# outputs debug line in specs
+# "D, [2021-01-14T20:11:20.985266 #29] DEBUG -- : HTTPI /peer GET request to internal-dsva-vagov-dev-fwdproxy-1893365470.us-gov-west-1.elb.amazonaws.com (net_http)\n"
+
 RSpec.describe V0::Profile::PaymentHistoryController, type: :controller do
   let(:user) { create(:evss_user) }
 

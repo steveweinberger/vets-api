@@ -32,7 +32,7 @@ RSpec.describe InProgressFormSerializer, type: :serializer do
         .to be_present
       expect(metadata['how_now']['brown_cow']['-an eas-i-ly corRupted KEY.'])
         .not_to be_present
-      puts metadata['how_now']['brown_cow'].keys
+      puts metadata['how_now']['brown_cow'].keys # puts in spec!
     end
   end
 end

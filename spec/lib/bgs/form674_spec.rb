@@ -3,6 +3,9 @@
 require 'rails_helper'
 require 'bgs/form674'
 
+# outputs logs during specs
+# "D, [2021-01-14T20:06:37.183653 #29] DEBUG -- : HTTPI /peer GET request to internal-dsva-vagov-dev-fwdproxy-1893365470.us-gov-west-1.elb.amazonaws.com (net_http)\n"
+
 RSpec.describe BGS::Form674 do
   let(:user_object) { FactoryBot.create(:evss_user, :loa3) }
   let(:all_flows_payload) { FactoryBot.build(:form_686c_674) }

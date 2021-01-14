@@ -2,6 +2,9 @@
 
 require 'rails_helper'
 
+# outputs text during tests
+# "SHRINE WARNING: Error occurred when attempting to extract image dimensions: #<FastImage::UnknownImageType: FastImage::UnknownImageType>\n"
+
 RSpec.describe PersistentAttachments::PensionBurial, uploader_helpers: true do
   let(:file) { Rails.root.join('spec', 'fixtures', 'files', 'doctors-note.pdf') }
   let(:instance) { described_class.new(form_id: 'T-123') }

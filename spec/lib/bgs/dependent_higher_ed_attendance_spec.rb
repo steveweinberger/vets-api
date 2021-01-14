@@ -3,6 +3,8 @@
 require 'rails_helper'
 require 'bgs/dependent_higher_ed_attendance'
 
+# outputs debugger line in tests
+
 RSpec.describe BGS::DependentHigherEdAttendance do
   let(:user_object) { FactoryBot.create(:evss_user, :loa3) }
   let(:proc_id) { '3831414' }

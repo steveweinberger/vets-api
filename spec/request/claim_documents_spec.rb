@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# outputs shrine warning
+# "SHRINE WARNING: Error occurred when attempting to extract image dimensions: #<FastImage::UnknownImageType: FastImage::UnknownImageType>\n"
+
 require 'rails_helper'
 RSpec.describe 'Claim Document Attachment', type: :request do
   let(:file) do

@@ -2,6 +2,9 @@
 
 require 'rails_helper'
 
+# outputs debug line during specs
+# "D, [2021-01-14T20:16:23.232090 #29] DEBUG -- : HTTPI /peer GET request to internal-dsva-vagov-dev-fwdproxy-1893365470.us-gov-west-1.elb.amazonaws.com (net_http)\n"
+
 RSpec.describe 'Debts API Endpoint', type: :request do
   include SchemaMatchers
 

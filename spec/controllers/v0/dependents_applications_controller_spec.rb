@@ -2,6 +2,9 @@
 
 require 'rails_helper'
 
+# outputs during tests
+# "D, [2021-01-14T19:41:27.678355 #29] DEBUG -- : HTTPI /peer GET request to internal-dsva-vagov-dev-fwdproxy-1893365470.us-gov-west-1.elb.amazonaws.com (net_http)\n"
+
 RSpec.describe V0::DependentsApplicationsController do
   let(:user) { create(:evss_user) }
 

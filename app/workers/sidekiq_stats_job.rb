@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# throws deprecation warning for config_for accessed with strings
+
 class SidekiqStatsJob
   include Sidekiq::Worker
 

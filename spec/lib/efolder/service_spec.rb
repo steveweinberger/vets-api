@@ -4,8 +4,11 @@ require 'rails_helper'
 require Rails.root.join('modules', 'claims_api', 'spec', 'support', 'fake_vbms.rb')
 require 'efolder/service'
 
+# outputs debug log during specs
+# "D, [2021-01-14T20:22:01.130120 #29] DEBUG -- : HTTPI /peer GET request to internal-dsva-vagov-dev-fwdproxy-1893365470.us-gov-west-1.elb.amazonaws.com (net_http)\n"
+
 RSpec.describe Efolder::Service do
-  subject { described_class.new(user) }
+  subject { described_class.new(user) } # this is the stack trace for the first debug message
 
   let(:file_number) { '796043735' }
   let(:user) { build(:user, :loa3, ssn: file_number) }
