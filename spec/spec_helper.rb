@@ -162,6 +162,8 @@ RSpec.configure do |config|
   config.after(:all, :enable_csrf_protection) do
     ActionController::Base.allow_forgery_protection = @original_allow_forgery_protection
   end
+
+  # this is some ugly code to interrupt tests when they are trying to print output
   config.before(:all) do
     # temp to discover which specs are dropping output
     # def $stderr.puts(string)
