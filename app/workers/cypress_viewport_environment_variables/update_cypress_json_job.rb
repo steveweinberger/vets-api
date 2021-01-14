@@ -19,7 +19,6 @@ module CypressViewportEnvironmentVariables
                                                      user_report: reports.user_report,
                                                      viewport_report: reports.viewport_report)
 
-      # create viewport collections
       # get cypress file
       # edit file
       # save file
