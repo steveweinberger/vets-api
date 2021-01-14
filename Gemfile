@@ -172,6 +172,7 @@ group :development, :test do
   gem 'faraday_curl'
   gem 'fuubar'
   gem 'guard-rspec', '~> 4.7'
+  gem 'octokit', '~> 4.20'
   gem 'overcommit'
   gem 'parallel_tests'
   gem 'pry-byebug'
