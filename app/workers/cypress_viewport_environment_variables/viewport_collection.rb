@@ -59,7 +59,9 @@ module CypressViewportEnvironmentVariables
     end
 
     def all_top_viewport_collections_full?
-      viewport_collections.all? { |viewports| viewports.count >= NUMBER_OF_TOP_VIEWPORTS }
+      viewport_collections.all? do |viewports|
+        viewports.count >= NUMBER_OF_TOP_VIEWPORTS
+      end
     end
 
     def update_viewport_rank_attributes_in_each_top_viewport_collection
