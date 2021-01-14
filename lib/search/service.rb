@@ -39,10 +39,36 @@ module Search
       handle_error(e)
     end
 
+    def track_click(url, query, user_agent, client_ip)
+      with_monitoring do
+        # todo - make url, query, user_agent, and client_ip are URL-encoded
+        query_params = {
+          affiliate: affiliate,
+          access_key: access_key,
+          url: url,
+          query: query,
+          user_agent: user_agent,
+          client_ip: client_ip
+        }
+
+        # todo - confirm that the API request is issued to 'https://api.gsa.gov/technology/searchgov/v2/clicks
+        # instead of "https://search.usa.gov/api/v2" (which is the endpoint for the "results" method)
+        perform(:post, track_click_url, query_params)
+        # todo - do we need to do anything with the response other than
+        # check the response code?
+      end
+    rescue => e
+      handle_error(e)
+    end
+
     private
 
     def results_url
       config.base_path
+    end
+
+    def track_click_url
+      config.track_click_base_path
     end
 
     # Required params [affiliate, access_key, query]

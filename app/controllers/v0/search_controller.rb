@@ -19,10 +19,33 @@ module V0
       render json: response, serializer: SearchSerializer, meta: { pagination: response.pagination }
     end
 
+    def track_search_result_click
+      # Send a click event to the search.gov admin dashboard for comprehensive analytics
+      # The full search.gov API request should look like https://api.gsa.gov/technology/searchgov/v2/clicks?url={URL}&query={QUERY}&affiliate=logstash&position={POSITION}&module_code={MODULE_CODE}&access_key={ACCESS_KEY}=&client_ip={CLIENT_IP}&user_agent={USER_AGENT}
+      # Example scenario - A user on www.va.gov/search?query=health (query=search) clicked search result linking to https://benefits.va.gov (url=https://benefits.va.gov)
+
+      # url, query, user_agent, and client_ip will all be collected here.
+      # The search service will appent the other params.
+
+      url = params[:url]
+      query = params[:query]
+      user_agent = params[:user_agent]
+      client_ip = nil # todo - how to get "client_ip?"
+
+      Search::Service.new(nil, nil).track_click(url, query, user_agent, client_ip)
+
+      # We probably don't need to do anything with the response
+      # other than return a correct status code.
+    end
+
     private
 
     def search_params
       params.permit(:query, :page)
+    end
+
+    def track_click_params
+      params.permit(:url, :query, :user_agent, :client_ip)
     end
 
     # Returns a sanitized, permitted version of the passed query params.

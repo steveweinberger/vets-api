@@ -26,6 +26,11 @@ module Search
       "#{Settings.search.url}/search/i14y"
     end
 
+    def track_click_base_path
+      # Todo - move this into Settings.search.track_click_url (settings.yml)
+      'https://api.gsa.gov/technology/searchgov/v2/clicks'
+    end
+
     def service_name
       'Search/Results'
     end
