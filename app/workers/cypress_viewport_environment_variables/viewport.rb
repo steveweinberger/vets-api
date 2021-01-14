@@ -33,7 +33,7 @@ module CypressViewportEnvironmentVariables
       @percentTraffic = "#{calculate_percentage_of_users_who_use_viewport(number_of_users, total_users)}%"
       @percentTrafficPeriod = "from #{start_date} to #{end_date}"
       @viewportPreset = "va-top-#{device}-"
-      @width, @height = resolution.split('x')
+      @width, @height = resolution.split('x').map(&:to_i)
     end
 
     def update_attributes_that_reference_rank(rank)
