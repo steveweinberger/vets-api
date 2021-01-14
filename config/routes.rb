@@ -253,7 +253,7 @@ Rails.application.routes.draw do
     end
 
     resources :search, only: :index
-    get 'track_search_result_click', to: 'search#track_search_result_click'
+    post 'search/track_search_result_click', to: 'search#track_search_result_click'
 
     get 'forms', to: 'forms#index'
 
