@@ -1,4 +1,4 @@
-module CypressViewportEnvironmentVariables
+module CypressViewportUpdater
   class Viewport
     DEVICES = {
       '1920x1080' => 'Microsoft Windows RT Tablet',

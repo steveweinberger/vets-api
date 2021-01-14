@@ -1,6 +1,6 @@
 require 'google/apis/analyticsreporting_v4'
 
-module CypressViewportEnvironmentVariables
+module CypressViewportUpdater
   class GoogleAnalyticsReports
     include Google::Apis::AnalyticsreportingV4
     include Google::Auth

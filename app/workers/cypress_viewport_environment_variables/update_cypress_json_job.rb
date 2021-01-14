@@ -3,7 +3,7 @@
 require_relative './google_analytics_reports'
 require_relative './viewport_collection'
 
-module CypressViewportEnvironmentVariables
+module CypressViewportUpdater
   class UpdateCypressJsonJob
     include Sidekiq::Worker
 
@@ -11,10 +11,10 @@ module CypressViewportEnvironmentVariables
     END_DATE = Date.today.prev_month.end_of_month
 
     def perform
-      reports = CypressViewportEnvironmentVariables::
+      reports = CypressViewportUpdater::
                   GoogleAnalyticsReports.new(start_date: START_DATE,
                                              end_date: END_DATE)
-      viewport_collection = CypressViewportEnvironmentVariables::
+      viewport_collection = CypressViewportUpdater::
                               ViewportCollection.new(start_date: START_DATE,
                                                      end_date: END_DATE,
                                                      user_report: reports.user_report,

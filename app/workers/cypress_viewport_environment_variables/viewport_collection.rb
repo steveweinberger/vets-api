@@ -1,6 +1,6 @@
 require_relative './viewport'
 
-module CypressViewportEnvironmentVariables
+module CypressViewportUpdater
   class ViewportCollection
 
     NUMBER_OF_TOP_VIEWPORTS = 5
@@ -49,7 +49,7 @@ module CypressViewportEnvironmentVariables
     end
 
     def make_viewport(row)
-      CypressViewportEnvironmentVariables::
+      CypressViewportUpdater::
         Viewport.new(start_date: start_date,
                      end_date: end_date,
                      row: row,
