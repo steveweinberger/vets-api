@@ -4,7 +4,7 @@ require 'rails_helper'
 require 'bgs/vnp_veteran'
 
 # has outputs?
-# could it be in bgs?
+# could it be in bgs? looks like bgs tests do this too.  Tried `HTTPI.log = false` for no effect
 # "/usr/local/bundle/bundler/gems/bgs-ext-4da926722554/lib/bgs/base.rb:170:in `request'",
 # "/usr/local/bundle/bundler/gems/bgs-ext-4da926722554/lib/bgs/services/vnp_ptcpnt.rb:22:in `vnp_ptcpnt_create'",
 # "/srv/vets-api/src/lib/bgs/service.rb:59:in `block in create_participant'",

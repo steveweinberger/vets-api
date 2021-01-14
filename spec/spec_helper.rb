@@ -173,7 +173,7 @@ RSpec.configure do |config|
 
     def $stdout.write(string)
       # super(Kernel.caller)
-      binding.pry unless string == "\e[32m.\e[0m"
+      binding.pry if Kernel.caller.any? {|x| x=~/Savon/i} # savon/httpi is doing logging inside bgs_ext
       super
     end
   end
