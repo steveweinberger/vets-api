@@ -45,11 +45,7 @@ module CypressViewportEnvironmentVariables
           end
         end
 
-        break if [top_mobile_viewports,
-                  top_tablet_viewports,
-                  top_desktop_viewports].all? do |array|
-                    array.size >= NUMBER_OF_TOP_VIEWPORTS
-                  end
+        break if all_top_viewport_collections_full?
       end
     end
 
@@ -59,6 +55,12 @@ module CypressViewportEnvironmentVariables
                      end_date: end_date,
                      row: row,
                      total_users: total_users)
+    end
+
+    def all_top_viewport_collections_full?
+      viewport_collections = [top_mobile_viewports, top_tablet_viewports, top_desktop_viewports]
+      viewport_collections.all? { |viewports| viewports.count >= NUMBER_OF_TOP_VIEWPORTS }
+      end
     end
   end
 end
