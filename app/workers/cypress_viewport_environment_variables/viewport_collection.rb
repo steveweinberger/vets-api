@@ -17,7 +17,7 @@ module CypressViewportEnvironmentVariables
       @end_date = end_date
       @total_users = parse_user_report_for_total_users(user_report)
       @google_analytics_viewport_report = viewport_report
-      parse_viewport_report
+      parse_google_analytics_viewport_report_to_create_top_viewport_collections
     end
 
     private
@@ -26,7 +26,7 @@ module CypressViewportEnvironmentVariables
       user_report.data.totals.first.values.first.to_f
     end
 
-    def parse_viewport_report
+    def parse_google_analytics_viewport_report_to_create_top_viewport_collections
       google_analytics_viewport_report.data.rows.each do |row|
         device = row.dimensions.first
 
@@ -60,7 +60,6 @@ module CypressViewportEnvironmentVariables
     def all_top_viewport_collections_full?
       viewport_collections = [top_mobile_viewports, top_tablet_viewports, top_desktop_viewports]
       viewport_collections.all? { |viewports| viewports.count >= NUMBER_OF_TOP_VIEWPORTS }
-      end
     end
   end
 end
