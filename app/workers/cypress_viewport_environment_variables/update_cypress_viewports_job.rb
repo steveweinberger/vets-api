@@ -20,11 +20,31 @@ module CypressViewportUpdater
                                                      user_report: reports.user_report,
                                                      viewport_report: reports.viewport_report)
 
-      # get cypress file
-      # edit file
-      # save file
+
+      Octokit::Client.new(client_id: 'Iv1.6ab544c8f04d383c', client_secret: '378292d09573f3ed2f9d7d977b6d47f20fe7e337')
+      
+      # TO-DO
+      # two files to update:
+      # cypress.json
+      # viewportPreset.js
+
+      # implement open, update and save for each file locally (no access to github api yet):
+      # open cypress.json
+      # update cypress.json
+      # save cypress.json
+
+      # open viewportPreset.js
+      # update viewportPreset.js
+      # save viewportPreset.js
+
+      # GITHUB API
+      # get cypress.json
+      # get viewportPreset.js
+      # update files (see above)
+
       # create new git branch
-      # commit file
+      # commit cypress.json
+      # commit viewportPreset.js
       # submit pr
     end
   end
