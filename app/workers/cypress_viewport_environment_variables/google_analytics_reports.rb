@@ -29,24 +29,30 @@ module CypressViewportUpdater
 
     def create_reports
       request = GetReportsRequest.new(report_requests: [
-                 # reports number of users
-                 ReportRequest.new(
-                   view_id: VIEW_ID,
-                   date_ranges: [date_range],
-                   metrics: [metric_user],
-                 ),
-                 # reports number of users using different screen resolutions
-                 ReportRequest.new(
-                   view_id: VIEW_ID,
-                   date_ranges: [date_range],
-                   metrics: [metric_user],
-                   dimensions: [dimension_device_category, dimension_screen_resolution],
-                   order_bys: [{ field_name: "ga:users", sort_order: "DESCENDING" }],
-                   page_size: 100,
-                 )])
+                 user_report_request,
+                 viewport_report_request])
 
       response = analytics.batch_get_reports(request)
       self.user_report, self.viewport_report = response.reports[0], response.reports[1]
+    end
+
+    def user_report_request
+      ReportRequest.new(
+        view_id: VIEW_ID,
+        date_ranges: [date_range],
+        metrics: [metric_user],
+      )
+    end
+
+    def viewport_report_request
+      ReportRequest.new(
+        view_id: VIEW_ID,
+        date_ranges: [date_range],
+        metrics: [metric_user],
+        dimensions: [dimension_device_category, dimension_screen_resolution],
+        order_bys: [{ field_name: "ga:users", sort_order: "DESCENDING" }],
+        page_size: 100,
+      )
     end
 
     def date_range
