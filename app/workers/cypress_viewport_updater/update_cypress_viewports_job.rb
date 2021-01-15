@@ -62,10 +62,9 @@ module CypressViewportUpdater
       # You must first convert the hash to json to convert Ruby objects to json
       # Convert that json back to a hash
       # Then call JSON.pretty_generate() with the new hash
-      json = hash.to_json
-      new_hash = JSON.parse(json)
+
       File.write('app/workers/cypress_viewport_updater/updated_files/cypress.json',
-                    JSON.pretty_generate(new_hash))
+                    JSON.pretty_generate(JSON.parse(hash.to_json)))
     end
   end
 end
