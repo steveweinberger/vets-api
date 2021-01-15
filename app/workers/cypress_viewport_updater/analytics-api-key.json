@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "vsp-analytics-and-insights",
+  "private_key_id": "8e9ee03076656cbe20c17f396cb9e97555e08689",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQC/l3zj8rBHow4K\n2TnloVgi2w7huQJhcDyF4oAbL4jW2QYrR1/KmJ2M2ruGIZAEzMmWRor4j5G0scdw\nMmGGyBNMExHxgT2VllWFU7N6ZcKXl0uaMsqUeY9iGvgj6Ns/WBRNcSIHfhDv9iVV\nJM33q+GI3vOANdZW8zg9bO7FBrCaO6h2ZWhOfTnad4nNjpQCjTaZjE4BjuYzC1ZR\n1NbC0l6bGys8x78X+s5gmXMy3yEwSA5OdcOaeyEN+IrYuatplxji8lBHt76XUR+f\n6u5ivodo2KgqtFodPNdnaRJGtiXaKK+ExUIytpxZdJIgJISsrApckTZ/1HuVcgdA\nIA7v6LWRAgMBAAECggEAEunT28ZWUdoWPaqsUR+EfXthzJVol2EermpZ0mU2xVvb\nBKx4971pZzFkG/WF+71SJK4905QLsppuuWQV1dn8MrE6vxwurczPkDf/MqTnSPL3\n9QbQ0geuiIUoTBY1h5sstOjnTrVKm3+xd4ZouUuL2gjFYbme2UpNGd4+M2/JwQ3Z\nFboPhjNyMNYlEuXTfYrc/TcSK9RXrfe4OKGOXHtvwK4ipgddexw9kjviYrMCy5I1\naQvH/4dhFaetWnaGbYDghMA/a277E4dRnbzD29OoClGGSMQi2MB1zoAxZNlpfS/k\nuzHfqjd1Ig/py1QcUCmUbo6eNjkQO4jFMonZyR/AiQKBgQDplOzhFrou517Eb2M9\nk+PlDf+Ate8Z5TPAunM94y0EK3Gg/egjh+clqbyGHGLKrBBgQMXkcNEQlf9EURsE\n6NuKUxNO7WjU1C4wUt6c1WiWJ9kyrYibWsTS2XnwGtVpq7cv+Ie+8nGDrFJsN6NP\nuq6cHb3GeNJJRo3khAAGwnuuWQKBgQDR+t+musNPKAH6PvKsbU/bBDW/n4VdgcvD\n7uNe5JIHcwZw8wDYfvMDDrgP+FKubURbk1cgG9q9gTzLrj1MgXt33SKJ7L0+ExxS\nKIPrKYz4Fei3nOsu2YaU/qDOCPcnFZ+BiF5DFJ6wEEcn/asUosaoYemID/C+QHfL\nh/xEnvMJ+QKBgC2ijvUa/50STw2JxZXOQwQJTBXVdbVVdlr9Em7Q54adBkIx2Ry3\n/Iz7MH3zJcn6++gSP5d2AyJ+a7TpM6It7FaGDIurDoQmQC/owN1bRGexuVmRVdMk\nVLftDUm/tFpE1jFlGQBRVaQoEqJZ7GozStHtbZpNGKiARFCVCXxImulhAoGAJof8\npmG7GTlkM4F9knp0nuIE4ubo2CHLPGcHvg//Y/KNightbUzOVw9KY1PUCEHwu0Us\nRa4W05N1joKoqPNRrssbXWfdyhhDqCfbHToArj2G+LqIxY4RDiIza9tlTvy+ykw1\nz+VmwTQbepEn5Z+BCMD+04LpUGAQG38WoZjxTDECgYAiwSPtjAGWoRBNuOv5/Drr\ngSxqb0M+s1HA6IKNhmfnctEqaL8onvXvTKMzwlAyC3Rbd/LdnYKMcAXNJbEl1BBy\nZutDN3DNs7bAwJf/VRNNmEzDb3/XtjomSFZDWfVKPnvmTFHKDek7nu5Bl8DBY6VC\npQjFqD1E4AYQXNz7vRdITA==\n-----END PRIVATE KEY-----\n",
+  "client_email": "va-gov-top-user-viewports@vsp-analytics-and-insights.iam.gserviceaccount.com",
+  "client_id": "116081333131928897052",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/va-gov-top-user-viewports%40vsp-analytics-and-insights.iam.gserviceaccount.com"
+}
