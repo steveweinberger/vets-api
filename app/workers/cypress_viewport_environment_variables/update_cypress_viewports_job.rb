@@ -19,9 +19,6 @@ module CypressViewportUpdater
                                                      end_date: END_DATE,
                                                      user_report: reports.user_report,
                                                      viewport_report: reports.viewport_report)
-
-
-      Octokit::Client.new(client_id: 'Iv1.6ab544c8f04d383c', client_secret: '378292d09573f3ed2f9d7d977b6d47f20fe7e337')
       
       # TO-DO
       # two files to update:
