@@ -58,11 +58,6 @@ module CypressViewportUpdater
       directory_name = 'app/workers/cypress_viewport_updater/updated_files'
       Dir.mkdir(directory_name) unless Dir.exist?(directory_name)
 
-      # JSON.pretty_generate() does not convert Ruby objects to json
-      # You must first convert the hash to json to convert Ruby objects to json
-      # Convert that json back to a hash
-      # Then call JSON.pretty_generate() with the new hash
-
       File.write('app/workers/cypress_viewport_updater/updated_files/cypress.json',
                     JSON.pretty_generate(JSON.parse(hash.to_json)))
     end
