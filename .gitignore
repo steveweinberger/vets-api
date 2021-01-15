@@ -85,4 +85,4 @@ modules/**/Gemfile.lock
 /config/master.key
 
 # Ignore google analytics api credentials.
-/app/workers/cypress_viewport_environment_variables/analytics-api-key.json
+/app/workers/cypress_viewport_updater/analytics-api-key.json
