@@ -29,23 +29,30 @@ module CypressViewportUpdater
         case device
         when 'mobile'
           mobile_viewports = viewports[:mobile]
-          if mobile_viewports.size < NUMBER_OF_TOP_VIEWPORTS
+          if mobile_viewports.size < NUMBER_OF_TOP_VIEWPORTS &&
+               width_and_height_set?(row)
             mobile_viewports << make_viewport(row)
           end
         when 'tablet'
           tablet_viewports = viewports[:tablet]
-          if tablet_viewports.size < NUMBER_OF_TOP_VIEWPORTS
+          if tablet_viewports.size < NUMBER_OF_TOP_VIEWPORTS &&
+               width_and_height_set?(row)
             tablet_viewports << make_viewport(row)
           end
         when 'desktop'
           desktop_viewports = viewports[:desktop]
-          if desktop_viewports.size < NUMBER_OF_TOP_VIEWPORTS
+          if desktop_viewports.size < NUMBER_OF_TOP_VIEWPORTS &&
+               width_and_height_set?(row)
             desktop_viewports << make_viewport(row)
           end
         end
 
         break if viewports_full?
       end
+    end
+
+    def width_and_height_set?(row)
+      row.dimensions[1] != "(not set)"
     end
 
     def make_viewport(row)
