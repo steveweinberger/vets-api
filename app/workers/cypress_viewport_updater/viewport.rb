@@ -21,7 +21,7 @@ module CypressViewportUpdater
       '320x480' => 'iPhone 1st gen , iPhone 3G , iPhone 3GS , iPhone 4',
     }
 
-    attr_reader :viewportPreset
+    attr_reader :viewportPreset, :width, :height
 
     def initialize(start_date:, end_date:, row:, total_users:)
       number_of_users = row.metrics.first.values.first.to_f
