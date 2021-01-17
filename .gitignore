@@ -81,8 +81,5 @@ docker_debugging
 # Ignore lock files in modules (gems)
 modules/**/Gemfile.lock
 
-# Ignore master key for decrypting credentials and more.
-/config/master.key
-
 # Ignore google analytics api credentials.
 /app/workers/cypress_viewport_updater/analytics-api-key.json
