@@ -20,6 +20,7 @@ module CypressViewportUpdater
                                                      user_report: reports.user_report,
                                                      viewport_report: reports.viewport_report)
       create_updated_cypress_json_file(viewport_collection)
+      create_updated_viewport_preset_js_file(viewport_collection)
       # update_cypress_json_file(viewport_collection)
       # TO-DO
       # two files to update:
@@ -61,6 +62,43 @@ module CypressViewportUpdater
       hash['env']['vaTopMobileViewports'] = collection.viewports[:mobile]
       hash['env']['vaTopTabletViewports'] = collection.viewports[:tablet]
       hash['env']['vaTopDesktopViewports'] = collection.viewports[:desktop]
+    end
+
+    def create_updated_viewport_preset_js_file(viewport_collection)
+      old_file_path = 'app/workers/cypress_viewport_updater/old_files/viewportPreset.js'
+      new_file = create_new_viewport_preset_js_file
+
+      File.open(old_file_path, 'r').each do |line|
+        if /va-top-(mobile|tablet|desktop)-\d+/.match(line)
+          if /va-top-(mobile|tablet|desktop)-1/.match(line)
+            print_viewport_presets(file: new_file,
+                                   line: line,
+                                   collection: viewport_collection)
+          end
+        else
+          new_file.print line
+        end
+      end
+
+      new_file.close
+    end
+
+    def create_new_viewport_preset_js_file
+      new_file_path = 'app/workers/cypress_viewport_updater/updated_files/viewportPreset.js'
+      File.delete(new_file_path) if File.exist?(new_file_path)
+      File.new(new_file_path, 'w')
+    end
+
+    def print_viewport_presets(file:, line:, collection:)
+      viewport_type = /(mobile|tablet|desktop)/.match(line)[0]
+      viewports = collection.viewports[viewport_type.to_sym]
+
+      viewports.each_with_index do |viewport, i|
+        width = viewport.width
+        height = viewport.height
+        preset = "  'va-top-#{viewport_type}-#{i + 1}': { width: #{width}, height: #{height} },\n"
+        file.print preset
+      end
     end
   end
 end
