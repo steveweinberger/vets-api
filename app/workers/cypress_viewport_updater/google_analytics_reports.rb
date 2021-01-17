@@ -5,7 +5,7 @@ module CypressViewportUpdater
     include Google::Apis::AnalyticsreportingV4
     include Google::Auth
 
-    JSON_CREDENTIALS = File.open('./app/workers/cypress_viewport_updater/analytics-api-key.json')
+    JSON_CREDENTIALS = YAML::load(File.open('config/settings.local.yml'))['google_analytics_service_credentials'].to_json
     SCOPE = "https://www.googleapis.com/auth/analytics.readonly"
     VIEW_ID = "176188361"
 
@@ -16,7 +16,7 @@ module CypressViewportUpdater
       @end_date = end_date
       @analytics = AnalyticsReportingService.new
       analytics.authorization = ServiceAccountCredentials.make_creds(
-                                  json_key_io: JSON_CREDENTIALS,
+                                  json_key_io: StringIO.new(JSON_CREDENTIALS),
                                   scope: SCOPE)
       @user_report = nil
       @viewport_report = nil
