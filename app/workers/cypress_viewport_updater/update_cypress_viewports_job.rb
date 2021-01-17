@@ -49,17 +49,18 @@ module CypressViewportUpdater
     private
 
     def create_updated_cypress_json_file(viewport_collection)
-      file = File.read('app/workers/cypress_viewport_updater/old_files/cypress.json')
-      hash = JSON.parse(file)
-      hash['env']['vaTopMobileViewports'] = viewport_collection.viewports[:mobile]
-      hash['env']['vaTopTabletViewports'] = viewport_collection.viewports[:tablet]
-      hash['env']['vaTopDesktopViewports'] = viewport_collection.viewports[:desktop]
+      old_file_path = 'app/workers/cypress_viewport_updater/old_files/cypress.json'
+      new_file_path = 'app/workers/cypress_viewport_updater/updated_files/cypress.json'
+      hash = JSON.parse(File.read(old_file_path))
+      update_viewports(hash: hash, collection: viewport_collection)
+      File.delete(new_file_path) if File.exist?(new_file_path)
+      File.write(new_file_path, JSON.pretty_generate(JSON.parse(hash.to_json)))
+    end
 
-      directory_name = 'app/workers/cypress_viewport_updater/updated_files'
-      Dir.mkdir(directory_name) unless Dir.exist?(directory_name)
-
-      File.write('app/workers/cypress_viewport_updater/updated_files/cypress.json',
-                    JSON.pretty_generate(JSON.parse(hash.to_json)))
+    def update_viewports(hash:, collection:)
+      hash['env']['vaTopMobileViewports'] = collection.viewports[:mobile]
+      hash['env']['vaTopTabletViewports'] = collection.viewports[:tablet]
+      hash['env']['vaTopDesktopViewports'] = collection.viewports[:desktop]
     end
   end
 end
