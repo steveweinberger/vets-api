@@ -21,26 +21,11 @@ module CypressViewportUpdater
                                                      viewport_report: reports.viewport_report)
       create_updated_cypress_json_file(viewport_collection)
       create_updated_viewport_preset_js_file(viewport_collection)
-      # update_cypress_json_file(viewport_collection)
       # TO-DO
-      # two files to update:
-      # cypress.json
-      # viewportPreset.js
-
-      # implement open, update and save for each file locally (no access to github api yet):
-      # open cypress.json
-      # update cypress.json
-      # save cypress.json
-
-      # open viewportPreset.js
-      # update viewportPreset.js
-      # save viewportPreset.js
-
       # GITHUB API
       # get cypress.json
       # get viewportPreset.js
       # update files (see above)
-
       # create new git branch
       # commit cypress.json
       # commit viewportPreset.js
