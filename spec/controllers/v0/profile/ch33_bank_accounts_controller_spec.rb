@@ -2,9 +2,6 @@
 
 require 'rails_helper'
 
-# outputs debug line in tests
-# "D, [2021-01-14T16:03:49.803358 #29] DEBUG -- : HTTPI /peer GET request to internal-dsva-vagov-dev-fwdproxy-1893365470.us-gov-west-1.elb.amazonaws.com (net_http)\n"
-
 RSpec.describe V0::Profile::Ch33BankAccountsController, type: :controller do
   let(:user) { FactoryBot.build(:ch33_dd_user) }
 

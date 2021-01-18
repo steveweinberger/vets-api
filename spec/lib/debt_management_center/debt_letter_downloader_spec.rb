@@ -4,9 +4,6 @@ require 'rails_helper'
 require 'debt_management_center/debt_letter_downloader'
 require Rails.root.join('modules', 'claims_api', 'spec', 'support', 'fake_vbms.rb')
 
-# outputs debug lines in specs
-# "D, [2021-01-14T20:17:42.588928 #29] DEBUG -- : HTTPI /peer GET request to internal-dsva-vagov-dev-fwdproxy-1893365470.us-gov-west-1.elb.amazonaws.com (net_http)\n"
-
 RSpec.describe DebtManagementCenter::DebtLetterDownloader do
   subject { described_class.new(user) } # this is the stacktrace for the line that has debugging
 
