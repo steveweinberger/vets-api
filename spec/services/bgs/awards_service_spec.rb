@@ -2,8 +2,6 @@
 
 require 'rails_helper'
 
-# has outputs?
-
 RSpec.describe BGS::AwardsService do
   let(:user) { FactoryBot.create(:evss_user, :loa3) }
 
