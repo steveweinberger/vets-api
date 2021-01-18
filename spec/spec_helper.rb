@@ -190,8 +190,3 @@ RSpec.configure do |config|
   #   $stdout = original_stdout
   # end
 end
-
-# when BGS is used, disable logging because it doesn't use the Rails.logger (as of bgs_ext 0.18.0)
-BGS.configure do |config|
-  config.log = false
-end
