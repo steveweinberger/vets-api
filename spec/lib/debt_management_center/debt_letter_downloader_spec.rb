@@ -5,7 +5,7 @@ require 'debt_management_center/debt_letter_downloader'
 require Rails.root.join('modules', 'claims_api', 'spec', 'support', 'fake_vbms.rb')
 
 RSpec.describe DebtManagementCenter::DebtLetterDownloader do
-  subject { described_class.new(user) } # this is the stacktrace for the line that has debugging
+  subject { described_class.new(user) }
 
   let(:file_number) { '796043735' }
   let(:user) { build(:user, :loa3, ssn: file_number) }

@@ -5,7 +5,7 @@ require Rails.root.join('modules', 'claims_api', 'spec', 'support', 'fake_vbms.r
 require 'efolder/service'
 
 RSpec.describe Efolder::Service do
-  subject { described_class.new(user) } # this is the stack trace for the first debug message
+  subject { described_class.new(user) }
 
   let(:file_number) { '796043735' }
   let(:user) { build(:user, :loa3, ssn: file_number) }

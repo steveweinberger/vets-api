@@ -2,18 +2,6 @@
 
 require 'rails_helper'
 
-#some output from these tests
-# "D, [2021-01-14T19:53:28.606708 #29] DEBUG -- : HTTPI /peer GET request to internal-dsva-vagov-dev-fwdproxy-1893365470.us-gov-west-1.elb.amazonaws.com (net_http)\n"
-
-# call stack lines to maybe help
-# "/srv/vets-api/src/spec/request/swagger_spec.rb:3134:in `block (4 levels) in <top (required)>'"
-# "/srv/vets-api/src/spec/request/swagger_spec.rb:2288:in `block (8 levels) in <top (required)>'"
-# "/srv/vets-api/src/spec/request/swagger_spec.rb:2310:in `block (7 levels) in <top (required)>'"
-# "/srv/vets-api/src/spec/request/swagger_spec.rb:3029:in `block (5 levels) in <top (required)>'"
-# "/srv/vets-api/src/spec/request/swagger_spec.rb:3034:in `block (4 levels) in <top (required)>'"
-# "/srv/vets-api/src/spec/request/swagger_spec.rb:3091:in `block (5 levels) in <top (required)>'"
-# "/srv/vets-api/src/spec/request/swagger_spec.rb:3126:in `block (5 levels) in <top (required)>'"
-
 require 'support/bb_client_helpers'
 require 'support/pagerduty/services/spec_setup'
 require 'support/stub_debt_letters'
