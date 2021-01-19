@@ -7,8 +7,8 @@ module CypressViewportUpdater
   class UpdateCypressViewportsJob
     include Sidekiq::Worker
 
-    START_DATE = Date.today.prev_month.beginning_of_month
-    END_DATE = Date.today.prev_month.end_of_month
+    START_DATE = Time.zone.today.prev_month.beginning_of_month
+    END_DATE = Time.zone.today.prev_month.end_of_month
 
     def perform
       reports = CypressViewportUpdater::
