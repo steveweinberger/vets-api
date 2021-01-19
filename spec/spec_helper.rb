@@ -167,13 +167,13 @@ RSpec.configure do |config|
   config.before(:all) do
     # temp to discover which specs are dropping output
     # def $stderr.write(string)
-    #   binding.pry if string.include?('DEPRECATION WARNING')
+    #   binding.pry if string.include?('SHRINE')
     #   super
     # end
 
     # def $stdout.write(string)
     #   # super(Kernel.caller)
-    #   binding.pry if string.include?('DEPRECATION WARNING')
+    #   binding.pry if string.include?('SHRINE')
     #   # binding.pry if Kernel.caller.any? {|x| x=~/Savon/i} # savon/httpi is doing logging inside bgs_ext
     #   # binding.pry if Kernel.caller.any? {|x| x=~/Savon/i} # savon/httpi is doing logging inside bgs_ext
     #   super

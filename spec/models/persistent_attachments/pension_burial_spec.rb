@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-# outputs text during tests
+# outputs text during tests.  Seems like the issue is the doctors-note.pdf
 # "SHRINE WARNING: Error occurred when attempting to extract image dimensions: #<FastImage::UnknownImageType: FastImage::UnknownImageType>\n"
 
 RSpec.describe PersistentAttachments::PensionBurial, uploader_helpers: true do

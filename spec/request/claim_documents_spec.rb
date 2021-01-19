@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# outputs shrine warning
+# outputs text during tests.  Seems like the issue is the doctors-note.pdf
 # "SHRINE WARNING: Error occurred when attempting to extract image dimensions: #<FastImage::UnknownImageType: FastImage::UnknownImageType>\n"
 
 require 'rails_helper'
