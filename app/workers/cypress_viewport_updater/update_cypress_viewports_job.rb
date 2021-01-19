@@ -21,6 +21,7 @@ module CypressViewportUpdater
                                                      viewport_report: reports.viewport_report)
       create_updated_cypress_json_file(viewport_collection)
       create_updated_viewport_preset_js_file(viewport_collection)
+      client = CypressViewportUpdater::GithubApp
       # TO-DO
       # GITHUB API
       # get cypress.json
