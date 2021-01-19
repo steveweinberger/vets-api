@@ -3,8 +3,7 @@
 require 'rails_helper'
 require 'sidekiq/api'
 
-# this is sending the deprecations
-
+# this is sending the deprecations about config_for.  i believe sidekiq 6 will remove thsoe
 
 RSpec.describe SidekiqStatsJob, type: :job do
   subject do

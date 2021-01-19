@@ -13,6 +13,7 @@ class SidekiqStatsJob
 
   def perform
     # this is where deprecatin is coming frmo
+    # binding.pry
     info = Sidekiq::Stats.new
 
     self.class::METRIC_NAMES.each do |method, stat|
