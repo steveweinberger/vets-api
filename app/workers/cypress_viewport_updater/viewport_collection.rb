@@ -1,12 +1,13 @@
+# frozen_string_literal: true
+
 require_relative './viewport'
 
 module CypressViewportUpdater
   class ViewportCollection
-
     NUMBER_OF_TOP_VIEWPORTS = 5
 
     attr_reader :start_date, :end_date, :total_users, :viewports
-    
+
     def initialize(start_date:, end_date:, user_report:, viewport_report:)
       @start_date = start_date
       @end_date = end_date
@@ -24,27 +25,11 @@ module CypressViewportUpdater
 
     def parse_viewport_report_to_populate_viewports(viewport_report)
       viewport_report.data.rows.each do |row|
-        device = row.dimensions.first
+        viewport_type = row.dimensions.first.to_sym
 
-        case device
-        when 'mobile'
-          mobile_viewports = viewports[:mobile]
-          if mobile_viewports.size < NUMBER_OF_TOP_VIEWPORTS &&
-               width_and_height_set?(row)
-            mobile_viewports << make_viewport(row)
-          end
-        when 'tablet'
-          tablet_viewports = viewports[:tablet]
-          if tablet_viewports.size < NUMBER_OF_TOP_VIEWPORTS &&
-               width_and_height_set?(row)
-            tablet_viewports << make_viewport(row)
-          end
-        when 'desktop'
-          desktop_viewports = viewports[:desktop]
-          if desktop_viewports.size < NUMBER_OF_TOP_VIEWPORTS &&
-               width_and_height_set?(row)
-            desktop_viewports << make_viewport(row)
-          end
+        if viewports[viewport_type].size < NUMBER_OF_TOP_VIEWPORTS &&
+           width_and_height_set?(row)
+          viewports[viewport_type] << make_viewport(row)
         end
 
         break if viewports_full?
@@ -52,7 +37,7 @@ module CypressViewportUpdater
     end
 
     def width_and_height_set?(row)
-      row.dimensions[1] != "(not set)"
+      row.dimensions[1] != '(not set)'
     end
 
     def make_viewport(row)
