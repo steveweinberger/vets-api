@@ -54,3 +54,8 @@ Rails.application.configure do
   config.rails_semantic_logger.processing = true
   config.rails_semantic_logger.rendered   = true
 end
+
+# this can turn resolved deprecations into exceptions!
+# ActiveSupport::Deprecation.disallowed_warnings = [
+#   "Accessing hashes returned from config_for"
+# ]

@@ -3,6 +3,9 @@
 require 'rails_helper'
 require 'sidekiq/api'
 
+# this is sending the deprecations
+
+
 RSpec.describe SidekiqStatsJob, type: :job do
   subject do
     described_class.new

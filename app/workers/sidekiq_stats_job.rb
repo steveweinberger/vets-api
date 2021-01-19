@@ -12,6 +12,7 @@ class SidekiqStatsJob
   ].freeze
 
   def perform
+    # this is where deprecatin is coming frmo
     info = Sidekiq::Stats.new
 
     self.class::METRIC_NAMES.each do |method, stat|

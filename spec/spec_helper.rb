@@ -166,14 +166,16 @@ RSpec.configure do |config|
   # this is some ugly code to interrupt tests when they are trying to print output
   config.before(:all) do
     # temp to discover which specs are dropping output
-    # def $stderr.puts(string)
-    #   super(Kernel.caller)
-    #   super
-    # end
+    def $stderr.write(string)
+      binding.pry if string.include?('DEPRECATION WARNING')
+      super
+    end
 
     def $stdout.write(string)
       # super(Kernel.caller)
-      binding.pry if Kernel.caller.any? {|x| x=~/Savon/i} # savon/httpi is doing logging inside bgs_ext
+      binding.pry if string.include?('DEPRECATION WARNING')
+      # binding.pry if Kernel.caller.any? {|x| x=~/Savon/i} # savon/httpi is doing logging inside bgs_ext
+      # binding.pry if Kernel.caller.any? {|x| x=~/Savon/i} # savon/httpi is doing logging inside bgs_ext
       super
     end
   end

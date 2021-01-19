@@ -3,6 +3,9 @@
 require 'rails_helper'
 require 'generators/provider_state/provider_state_generator'
 
+# hide generator output
+# create  spec/service_consumers/provider_states_for/test.rb
+
 describe ProviderStateGenerator do
   describe 'create_provider_state_file' do
     context 'once generated' do
