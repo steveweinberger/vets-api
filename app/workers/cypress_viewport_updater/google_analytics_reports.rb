@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'google/apis/analyticsreporting_v4'
 
 module CypressViewportUpdater
@@ -5,9 +7,10 @@ module CypressViewportUpdater
     include Google::Apis::AnalyticsreportingV4
     include Google::Auth
 
-    JSON_CREDENTIALS = YAML::load(File.open('config/settings.local.yml'))['google_analytics_service_credentials'].to_json
-    SCOPE = "https://www.googleapis.com/auth/analytics.readonly"
-    VIEW_ID = "176188361"
+    data = YAML.safe_load(File.open('config/settings.local.yml'))
+    JSON_CREDENTIALS = data['google_analytics_service_credentials'].to_json
+    SCOPE = 'https://www.googleapis.com/auth/analytics.readonly'
+    VIEW_ID = '176188361'
 
     attr_reader :start_date, :end_date, :analytics, :user_report, :viewport_report
 
@@ -16,8 +19,9 @@ module CypressViewportUpdater
       @end_date = end_date
       @analytics = AnalyticsReportingService.new
       analytics.authorization = ServiceAccountCredentials.make_creds(
-                                  json_key_io: StringIO.new(JSON_CREDENTIALS),
-                                  scope: SCOPE)
+        json_key_io: StringIO.new(JSON_CREDENTIALS),
+        scope: SCOPE
+      )
       @user_report = nil
       @viewport_report = nil
       create_reports
@@ -29,18 +33,19 @@ module CypressViewportUpdater
 
     def create_reports
       request = GetReportsRequest.new(report_requests: [
-                 user_report_request,
-                 viewport_report_request])
-
+                                        user_report_request,
+                                        viewport_report_request
+                                      ])
       response = analytics.batch_get_reports(request)
-      self.user_report, self.viewport_report = response.reports[0], response.reports[1]
+      self.user_report = response.reports[0]
+      self.viewport_report = response.reports[1]
     end
 
     def user_report_request
       ReportRequest.new(
         view_id: VIEW_ID,
         date_ranges: [date_range],
-        metrics: [metric_user],
+        metrics: [metric_user]
       )
     end
 
@@ -50,8 +55,8 @@ module CypressViewportUpdater
         date_ranges: [date_range],
         metrics: [metric_user],
         dimensions: [dimension_device_category, dimension_screen_resolution],
-        order_bys: [{ field_name: "ga:users", sort_order: "DESCENDING" }],
-        page_size: 100,
+        order_bys: [{ field_name: 'ga:users', sort_order: 'DESCENDING' }],
+        page_size: 100
       )
     end
 
