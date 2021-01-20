@@ -25,10 +25,12 @@ module CypressViewportUpdater
       github.get_content(cypress_json_file)
       github.get_content(viewport_preset_js_file)
       github.create_branch
-      updated_cypress_json_file_content = cypress_json_file.update(viewport_collection).content
-      github.update_content(cypress_json_file, updated_cypress_json_file_content)
-      updated_viewport_preset_js_file_content = viewport_preset_js_file.update(viewport_collection).content
-      github.update_content(viewport_preset_js_file, updated_viewport_preset_js_file_content)
+
+      [cypress_json_file, viewport_preset_js_file].each do |file|
+        content = file.update(viewport_collection).content
+        github.update_content(file: file, content: content)
+      end
+
       github.submit_pr
     end
   end
