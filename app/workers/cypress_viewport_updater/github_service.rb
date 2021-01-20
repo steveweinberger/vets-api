@@ -18,11 +18,8 @@ module CypressViewportUpdater
     end
 
     def create_branch
-      # from http://mattgreensmith.net/2013/08/08/commit-directly-to-github-via-api-with-octokit/
-      # sha_latest_commit = github.ref(repo, ref).object.sha
-      # Find and store the SHA for the tree object that the heads/master commit points to.
-      # sha_base_tree = github.commit(repo, sha_latest_commit).commit.tree.sha
-      ref = "heads/#{make_feature_branch_name}"
+      set_feature_branch_name
+      ref = "heads/#{feature_branch_name}"
       sha = client.ref(REPO, 'heads/master').object.sha
       client.create_ref(REPO, ref, sha)
     end
@@ -47,7 +44,7 @@ module CypressViewportUpdater
 
     attr_writer :feature_branch_name
 
-    def make_feature_branch_name
+    def set_feature_branch_name
       prefix = DateTime.now.strftime('%m%d%Y%H%M%S%L')
       name = 'update_cypress_viewport_data'
       self.feature_branch_name = prefix + '_' + name
