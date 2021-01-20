@@ -4,7 +4,7 @@ require_relative './viewport'
 
 module CypressViewportUpdater
   class ViewportCollection
-    NUMBER_OF_TOP_VIEWPORTS = 5
+    NUM_TOP_VIEWPORTS = { mobile: 5, tablet: 1, desktop: 5 }.freeze
 
     attr_reader :start_date, :end_date, :total_users, :viewports
 
@@ -14,7 +14,6 @@ module CypressViewportUpdater
       @total_users = parse_user_report_for_total_users(user_report)
       @viewports = { mobile: [], tablet: [], desktop: [] }
       parse_viewport_report_to_populate_viewports(viewport_report)
-      update_viewport_attributes_that_reference_rank
     end
 
     private
@@ -24,12 +23,15 @@ module CypressViewportUpdater
     end
 
     def parse_viewport_report_to_populate_viewports(viewport_report)
+      count = { mobile: 0, tablet: 0, desktop: 0 }
+
       viewport_report.data.rows.each do |row|
         viewport_type = row.dimensions.first.to_sym
 
-        if viewports[viewport_type].size < NUMBER_OF_TOP_VIEWPORTS &&
+        if viewports[viewport_type].count < NUM_TOP_VIEWPORTS[viewport_type] &&
            width_and_height_set?(row)
-          viewports[viewport_type] << make_viewport(row)
+          count[viewport_type] += 1
+          viewports[viewport_type] << make_viewport(row: row, rank: count[viewport_type])
         end
 
         break if viewports_full?
@@ -40,31 +42,19 @@ module CypressViewportUpdater
       row.dimensions[1] != '(not set)'
     end
 
-    def make_viewport(row)
+    def make_viewport(row:, rank:)
       CypressViewportUpdater::
         Viewport.new(start_date: start_date,
                      end_date: end_date,
                      row: row,
+                     rank: rank,
                      total_users: total_users)
     end
 
     def viewports_full?
-      viewport_types.all? do |viewports|
-        viewports.count >= NUMBER_OF_TOP_VIEWPORTS
-      end
-    end
-
-    def update_viewport_attributes_that_reference_rank
-      viewport_types.each do |viewports|
-        viewports.each_with_index do |viewport, index|
-          rank = (index + 1).to_s
-          viewport.update_attributes_that_reference_rank(rank)
-        end
-      end
-    end
-
-    def viewport_types
-      [viewports[:mobile], viewports[:tablet], viewports[:desktop]]
+      viewports[:mobile].count >= NUM_TOP_VIEWPORTS[:mobile] &&
+        viewports[:tablet].count >= NUM_TOP_VIEWPORTS[:tablet] &&
+        viewports[:desktop].count >= NUM_TOP_VIEWPORTS[:desktop]
     end
   end
 end

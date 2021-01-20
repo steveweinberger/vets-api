@@ -38,28 +38,23 @@ module CypressViewportUpdater
 
     # rubocop:enable Naming/MethodName
 
-    def initialize(start_date:, end_date:, row:, total_users:)
+    def initialize(start_date:, end_date:, row:, rank:, total_users:)
       number_of_users = row.metrics.first.values.first.to_f
       device = row.dimensions[0]
       resolution = row.dimensions[1]
       dimensions = resolution.split('x').map(&:to_i)
 
       @list = "VA Top #{device.capitalize} Viewports"
-      @rank = nil
+      @rank = rank
       # variable names are converted to json and must be snakeCase
       # rubocop:disable Naming/VariableName
       @devicesWithViewport = device_list(device: device, resolution: resolution)
       @percentTraffic = "#{calculate_percentage_of_users_who_use_viewport(number_of_users, total_users)}%"
       @percentTrafficPeriod = "from #{start_date} to #{end_date}"
-      @viewportPreset = "va-top-#{device}-"
+      @viewportPreset = "va-top-#{device}-#{rank}"
       # rubocop:enable Naming/VariableName
       @width = dimensions[0]
       @height = dimensions[1]
-    end
-
-    def update_attributes_that_reference_rank(rank)
-      update_rank(rank)
-      update_viewport_preset(rank)
     end
 
     private
@@ -80,14 +75,6 @@ module CypressViewportUpdater
 
     def calculate_percentage_of_users_who_use_viewport(number_of_users, total_users)
       (number_of_users / total_users * 100).round(2)
-    end
-
-    def update_rank(rank)
-      self.rank = rank
-    end
-
-    def update_viewport_preset(rank)
-      self.viewportPreset += rank
     end
   end
 end
