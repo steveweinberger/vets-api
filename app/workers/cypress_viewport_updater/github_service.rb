@@ -34,19 +34,11 @@ module CypressViewportUpdater
     end
 
     def submit_pr
-      last_month = Time.zone.today.prev_month.strftime('%m/%Y')
-      title = 'Update Cypress Viewport Data (Automatic Update)'
-      body = "Updates `config/cypress.json` and "\
-             "`src/platform/testing/e2e/cypress/support/commands/viewportPreset.js` "\
-             "with Google Analytics viewport data from last month (#{last_month})."\
-             "\n\nThese files are updated automatically once a month via a Sidekiq job "\
-             "that runs in `vets-api`."
-
       client.create_pull_request(REPO,
                                  'master',
                                  feature_branch_name,
-                                 title,
-                                 body)
+                                 pr_title,
+                                 pr_body)
     end
 
     private
@@ -57,6 +49,22 @@ module CypressViewportUpdater
       prefix = DateTime.now.strftime('%m%d%Y%H%M%S%L')
       name = 'update_cypress_viewport_data'
       self.feature_branch_name = prefix + '_' + name
+    end
+
+    def pr_title
+      'Update Cypress Viewport Data (Automatic Update)'
+    end
+
+    def pr_body
+      last_month = Time.zone.today.prev_month.strftime('%m/%Y')
+
+      "Updates `config/cypress.json` and "\
+      "`src/platform/testing/e2e/cypress/support/commands/viewportPreset.js` "\
+      "with Google Analytics viewport data from last month (#{last_month}).\n"\
+      "\n"\
+      "These files are updated automatically via a Sidekiq job in `vets-api`"\
+      "that runs at noon on the 2nd day of each month to get the analytics data"\
+      "for the previous month. (Google Analytics updates every 24 hours.)"
     end
   end
 end
