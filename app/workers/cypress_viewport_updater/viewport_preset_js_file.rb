@@ -10,6 +10,8 @@ module CypressViewportUpdater
     end
 
     def update(collection)
+      create_current_files_directory
+      create_updated_files_directory
       create_local_current_file
       new_file = create_updated_viewport_preset_js_file
 

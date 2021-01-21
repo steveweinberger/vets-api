@@ -10,6 +10,8 @@ module CypressViewportUpdater
     end
 
     def update(collection)
+      create_current_files_directory
+      create_updated_files_directory
       create_local_current_file
       file_as_hash = JSON.parse(File.read(local_current_file_path))
       update_viewports(hash: file_as_hash, collection: collection)
