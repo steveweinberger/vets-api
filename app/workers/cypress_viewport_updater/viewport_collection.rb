@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative './viewport'
-
 module CypressViewportUpdater
   class ViewportCollection
     NUM_TOP_VIEWPORTS = { mobile: 5, tablet: 1, desktop: 5 }.freeze

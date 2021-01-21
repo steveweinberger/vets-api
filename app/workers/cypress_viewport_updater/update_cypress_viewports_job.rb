@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require_relative './google_analytics_reports'
-require_relative './viewport_collection'
-
 module CypressViewportUpdater
   class UpdateCypressViewportsJob
     include Sidekiq::Worker
