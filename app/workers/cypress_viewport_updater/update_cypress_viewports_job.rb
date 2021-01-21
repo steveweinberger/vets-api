@@ -9,9 +9,8 @@ module CypressViewportUpdater
 
     def perform
       reports = CypressViewportUpdater::GoogleAnalyticsReports.new
-      viewport_collection = CypressViewportUpdater::
-                              ViewportCollection.new(user_report: reports.user_report,
-                                                     viewport_report: reports.viewport_report)
+      viewport_collection = CypressViewportUpdater::ViewportCollection.new(reports.user_report)
+      viewport_collection.create(reports.viewport_report)
       github = CypressViewportUpdater::GithubService.new
       cypress_json_file = CypressViewportUpdater::CypressJsonFile.new
       viewport_preset_js_file = CypressViewportUpdater::ViewportPresetJsFile.new
