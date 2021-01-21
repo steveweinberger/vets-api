@@ -24,7 +24,7 @@ module CypressViewportUpdater
       client.create_ref(REPO, ref, sha)
     end
 
-    def update_content(file, content)
+    def update_content(file:, content:)
       client.update_content(REPO,
                             file.github_path,
                             "update #{file.name}",
