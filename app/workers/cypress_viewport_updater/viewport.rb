@@ -38,7 +38,7 @@ module CypressViewportUpdater
 
     # rubocop:enable Naming/MethodName
 
-    def initialize(start_date:, end_date:, row:, rank:, total_users:)
+    def initialize(row:, rank:, total_users:)
       number_of_users = row.metrics.first.values.first.to_f
       device = row.dimensions[0]
       resolution = row.dimensions[1]
@@ -50,7 +50,7 @@ module CypressViewportUpdater
       # rubocop:disable Naming/VariableName
       @devicesWithViewport = device_list(device: device, resolution: resolution)
       @percentTraffic = "#{calculate_percentage_of_users_who_use_viewport(number_of_users, total_users)}%"
-      @percentTrafficPeriod = "from #{start_date} to #{end_date}"
+      @percentTrafficPeriod = traffic_period
       @viewportPreset = "va-top-#{device}-#{rank}"
       # rubocop:enable Naming/VariableName
       @width = dimensions[0]
@@ -75,6 +75,16 @@ module CypressViewportUpdater
 
     def calculate_percentage_of_users_who_use_viewport(number_of_users, total_users)
       (number_of_users / total_users * 100).round(2)
+    end
+
+    def traffic_period
+      start_date = CypressViewportUpdater::UpdateCypressViewportsJob::START_DATE
+      end_date = CypressViewportUpdater::UpdateCypressViewportsJob::END_DATE
+      "From: #{format_date(start_date)}, To: #{format_date(end_date)}"
+    end
+
+    def format_date(date)
+      date.strftime('%m/%d/%Y')
     end
   end
 end

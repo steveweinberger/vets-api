@@ -12,11 +12,9 @@ module CypressViewportUpdater
     SCOPE = 'https://www.googleapis.com/auth/analytics.readonly'
     VIEW_ID = '176188361'
 
-    attr_reader :start_date, :end_date, :analytics, :user_report, :viewport_report
+    attr_reader :analytics, :user_report, :viewport_report
 
-    def initialize(start_date:, end_date:)
-      @start_date = start_date
-      @end_date = end_date
+    def initialize
       @analytics = AnalyticsReportingService.new
       analytics.authorization = ServiceAccountCredentials.make_creds(
         json_key_io: StringIO.new(JSON_CREDENTIALS),
@@ -61,6 +59,8 @@ module CypressViewportUpdater
     end
 
     def date_range
+      start_date = CypressViewportUpdater::UpdateCypressViewportsJob::START_DATE
+      end_date = CypressViewportUpdater::UpdateCypressViewportsJob::END_DATE
       DateRange.new(start_date: start_date, end_date: end_date)
     end
 

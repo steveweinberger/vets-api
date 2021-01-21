@@ -4,11 +4,9 @@ module CypressViewportUpdater
   class ViewportCollection
     NUM_TOP_VIEWPORTS = { mobile: 5, tablet: 1, desktop: 5 }.freeze
 
-    attr_reader :start_date, :end_date, :total_users, :viewports
+    attr_reader :total_users, :viewports
 
-    def initialize(start_date:, end_date:, user_report:, viewport_report:)
-      @start_date = start_date
-      @end_date = end_date
+    def initialize(user_report:, viewport_report:)
       @total_users = parse_user_report_for_total_users(user_report)
       @viewports = { mobile: [], tablet: [], desktop: [] }
       parse_viewport_report_to_populate_viewports(viewport_report)
@@ -42,9 +40,7 @@ module CypressViewportUpdater
 
     def make_viewport(row:, rank:)
       CypressViewportUpdater::
-        Viewport.new(start_date: start_date,
-                     end_date: end_date,
-                     row: row,
+        Viewport.new(row: row,
                      rank: rank,
                      total_users: total_users)
     end

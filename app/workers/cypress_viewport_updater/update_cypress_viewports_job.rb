@@ -8,13 +8,9 @@ module CypressViewportUpdater
     END_DATE = Time.zone.today.prev_month.end_of_month
 
     def perform
-      reports = CypressViewportUpdater::
-                  GoogleAnalyticsReports.new(start_date: START_DATE,
-                                             end_date: END_DATE)
+      reports = CypressViewportUpdater::GoogleAnalyticsReports.new
       viewport_collection = CypressViewportUpdater::
-                              ViewportCollection.new(start_date: START_DATE,
-                                                     end_date: END_DATE,
-                                                     user_report: reports.user_report,
+                              ViewportCollection.new(user_report: reports.user_report,
                                                      viewport_report: reports.viewport_report)
       github = CypressViewportUpdater::GithubService.new
       cypress_json_file = CypressViewportUpdater::CypressJsonFile.new
