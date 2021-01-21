@@ -22,6 +22,7 @@ module CypressViewportUpdater
       github = CypressViewportUpdater::GithubService.new
       cypress_json_file = CypressViewportUpdater::CypressJsonFile.new
       viewport_preset_js_file = CypressViewportUpdater::ViewportPresetJsFile.new
+      create_local_directories
       github.get_content(cypress_json_file)
       github.get_content(viewport_preset_js_file)
       github.create_branch
@@ -32,6 +33,17 @@ module CypressViewportUpdater
       end
 
       github.submit_pr
+    end
+
+    private
+
+    def create_local_directories
+      current_files_directory = 'app/workers/cypress_viewport_updater/current_files'
+      updated_files_directory = 'app/workers/cypress_viewport_updater/updated_files'
+
+      [current_files_directory, updated_files_directory].each do |dirname|
+        FileUtils.mkdir_p(dirname) unless File.directory?(dirname)
+      end
     end
   end
 end
