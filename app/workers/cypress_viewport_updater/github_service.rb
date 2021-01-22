@@ -41,7 +41,7 @@ module CypressViewportUpdater
                                  pr_body)
     end
 
-    private
+    # private
 
     attr_writer :feature_branch_name
 
@@ -62,8 +62,8 @@ module CypressViewportUpdater
       "`src/platform/testing/e2e/cypress/support/commands/viewportPreset.js` "\
       "with Google Analytics viewport data from last month (#{last_month}).\n"\
       "\n"\
-      "These files are updated automatically via a Sidekiq job in `vets-api`"\
-      "that runs at noon on the 2nd day of each month to get the analytics data"\
+      "These files are updated automatically via a Sidekiq job in `vets-api` "\
+      "that runs at noon on the 2nd day of each month to get the analytics data "\
       "for the previous month. (Google Analytics updates every 24 hours.)"
     end
   end
