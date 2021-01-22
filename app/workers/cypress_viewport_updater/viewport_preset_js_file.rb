@@ -40,10 +40,11 @@ module CypressViewportUpdater
       viewport_type = /(mobile|tablet|desktop)/.match(line)[0]
       viewports = collection.viewports[viewport_type.to_sym]
 
-      viewports.each_with_index do |viewport, i|
+      viewports.each do |viewport|
+        rank = viewport.rank
         width = viewport.width
         height = viewport.height
-        preset = "  'va-top-#{viewport_type}-#{i + 1}': { width: #{width}, height: #{height} },\n"
+        preset = "  'va-top-#{viewport_type}-#{rank}': { width: #{width}, height: #{height} },\n"
         file.print preset
       end
     end
