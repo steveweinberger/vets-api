@@ -9,7 +9,7 @@ module CypressViewportUpdater
             name: 'viewportPreset.js')
     end
 
-    def update(collection)
+    def update(viewports)
       create_local_current_file
       new_file = create_updated_viewport_preset_js_file
 
@@ -17,7 +17,7 @@ module CypressViewportUpdater
         if /va-top-(mobile|tablet|desktop)-\d+/.match(line)
           if /va-top-(mobile|tablet|desktop)-1/.match(line)
             create_viewport_presets(line: line,
-                                    collection: collection) do |preset|
+                                    viewports: viewports) do |preset|
                                       new_file.print preset
                                     end
           end
@@ -37,11 +37,10 @@ module CypressViewportUpdater
       File.new(local_updated_file_path, 'w')
     end
 
-    def create_viewport_presets(line:, collection:)
-      viewport_type = /(mobile|tablet|desktop)/.match(line)[0]
-      viewports = collection.viewports[viewport_type.to_sym]
+    def create_viewport_presets(line:, viewports:)
+      viewport_type = /(mobile|tablet|desktop)/.match(line)[0].to_sym
 
-      viewports.each do |viewport|
+      viewports.send(viewport_type).each do |viewport|
         rank = viewport.rank
         width = viewport.width
         height = viewport.height
