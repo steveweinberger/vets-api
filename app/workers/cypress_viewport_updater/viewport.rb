@@ -34,7 +34,7 @@ module CypressViewportUpdater
 
     # method names are converted to json and must be snakeCase
     # rubocop:disable Naming/MethodName
-    attr_reader :viewportPreset, :width, :height
+    attr_reader :viewportPreset, :rank, :width, :height
 
     # rubocop:enable Naming/MethodName
 
