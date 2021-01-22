@@ -16,9 +16,10 @@ module CypressViewportUpdater
       File.open(local_current_file_path, 'r').each do |line|
         if /va-top-(mobile|tablet|desktop)-\d+/.match(line)
           if /va-top-(mobile|tablet|desktop)-1/.match(line)
-            print_viewport_presets(file: new_file,
-                                   line: line,
-                                   collection: collection)
+            create_viewport_presets(line: line,
+                                    collection: collection) do |preset|
+                                      new_file.print preset
+                                    end
           end
         else
           new_file.print line
@@ -36,7 +37,7 @@ module CypressViewportUpdater
       File.new(local_updated_file_path, 'w')
     end
 
-    def print_viewport_presets(file:, line:, collection:)
+    def create_viewport_presets(line:, collection:)
       viewport_type = /(mobile|tablet|desktop)/.match(line)[0]
       viewports = collection.viewports[viewport_type.to_sym]
 
@@ -44,8 +45,7 @@ module CypressViewportUpdater
         rank = viewport.rank
         width = viewport.width
         height = viewport.height
-        preset = "  'va-top-#{viewport_type}-#{rank}': { width: #{width}, height: #{height} },\n"
-        file.print preset
+        yield("  'va-top-#{viewport_type}-#{rank}': { width: #{width}, height: #{height} },\n")
       end
     end
   end
