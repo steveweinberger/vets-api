@@ -27,7 +27,15 @@ module CypressViewportUpdater
                                         user_report_request,
                                         viewport_report_request
                                       ])
-      analytics.batch_get_reports(request).reports
+      @reports = analytics.batch_get_reports(request).reports
+    end
+
+    def user_report
+      @reports[0]
+    end
+
+    def viewport_report
+      @reports[1]
     end
 
     private
