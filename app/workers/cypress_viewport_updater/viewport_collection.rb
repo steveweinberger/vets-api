@@ -6,12 +6,12 @@ module CypressViewportUpdater
 
     attr_reader :total_users, :viewports
 
-    def initialize(user_report)
+    def initialize(user_report:)
       @total_users = parse_user_report_for_total_users(user_report)
       @viewports = { mobile: [], tablet: [], desktop: [] }
     end
 
-    def create(viewport_report)
+    def create(viewport_report:)
       parse_viewport_report_to_populate_viewports(viewport_report)
     end
 
