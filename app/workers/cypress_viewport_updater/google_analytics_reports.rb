@@ -28,6 +28,7 @@ module CypressViewportUpdater
                                         viewport_report_request
                                       ])
       @reports = analytics.batch_get_reports(request).reports
+      self
     end
 
     def user_report
