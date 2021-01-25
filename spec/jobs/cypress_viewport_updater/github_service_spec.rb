@@ -3,15 +3,15 @@
 require 'rails_helper'
 
 RSpec.describe CypressViewportUpdater::GithubService do
-  before do
-    VCR.use_cassette('cypress_viewport_updater/github_service') do
-      @github = CypressViewportUpdater::GithubService.new
-    end
-  end
-
   describe '#new' do
     it 'returns a new instance' do
-      expect(@github).to be_an_instance_of(described_class)
+      github = nil
+
+      VCR.use_cassette('cypress_viewport_updater/github_service_new') do
+        github = CypressViewportUpdater::GithubService.new
+      end
+
+      expect(github).to be_an_instance_of(described_class)
     end
   end
 
@@ -57,7 +57,7 @@ RSpec.describe CypressViewportUpdater::GithubService do
   end
 
   describe '#update_content' do
-    let(:file) do
+    let!(:file) do
       CypressViewportUpdater::CypressJsonFile.new(
         github_path: 'config/cypress.json',
         local_current_file_path: 'app/workers/cypress_viewport_updater/current_files/cypress.json',
@@ -66,20 +66,24 @@ RSpec.describe CypressViewportUpdater::GithubService do
       )
     end
 
-    let(:file_content) { 'File content' }
+    file_content = 'File content'
 
     before do
       github = nil
 
-      VCR.use_cassette('cypress_viewport_updater/github_service_update_content_step_1') do
-        github = CypressViewportUpdater::GithubService.new.get_content(file)
+      VCR.use_cassette('cypress_viewport_updater/github_service_update_content_new') do
+        github = CypressViewportUpdater::GithubService.new
       end
 
-      VCR.use_cassette('cypress_viewport_updater/github_service_update_content_step_2') do
+      VCR.use_cassette('cypress_viewport_updater/github_service_update_content_get_content') do
+        github = github.get_content(file)
+      end
+
+      VCR.use_cassette('cypress_viewport_updater/github_service_update_content_create_branch') do
         github.create_branch
       end
 
-      VCR.use_cassette('cypress_viewport_updater/github_service_update_content_step_3') do
+      VCR.use_cassette('cypress_viewport_updater/github_service_update') do
         @update_content = github.update_content(file: file, content: file_content)
       end
     end
@@ -109,34 +113,33 @@ RSpec.describe CypressViewportUpdater::GithubService do
       )
       content_1 = 'File 1 content'
       content_2 = 'File 2 content'
-
       github = nil
 
-      VCR.use_cassette('cypress_viewport_updater/github_service_submit_pr_step_1') do
+      VCR.use_cassette('cypress_viewport_updater/github_service_submit_pr_new') do
         github = CypressViewportUpdater::GithubService.new
       end
 
-      VCR.use_cassette('cypress_viewport_updater/github_service_submit_pr_step_2') do
-        CypressViewportUpdater::GithubService.new.get_content(file_1)
+      VCR.use_cassette('cypress_viewport_updater/github_service_submit_pr_get_content_file_1') do
+        github.get_content(file_1)
       end
 
-      VCR.use_cassette('cypress_viewport_updater/github_service_submit_pr_step_3') do
-        CypressViewportUpdater::GithubService.new.get_content(file_2)
+      VCR.use_cassette('cypress_viewport_updater/github_service_submit_pr_get_content_file_2') do
+        github.get_content(file_2)
       end
 
-      VCR.use_cassette('cypress_viewport_updater/github_service_submit_pr_step_4') do
+      VCR.use_cassette('cypress_viewport_updater/github_service_submit_pr_create_branch') do
         github.create_branch
       end
 
-      VCR.use_cassette('cypress_viewport_updater/github_service_submit_pr_step_5') do
+      VCR.use_cassette('cypress_viewport_updater/github_service_submit_pr_update_content_file_1') do
         github.update_content(file: file_1, content: content_1)
       end
 
-      VCR.use_cassette('cypress_viewport_updater/github_service_submit_pr_step_6') do
+      VCR.use_cassette('cypress_viewport_updater/github_service_submit_pr_update_content_file_2') do
         github.update_content(file: file_2, content: content_2)
       end
 
-      VCR.use_cassette('cypress_viewport_updater/github_service_submit_pr_step_7') do
+      VCR.use_cassette('cypress_viewport_updater/github_service_submit_pr') do
         @submit_pr = github.submit_pr
       end
     end
