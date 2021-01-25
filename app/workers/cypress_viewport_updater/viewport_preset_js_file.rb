@@ -2,11 +2,11 @@
 
 module CypressViewportUpdater
   class ViewportPresetJsFile < ExistingGithubFile
-    def initialize
-      super(github_path: 'src/platform/testing/e2e/cypress/support/commands/viewportPreset.js',
-            local_current_file_path: 'app/workers/cypress_viewport_updater/current_files/viewportPreset.js',
-            local_updated_file_path: 'app/workers/cypress_viewport_updater/updated_files/viewportPreset.js',
-            name: 'viewportPreset.js')
+    def initialize(github_path:, local_current_file_path:, local_updated_file_path:, name:)
+      super(github_path: github_path,
+            local_current_file_path: local_current_file_path,
+            local_updated_file_path: local_updated_file_path,
+            name: name)
     end
 
     def update(viewports)
