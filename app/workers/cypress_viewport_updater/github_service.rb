@@ -42,7 +42,7 @@ module CypressViewportUpdater
                                  pr_body)
     end
 
-    # private
+    private
 
     attr_writer :feature_branch_name
 
