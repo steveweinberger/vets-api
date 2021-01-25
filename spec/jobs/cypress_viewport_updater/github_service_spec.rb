@@ -3,18 +3,19 @@
 require 'rails_helper'
 
 RSpec.describe CypressViewportUpdater::GithubService do
+  before do
+    VCR.use_cassette('cypress_viewport_updater/github_service') do
+      @github = CypressViewportUpdater::GithubService.new
+    end
+  end
+
   describe '#new' do
     it 'returns a new instance' do
-      VCR.use_cassette('cypress_viewport_updater/github_service') do
-        @github = CypressViewportUpdater::GithubService.new
-      end
-
       expect(@github).to be_an_instance_of(described_class)
     end
   end
 
   describe '#get_content' do
-    # to-do: stub calling #get_content
     let!(:file) do
       CypressViewportUpdater::CypressJsonFile.new(
         github_path: 'config/cypress.json',
@@ -40,7 +41,6 @@ RSpec.describe CypressViewportUpdater::GithubService do
   end
 
   describe '#create_branch' do
-    # to-do: stub calling #create_branch
     before do
       VCR.use_cassette('cypress_viewport_updater/github_service_create_branch') do
         @create_branch = CypressViewportUpdater::GithubService.new.create_branch
@@ -57,10 +57,112 @@ RSpec.describe CypressViewportUpdater::GithubService do
   end
 
   describe '#update_content' do
-    # to-do: stub calling #update_content
+    let(:file) do
+      CypressViewportUpdater::CypressJsonFile.new(
+        github_path: 'config/cypress.json',
+        local_current_file_path: 'app/workers/cypress_viewport_updater/current_files/cypress.json',
+        local_updated_file_path: 'app/workers/cypress_viewport_updater/updated_files/cypress.json',
+        name: 'cypress.json'
+      )
+    end
+
+    let(:file_content) { 'File content' }
+
+    before do
+      github = nil
+
+      VCR.use_cassette('cypress_viewport_updater/github_service_update_content_step_1') do
+        github = CypressViewportUpdater::GithubService.new.get_content(file)
+      end
+
+      VCR.use_cassette('cypress_viewport_updater/github_service_update_content_step_2') do
+        github.create_branch
+      end
+
+      VCR.use_cassette('cypress_viewport_updater/github_service_update_content_step_3') do
+        @update_content = github.update_content(file: file, content: file_content)
+      end
+    end
+
+    it 'returns the name of the file' do
+      expect(@update_content.content.name).to eq(file.name)
+    end
+
+    it 'returns the github file path' do
+      expect(@update_content.content.path).to eq(file.github_path)
+    end
   end
 
   describe '#submit_pr' do
-    # to-do: stub calling #submit_pr
+    before do
+      file_1 = CypressViewportUpdater::CypressJsonFile.new(
+        github_path: 'config/cypress.json',
+        local_current_file_path: 'app/workers/cypress_viewport_updater/current_files/cypress.json',
+        local_updated_file_path: 'app/workers/cypress_viewport_updater/updated_files/cypress.json',
+        name: 'cypress.json'
+      )
+      file_2 = CypressViewportUpdater::CypressJsonFile.new(
+        github_path: 'src/platform/testing/e2e/cypress/support/commands/viewportPreset.js',
+        local_current_file_path: 'app/workers/cypress_viewport_updater/current_files/viewportPreset.js',
+        local_updated_file_path: 'app/workers/cypress_viewport_updater/updated_files/viewportPreset.js',
+        name: 'viewportPreset.js'
+      )
+      content_1 = 'File 1 content'
+      content_2 = 'File 2 content'
+
+      github = nil
+
+      VCR.use_cassette('cypress_viewport_updater/github_service_submit_pr_step_1') do
+        github = CypressViewportUpdater::GithubService.new
+      end
+
+      VCR.use_cassette('cypress_viewport_updater/github_service_submit_pr_step_2') do
+        CypressViewportUpdater::GithubService.new.get_content(file_1)
+      end
+
+      VCR.use_cassette('cypress_viewport_updater/github_service_submit_pr_step_3') do
+        CypressViewportUpdater::GithubService.new.get_content(file_2)
+      end
+
+      VCR.use_cassette('cypress_viewport_updater/github_service_submit_pr_step_4') do
+        github.create_branch
+      end
+
+      VCR.use_cassette('cypress_viewport_updater/github_service_submit_pr_step_5') do
+        github.update_content(file: file_1, content: content_1)
+      end
+
+      VCR.use_cassette('cypress_viewport_updater/github_service_submit_pr_step_6') do
+        github.update_content(file: file_2, content: content_2)
+      end
+
+      VCR.use_cassette('cypress_viewport_updater/github_service_submit_pr_step_7') do
+        @submit_pr = github.submit_pr
+      end
+    end
+
+    it 'submits a pr to the department-of-veterans-affairs/vets-website repo' do
+      expect(@submit_pr.base.repo.full_name).to eq('holdenhinkle/vets-website')
+      # expect(@submit_pr.base.repo.full_name).to eq('department-of-veterans-affairs/vets-website')
+    end
+
+    it 'returns the number of commits in the repo' do
+      expect(@submit_pr.commits).to eq(2)
+    end
+
+    it 'returns the url to the pr' do
+      expect(@submit_pr.url)
+        .to match(%r{\bhttps:\/\/api.github.com\/repos\/holdenhinkle\/vets-website\/pulls\/\d+\b})
+      # expect(@submit_pr)
+      #   .to match(%r{\bhttps:\/\/api.github.com\/repos\/department-of-veterans-affairs\/vets-website\/pulls\/\d+\b})
+    end
+
+    it 'returns the pr title' do
+      expect(@submit_pr.title).not_to eq('')
+    end
+
+    it 'returns the pr body' do
+      expect(@submit_pr.body).not_to eq('')
+    end
   end
 end
