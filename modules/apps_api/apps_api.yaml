@@ -1,0 +1,100 @@
+apiVersion: 0.0.1
+kind: API
+metadata:
+  name: Apps Api
+  description: The Third Party Applications API provides a list of applications that veterans can connect to and share their data with.
+  tags:
+    - rest
+spec:
+  type: openapi
+  lifecycle: production
+  owner: team-bilby
+  definition: |
+    openapi: "3.0.0"
+    info:
+      version: 1.0.0
+      title: Swagger Petstore
+      license:
+        name: MIT
+    servers:
+      - url: https://sandbox-api.va.gov/services/apps/v0
+    paths:
+      /directory:
+        get:
+          tags:
+            - apps
+          summary: Retrieve OAuth Applications available
+          operationId: getApps
+          responses:
+            '200':
+              description: Applications retrieved successfully
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    required:
+                      - data
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/App"
+                      meta:
+                        type: object
+                        properties:
+                          count:
+                            type: number
+                            description: 'Counter used for pagination'
+                            example: 1
+    components:
+      schemas:
+        App:
+          type: object
+          properties:
+            id:
+              type: string
+              description: Unique ID of the application.
+              example: '1'
+            app_type:
+              type: string
+              description: The type of the application.
+              example: 'Third-Party-OAuth'
+            name:
+              type: string
+              description: The name of the application.
+              example: 'Example Health'
+            description:
+              type: string
+              description: The description of the application.
+              example: 'Example Health is a app to help you manage your healthcare records.'
+            platforms:
+              type: array
+              items:
+                type: string
+                description: The platforms the application is available on.
+              example:
+                - Web
+                - IOS
+            logo_url:
+              type: string
+              description: The source url of the application's logo.
+              example: 'https://www.example.com/static/images/example.png'
+            service_categories:
+              type: array
+              items:
+                type: string
+                description: An array of categories this application belongs to.
+              example:
+                - Health
+            app_url:
+              type: string
+              description: The URL of the application.
+              example: 'https://www.example.com'
+            privacy_url:
+              type: string
+              description: The Applications Privacy Policy
+              example: 'https://www.example.com/privacy'
+            tos_url:
+              type: string
+              description: The Applications Terms of Service
+              example: 'https://www.example.com/tos'
