@@ -12,14 +12,13 @@ module CypressViewportUpdater
     SCOPE = 'https://www.googleapis.com/auth/analytics.readonly'
     VIEW_ID = '176188361'
 
-    attr_reader :analytics
-
     def initialize
       @analytics = AnalyticsReportingService.new
-      analytics.authorization = ServiceAccountCredentials.make_creds(
+      @analytics.authorization = ServiceAccountCredentials.make_creds(
         json_key_io: StringIO.new(JSON_CREDENTIALS),
         scope: SCOPE
       )
+      @reports = nil
     end
 
     def request_reports
@@ -27,16 +26,16 @@ module CypressViewportUpdater
                                         user_report_request,
                                         viewport_report_request
                                       ])
-      @reports = analytics.batch_get_reports(request).reports
+      @reports = @analytics.batch_get_reports(request).reports
       self
     end
 
     def user_report
-      @reports[0]
+      @reports[0] if @reports && @reports[0]
     end
 
     def viewport_report
-      @reports[1]
+      @reports[1] if @reports && @reports[1]
     end
 
     private
