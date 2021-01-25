@@ -4,14 +4,14 @@ require 'rails_helper'
 
 RSpec.describe CypressViewportUpdater::GoogleAnalyticsReports do
   describe '#new' do
-    before do
-      VCR.use_cassette('cypress_viewport_updater/google_analytics_new') do
-        @new_instance = CypressViewportUpdater::GoogleAnalyticsReports.new
-      end
-    end
-
     it 'returns a new instance' do
-      expect(@new_instance).to be_an_instance_of(described_class)
+      google_analytics = nil
+
+      VCR.use_cassette('cypress_viewport_updater/google_analytics_new') do
+        google_analytics = CypressViewportUpdater::GoogleAnalyticsReports.new
+      end
+
+      expect(google_analytics).to be_an_instance_of(described_class)
     end
   end
 
