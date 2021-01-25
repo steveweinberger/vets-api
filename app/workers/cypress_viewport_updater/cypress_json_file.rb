@@ -2,11 +2,11 @@
 
 module CypressViewportUpdater
   class CypressJsonFile < ExistingGithubFile
-    def initialize
-      super(github_path: 'config/cypress.json',
-            local_current_file_path: 'app/workers/cypress_viewport_updater/current_files/cypress.json',
-            local_updated_file_path: 'app/workers/cypress_viewport_updater/updated_files/cypress.json',
-            name: 'cypress.json')
+    def initialize(github_path:, local_current_file_path:, local_updated_file_path:, name:)
+      super(github_path: github_path,
+            local_current_file_path: local_current_file_path,
+            local_updated_file_path: local_updated_file_path,
+            name: name)
     end
 
     def update(viewports)
