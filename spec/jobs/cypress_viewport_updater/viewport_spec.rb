@@ -20,27 +20,51 @@ RSpec.describe CypressViewportUpdater::Viewport do
     end
   end
 
-  describe '#viewportPreset' do
+  describe '#list' do
     it 'returns the correct value' do
-      expect(@viewport.viewportPreset).to eq('va-top-desktop-1')
+      expect(@viewport.list).to eq('VA Top Desktop Viewports')
     end
   end
 
   describe '#rank' do
     it 'returns the correct value' do
       expect(@viewport.rank).to eq(1)
-    end    
+    end
+  end
+
+  describe '#devicesWithViewport' do
+    it 'returns the correct value' do
+      expect(@viewport.devicesWithViewport).to eq('This property is not set for desktops.')
+    end
+  end
+
+  describe '#percentTraffic' do
+    it 'returns the correct value' do
+      expect(@viewport.percentTraffic).to eq('28.05%')
+    end
+  end
+
+  describe '#percentTrafficPeriod' do
+    it 'returns the correct value' do
+      expect(@viewport.percentTrafficPeriod).to eq('From: 12/01/2020, To: 12/31/2020')
+    end
+  end
+
+  describe '#viewportPreset' do
+    it 'returns the correct value' do
+      expect(@viewport.viewportPreset).to eq('va-top-desktop-1')
+    end
   end
 
   describe '#width' do
     it 'returns the correct value' do
       expect(@viewport.width).to eq(1280)
-    end    
+    end
   end
 
   describe '#height' do
     it 'returns the correct value' do
       expect(@viewport.height).to eq(960)
-    end    
+    end
   end
 end

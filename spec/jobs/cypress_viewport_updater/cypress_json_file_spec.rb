@@ -90,8 +90,12 @@ RSpec.describe CypressViewportUpdater::CypressJsonFile do
       if @viewports.mobile.count == mobile_viewports.count
         @viewports.mobile.each_with_index do |new_data, i|
           data_in_file = mobile_viewports[i]
-          expect(new_data.viewportPreset).to eq(data_in_file['viewportPreset'])
+          expect(new_data.list).to eq(data_in_file['list'])
           expect(new_data.rank).to eq(data_in_file['rank'])
+          expect(new_data.devicesWithViewport).to eq(data_in_file['devicesWithViewport'])
+          expect(new_data.percentTraffic).to eq(data_in_file['percentTraffic'])
+          expect(new_data.percentTrafficPeriod).to eq(data_in_file['percentTrafficPeriod'])
+          expect(new_data.viewportPreset).to eq(data_in_file['viewportPreset'])
           expect(new_data.width).to eq(data_in_file['width'])
           expect(new_data.height).to eq(data_in_file['height'])
         end
@@ -108,8 +112,12 @@ RSpec.describe CypressViewportUpdater::CypressJsonFile do
       if @viewports.tablet.count == tablet_viewports.count
         @viewports.tablet.each_with_index do |new_data, i|
           data_in_file = tablet_viewports[i]
-          expect(new_data.viewportPreset).to eq(data_in_file['viewportPreset'])
+          expect(new_data.list).to eq(data_in_file['list'])
           expect(new_data.rank).to eq(data_in_file['rank'])
+          expect(new_data.devicesWithViewport).to eq(data_in_file['devicesWithViewport'])
+          expect(new_data.percentTraffic).to eq(data_in_file['percentTraffic'])
+          expect(new_data.percentTrafficPeriod).to eq(data_in_file['percentTrafficPeriod'])
+          expect(new_data.viewportPreset).to eq(data_in_file['viewportPreset'])
           expect(new_data.width).to eq(data_in_file['width'])
           expect(new_data.height).to eq(data_in_file['height'])
         end
@@ -126,8 +134,12 @@ RSpec.describe CypressViewportUpdater::CypressJsonFile do
       if @viewports.desktop.count == desktop_viewports.count
         @viewports.desktop.each_with_index do |new_data, i|
           data_in_file = desktop_viewports[i]
-          expect(new_data.viewportPreset).to eq(data_in_file['viewportPreset'])
+          expect(new_data.list).to eq(data_in_file['list'])
           expect(new_data.rank).to eq(data_in_file['rank'])
+          expect(new_data.devicesWithViewport).to eq(data_in_file['devicesWithViewport'])
+          expect(new_data.percentTraffic).to eq(data_in_file['percentTraffic'])
+          expect(new_data.percentTrafficPeriod).to eq(data_in_file['percentTrafficPeriod'])
+          expect(new_data.viewportPreset).to eq(data_in_file['viewportPreset'])
           expect(new_data.width).to eq(data_in_file['width'])
           expect(new_data.height).to eq(data_in_file['height'])
         end
