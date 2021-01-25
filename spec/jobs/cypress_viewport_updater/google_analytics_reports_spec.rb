@@ -17,21 +17,21 @@ RSpec.describe CypressViewportUpdater::GoogleAnalyticsReports do
 
   describe 'before #request_report is called' do
     before do
-      VCR.use_cassette('cypress_viewport_updater/google_analytics_before_request_report') do
-        @before_request_report = CypressViewportUpdater::GoogleAnalyticsReports.new
+      VCR.use_cassette('cypress_viewport_updater/google_analytics_new') do
+        @google_analytics = CypressViewportUpdater::GoogleAnalyticsReports.new
       end
     end
 
     describe '#user_report' do
       it 'returns nil' do
-        report = @before_request_report.user_report
+        report = @google_analytics.user_report
         expect(report).to be_nil
       end
     end
 
     describe '#viewport_report' do
       it 'returns nil' do
-        report = @before_request_report.viewport_report
+        report = @google_analytics.viewport_report
         expect(report).to be_nil
       end
     end
