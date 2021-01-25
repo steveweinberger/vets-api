@@ -91,7 +91,7 @@ RSpec.describe CypressViewportUpdater::GoogleAnalyticsReports do
         expect(secondary_dimension).to eq('ga:screenResolution')
       end
 
-      it 'returns a report object with that has 100 results' do
+      it 'returns a report object that has 100 results' do
         results_total = @after_request_report.viewport_report.data.rows.count
         expect(results_total).to eq(100)
       end
