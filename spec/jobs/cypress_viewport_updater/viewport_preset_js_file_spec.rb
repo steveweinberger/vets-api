@@ -65,17 +65,17 @@ RSpec.describe CypressViewportUpdater::ViewportPresetJsFile do
     it 'updates the file with the correct data' do
       lines = File.open(@file.local_updated_file_path, 'r').to_a
 
-      lines.each_with_index do |line, outer_line_idx|
+      lines.each_with_index do |line, line_index|
         if /va-top-(mobile|tablet|desktop)-1/.match(line)
           vp_type = /(mobile|tablet|desktop)/.match(line)[0].to_sym
           vp_data = @viewports.send(vp_type)
           vp_count = vp_data.count
-          vp_index = 0
-          outer_line_idx.upto(outer_line_idx + vp_count - 1) do |inner_line_idx|
-            vp = vp_data[vp_index]
+          vp_data_index = 0
+          line_index.upto(line_index + vp_count - 1) do |vp_type_line_index|
+            vp = vp_data[vp_data_index]
             preset = "  'va-top-#{vp_type}-#{vp.rank}': { width: #{vp.width}, height: #{vp.height} },\n"
-            expect(lines[inner_line_idx]).to eq(preset)
-            vp_index += 1
+            expect(lines[vp_type_line_index]).to eq(preset)
+            vp_data_index += 1
           end
         end
       end
