@@ -1,7 +1,7 @@
 apiVersion: 0.0.1
 kind: API
 metadata:
-  name: Apps Api
+  name: apps-api
   description: The Third Party Applications API provides a list of applications that veterans can connect to and share their data with.
   tags:
     - rest
