@@ -16,18 +16,11 @@ RSpec.describe CypressViewportUpdater::GithubService do
   end
 
   describe '#get_content' do
-    let!(:file) do
-      CypressViewportUpdater::CypressJsonFile.new(
-        github_path: 'config/cypress.json',
-        local_current_file_path: 'app/workers/cypress_viewport_updater/current_files/cypress.json',
-        local_updated_file_path: 'app/workers/cypress_viewport_updater/updated_files/cypress.json',
-        name: 'cypress.json'
-      )
-    end
+    let!(:file) { CypressViewportUpdater::CypressJsonFile.new }
 
     before do
       VCR.use_cassette('cypress_viewport_updater/github_service_get_content') do
-        CypressViewportUpdater::GithubService.new.get_content(file)
+        CypressViewportUpdater::GithubService.new.get_content(file: file)
       end
     end
 
@@ -57,16 +50,7 @@ RSpec.describe CypressViewportUpdater::GithubService do
   end
 
   describe '#update_content' do
-    let!(:file) do
-      CypressViewportUpdater::CypressJsonFile.new(
-        github_path: 'config/cypress.json',
-        local_current_file_path: 'app/workers/cypress_viewport_updater/current_files/cypress.json',
-        local_updated_file_path: 'app/workers/cypress_viewport_updater/updated_files/cypress.json',
-        name: 'cypress.json'
-      )
-    end
-
-    file_content = 'File content'
+    let!(:file) { CypressViewportUpdater::CypressJsonFile.new }
 
     before do
       github = nil
@@ -76,7 +60,7 @@ RSpec.describe CypressViewportUpdater::GithubService do
       end
 
       VCR.use_cassette('cypress_viewport_updater/github_service_update_content_get_content') do
-        github = github.get_content(file)
+        github = github.get_content(file: file)
       end
 
       VCR.use_cassette('cypress_viewport_updater/github_service_update_content_create_branch') do
@@ -84,7 +68,8 @@ RSpec.describe CypressViewportUpdater::GithubService do
       end
 
       VCR.use_cassette('cypress_viewport_updater/github_service_update') do
-        @update_content = github.update_content(file: file, content: file_content)
+        file.updated_content = 'Updated content'
+        @update_content = github.update_content(file: file)
       end
     end
 
@@ -99,20 +84,8 @@ RSpec.describe CypressViewportUpdater::GithubService do
 
   describe '#submit_pr' do
     before do
-      file_1 = CypressViewportUpdater::CypressJsonFile.new(
-        github_path: 'config/cypress.json',
-        local_current_file_path: 'app/workers/cypress_viewport_updater/current_files/cypress.json',
-        local_updated_file_path: 'app/workers/cypress_viewport_updater/updated_files/cypress.json',
-        name: 'cypress.json'
-      )
-      file_2 = CypressViewportUpdater::CypressJsonFile.new(
-        github_path: 'src/platform/testing/e2e/cypress/support/commands/viewportPreset.js',
-        local_current_file_path: 'app/workers/cypress_viewport_updater/current_files/viewportPreset.js',
-        local_updated_file_path: 'app/workers/cypress_viewport_updater/updated_files/viewportPreset.js',
-        name: 'viewportPreset.js'
-      )
-      content_1 = 'File 1 content'
-      content_2 = 'File 2 content'
+      file_1 = CypressViewportUpdater::CypressJsonFile.new
+      file_2 = CypressViewportUpdater::ViewportPresetJsFile.new
       github = nil
 
       VCR.use_cassette('cypress_viewport_updater/github_service_submit_pr_new') do
@@ -120,11 +93,11 @@ RSpec.describe CypressViewportUpdater::GithubService do
       end
 
       VCR.use_cassette('cypress_viewport_updater/github_service_submit_pr_get_content_file_1') do
-        github.get_content(file_1)
+        github.get_content(file: file_1)
       end
 
       VCR.use_cassette('cypress_viewport_updater/github_service_submit_pr_get_content_file_2') do
-        github.get_content(file_2)
+        github.get_content(file: file_2)
       end
 
       VCR.use_cassette('cypress_viewport_updater/github_service_submit_pr_create_branch') do
@@ -132,11 +105,13 @@ RSpec.describe CypressViewportUpdater::GithubService do
       end
 
       VCR.use_cassette('cypress_viewport_updater/github_service_submit_pr_update_content_file_1') do
-        github.update_content(file: file_1, content: content_1)
+        file_1.updated_content = 'File 1 content'
+        github.update_content(file: file_1)
       end
 
       VCR.use_cassette('cypress_viewport_updater/github_service_submit_pr_update_content_file_2') do
-        github.update_content(file: file_2, content: content_2)
+        file_2.updated_content = 'File 2 content'
+        github.update_content(file: file_2)
       end
 
       VCR.use_cassette('cypress_viewport_updater/github_service_submit_pr') do

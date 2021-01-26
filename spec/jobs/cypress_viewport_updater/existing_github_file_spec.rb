@@ -9,18 +9,6 @@ RSpec.shared_examples 'an existing file' do
     end
   end
 
-  describe '#local_current_file_path' do
-    it 'returns the correct value' do
-      expect(@file.local_current_file_path).to eq(local_current_file_path)
-    end
-  end
-
-  describe '#local_updated_file_path' do
-    it 'returns the correct value' do
-      expect(@file.local_updated_file_path).to eq(local_updated_file_path)
-    end
-  end
-
   describe '#name' do
     it 'returns the correct value' do
       expect(@file.name).to eq(name)
@@ -67,60 +55,33 @@ RSpec.shared_examples 'an existing file' do
     end
   end
 
-  describe '#create_local_current_file' do
-    before do
-      current_files_directory = 'app/workers/cypress_viewport_updater/current_files'
-      FileUtils.mkdir_p(current_files_directory) unless File.directory?(current_files_directory)
-    end
-
-    it 'deletes a file if it exists' do
-      # this tests part of what the method does internally, but does it satisfy SimpleCov?
-      File.delete(local_current_file_path) if File.exist?(local_current_file_path)
-
-      raw_content_1 = 'Raw content 1'
-      File.write(@file.local_current_file_path, raw_content_1)
-      File.read(@file.local_current_file_path)
-
-      raw_content_2 = 'Raw content 2'
-      @file.raw_content = raw_content_2
-      @file.create_local_current_file
-      expect(File.read(@file.local_current_file_path)).to eq(raw_content_2)
-    end
-
-    it 'creates a file' do
-      # this tests part of what the method does internally, but does it satisfy SimpleCov?
-      File.delete(local_current_file_path) if File.exist?(local_current_file_path)
-
-      raw_content = 'Raw content'
-      @file.raw_content = raw_content
-      @file.create_local_current_file
-      expect(File.exist?(local_current_file_path)).to be(true)
+  describe '#updated_content' do
+    it 'returns the correct value' do
+      updated_content = 'Content'
+      @file.updated_content = updated_content
+      expect(@file.updated_content).to eq(updated_content)
     end
   end
 
-  describe '#content' do
-    it 'returns the content from local_updated_file_path' do
-      updated_files_directory = 'app/workers/cypress_viewport_updater/updated_files'
-      FileUtils.mkdir_p(updated_files_directory) unless File.directory?(updated_files_directory)
-      File.delete(local_updated_file_path) if File.exist?(local_updated_file_path)
-      updated_content = 'Updated content'
-      File.write(local_updated_file_path, updated_content)
-      expect(@file.content).to eq(updated_content)
+  describe '#updated_content=' do
+    it 'returns the correct value when it is updated' do
+      updated_content_1 = 'Content'
+      @file.updated_content = updated_content_1
+      expect(@file.updated_content).to eq(updated_content_1)
+
+      updated_content_2 = 'Updated content'
+      @file.updated_content = updated_content_2
+      expect(@file.updated_content).to eq(updated_content_2)
     end
   end
 end
 
 context CypressViewportUpdater::ExistingGithubFile do
   let!(:github_path) { 'config/cypress.json' }
-  let!(:local_current_file_path) { 'app/workers/cypress_viewport_updater/current_files/cypress.json' }
-  let!(:local_updated_file_path) { 'app/workers/cypress_viewport_updater/updated_files/cypress.json' }
   let!(:name) { 'cypress.json' }
 
   before do
-    @file = described_class.new(github_path: github_path,
-                                local_current_file_path: local_current_file_path,
-                                local_updated_file_path: local_updated_file_path,
-                                name: name)
+    @file = described_class.new(github_path: github_path, name: name)
   end
 
   it_behaves_like 'an existing file'
@@ -128,15 +89,10 @@ end
 
 context CypressViewportUpdater::CypressJsonFile do
   let!(:github_path) { 'config/cypress.json' }
-  let!(:local_current_file_path) { 'app/workers/cypress_viewport_updater/current_files/cypress.json' }
-  let!(:local_updated_file_path) { 'app/workers/cypress_viewport_updater/updated_files/cypress.json' }
   let!(:name) { 'cypress.json' }
 
   before do
-    @file = described_class.new(github_path: github_path,
-                                local_current_file_path: local_current_file_path,
-                                local_updated_file_path: local_updated_file_path,
-                                name: name)
+    @file = described_class.new
   end
 
   it_behaves_like 'an existing file'
@@ -144,15 +100,10 @@ end
 
 context CypressViewportUpdater::ViewportPresetJsFile do
   let!(:github_path) { 'src/platform/testing/e2e/cypress/support/commands/viewportPreset.js' }
-  let!(:local_current_file_path) { 'app/workers/cypress_viewport_updater/current_files/viewportPreset.js' }
-  let!(:local_updated_file_path) { 'app/workers/cypress_viewport_updater/updated_files/viewportPreset.js' }
   let!(:name) { 'viewportPreset.js' }
 
   before do
-    @file = described_class.new(github_path: github_path,
-                                local_current_file_path: local_current_file_path,
-                                local_updated_file_path: local_updated_file_path,
-                                name: name)
+    @file = described_class.new
   end
 
   it_behaves_like 'an existing file'

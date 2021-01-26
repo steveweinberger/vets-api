@@ -12,7 +12,7 @@ module CypressViewportUpdater
       @client = Octokit::Client.new(access_token: ACCESS_TOKEN)
     end
 
-    def get_content(file)
+    def get_content(file:)
       file.sha = @client.content(REPO, path: file.github_path).sha
       file.raw_content = @client.content(REPO, path: file.github_path, accept: 'application/vnd.github.V3.raw')
       self
@@ -25,21 +25,21 @@ module CypressViewportUpdater
       @client.create_ref(REPO, ref, sha)
     end
 
-    def update_content(file:, content:)
+    def update_content(file:)
       @client.update_content(REPO,
-                            file.github_path,
-                            "update #{file.name}",
-                            file.sha,
-                            content,
-                            branch: feature_branch_name)
+                             file.github_path,
+                             "update #{file.name}",
+                             file.sha,
+                             file.updated_content,
+                             branch: feature_branch_name)
     end
 
     def submit_pr
       @client.create_pull_request(REPO,
-                                 'master',
-                                 feature_branch_name,
-                                 pr_title,
-                                 pr_body)
+                                  'master',
+                                  feature_branch_name,
+                                  pr_title,
+                                  pr_body)
     end
 
     private
