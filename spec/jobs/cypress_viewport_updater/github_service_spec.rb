@@ -3,6 +3,19 @@
 require 'rails_helper'
 
 RSpec.describe CypressViewportUpdater::GithubService do
+  VCR.configure do |c|
+    %w[
+      https://api.github.com/repos/holdenhinkle/vets-website/contents/config/cypress.json
+      https://api.github.com/repos/holdenhinkle/vets-website/contents/src/platform/testing/e2e/cypress/support/commands/viewportPreset.js
+      https://api.github.com/repos/holdenhinkle/vets-website/git/refs
+      https://api.github.com/repos/holdenhinkle/vets-website/git/refs/heads/master
+      https://api.github.com/repos/holdenhinkle/vets-website/pulls
+    ].each do |key|
+      data = YAML.safe_load(File.open('config/settings.local.yml'))
+      c.filter_sensitive_data('Removed') { data[key] }
+    end
+  end
+
   describe '#new' do
     it 'returns a new instance' do
       github = nil
