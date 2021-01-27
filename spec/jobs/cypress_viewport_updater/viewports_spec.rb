@@ -3,6 +3,32 @@
 require 'rails_helper'
 
 RSpec.describe CypressViewportUpdater::Viewports do
+  VCR.configure do |c|
+    # the following filter is used on requests to
+    # https://analyticsreporting.googleapis.com/v4/reports:batchGet
+    c.filter_sensitive_data('removed') do |interaction|
+      if interaction.request.headers['Authorization']
+        if (match = interaction.request.headers['Authorization'].first.match(/^Bearer.+/))
+          match[0]
+        end
+      end
+    end
+
+    # the following filters are used on requests/responses to
+    # https://www.googleapis.com/oauth2/v4/token
+    c.filter_sensitive_data('removed') do |interaction|
+      if (match = interaction.request.body.match(/^grant_type.+/))
+        match[0]
+      end
+    end
+
+    c.filter_sensitive_data('{"access_token":"removed","expires_in":3599,"token_type":"Bearer"}') do |interaction|
+      if (match = interaction.response.body.match(/^{\"access_token.+/))
+        match[0]
+      end
+    end
+  end
+
   before do
     VCR.use_cassette('cypress_viewport_updater/google_analytics_after_request_report') do
       @ga = CypressViewportUpdater::GoogleAnalyticsReports

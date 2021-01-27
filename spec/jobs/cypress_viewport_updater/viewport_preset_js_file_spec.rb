@@ -4,18 +4,34 @@ require 'rails_helper'
 
 RSpec.describe CypressViewportUpdater::ViewportPresetJsFile do
   VCR.configure do |c|
-    %w[
-      https://api.github.com/repos/holdenhinkle/vets-website/contents/config/cypress.json
-      https://api.github.com/repos/holdenhinkle/vets-website/contents/src/platform/testing/e2e/cypress/support/commands/viewportPreset.js
-      https://api.github.com/repos/holdenhinkle/vets-website/git/refs
-      https://api.github.com/repos/holdenhinkle/vets-website/git/refs/heads/master
-      https://api.github.com/repos/holdenhinkle/vets-website/pulls
-    ].each do |key|
-      data = YAML.safe_load(File.open('config/settings.local.yml'))
-      c.filter_sensitive_data('Removed') { data[key] }
+    # the following filter is used on requests to
+    # https://analyticsreporting.googleapis.com/v4/reports:batchGet
+    # and all requests to https://api.github.com
+    c.filter_sensitive_data('removed') do |interaction|
+      if interaction.request.headers['Authorization']
+        token = interaction.request.headers['Authorization'].first
+
+        if (match = token.match(/^Bearer.+/) || token.match(/^token.+/))
+          match[0]
+        end
+      end
+    end
+
+    # the following filters are used on requests/responses to
+    # https://www.googleapis.com/oauth2/v4/token
+    c.filter_sensitive_data('removed') do |interaction|
+      if (match = interaction.request.body.match(/^grant_type.+/))
+        match[0]
+      end
+    end
+
+    c.filter_sensitive_data('{"access_token":"removed","expires_in":3599,"token_type":"Bearer"}') do |interaction|
+      if (match = interaction.response.body.match(/^{\"access_token.+/))
+        match[0]
+      end
     end
   end
-  
+
   before do
     @file = described_class.new
   end
