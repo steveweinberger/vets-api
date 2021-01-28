@@ -2,44 +2,64 @@
 
 module CypressViewportUpdater
   class GithubService
+    include SentryLogging
+
     data = YAML.safe_load(File.open('config/settings.local.yml'))
     ACCESS_TOKEN = data['github_cypress_viewport_updater_bot']['access_token']
     REPO = 'holdenhinkle/vets-website'
 
-    attr_reader :feature_branch_name
+    attr_reader :client, :feature_branch_name
 
     def initialize
       @client = Octokit::Client.new(access_token: ACCESS_TOKEN)
     end
 
     def get_content(file:)
-      file.sha = @client.content(REPO, path: file.github_path).sha
-      file.raw_content = @client.content(REPO, path: file.github_path, accept: 'application/vnd.github.V3.raw')
+      begin
+        file.sha = @client.content(REPO, path: file.github_path).sha
+        file.raw_content = @client.content(REPO, path: file.github_path, accept: 'application/vnd.github.V3.raw')
+      rescue Octokit::ClientError, Octokit::UnprocessableEntity, StandardError => e
+        log_exception_to_sentry(e)
+      end
+      
       self
     end
 
     def create_branch
       set_feature_branch_name
       ref = "heads/#{feature_branch_name}"
-      sha = @client.ref(REPO, 'heads/master').object.sha
-      @client.create_ref(REPO, ref, sha)
+
+      begin
+        sha = @client.ref(REPO, 'heads/master').object.sha
+        @client.create_ref(REPO, ref, sha)
+      rescue Octokit::ClientError, Octokit::UnprocessableEntity, StandardError => e
+        log_exception_to_sentry(e)
+      end
     end
 
     def update_content(file:)
-      @client.update_content(REPO,
-                             file.github_path,
-                             "update #{file.name}",
-                             file.sha,
-                             file.updated_content,
-                             branch: feature_branch_name)
+      begin
+        @client.update_content(REPO,
+                              file.github_path,
+                              "update #{file.name}",
+                              file.sha,
+                              file.updated_content,
+                              branch: feature_branch_name)
+      rescue Octokit::ClientError, Octokit::UnprocessableEntity, StandardError => e
+        log_exception_to_sentry(e)
+      end
     end
 
     def submit_pr
+      begin
       @client.create_pull_request(REPO,
                                   'master',
                                   feature_branch_name,
                                   pr_title,
                                   pr_body)
+      rescue Octokit::ClientError, Octokit::UnprocessableEntity, StandardError => e
+        log_exception_to_sentry(e)
+      end
     end
 
     private

@@ -6,6 +6,7 @@ module CypressViewportUpdater
   class GoogleAnalyticsReports
     include Google::Apis::AnalyticsreportingV4
     include Google::Auth
+    include SentryLogging
 
     data = YAML.safe_load(File.open('config/settings.local.yml'))
     JSON_CREDENTIALS = data['google_analytics_service_credentials'].to_json
@@ -26,7 +27,12 @@ module CypressViewportUpdater
                                         user_report_request,
                                         viewport_report_request
                                       ])
-      @reports = @analytics.batch_get_reports(request).reports
+      begin
+        @reports = @analytics.batch_get_reports(request).reports
+      rescue => e
+        log_exception_to_sentry(e)
+      end
+
       self
     end
 
