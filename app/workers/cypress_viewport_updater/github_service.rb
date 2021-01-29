@@ -21,7 +21,7 @@ module CypressViewportUpdater
       rescue Octokit::ClientError, Octokit::UnprocessableEntity, StandardError => e
         log_exception_to_sentry(e)
       end
-      
+
       self
     end
 
@@ -38,28 +38,24 @@ module CypressViewportUpdater
     end
 
     def update_content(file:)
-      begin
-        @client.update_content(REPO,
-                              file.github_path,
-                              "update #{file.name}",
-                              file.sha,
-                              file.updated_content,
-                              branch: feature_branch_name)
-      rescue Octokit::ClientError, Octokit::UnprocessableEntity, StandardError => e
-        log_exception_to_sentry(e)
-      end
+      @client.update_content(REPO,
+                             file.github_path,
+                             "update #{file.name}",
+                             file.sha,
+                             file.updated_content,
+                             branch: feature_branch_name)
+    rescue Octokit::ClientError, Octokit::UnprocessableEntity, StandardError => e
+      log_exception_to_sentry(e)
     end
 
     def submit_pr
-      begin
       @client.create_pull_request(REPO,
                                   'master',
                                   feature_branch_name,
                                   pr_title,
                                   pr_body)
-      rescue Octokit::ClientError, Octokit::UnprocessableEntity, StandardError => e
-        log_exception_to_sentry(e)
-      end
+    rescue Octokit::ClientError, Octokit::UnprocessableEntity, StandardError => e
+      log_exception_to_sentry(e)
     end
 
     private
