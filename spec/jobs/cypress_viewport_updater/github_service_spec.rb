@@ -135,8 +135,7 @@ RSpec.describe CypressViewportUpdater::GithubService do
     end
 
     it 'submits a pr to the department-of-veterans-affairs/vets-website repo' do
-      expect(@submit_pr.base.repo.full_name).to eq('holdenhinkle/vets-website')
-      # expect(@submit_pr.base.repo.full_name).to eq('department-of-veterans-affairs/vets-website')
+      expect(@submit_pr.base.repo.full_name).to eq('department-of-veterans-affairs/vets-website')
     end
 
     it 'returns the number of commits in the repo' do
@@ -145,9 +144,7 @@ RSpec.describe CypressViewportUpdater::GithubService do
 
     it 'returns the url to the pr' do
       expect(@submit_pr.url)
-        .to match(%r{\bhttps:\/\/api.github.com\/repos\/holdenhinkle\/vets-website\/pulls\/\d+\b})
-      # expect(@submit_pr)
-      #   .to match(%r{\bhttps:\/\/api.github.com\/repos\/department-of-veterans-affairs\/vets-website\/pulls\/\d+\b})
+        .to match(%r{\bhttps:\/\/api.github.com\/repos\/department-of-veterans-affairs\/vets-website\/pulls\/\d+\b})
     end
 
     it 'returns the pr title' do
