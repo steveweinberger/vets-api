@@ -12,6 +12,7 @@ module HealthQuest
           client.use_r4
           client.default_json
           client.additional_headers = headers
+          client.use_minimal_preference
         end
       end
 

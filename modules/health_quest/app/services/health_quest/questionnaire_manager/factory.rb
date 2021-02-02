@@ -29,8 +29,10 @@ module HealthQuest
       end
 
       def all
-        get_patient
-        get_appointments
+        @patient = get_patient.resource
+        @appointments = get_appointments.fetch(:data, [])
+        return aggregated_data if patient.blank? || appointments.blank?
+
         get_questionnaires
         get_questionnaire_responses
         get_sip_data
@@ -38,10 +40,12 @@ module HealthQuest
       end
 
       def get_appointments
-        @appointments = appointment_service.get_appointments(three_months_ago, one_year_from_now)
+        @get_appointments ||= appointment_service.get_appointments(three_months_ago, one_year_from_now)
       end
 
-      def get_patient; end
+      def get_patient
+        @get_patient ||= patient_service.get
+      end
 
       def get_questionnaires; end
 
