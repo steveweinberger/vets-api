@@ -4,7 +4,6 @@ module CypressViewportUpdater
   class GithubService
     include SentryLogging
 
-    binding.pry
     github_data = YAML.safe_load(File.open('config/settings.local.yml'))['github_cypress_viewport_updater_app']
     PRIVATE_KEY = OpenSSL::PKey::RSA.new(github_data['private_pem'].gsub('\n', "\n"))
     INSTALLATION_ID = github_data['installation_id']
