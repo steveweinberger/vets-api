@@ -665,6 +665,7 @@ veteran_readiness_and_employment:
   credentials: ~
   auth_endpoint: ~
 
+# Settings for connecting to the va.gov Google Analytics for the Cypress Viewport Updater
 google_analytics_cvu:
   type: service_account
   project_id: vsp-analytics-and-insights
@@ -677,6 +678,7 @@ google_analytics_cvu:
   auth_provider_x509_cert_url: https://www.googleapis.com/oauth2/v1/certs
   client_x509_cert_url: https://www.googleapis.com/robot/v1/metadata/x509/va-gov-top-user-viewports%40vsp-analytics-and-insights.iam.gserviceaccount.com
 
+# Settings for connecting to the cypress-viewport-updater-bot GitHub app
 github_cvu:
   installation_id: ~
   integration_id: ~
