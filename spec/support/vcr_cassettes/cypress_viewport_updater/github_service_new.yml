@@ -25,20 +25,18 @@ http_interactions:
       Server:
       - GitHub.com
       Date:
-      - Wed, 03 Feb 2021 13:44:50 GMT
+      - Mon, 08 Feb 2021 17:22:59 GMT
       Content-Type:
       - application/json; charset=utf-8
       Content-Length:
       - '202'
-      Status:
-      - 201 Created
       Cache-Control:
       - public, max-age=60, s-maxage=60
       Vary:
       - Accept
       - Accept-Encoding, Accept, X-Requested-With
       Etag:
-      - '"3ba1b170d67a55d6392d96c48c8f90389bbfe50c4204c615fb5cf7f6361d5bf3"'
+      - '"0e25ac3b05c240c0e0a1141c49f6b4a308135ae1c0aa39da5bda74b4f96ff3fd"'
       X-Github-Media-Type:
       - github.v3; format=json
       Access-Control-Expose-Headers:
@@ -60,9 +58,9 @@ http_interactions:
       Content-Security-Policy:
       - default-src 'none'
       X-Github-Request-Id:
-      - C2AF:28F5:12E91AC:2D733AD:601AA8D2
+      - D03A:6FD7:3078D83:4B9D75C:60217373
     body:
       encoding: UTF-8
       string: '{"token":"removed","expires_at":"2021-02-02T18:24:37Z","permissions":{"contents":"write","metadata":"read","pull_requests":"write"},"repository_selection":"selected"}'
-  recorded_at: Wed, 03 Feb 2021 13:44:50 GMT
+  recorded_at: Mon, 08 Feb 2021 17:22:59 GMT
 recorded_with: VCR 6.0.0

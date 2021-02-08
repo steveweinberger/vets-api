@@ -1,85 +1,81 @@
 ---
 http_interactions:
-  - request:
-      method: put
-      uri: https://api.github.com/repos/department-of-veterans-affairs/vets-website/contents/config/cypress.json
-      body:
-        encoding: UTF-8
-        string:
-          '{"branch":"02032021134451653_update_cypress_viewport_data","sha":"45804756d06ea2ba9b77282775107d764282e1e5","content":"VXBkYXRlZCBjb250ZW50","message":"update
-          cypress.json"}'
-      headers:
-        Accept:
-          - application/vnd.github.v3+json
-        User-Agent:
-          - Octokit Ruby Gem 4.20.0
-        Content-Type:
-          - application/json
-        Authorization:
-          - removed
-        Accept-Encoding:
-          - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
-    response:
-      status:
-        code: 200
-        message: OK
-      headers:
-        Server:
-          - GitHub.com
-        Date:
-          - Wed, 03 Feb 2021 13:44:53 GMT
-        Content-Type:
-          - application/json; charset=utf-8
-        Transfer-Encoding:
-          - chunked
-        Status:
-          - 200 OK
-        Cache-Control:
-          - private, max-age=60, s-maxage=60
-        Vary:
-          - Accept, Authorization, Cookie, X-GitHub-OTP
-          - Accept-Encoding, Accept, X-Requested-With
-        Etag:
-          - W/"e83df6e511c1bec2cb3f70395786152a1ca1e24d85536dcd53ccf0e610902793"
-        X-Github-Media-Type:
-          - github.v3; format=json
-        X-Ratelimit-Limit:
-          - "15000"
-        X-Ratelimit-Remaining:
-          - "14978"
-        X-Ratelimit-Reset:
-          - "1612363475"
-        X-Ratelimit-Used:
-          - "22"
-        Access-Control-Expose-Headers:
-          - ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining,
-            X-RateLimit-Used, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes,
-            X-Poll-Interval, X-GitHub-Media-Type, Deprecation, Sunset
-        Access-Control-Allow-Origin:
-          - "*"
-        Strict-Transport-Security:
-          - max-age=31536000; includeSubdomains; preload
-        X-Frame-Options:
-          - deny
-        X-Content-Type-Options:
-          - nosniff
-        X-Xss-Protection:
-          - 1; mode=block
-        Referrer-Policy:
-          - origin-when-cross-origin, strict-origin-when-cross-origin
-        Content-Security-Policy:
-          - default-src 'none'
-        X-Github-Request-Id:
-          - C2B5:2DA8:9A8FE6:18BEF1A:601AA8D4
-      body:
-        encoding: ASCII-8BIT
-        string:
-          '{"content":{"name":"cypress.json","path":"config/cypress.json","sha":"1dd21f228823d7bd230ca98a7fcc0e5570ce30e8","size":15,"url":"https://api.github.com/repos/department-of-veterans-affairs/vets-website/contents/config/cypress.json?ref=02032021134451653_update_cypress_viewport_data","html_url":"https://github.com/department-of-veterans-affairs/vets-website/blob/02032021134451653_update_cypress_viewport_data/config/cypress.json","git_url":"https://api.github.com/repos/department-of-veterans-affairs/vets-website/git/blobs/1dd21f228823d7bd230ca98a7fcc0e5570ce30e8","download_url":"https://raw.githubusercontent.com/department-of-veterans-affairs/vets-website/02032021134451653_update_cypress_viewport_data/config/cypress.json","type":"file","_links":{"self":"https://api.github.com/repos/department-of-veterans-affairs/vets-website/contents/config/cypress.json?ref=02032021134451653_update_cypress_viewport_data","git":"https://api.github.com/repos/department-of-veterans-affairs/vets-website/git/blobs/1dd21f228823d7bd230ca98a7fcc0e5570ce30e8","html":"https://github.com/department-of-veterans-affairs/vets-website/blob/02032021134451653_update_cypress_viewport_data/config/cypress.json"}},"commit":{"sha":"b7529ac5de09f8cbcf71ced32d0a55fd76ac97dc","node_id":"MDY6Q29tbWl0MzMyMDI2Njc6Yjc1MjlhYzVkZTA5ZjhjYmNmNzFjZWQzMmQwYTU1ZmQ3NmFjOTdkYw==","url":"https://api.github.com/repos/department-of-veterans-affairs/vets-website/git/commits/b7529ac5de09f8cbcf71ced32d0a55fd76ac97dc","html_url":"https://github.com/department-of-veterans-affairs/vets-website/commit/b7529ac5de09f8cbcf71ced32d0a55fd76ac97dc","author":{"name":"cypress-viewport-updater-bot[bot]","email":"77450695+cypress-viewport-updater-bot[bot]@users.noreply.github.com","date":"2021-02-03T13:44:52Z"},"committer":{"name":"GitHub","email":"noreply@github.com","date":"2021-02-03T13:44:52Z"},"tree":{"sha":"ae208e9e02f2046be20fd354cff9828d8fcdbfb6","url":"https://api.github.com/repos/department-of-veterans-affairs/vets-website/git/trees/ae208e9e02f2046be20fd354cff9828d8fcdbfb6"},"message":"update
-          cypress.json","parents":[{"sha":"a88961fc46104ca8e9f758793eaa3eebc7a0a7a0","url":"https://api.github.com/repos/department-of-veterans-affairs/vets-website/git/commits/a88961fc46104ca8e9f758793eaa3eebc7a0a7a0","html_url":"https://github.com/department-of-veterans-affairs/vets-website/commit/a88961fc46104ca8e9f758793eaa3eebc7a0a7a0"}],"verification":{"verified":true,"reason":"valid","signature":"-----BEGIN
-          PGP SIGNATURE-----\n-----END
-          PGP SIGNATURE-----\n","payload":"tree ae208e9e02f2046be20fd354cff9828d8fcdbfb6\nparent
-          a88961fc46104ca8e9f758793eaa3eebc7a0a7a0\nauthor cypress-viewport-updater-bot[bot]
-          <77450695+cypress-viewport-updater-bot[bot]@users.noreply.github.com> 1612359892
-          +0000\ncommitter GitHub <noreply@github.com> 1612359892 +0000\n\nupdate cypress.json"}}}'
-    recorded_at: Wed, 03 Feb 2021 13:44:53 GMT
+- request:
+    method: put
+    uri: https://api.github.com/repos/department-of-veterans-affairs/vets-website/contents/config/cypress.json
+    body:
+      encoding: UTF-8
+      string: '{"branch":"02082021172249711_update_cypress_viewport_data","sha":"45804756d06ea2ba9b77282775107d764282e1e5","content":"VXBkYXRlZCBjb250ZW50","message":"update
+        cypress.json"}'
+    headers:
+      Accept:
+      - application/vnd.github.v3+json
+      User-Agent:
+      - Octokit Ruby Gem 4.20.0
+      Content-Type:
+      - application/json
+      Authorization:
+      - removed
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - GitHub.com
+      Date:
+      - Mon, 08 Feb 2021 17:22:51 GMT
+      Content-Type:
+      - application/json; charset=utf-8
+      Transfer-Encoding:
+      - chunked
+      Cache-Control:
+      - private, max-age=60, s-maxage=60
+      Vary:
+      - Accept, Authorization, Cookie, X-GitHub-OTP
+      - Accept-Encoding, Accept, X-Requested-With
+      Etag:
+      - W/"05a4fd25ae349baf73def14f34b33737ea757c8ad8f79267f13cfe2feed9d812"
+      X-Github-Media-Type:
+      - github.v3; format=json
+      X-Ratelimit-Limit:
+      - '15000'
+      X-Ratelimit-Remaining:
+      - '14995'
+      X-Ratelimit-Reset:
+      - '1612808569'
+      X-Ratelimit-Used:
+      - '5'
+      Access-Control-Expose-Headers:
+      - ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining,
+        X-RateLimit-Used, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes,
+        X-Poll-Interval, X-GitHub-Media-Type, Deprecation, Sunset
+      Access-Control-Allow-Origin:
+      - "*"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubdomains; preload
+      X-Frame-Options:
+      - deny
+      X-Content-Type-Options:
+      - nosniff
+      X-Xss-Protection:
+      - 1; mode=block
+      Referrer-Policy:
+      - origin-when-cross-origin, strict-origin-when-cross-origin
+      Content-Security-Policy:
+      - default-src 'none'
+      X-Github-Request-Id:
+      - D02C:0762:1665C24:39B420B:6021736A
+    body:
+      encoding: ASCII-8BIT
+      string: '{"content":{"name":"cypress.json","path":"config/cypress.json","sha":"1dd21f228823d7bd230ca98a7fcc0e5570ce30e8","size":15,"url":"https://api.github.com/repos/department-of-veterans-affairs/vets-website/contents/config/cypress.json?ref=02082021172249711_update_cypress_viewport_data","html_url":"https://github.com/department-of-veterans-affairs/vets-website/blob/02082021172249711_update_cypress_viewport_data/config/cypress.json","git_url":"https://api.github.com/repos/department-of-veterans-affairs/vets-website/git/blobs/1dd21f228823d7bd230ca98a7fcc0e5570ce30e8","download_url":"https://raw.githubusercontent.com/department-of-veterans-affairs/vets-website/02082021172249711_update_cypress_viewport_data/config/cypress.json","type":"file","_links":{"self":"https://api.github.com/repos/department-of-veterans-affairs/vets-website/contents/config/cypress.json?ref=02082021172249711_update_cypress_viewport_data","git":"https://api.github.com/repos/department-of-veterans-affairs/vets-website/git/blobs/1dd21f228823d7bd230ca98a7fcc0e5570ce30e8","html":"https://github.com/department-of-veterans-affairs/vets-website/blob/02082021172249711_update_cypress_viewport_data/config/cypress.json"}},"commit":{"sha":"1a42a6d207b4826124042180a768ff6f3a9fcb8f","node_id":"MDY6Q29tbWl0MzMyMDI2Njc6MWE0MmE2ZDIwN2I0ODI2MTI0MDQyMTgwYTc2OGZmNmYzYTlmY2I4Zg==","url":"https://api.github.com/repos/department-of-veterans-affairs/vets-website/git/commits/1a42a6d207b4826124042180a768ff6f3a9fcb8f","html_url":"https://github.com/department-of-veterans-affairs/vets-website/commit/1a42a6d207b4826124042180a768ff6f3a9fcb8f","author":{"name":"cypress-viewport-updater-bot[bot]","email":"77450695+cypress-viewport-updater-bot[bot]@users.noreply.github.com","date":"2021-02-08T17:22:50Z"},"committer":{"name":"GitHub","email":"noreply@github.com","date":"2021-02-08T17:22:50Z"},"tree":{"sha":"c94d34a6e06b55614f603e140b2eee2513a75979","url":"https://api.github.com/repos/department-of-veterans-affairs/vets-website/git/trees/c94d34a6e06b55614f603e140b2eee2513a75979"},"message":"update
+        cypress.json","parents":[{"sha":"9176c22f5d3fe1c54e849107d0d82db045487e1e","url":"https://api.github.com/repos/department-of-veterans-affairs/vets-website/git/commits/9176c22f5d3fe1c54e849107d0d82db045487e1e","html_url":"https://github.com/department-of-veterans-affairs/vets-website/commit/9176c22f5d3fe1c54e849107d0d82db045487e1e"}],"verification":{"verified":true,"reason":"valid","signature":"-----BEGIN
+        PGP SIGNATURE-----\n\nwsBcBAABCAAQBQJgIXNqCRBK7hj4Ov3rIwAAdHIIACa2cRUe0ADfhS+AgdjmCNWU\nfwi8zcX4fCxBLJfRJsIfkwJE0WhqXax+3lsTdEv2Ki142I06vW64yaLjpxr+l3FL\nheCHbeR6Bz0ymYNDa6FBvGphlc2EQOD3gwixQSOLMmlOrL//PHKcCUfaqFFI2b+Z\nLHwNiFkcnI8A9HDJ6hkhg9k5uQhRxQavRd4ePhSvfr2wjYUXGi457Kupcp6y9TgD\nazLIZsOjtBnsy/rYPxUvhENAefHLq8KL/RjwCIj5w7svi9yf3HvMFi+194FwJ5sA\nEPjrkD5aVN4KvYlKVZIAYiKgOXBmFFZpYdX8mu1x3pKkDHd3mPJsp73zgnPbWj0=\n=4l2U\n-----END
+        PGP SIGNATURE-----\n","payload":"tree c94d34a6e06b55614f603e140b2eee2513a75979\nparent
+        9176c22f5d3fe1c54e849107d0d82db045487e1e\nauthor cypress-viewport-updater-bot[bot]
+        <77450695+cypress-viewport-updater-bot[bot]@users.noreply.github.com> 1612804970
+        +0000\ncommitter GitHub <noreply@github.com> 1612804970 +0000\n\nupdate cypress.json"}}}'
+  recorded_at: Mon, 08 Feb 2021 17:22:51 GMT
 recorded_with: VCR 6.0.0
