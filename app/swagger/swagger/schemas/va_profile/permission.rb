@@ -4,7 +4,7 @@ require 'va_profile/models/permission'
 
 module Swagger
   module Schemas
-    module Vet360
+    module VAProfile
       class Permission
         include Swagger::Blocks
 

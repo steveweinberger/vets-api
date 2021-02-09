@@ -4,7 +4,7 @@ require 'evss/pciu/email_address'
 
 module Swagger
   module Schemas
-    module Vet360
+    module VAProfile
       class Email
         include Swagger::Blocks
 

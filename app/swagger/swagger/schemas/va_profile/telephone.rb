@@ -4,7 +4,7 @@ require 'va_profile/models/telephone'
 
 module Swagger
   module Schemas
-    module Vet360
+    module VAProfile
       class Telephone
         include Swagger::Blocks
 

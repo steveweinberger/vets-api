@@ -85,7 +85,7 @@ module Swagger
           extend Swagger::Responses::AuthenticationError
 
           key :description, 'Outputs address suggestions'
-          key :operationId, 'postVet360AddressValidation'
+          key :operationId, 'postVAProfileAddressValidation'
           key :tags, %w[
             profile
           ]
@@ -164,7 +164,7 @@ module Swagger
             key :required, true
 
             schema do
-              key :'$ref', :PostVet360DomesticAddress
+              key :'$ref', :PostVAProfileDomesticAddress
             end
           end
 
@@ -175,7 +175,7 @@ module Swagger
             key :required, true
 
             schema do
-              key :'$ref', :PostVet360InternationalAddress
+              key :'$ref', :PostVAProfileInternationalAddress
             end
           end
 
@@ -186,7 +186,7 @@ module Swagger
             key :required, true
 
             schema do
-              key :'$ref', :PostVet360MilitaryOverseasAddress
+              key :'$ref', :PostVAProfileMilitaryOverseasAddress
             end
           end
 
@@ -216,7 +216,7 @@ module Swagger
             key :required, true
 
             schema do
-              key :'$ref', :PutVet360DomesticAddress
+              key :'$ref', :PutVAProfileDomesticAddress
             end
           end
 
@@ -227,7 +227,7 @@ module Swagger
             key :required, true
 
             schema do
-              key :'$ref', :PutVet360InternationalAddress
+              key :'$ref', :PutVAProfileInternationalAddress
             end
           end
 
@@ -238,7 +238,7 @@ module Swagger
             key :required, true
 
             schema do
-              key :'$ref', :PutVet360MilitaryOverseasAddress
+              key :'$ref', :PutVAProfileMilitaryOverseasAddress
             end
           end
 
@@ -268,7 +268,7 @@ module Swagger
             key :required, true
 
             schema do
-              key :'$ref', :PutVet360DomesticAddress
+              key :'$ref', :PutVAProfileDomesticAddress
             end
           end
 
@@ -279,7 +279,7 @@ module Swagger
             key :required, true
 
             schema do
-              key :'$ref', :PutVet360InternationalAddress
+              key :'$ref', :PutVAProfileInternationalAddress
             end
           end
 
@@ -290,7 +290,7 @@ module Swagger
             key :required, true
 
             schema do
-              key :'$ref', :PutVet360MilitaryOverseasAddress
+              key :'$ref', :PutVAProfileMilitaryOverseasAddress
             end
           end
 

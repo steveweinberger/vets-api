@@ -2,22 +2,21 @@
 
 module Swagger
   module Schemas
-    module Vet360
-      class Countries
+    module VAProfile
+      class Zipcodes
         include Swagger::Blocks
 
-        swagger_schema :Vet360Countries do
+        swagger_schema :Vet360Zipcodes do
           key :required, [:data]
 
           property :data, type: :object do
             key :required, [:attributes]
             property :attributes, type: :object do
-              key :required, [:countries]
-              property :countries do
+              key :required, [:zipcodes]
+              property :zipcodes do
                 key :type, :array
                 items do
-                  property :country_name, type: :string, example: 'Italy'
-                  property :country_code_iso3, type: :string, example: 'ITA'
+                  property :zip_code, type: :string, example: '97062'
                 end
               end
             end

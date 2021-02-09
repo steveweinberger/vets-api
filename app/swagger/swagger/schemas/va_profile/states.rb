@@ -2,7 +2,7 @@
 
 module Swagger
   module Schemas
-    module Vet360
+    module VAProfile
       class States
         include Swagger::Blocks
 

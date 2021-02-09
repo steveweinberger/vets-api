@@ -5,12 +5,12 @@ require 'va_profile/models/base_address'
 
 module Swagger
   module Schemas
-    module Vet360
+    module VAProfile
       class Address
         include Swagger::Blocks
         ADDRESS_FIELD_LIMIT = ::VAProfile::Models::BaseAddress::ADDRESS_FIELD_LIMIT
 
-        swagger_schema :Vet360AddressSuggestion do
+        swagger_schema :VAProfileAddressSuggestion do
           key :type, :object
           key :required, %i[
             address_line1
@@ -58,12 +58,12 @@ module Swagger
         end
 
         %i[
-          PostVet360DomesticAddress
-          PutVet360DomesticAddress
-          PostVet360InternationalAddress
-          PutVet360InternationalAddress
-          PostVet360MilitaryOverseasAddress
-          PutVet360MilitaryOverseasAddress
+          PostVAProfileDomesticAddress
+          PutVAProfileDomesticAddress
+          PostVAProfileInternationalAddress
+          PutVAProfileInternationalAddress
+          PostVAProfileMilitaryOverseasAddress
+          PutVAProfileMilitaryOverseasAddress
         ].each do |schema|
           swagger_schema schema do
             property :validation_key, type: :integer
@@ -76,7 +76,7 @@ module Swagger
           end
         end
 
-        swagger_schema :PostVet360DomesticAddress do
+        swagger_schema :PostVAProfileDomesticAddress do
           key :required, %i[
             address_line1
             address_pou
@@ -112,7 +112,7 @@ module Swagger
                    pattern: ::VAProfile::Models::Address::VALID_NUMERIC_REGEX.inspect
         end
 
-        swagger_schema :PutVet360DomesticAddress do
+        swagger_schema :PutVAProfileDomesticAddress do
           key :required, %i[
             address_line1
             address_pou
@@ -150,7 +150,7 @@ module Swagger
                    pattern: ::VAProfile::Models::Address::VALID_NUMERIC_REGEX.inspect
         end
 
-        swagger_schema :PostVet360InternationalAddress do
+        swagger_schema :PostVAProfileInternationalAddress do
           key :required, %i[
             address_line1
             address_pou
@@ -175,7 +175,7 @@ module Swagger
           property :international_postal_code, type: :string, example: '12345'
         end
 
-        swagger_schema :PutVet360InternationalAddress do
+        swagger_schema :PutVAProfileInternationalAddress do
           key :required, %i[
             address_line1
             address_pou
@@ -202,7 +202,7 @@ module Swagger
           property :international_postal_code, type: :string, example: '12345'
         end
 
-        swagger_schema :PostVet360MilitaryOverseasAddress do
+        swagger_schema :PostVAProfileMilitaryOverseasAddress do
           key :required, %i[
             address_line1
             address_pou
@@ -238,7 +238,7 @@ module Swagger
                    pattern: ::VAProfile::Models::Address::VALID_NUMERIC_REGEX.inspect
         end
 
-        swagger_schema :PutVet360MilitaryOverseasAddress do
+        swagger_schema :PutVAProfileMilitaryOverseasAddress do
           key :required, %i[
             address_line1
             address_pou

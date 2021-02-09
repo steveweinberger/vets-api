@@ -10,7 +10,7 @@ require 'common/models/concerns/cache_aside'
 
 module Swagger
   module Schemas
-    module Vet360
+    module VAProfile
       class ContactInformation
         include Swagger::Blocks
 
