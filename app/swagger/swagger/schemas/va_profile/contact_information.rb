@@ -14,7 +14,7 @@ module Swagger
       class ContactInformation
         include Swagger::Blocks
 
-        swagger_schema :Vet360ContactInformation do
+        swagger_schema :VAProfileContactInformation do
           property :data, type: :object do
             property :id, type: :string
             property :type, type: :string
