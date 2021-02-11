@@ -469,8 +469,8 @@ module Swagger
         operation :put do
           extend Swagger::Responses::AuthenticationError
 
-          key :description, 'Updates a users existing Vet360 email address'
-          key :operationId, 'putVet360EmailAddress'
+          key :description, 'Updates a users existing VAProfile email address'
+          key :operationId, 'putVAProfileEmailAddress'
           key :tags, %w[
             profile
           ]
