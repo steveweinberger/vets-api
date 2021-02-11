@@ -484,7 +484,7 @@ module Swagger
             key :required, true
 
             schema do
-              key :'$ref', :PutVet360Email
+              key :'$ref', :PutVAProfileEmail
             end
           end
 
@@ -514,7 +514,7 @@ module Swagger
             key :required, true
 
             schema do
-              key :'$ref', :PutVet360Email
+              key :'$ref', :PutVAProfileEmail
             end
           end
 

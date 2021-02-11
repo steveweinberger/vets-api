@@ -18,7 +18,7 @@ module Swagger
                    pattern: EVSS::PCIU::EmailAddress::VALID_EMAIL_REGEX.inspect
         end
 
-        swagger_schema :PutVet360Email do
+        swagger_schema :PutVAProfileEmail do
           key :required, %i[email_address id]
           property :id, type: :integer, example: 1
           property :email_address,
