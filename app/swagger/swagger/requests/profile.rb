@@ -253,8 +253,8 @@ module Swagger
         operation :delete do
           extend Swagger::Responses::AuthenticationError
 
-          key :description, 'Logically deletes a user\'s existing Vet360 address'
-          key :operationId, 'deleteVet360Address'
+          key :description, 'Logically deletes a user\'s existing VAProfile address'
+          key :operationId, 'deleteVAProfileAddress'
           key :tags, %w[
             profile
           ]
