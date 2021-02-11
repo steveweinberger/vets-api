@@ -43,7 +43,7 @@ module Swagger
           end
         end
 
-        swagger_schema :AsyncTransactionsVet360 do
+        swagger_schema :AsyncTransactionsVAProfile do
           key :required, [:data]
           property :data,
                    type: :array do
