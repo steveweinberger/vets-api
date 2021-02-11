@@ -454,7 +454,7 @@ module Swagger
             key :required, true
 
             schema do
-              key :'$ref', :PostVet360Email
+              key :'$ref', :PostVAProfileEmail
             end
           end
 

@@ -8,7 +8,7 @@ module Swagger
       class Email
         include Swagger::Blocks
 
-        swagger_schema :PostVet360Email do
+        swagger_schema :PostVAProfileEmail do
           key :required, %i[email_address]
           property :email_address,
                    type: :string,
