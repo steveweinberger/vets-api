@@ -201,8 +201,8 @@ module Swagger
         operation :put do
           extend Swagger::Responses::AuthenticationError
 
-          key :description, 'Updates a users existing Vet360 address'
-          key :operationId, 'putVet360Address'
+          key :description, 'Updates a users existing VAProfile address'
+          key :operationId, 'putVAProfileAddress'
           key :tags, %w[
             profile
           ]
