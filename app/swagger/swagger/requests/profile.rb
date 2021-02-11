@@ -149,8 +149,8 @@ module Swagger
         operation :post do
           extend Swagger::Responses::AuthenticationError
 
-          key :description, 'Creates a users Vet360 address'
-          key :operationId, 'postVet360Address'
+          key :description, 'Creates a users VAProfile address'
+          key :operationId, 'postVAProfileAddress'
           key :tags, %w[
             profile
           ]
