@@ -499,8 +499,8 @@ module Swagger
         operation :delete do
           extend Swagger::Responses::AuthenticationError
 
-          key :description, 'Deletes a users existing Vet360 email address'
-          key :operationId, 'deleteVet360EmailAddress'
+          key :description, 'Deletes a users existing VAProfile email address'
+          key :operationId, 'deleteVAProfileEmailAddress'
           key :tags, %w[
             profile
           ]
