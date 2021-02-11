@@ -563,7 +563,7 @@ module Swagger
           extend Swagger::Responses::AuthenticationError
 
           key :description, 'Initializes a vet360_id for the current user'
-          key :operationId, 'initializeVet360Id'
+          key :operationId, 'initializeVAProfileVAProfileId'
           key :tags, %w[
             profile
           ]
