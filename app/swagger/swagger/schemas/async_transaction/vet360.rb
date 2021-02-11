@@ -6,7 +6,7 @@ module Swagger
       class Vet360
         include Swagger::Blocks
 
-        swagger_schema :AsyncTransactionVet360 do
+        swagger_schema :AsyncTransactionVAProfile do
           key :required, [:data]
 
           property :data, type: :object do

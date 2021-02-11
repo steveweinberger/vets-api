@@ -193,7 +193,7 @@ module Swagger
           response 200 do
             key :description, 'Response is OK'
             schema do
-              key :'$ref', :AsyncTransactionVet360
+              key :'$ref', :AsyncTransactionVAProfile
             end
           end
         end
@@ -245,7 +245,7 @@ module Swagger
           response 200 do
             key :description, 'Response is OK'
             schema do
-              key :'$ref', :AsyncTransactionVet360
+              key :'$ref', :AsyncTransactionVAProfile
             end
           end
         end
@@ -297,7 +297,7 @@ module Swagger
           response 200 do
             key :description, 'Response is OK'
             schema do
-              key :'$ref', :AsyncTransactionVet360
+              key :'$ref', :AsyncTransactionVAProfile
             end
           end
         end
@@ -461,7 +461,7 @@ module Swagger
           response 200 do
             key :description, 'Response is OK'
             schema do
-              key :'$ref', :AsyncTransactionVet360
+              key :'$ref', :AsyncTransactionVAProfile
             end
           end
         end
@@ -491,7 +491,7 @@ module Swagger
           response 200 do
             key :description, 'Response is OK'
             schema do
-              key :'$ref', :AsyncTransactionVet360
+              key :'$ref', :AsyncTransactionVAProfile
             end
           end
         end
@@ -521,7 +521,7 @@ module Swagger
           response 200 do
             key :description, 'Response is OK'
             schema do
-              key :'$ref', :AsyncTransactionVet360
+              key :'$ref', :AsyncTransactionVAProfile
             end
           end
         end
@@ -573,7 +573,7 @@ module Swagger
           response 200 do
             key :description, 'Response is OK'
             schema do
-              key :'$ref', :AsyncTransactionVet360
+              key :'$ref', :AsyncTransactionVAProfile
             end
           end
         end
@@ -599,7 +599,7 @@ module Swagger
           response 200 do
             key :description, 'Response is OK'
             schema do
-              key :'$ref', :AsyncTransactionVet360
+              key :'$ref', :AsyncTransactionVAProfile
             end
           end
         end
@@ -801,7 +801,7 @@ module Swagger
           response 200 do
             key :description, 'Response is OK'
             schema do
-              key :'$ref', :AsyncTransactionVet360
+              key :'$ref', :AsyncTransactionVAProfile
             end
           end
         end
@@ -857,7 +857,7 @@ module Swagger
           response 200 do
             key :description, 'Response is OK'
             schema do
-              key :'$ref', :AsyncTransactionVet360
+              key :'$ref', :AsyncTransactionVAProfile
             end
           end
         end
@@ -887,7 +887,7 @@ module Swagger
           response 200 do
             key :description, 'Response is OK'
             schema do
-              key :'$ref', :AsyncTransactionVet360
+              key :'$ref', :AsyncTransactionVAProfile
             end
           end
         end
@@ -917,7 +917,7 @@ module Swagger
           response 200 do
             key :description, 'Response is OK'
             schema do
-              key :'$ref', :AsyncTransactionVet360
+              key :'$ref', :AsyncTransactionVAProfile
             end
           end
         end
@@ -949,7 +949,7 @@ module Swagger
           response 200 do
             key :description, 'Response is OK'
             schema do
-              key :'$ref', :AsyncTransactionVet360
+              key :'$ref', :AsyncTransactionVAProfile
             end
           end
         end
@@ -979,7 +979,7 @@ module Swagger
           response 200 do
             key :description, 'Response is OK'
             schema do
-              key :'$ref', :AsyncTransactionVet360
+              key :'$ref', :AsyncTransactionVAProfile
             end
           end
         end
@@ -1009,7 +1009,7 @@ module Swagger
           response 200 do
             key :description, 'Response is OK'
             schema do
-              key :'$ref', :AsyncTransactionVet360
+              key :'$ref', :AsyncTransactionVAProfile
             end
           end
         end
