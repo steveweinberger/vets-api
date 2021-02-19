@@ -6,7 +6,7 @@ metadata:
   tags:
     - rest
   annotations:
-    backstage.io/techdocs-ref: url:https://github.com/department-of-veterans-affairs/backstage/blob/master/documentation/techdocs
+    backstage.io/techdocs-ref: url:https://github.com/department-of-veterans-affairs/backstage/blob/master/documentation/apps_api
 spec:
   type: openapi
   lifecycle: production
