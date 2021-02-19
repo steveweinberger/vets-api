@@ -5,6 +5,8 @@ metadata:
   description: The Third Party Applications API provides a list of applications that veterans can connect to and share their data with.
   tags:
     - rest
+  annotations:
+    backstage.io/techdocs-ref: url:https://github.com/department-of-veterans-affairs/backstage/blob/master/documentation/techdocs
 spec:
   type: openapi
   lifecycle: production
