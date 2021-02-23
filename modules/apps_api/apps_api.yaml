@@ -2,6 +2,7 @@ apiVersion: backstage.io/v1alpha1
 kind: API
 metadata:
   name: apps-api
+  namespace: department-of-veterans-affairs
   description: The Third Party Applications API provides a list of applications that veterans can connect to and share their data with.
   tags:
     - rest
@@ -10,7 +11,7 @@ metadata:
 spec:
   type: openapi
   lifecycle: production
-  owner: team-bilby
+  owner: 'department-of-veterans-affairs/va-backstage'
   definition: |
     openapi: "3.0.0"
     info:
