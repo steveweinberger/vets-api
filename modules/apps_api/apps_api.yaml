@@ -11,7 +11,7 @@ metadata:
 spec:
   type: openapi
   lifecycle: production
-  owner: 'department-of-veterans-affairs/va-backstage'
+  owner: 'department-of-veterans-affairs/team-backstage'
   definition: |
     openapi: "3.0.0"
     info:
