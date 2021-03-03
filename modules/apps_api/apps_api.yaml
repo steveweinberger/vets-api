@@ -8,7 +8,7 @@ metadata:
     - rest
   annotations:
     backstage.io/techdocs-ref: url:https://github.com/department-of-veterans-affairs/backstage/blob/master/documentation/apps_api
-    sentry.io/project-slug: apps-api
+    sentry.io/project-slug: 'apps-api'
 spec:
   type: openapi
   lifecycle: production
