@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module HealthQuest
-  module PatientGeneratedData
+  module Shared
     ##
     # A search options hash builder for a FHIR::Client's search instance method.
     #
@@ -13,11 +13,11 @@ module HealthQuest
       attr_reader :user, :filters
 
       ##
-      # Builds a PatientGeneratedData::OptionsBuilder instance from a given User and Hash
+      # Builds a Shared::OptionsBuilder instance from a given User and Hash
       #
       # @param user [User] the currently logged in user.
-      # @param filters [PatientGeneratedData::QuestionnaireResponse::OptionsBuilder] the set of query options.
-      # @return [PatientGeneratedData::QuestionnaireResponse::Factory] an instance of this class
+      # @param filters [Hash] the set of query options.
+      # @return [Shared::OptionsBuilder] an instance of this class
       #
       def self.manufacture(user, filters)
         new(user, filters)
@@ -29,7 +29,7 @@ module HealthQuest
       end
 
       ##
-      # Build the options hash that will be used to query the PGD for resources.
+      # Build the options hash that will be used to query the lighthouse for resources.
       #
       # @return [Hash]
       #
@@ -41,12 +41,17 @@ module HealthQuest
       end
 
       ##
-      # The registry which holds the return value for `to_hash`.
+      # The registry which holds the return value for the `to_hash` method.
       #
       # @return [Hash]
       #
       def registry
         {
+          appointment: {
+            patient: user.icn,
+            date: appointment_dates,
+            location: clinic_id
+          },
           questionnaire_response: {
             subject: appointment_reference,
             source: user.icn,
@@ -56,6 +61,24 @@ module HealthQuest
             'context-type-value': context_type_value
           }
         }
+      end
+
+      ##
+      # Get the location id from the filters.
+      #
+      # @return [String]
+      #
+      def clinic_id
+        @clinic_id ||= filters&.fetch(:location, nil)
+      end
+
+      ##
+      # Get the range of appointment dates from the filters.
+      #
+      # @return [String]
+      #
+      def appointment_dates
+        @appointment_dates ||= filters&.fetch(:date, nil)
       end
 
       ##
