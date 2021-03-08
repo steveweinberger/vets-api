@@ -268,11 +268,11 @@ namespace :vet360 do
 
     Sample way to call this rake task:
 
-    rake vet360:init_vet360_id[123456,1312312,134234234,4234234]'
+    rake vet360:init_va_profile_id[123456,1312312,134234234,4234234]'
 
     Note: There *cannot* be any spaces around the commas (i.e. [123456, 1312312, 134234234, 4234234])
   DESCRIPTION
-  task :init_vet360_id, [:icns] => [:environment] do |_, args|
+  task :init_va_profile_id, [:icns] => [:environment] do |_, args|
     service = VAProfile::Person::Service.new('rake_user')
     icns    = args.extras.prepend(args[:icns])
     results = []
@@ -280,7 +280,7 @@ namespace :vet360 do
     p "#{icns.size} to be initialized"
 
     icns.each do |icn|
-      response  = service.init_vet360_id(icn)
+      response  = service.init_va_profile_id(icn)
       vet360_id = response&.person&.vet360_id
 
       results << { icn: icn, vet360_id: vet360_id }

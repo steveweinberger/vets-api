@@ -255,12 +255,12 @@ describe 'vet360 rake tasks' do
     end
   end
 
-  describe 'rake vet360:init_vet360_id' do
+  describe 'rake vet360:init_va_profile_id' do
     let :run_rake_task do
       data = '123456,1312312'
       ENV['VET360_RAKE_DATA'] = data
-      Rake::Task['vet360:init_vet360_id'].reenable
-      Rake.application.invoke_task 'vet360:init_vet360_id'
+      Rake::Task['vet360:init_va_profile_id'].reenable
+      Rake.application.invoke_task 'vet360:init_va_profile_id'
     end
 
     it 'runs without errors' do
