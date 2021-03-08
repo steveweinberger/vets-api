@@ -18,14 +18,14 @@ module VAProfile
 
       configuration VAProfile::ContactInformation::Configuration
 
-      # Initializes a vet360_id for a user that does not have one. Can be used when a current user
+      # Initializes a va_profile_id for a user that does not have one. Can be used when a current user
       # is present, or through a rake task when no user is present (through passing in their ICN).
       # This is an asynchronous process for VAProfile, so it returns VAProfile transaction information.
       #
       # @param icn [String] A users ICN. Only required when current user is absent.  Intended to be used in a rake task.
       # @return [VAProfile::ContactInformation::PersonTransactionResponse] response wrapper around a transaction object
       #
-      def init_vet360_id(icn = nil)
+      def init_va_profile_id(icn = nil)
         with_monitoring do
           raw_response = perform(:post, encode_url!(icn), empty_body)
 
