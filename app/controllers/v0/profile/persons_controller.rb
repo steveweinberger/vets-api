@@ -9,7 +9,7 @@ module V0
 
       after_action :invalidate_mpi_cache
 
-      def initialize_vet360_id
+      def initialize_va_profile_id
         response    = VAProfile::Person::Service.new(@current_user).init_vet360_id
         transaction = AsyncTransaction::VAProfile::InitializePersonTransaction.start(@current_user, response)
 
