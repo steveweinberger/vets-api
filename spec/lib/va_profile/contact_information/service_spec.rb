@@ -545,12 +545,12 @@ describe VAProfile::ContactInformation::Service, skip_vet360: true do
       end
 
       context 'for initializing a vet360_id' do
-        it 'increments the StatsD VAProfile init_vet360_id counters' do
+        it 'increments the StatsD VAProfile init_va_profile_id counters' do
           transaction_id = '786efe0e-fd20-4da2-9019-0c00540dba4d'
 
           VCR.use_cassette('va_profile/contact_information/person_transaction_status') do
             expect { subject.get_person_transaction_status(transaction_id) }.to trigger_statsd_increment(
-              "#{VAProfile::Service::STATSD_KEY_PREFIX}.init_vet360_id.success"
+              "#{VAProfile::Service::STATSD_KEY_PREFIX}.init_va_profile_id.success"
             )
           end
         end

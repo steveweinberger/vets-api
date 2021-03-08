@@ -141,7 +141,7 @@ module VAProfile
       def get_person_transaction_status(transaction_id)
         with_monitoring do
           raw_response = perform(:get, "status/#{transaction_id}")
-          VAProfile::Stats.increment_transaction_results(raw_response, 'init_vet360_id')
+          VAProfile::Stats.increment_transaction_results(raw_response, 'init_va_profile_id')
 
           VAProfile::ContactInformation::PersonTransactionResponse.from(raw_response, @user)
         end
