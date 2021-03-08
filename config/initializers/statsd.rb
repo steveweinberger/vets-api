@@ -116,8 +116,8 @@ end
 StatsD.increment("#{VAProfile::Service::STATSD_KEY_PREFIX}.total_operations", 0)
 StatsD.increment("#{VAProfile::Service::STATSD_KEY_PREFIX}.posts_and_puts.success", 0)
 StatsD.increment("#{VAProfile::Service::STATSD_KEY_PREFIX}.posts_and_puts.failure", 0)
-StatsD.increment("#{VAProfile::Service::STATSD_KEY_PREFIX}.init_vet360_id.success", 0)
-StatsD.increment("#{VAProfile::Service::STATSD_KEY_PREFIX}.init_vet360_id.failure", 0)
+StatsD.increment("#{VAProfile::Service::STATSD_KEY_PREFIX}.init_va_profile_id.success", 0)
+StatsD.increment("#{VAProfile::Service::STATSD_KEY_PREFIX}.init_va_profile_id.failure", 0)
 
 # init eMIS
 StatsD.increment("#{EMIS::Service::STATSD_KEY_PREFIX}.edipi", 0, tags: ['present:true', 'present:false'])
