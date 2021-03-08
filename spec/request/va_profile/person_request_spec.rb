@@ -16,73 +16,81 @@ RSpec.describe 'person', type: :request do
 
   after { Timecop.return }
 
-  describe 'POST /v0/profile/initialize_vet360_id' do
-    let(:empty_body) do
-      {
-        bio: {
-          sourceDate: Time.zone.now.iso8601
-        }
-      }.to_json
-    end
+  %w[vet360 va_profile].each do |type|
+    path = "/v0/profile/initialize_#{type}_id"
 
-    before do
-      allow_any_instance_of(User).to receive(:vet360_id).and_return(nil)
-    end
+    describe "POST #{path}" do
+      let(:empty_body) do
+        {
+          bio: {
+            sourceDate: Time.zone.now.iso8601
+          }
+        }.to_json
+      end
 
-    context 'with a user that has an icn_with_aaid' do
-      it 'matches the transaction response schema', :aggregate_failures do
-        VCR.use_cassette('va_profile/person/init_vet360_id_success', VCR::MATCH_EVERYTHING) do
-          post('/v0/profile/initialize_vet360_id', params: empty_body, headers: headers)
+      subject do
+        post(path, params: empty_body, headers: headers)
+      end
 
-          expect(response).to have_http_status(:ok)
-          expect(response).to match_response_schema('va_profile/transaction_response')
+      before do
+        allow_any_instance_of(User).to receive(:vet360_id).and_return(nil)
+      end
+
+      context 'with a user that has an icn_with_aaid' do
+        it 'matches the transaction response schema', :aggregate_failures do
+          VCR.use_cassette('va_profile/person/init_vet360_id_success', VCR::MATCH_EVERYTHING) do
+            subject
+
+            expect(response).to have_http_status(:ok)
+            expect(response).to match_response_schema('va_profile/transaction_response')
+          end
+        end
+
+        it 'matches the transaction response camel-inflected schema', :aggregate_failures do
+          VCR.use_cassette('va_profile/person/init_vet360_id_success', VCR::MATCH_EVERYTHING) do
+            post(path, params: empty_body, headers: headers_with_camel)
+
+            expect(response).to have_http_status(:ok)
+            expect(response).to match_camelized_response_schema('va_profile/transaction_response')
+          end
+        end
+
+        it 'creates a new AsyncTransaction::VAProfile::InitializePersonTransaction', :aggregate_failures do
+          VCR.use_cassette('va_profile/person/init_vet360_id_success', VCR::MATCH_EVERYTHING) do
+            expect do
+              subject
+            end.to change { AsyncTransaction::VAProfile::InitializePersonTransaction.count }.from(0).to(1)
+
+            expect(AsyncTransaction::VAProfile::InitializePersonTransaction.first).to be_valid
+          end
+        end
+
+        it 'invalidates the cache for the mpi-profile-response Redis key' do
+          VCR.use_cassette('va_profile/person/init_vet360_id_success', VCR::MATCH_EVERYTHING) do
+            expect_any_instance_of(Common::RedisStore).to receive(:destroy)
+
+            subject
+          end
         end
       end
 
-      it 'matches the transaction response camel-inflected schema', :aggregate_failures do
-        VCR.use_cassette('va_profile/person/init_vet360_id_success', VCR::MATCH_EVERYTHING) do
-          post('/v0/profile/initialize_vet360_id', params: empty_body, headers: headers_with_camel)
+      context 'with an error response' do
+        it 'matches the errors response schema', :aggregate_failures do
+          VCR.use_cassette('va_profile/person/init_vet360_id_status_400', VCR::MATCH_EVERYTHING) do
+            subject
 
-          expect(response).to have_http_status(:ok)
-          expect(response).to match_camelized_response_schema('va_profile/transaction_response')
+            expect(response).to have_http_status(:bad_request)
+            expect(response).to match_response_schema('errors')
+          end
         end
-      end
 
-      it 'creates a new AsyncTransaction::VAProfile::InitializePersonTransaction', :aggregate_failures do
-        VCR.use_cassette('va_profile/person/init_vet360_id_success', VCR::MATCH_EVERYTHING) do
-          expect do
-            post('/v0/profile/initialize_vet360_id', params: empty_body, headers: headers)
-          end.to change { AsyncTransaction::VAProfile::InitializePersonTransaction.count }.from(0).to(1)
+        it 'matches the errors response camel-inflected schema', :aggregate_failures do
+          VCR.use_cassette('va_profile/person/init_vet360_id_status_400', VCR::MATCH_EVERYTHING) do
+            post(path, params: empty_body, headers: headers_with_camel)
 
-          expect(AsyncTransaction::VAProfile::InitializePersonTransaction.first).to be_valid
-        end
-      end
-
-      it 'invalidates the cache for the mpi-profile-response Redis key' do
-        VCR.use_cassette('va_profile/person/init_vet360_id_success', VCR::MATCH_EVERYTHING) do
-          expect_any_instance_of(Common::RedisStore).to receive(:destroy)
-
-          post('/v0/profile/initialize_vet360_id', params: empty_body, headers: headers)
-        end
-      end
-    end
-
-    context 'with an error response' do
-      it 'matches the errors response schema', :aggregate_failures do
-        VCR.use_cassette('va_profile/person/init_vet360_id_status_400', VCR::MATCH_EVERYTHING) do
-          post('/v0/profile/initialize_vet360_id', params: empty_body, headers: headers)
-
-          expect(response).to have_http_status(:bad_request)
-          expect(response).to match_response_schema('errors')
-        end
-      end
-
-      it 'matches the errors response camel-inflected schema', :aggregate_failures do
-        VCR.use_cassette('va_profile/person/init_vet360_id_status_400', VCR::MATCH_EVERYTHING) do
-          post('/v0/profile/initialize_vet360_id', params: empty_body, headers: headers_with_camel)
-
-          expect(response).to have_http_status(:bad_request)
-          expect(response).to match_camelized_response_schema('errors')
+            expect(response).to have_http_status(:bad_request)
+            expect(response).to match_camelized_response_schema('errors')
+          end
         end
       end
     end
