@@ -57,7 +57,7 @@ describe VAProfile::Person::Service, skip_vet360: true do
 
     context 'with a 400 response' do
       it 'raises an exception', :aggregate_failures do
-        VCR.use_cassette('va_profile/person/init_vet360_id_status_400', VCR::MATCH_EVERYTHING) do
+        VCR.use_cassette('va_profile/person/init_va_profile_id_status_400', VCR::MATCH_EVERYTHING) do
           expect { subject.init_va_profile_id }.to raise_error do |e|
             expect(e).to be_a(Common::Exceptions::BackendServiceException)
             expect(e.status_code).to eq(400)

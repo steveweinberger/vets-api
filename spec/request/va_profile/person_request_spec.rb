@@ -76,7 +76,7 @@ RSpec.describe 'person', type: :request do
 
       context 'with an error response' do
         it 'matches the errors response schema', :aggregate_failures do
-          VCR.use_cassette('va_profile/person/init_vet360_id_status_400', VCR::MATCH_EVERYTHING) do
+          VCR.use_cassette('va_profile/person/init_va_profile_id_status_400', VCR::MATCH_EVERYTHING) do
             subject
 
             expect(response).to have_http_status(:bad_request)
@@ -85,7 +85,7 @@ RSpec.describe 'person', type: :request do
         end
 
         it 'matches the errors response camel-inflected schema', :aggregate_failures do
-          VCR.use_cassette('va_profile/person/init_vet360_id_status_400', VCR::MATCH_EVERYTHING) do
+          VCR.use_cassette('va_profile/person/init_va_profile_id_status_400', VCR::MATCH_EVERYTHING) do
             post(path, params: empty_body, headers: headers_with_camel)
 
             expect(response).to have_http_status(:bad_request)
