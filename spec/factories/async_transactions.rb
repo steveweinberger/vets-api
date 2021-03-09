@@ -22,7 +22,7 @@ FactoryBot.define do
     end
 
     factory :initialize_person_transaction, class: AsyncTransaction::Vet360::InitializePersonTransaction do
-      trait :init_vet360_id do
+      trait :init_va_profile_id do
         source_id { nil }
       end
     end
@@ -41,7 +41,7 @@ FactoryBot.define do
 
     factory :va_profile_initialize_person_transaction,
             class: AsyncTransaction::VAProfile::InitializePersonTransaction do
-      trait :init_vet360_id do
+      trait :init_va_profile_id do
         source_id { nil }
       end
     end
