@@ -30,7 +30,7 @@ module FailedRequestLoggable
   def current_user_hash
     hash = {}
 
-    %i[first_name last_name birls_id icn edipi mhv_correlation_id participant_id vet360_id ssn]
+    %i[first_name last_name birls_id icn edipi mhv_correlation_id participant_id va_profile_id ssn]
       .each { |key| hash[key] = @current_user.try(key) }
 
     hash[:assurance_level] = begin
