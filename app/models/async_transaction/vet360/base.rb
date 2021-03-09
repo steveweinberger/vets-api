@@ -27,7 +27,7 @@ module AsyncTransaction
       def self.start(user, response)
         create(
           user_uuid: user.uuid,
-          source_id: user.vet360_id,
+          source_id: user.va_profile_id,
           source: 'vet360',
           status: REQUESTED,
           transaction_id: response.transaction.id,

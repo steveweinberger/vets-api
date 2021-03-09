@@ -51,11 +51,11 @@ RSpec.describe AsyncTransaction::VAProfile::Base, type: :model do
     let(:service) { VAProfile::ContactInformation::Service.new(user) }
 
     before do
-      # vet360_id appears in the API request URI so we need it to match the cassette
+      # va_profile_id appears in the API request URI so we need it to match the cassette
       allow_any_instance_of(MPIData).to receive(:response_from_redis_or_service).and_return(
         MPI::Responses::FindProfileResponse.new(
           status: MPI::Responses::FindProfileResponse::RESPONSE_STATUS[:ok],
-          profile: build(:mvi_profile, vet360_id: '1')
+          profile: build(:mvi_profile, va_profile_id: '1')
         )
       )
     end
@@ -117,12 +117,12 @@ RSpec.describe AsyncTransaction::VAProfile::Base, type: :model do
 
   describe '.start' do
     before do
-      allow(user).to receive(:vet360_id).and_return('1')
+      allow(user).to receive(:va_profile_id).and_return('1')
       allow(user).to receive(:icn).and_return('1234')
     end
 
     let(:user) { build(:user, :loa3) }
-    let(:address) { build(:va_profile_address, vet360_id: user.vet360_id, source_system_user: user.icn) }
+    let(:address) { build(:va_profile_address, va_profile_id: user.va_profile_id, source_system_user: user.icn) }
 
     it 'returns an instance with the user uuid', :aggregate_failures do
       VCR.use_cassette('va_profile/contact_information/post_address_success', VCR::MATCH_EVERYTHING) do
@@ -249,7 +249,7 @@ RSpec.describe AsyncTransaction::VAProfile::Base, type: :model do
       allow_any_instance_of(MPIData).to receive(:response_from_redis_or_service).and_return(
         MPI::Responses::FindProfileResponse.new(
           status: MPI::Responses::FindProfileResponse::RESPONSE_STATUS[:ok],
-          profile: build(:mvi_profile, vet360_id: '1')
+          profile: build(:mvi_profile, va_profile_id: '1')
         )
       )
     end
