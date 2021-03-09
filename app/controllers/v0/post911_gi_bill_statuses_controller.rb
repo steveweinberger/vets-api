@@ -77,7 +77,7 @@ module V0
         edipi: user.edipi,
         mhv_correlation_id: user.mhv_correlation_id,
         participant_id: user.participant_id,
-        vet360_id: user.vet360_id,
+        va_profile_id: user.va_profile_id,
         ssn: user.ssn,
         birth_date: Formatters::DateFormatter.format_date(user.birth_date, :datetime_iso8601)
       }.to_json
