@@ -61,7 +61,7 @@ module MPI
           cerner_facility_ids: select_facilities(select_extension(ids, /^\w+\^PI\^\w+\^USVHA\^C$/, VA_ROOT_OID)),
           cerner_id: select_ids(select_extension(ids, /^\w+\^PI\^200CRNR\^US\w+\^A$/, VA_ROOT_OID))&.first,
           birls_ids: birls_ids(ids),
-          vet360_id: select_ids(select_extension(ids, /^\w+\^PI\^200VETS\^USDVA\^A$/, VA_ROOT_OID))&.first,
+          va_profile_id: select_ids(select_extension(ids, /^\w+\^PI\^200VETS\^USDVA\^A$/, VA_ROOT_OID))&.first,
           icn_with_aaid: ICNWithAAIDParser.new(full_icn_with_aaid(ids)).without_id_status
         }
         result[:birls_id] = result[:birls_ids].first

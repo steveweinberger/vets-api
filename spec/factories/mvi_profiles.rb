@@ -66,7 +66,7 @@ FactoryBot.define do
     birls = [Faker::Number.number(digits: 10)]
     birls_id { birls.first }
     birls_ids { birls }
-    vet360_id { '123456789' }
+    va_profile_id { '123456789' }
     sec_id { '0001234567' }
     historical_icns { %w[1000123457V123456 1000123458V123456] }
     search_token { 'WSDOC2002071538432741110027956' }
@@ -102,7 +102,7 @@ FactoryBot.define do
       birls = ['796122306']
       birls_id { birls.first }
       birls_ids { birls }
-      vet360_id { '123456789' }
+      va_profile_id { '123456789' }
 
       trait :missing_attrs do
         given_names { %w[Mitchell] }
@@ -119,7 +119,7 @@ FactoryBot.define do
         vha_facility_ids { ['200MHS'] }
         participant_id { '9100792239' }
         edipi { nil }
-        vet360_id { nil }
+        va_profile_id { nil }
       end
 
       trait :multiple_mhvids do
@@ -139,7 +139,7 @@ FactoryBot.define do
         birls = ['123412345']
         birls_id { birls.first }
         birls_ids { birls }
-        vet360_id { nil }
+        va_profile_id { nil }
       end
 
       trait :address_austin do

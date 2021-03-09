@@ -27,7 +27,7 @@ module MPI
       attribute :birls_id, String
       attribute :birls_ids, Array[String]
       attribute :sec_id, String
-      attribute :vet360_id, String
+      attribute :va_profile_id, String
       attribute :historical_icns, Array[String]
       attribute :search_token, String
       attribute :cerner_facility_ids, Array[String]

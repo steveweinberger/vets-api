@@ -128,7 +128,7 @@ describe MPI::Responses::IdParser do
           cerner_facility_ids: nil,
           cerner_id: nil,
           birls_ids: [],
-          vet360_id: nil,
+          va_profile_id: nil,
           icn_with_aaid: nil,
           birls_id: nil
         }
