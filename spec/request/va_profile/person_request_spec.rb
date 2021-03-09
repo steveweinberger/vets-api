@@ -38,7 +38,7 @@ RSpec.describe 'person', type: :request do
 
       context 'with a user that has an icn_with_aaid' do
         it 'matches the transaction response schema', :aggregate_failures do
-          VCR.use_cassette('va_profile/person/init_vet360_id_success', VCR::MATCH_EVERYTHING) do
+          VCR.use_cassette('va_profile/person/init_va_profile_id_success', VCR::MATCH_EVERYTHING) do
             subject
 
             expect(response).to have_http_status(:ok)
@@ -47,7 +47,7 @@ RSpec.describe 'person', type: :request do
         end
 
         it 'matches the transaction response camel-inflected schema', :aggregate_failures do
-          VCR.use_cassette('va_profile/person/init_vet360_id_success', VCR::MATCH_EVERYTHING) do
+          VCR.use_cassette('va_profile/person/init_va_profile_id_success', VCR::MATCH_EVERYTHING) do
             post(path, params: empty_body, headers: headers_with_camel)
 
             expect(response).to have_http_status(:ok)
@@ -56,7 +56,7 @@ RSpec.describe 'person', type: :request do
         end
 
         it 'creates a new AsyncTransaction::VAProfile::InitializePersonTransaction', :aggregate_failures do
-          VCR.use_cassette('va_profile/person/init_vet360_id_success', VCR::MATCH_EVERYTHING) do
+          VCR.use_cassette('va_profile/person/init_va_profile_id_success', VCR::MATCH_EVERYTHING) do
             expect do
               subject
             end.to change { AsyncTransaction::VAProfile::InitializePersonTransaction.count }.from(0).to(1)
@@ -66,7 +66,7 @@ RSpec.describe 'person', type: :request do
         end
 
         it 'invalidates the cache for the mpi-profile-response Redis key' do
-          VCR.use_cassette('va_profile/person/init_vet360_id_success', VCR::MATCH_EVERYTHING) do
+          VCR.use_cassette('va_profile/person/init_va_profile_id_success', VCR::MATCH_EVERYTHING) do
             expect_any_instance_of(Common::RedisStore).to receive(:destroy)
 
             subject

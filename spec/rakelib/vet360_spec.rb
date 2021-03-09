@@ -264,7 +264,7 @@ describe 'vet360 rake tasks' do
     end
 
     it 'runs without errors' do
-      VCR.use_cassette('va_profile/person/init_vet360_id_success') do
+      VCR.use_cassette('va_profile/person/init_va_profile_id_success') do
         expect { silently { run_rake_task } }.not_to raise_error
       end
     end

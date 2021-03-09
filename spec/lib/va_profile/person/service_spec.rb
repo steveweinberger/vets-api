@@ -15,7 +15,7 @@ describe VAProfile::Person::Service, skip_vet360: true do
 
     context 'with a user present, that has a icn_with_aaid, and no passed in ICN' do
       it 'returns a status of 200', :aggregate_failures do
-        VCR.use_cassette('va_profile/person/init_vet360_id_success', VCR::MATCH_EVERYTHING) do
+        VCR.use_cassette('va_profile/person/init_va_profile_id_success', VCR::MATCH_EVERYTHING) do
           response = subject.init_va_profile_id
 
           expect(response).to be_ok
@@ -24,7 +24,7 @@ describe VAProfile::Person::Service, skip_vet360: true do
       end
 
       it 'initiates an asynchronous VAProfile transaction', :aggregate_failures do
-        VCR.use_cassette('va_profile/person/init_vet360_id_success', VCR::MATCH_EVERYTHING) do
+        VCR.use_cassette('va_profile/person/init_va_profile_id_success', VCR::MATCH_EVERYTHING) do
           response = subject.init_va_profile_id
 
           expect(response.transaction.id).to be_present
@@ -37,7 +37,7 @@ describe VAProfile::Person::Service, skip_vet360: true do
       let(:icn) { '1000123456V123456' }
 
       it 'returns a status of 200', :aggregate_failures do
-        VCR.use_cassette('va_profile/person/init_vet360_id_success', VCR::MATCH_EVERYTHING) do
+        VCR.use_cassette('va_profile/person/init_va_profile_id_success', VCR::MATCH_EVERYTHING) do
           response = subject.init_va_profile_id(icn)
 
           expect(response).to be_ok
@@ -46,7 +46,7 @@ describe VAProfile::Person::Service, skip_vet360: true do
       end
 
       it 'initiates an asynchronous VAProfile transaction', :aggregate_failures do
-        VCR.use_cassette('va_profile/person/init_vet360_id_success', VCR::MATCH_EVERYTHING) do
+        VCR.use_cassette('va_profile/person/init_va_profile_id_success', VCR::MATCH_EVERYTHING) do
           response = subject.init_va_profile_id(icn)
 
           expect(response.transaction.id).to be_present
