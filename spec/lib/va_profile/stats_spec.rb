@@ -76,22 +76,22 @@ describe VAProfile::Stats do
       end
     end
 
-    context 'when bucket1 is provided as init_vet360_id' do
-      let(:init_vet360) { 'init_vet360_id' }
+    context 'when bucket1 is provided as init_va_profile_id' do
+      let(:init_va_profile_id) { 'init_va_profile_id' }
 
-      it 'increments the StatsD Vet360 init_vet360_id success counter' do
+      it 'increments the StatsD Vet360 init_va_profile_id success counter' do
         response = raw_va_profile_transaction_response(success_status)
 
-        expect { described_class.increment_transaction_results(response, init_vet360) }.to trigger_statsd_increment(
-          "#{statsd_prefix}.#{init_vet360}.success"
+        expect { described_class.increment_transaction_results(response, init_va_profile_id) }.to trigger_statsd_increment(
+          "#{statsd_prefix}.#{init_va_profile_id}.success"
         )
       end
 
-      it 'increments the StatsD Vet360 init_vet360_id failure counter' do
+      it 'increments the StatsD Vet360 init_va_profile_id failure counter' do
         response = raw_va_profile_transaction_response(failure_status)
 
-        expect { described_class.increment_transaction_results(response, init_vet360) }.to trigger_statsd_increment(
-          "#{statsd_prefix}.#{init_vet360}.failure"
+        expect { described_class.increment_transaction_results(response, init_va_profile_id) }.to trigger_statsd_increment(
+          "#{statsd_prefix}.#{init_va_profile_id}.failure"
         )
       end
     end
