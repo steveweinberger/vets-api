@@ -1054,9 +1054,9 @@ RSpec.describe FormProfile, type: :model do
           can_prefill_emis(true)
         end
 
-        context 'with a user with no vet360_id' do
+        context 'with a user with no va_profile_id' do
           before do
-            allow(user).to receive(:vet360_id).and_return(nil)
+            allow(user).to receive(:va_profile_id).and_return(nil)
           end
 
           it 'omits address fields in 686c-674 form' do
