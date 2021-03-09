@@ -100,7 +100,7 @@ RSpec.describe 'person', type: :request do
     context 'with an ok response' do
       let(:transaction) do
         create(:initialize_person_transaction,
-               :init_vet360_id,
+               :init_va_profile_id,
                user_uuid: user.uuid,
                transaction_id: '786efe0e-fd20-4da2-9019-0c00540dba4d')
       end
@@ -127,7 +127,7 @@ RSpec.describe 'person', type: :request do
     context 'with an error response' do
       let(:transaction) do
         create(:initialize_person_transaction,
-               :init_vet360_id,
+               :init_va_profile_id,
                user_uuid: user.uuid,
                transaction_id: 'd47b3d96-9ddd-42be-ac57-8e564aa38029')
       end

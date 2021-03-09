@@ -2575,7 +2575,7 @@ RSpec.describe 'the API documentation', type: %i[apivore request], order: :defin
         transaction_id = '786efe0e-fd20-4da2-9019-0c00540dba4d'
         transaction = create(
           :va_profile_initialize_person_transaction,
-          :init_vet360_id,
+          :init_va_profile_id,
           user_uuid: user_without_vet360_id.uuid,
           transaction_id: transaction_id
         )
