@@ -64,10 +64,10 @@ class MPIData < Common::RedisStore
   # @return [String] the birls id
   delegate :birls_id, to: :profile, allow_nil: true
 
-  # A Vet360 Correlation ID
+  # A VAProfile Correlation ID
   #
-  # @return [String] the Vet360 id
-  delegate :vet360_id, to: :profile, allow_nil: true
+  # @return [String] the VAProfile id
+  delegate :va_profile_id, to: :profile, allow_nil: true
 
   # A list of ICN's that the user has been identitfied by historically
   #

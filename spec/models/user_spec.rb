@@ -353,8 +353,8 @@ RSpec.describe User, type: :model do
           expect(user.edipi).to be(user.identity.dslogon_edipi)
         end
 
-        it 'has a vet360 id if one exists' do
-          expect(user.vet360_id).to be(user.va_profile.vet360_id)
+        it 'has a va_profile id if one exists' do
+          expect(user.va_profile_id).to be(user.va_profile.va_profile_id)
         end
       end
 

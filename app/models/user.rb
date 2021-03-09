@@ -156,7 +156,7 @@ class User < Common::RedisStore
 
   # mpi attributes
   delegate :icn_with_aaid, to: :mpi
-  delegate :vet360_id, to: :mpi
+  delegate :va_profile_id, to: :mpi
   delegate :search_token, to: :mpi
 
   # emis attributes
@@ -302,7 +302,7 @@ class User < Common::RedisStore
   end
 
   def vet360_contact_info
-    return nil unless Settings.vet360.contact_information.enabled && vet360_id.present?
+    return nil unless Settings.vet360.contact_information.enabled && va_profile_id.present?
 
     @vet360_contact_info ||= VAProfileRedis::ContactInformation.for_user(self)
   end
@@ -322,7 +322,7 @@ class User < Common::RedisStore
   end
 
   def can_access_vet360?
-    loa3? && icn.present? && vet360_id.present?
+    loa3? && icn.present? && va_profile_id.present?
   rescue # Default to false for any error
     false
   end
