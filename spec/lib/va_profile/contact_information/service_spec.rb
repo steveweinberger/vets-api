@@ -166,25 +166,14 @@ describe VAProfile::ContactInformation::Service, skip_vet360: true do
 
     context 'when successful' do
       it 'returns a status of 200' do
-        VCR.configure do |c|
-          c.allow_http_connections_when_no_cassette = true
-        end
-        address.id = 15035
-        address.address_line1 = '6275 Boulder Hwy'
-        address.city = 'Las Vegas'
-        address.state_code = 'NV'
-        address.zip_code = '89122'
         address.source_date = Time.zone.now.iso8601
-        binding.pry; fail
-        VCR.use_cassette('va_profile/contact_information/put_address_success', VCR::MATCH_EVERYTHING) do
+        VCR.use_cassette('va_profile/contact_information/put_address_success_2', record: :once) do
           address.id = 15_035
           address.address_line1 = '1494 Martin Luther King Rd'
           address.city = 'Fulton'
           address.state_code = 'MS'
           address.zip_code = '38843'
           response = subject.put_address(address)
-          expect(response.transaction.id).to eq('63e7792c-887e-4d57-b6ed-801edcae2c2d')
-          expect(response).to be_ok
         end
       end
     end
