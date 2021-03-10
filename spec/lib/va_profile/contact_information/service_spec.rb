@@ -166,6 +166,10 @@ describe VAProfile::ContactInformation::Service, skip_vet360: true do
 
     context 'when successful' do
       it 'returns a status of 200' do
+        VCR.configure do |c|
+          c.allow_http_connections_when_no_cassette = true
+        end
+        binding.pry; fail
         VCR.use_cassette('va_profile/contact_information/put_address_success', VCR::MATCH_EVERYTHING) do
           address.id = 15_035
           address.address_line1 = '1494 Martin Luther King Rd'
