@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require 'spec_helper'
 require 'mpi/orch_search_service'
 
 describe Identity::MPI::OrchSearchService do

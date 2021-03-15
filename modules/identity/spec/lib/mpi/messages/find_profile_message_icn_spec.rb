@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require 'spec_helper'
 require 'mpi/messages/find_profile_message_icn'
 
 describe Identity::MPI::Messages::FindProfileMessageIcn do

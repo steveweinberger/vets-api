@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require 'spec_helper'
 require 'mpi/responses/find_profile_response'
 
 describe Identity::MPI::Responses::FindProfileResponse do

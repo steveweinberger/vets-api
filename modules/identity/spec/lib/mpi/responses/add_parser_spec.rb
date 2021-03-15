@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require 'spec_helper'
 require 'mpi/responses/add_parser'
 
 describe Identity::MPI::Responses::AddParser do

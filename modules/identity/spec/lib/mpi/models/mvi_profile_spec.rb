@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require 'spec_helper'
 
 describe Identity::MPI::Models::MviProfile do
   describe '#mhv_correlation_id' do

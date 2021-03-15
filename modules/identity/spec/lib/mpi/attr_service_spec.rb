@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require 'spec_helper'
 require 'hca/user_attributes' # a UserAttributes set that `find_profile` can use
 require 'mpi/attr_service'
 
