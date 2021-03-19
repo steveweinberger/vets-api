@@ -11,8 +11,9 @@ ActiveSupport::Inflector.inflections do |inflect|
   inflect.acronym 'EMIS'
   inflect.acronym 'EVSS'
   inflect.acronym 'FHIR'
-  inflect.acronym 'GIDS'
   inflect.acronym 'GI'
+  inflect.acronym 'GIDS'
+  inflect.acronym 'GitHub'
   inflect.acronym 'HCA'
   inflect.acronym 'IAM'
   inflect.acronym 'IHub'
@@ -22,6 +23,7 @@ ActiveSupport::Inflector.inflections do |inflect|
   inflect.acronym 'NCA' # National Cemetery Administration
   inflect.acronym 'OAuth'
   inflect.acronym 'PagerDuty'
+  inflect.acronym 'PCAFC'
   inflect.acronym 'PPIU'
   inflect.acronym 'PPMS'
   inflect.acronym 'PSSG'
