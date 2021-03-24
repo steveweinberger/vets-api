@@ -12,6 +12,28 @@ describe VAProfile::Service do
   let(:message) { 'the server responded with status 400' }
   let(:file)    { Rails.root.join('spec', 'support', 'va_profile', 'api_response_error_messages.csv') }
 
+  it 'f' do
+    VCR.configure do |c|
+      c.allow_http_connections_when_no_cassette = true
+    end
+    service = VAProfile::Communication::Service.new(user)
+
+    va_profile_id = 18277
+    oid = ERB::Util.url_encode('2.16.840.1.113883.4.349')
+    idWithAaid = ERB::Util.url_encode("#{va_profile_id}^PI^200VETS^USDVA")
+    body = {
+      bio: {
+        allowed: true,
+        communicationChannelId: 1,
+        communicationItemId: 1,
+        vaProfileId: va_profile_id,
+        sourceDate: Time.zone.now.iso8601
+      }
+    }.to_json
+    res = service.perform(:get, "#{oid}/#{idWithAaid}/communication-permissions")
+    binding.pry; fail
+  end
+
   describe '#handle_error' do
     before do
       allow_any_instance_of(Common::Client::Base).to receive_message_chain(:config, :base_path) { '' }
