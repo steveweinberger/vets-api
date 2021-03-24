@@ -24,14 +24,16 @@ describe VAProfile::Service do
     idWithAaid = ERB::Util.url_encode("#{va_profile_id}^PI^200VETS^USDVA")
     body = {
       bio: {
-        allowed: true,
+        allowed: false,
         communicationChannelId: 1,
-        communicationItemId: 1,
+        communicationItemId: 2,
         vaProfileId: va_profile_id,
         sourceDate: Time.zone.now.iso8601
       }
     }.to_json
-    res = service.perform(:get, "#{oid}/#{idWithAaid}/communication-permissions")
+    VCR.use_cassette('va_profile/communication/post_communication_permissions', record: :once) do
+      res = service.perform(:post, "#{oid}/#{idWithAaid}/communication-permissions", body)
+    end
     binding.pry; fail
   end
 
