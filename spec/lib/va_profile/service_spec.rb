@@ -3,6 +3,7 @@
 require 'rails_helper'
 require 'csv'
 require 'va_profile/service'
+require 'va_profile/communication/service'
 
 describe VAProfile::Service do
   subject       { described_class.new(user) }
