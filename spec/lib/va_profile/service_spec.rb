@@ -31,10 +31,10 @@ describe VAProfile::Service do
         sourceDate: Time.zone.now.iso8601
       }
     }.to_json
-    VCR.use_cassette('va_profile/communication/post_communication_permissions', record: :once) do
-      res = service.perform(:post, "#{oid}/#{idWithAaid}/communication-permissions", body)
+    VCR.use_cassette('va_profile/communication/get_communication_permissions', record: :once) do
+      res = service.perform(:get, "#{oid}/#{idWithAaid}/communication-permissions")
+      binding.pry; fail
     end
-    binding.pry; fail
   end
 
   describe '#handle_error' do
