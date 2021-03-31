@@ -1,0 +1,208 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "version": "1.0.0",
+    "title": "Benefits Claims",
+    "description": "",
+    "contact_name": "VA API Benefits Team",
+    "terms_of_service_url": "https://developer.va.gov/terms-of-service",
+    "license": "Creative Commons"
+  },
+  "tags": [
+    {
+      "name": "Veteran Identifiers",
+      "description": "Unique Veteran Identifier"
+    },
+    {
+      "name": "Claims",
+      "description": "Benefits Claims retrieval and monitoring"
+    },
+    {
+      "name": "Forms",
+      "description": "Benefits Claim requests"
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://sandbox-api.va.gov/services/claims",
+      "description": "VA.gov API sandbox environment"
+    },
+    {
+      "url": "https://api.va.gov/services/claims",
+      "description": "VA.gov API production environment"
+    }
+  ],
+  "paths": {
+    "/services/claims/v1/claims": {
+      "get": {
+        "summary": "Retrieves all claims for a Veteran",
+        "tags": [
+          "Claims"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-VA-SSN",
+            "required": false,
+            "description": "Veteran SSN if consumer is representative",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-VA-First-Name",
+            "required": false,
+            "description": "Veteran first name if consumer is representative",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-VA-Last-Name",
+            "required": false,
+            "description": "Veteran last name if consumer is representative",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-VA-Birth-Date",
+            "required": false,
+            "description": "Veteran birthdate if consumer is representative",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Key-Inflection",
+            "required": false,
+            "description": "Choose desired key structure for response",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "description": "OAuth token",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "blog found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-04/schema#",
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "uniqueItems": true,
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "type",
+                          "attributes"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "enum": [
+                              "evss_claims"
+                            ]
+                          },
+                          "attributes": {
+                            "type": "object",
+                            "required": [
+                              "evssId",
+                              "dateFiled",
+                              "minEstDate",
+                              "maxEstDate",
+                              "open",
+                              "waiverSubmitted",
+                              "requestedDecision",
+                              "documentsNeeded",
+                              "developmentLetterSent",
+                              "decisionLetterSent",
+                              "status",
+                              "claimType"
+                            ],
+                            "properties": {
+                              "evssId": {
+                                "type": "integer"
+                              },
+                              "dateFiled": {
+                                "type": "string"
+                              },
+                              "minEstDate": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "maxEstDate": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "open": {
+                                "type": "boolean"
+                              },
+                              "waiverSubmitted": {
+                                "type": "boolean"
+                              },
+                              "requestedDecision": {
+                                "type": "boolean"
+                              },
+                              "documentsNeeded": {
+                                "type": "boolean"
+                              },
+                              "developmentLetterSent": {
+                                "type": "boolean"
+                              },
+                              "decisionLetterSent": {
+                                "type": "boolean"
+                              },
+                              "status": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "claimType": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

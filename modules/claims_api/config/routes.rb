@@ -59,13 +59,14 @@ ClaimsApi::Engine.routes.draw do
     end
   end
 
-  namespace :docs do
-    namespace :v0 do
-      get 'api', to: 'api#index'
-    end
-
-    namespace :v1 do
-      get 'api', to: 'api#index'
-    end
-  end
+  mount Rswag::Api::Engine => '/docs'
+  # namespace :docs do
+  #   namespace :v0 do
+  #     get 'api', to: 'api#index'
+  #   end
+  #
+  #   namespace :v1 do
+  #     get 'api', to: 'api#index'
+  #   end
+  # end
 end
