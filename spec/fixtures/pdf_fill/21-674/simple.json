@@ -49,7 +49,8 @@
         "last": "Barrett"
       },
       "ssn": "333224444",
-      "birth_date": "2001-10-06"
+      "birth_date": "2001-10-06",
+      "is_parent_or_guardian": true
     },
     "veteran_contact_information": {
       "veteran_address": {

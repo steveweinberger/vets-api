@@ -62,6 +62,13 @@ module PdfFill
               question_num: 5,
               question_suffix: 'A',
               question_text: 'STUDENT\'S DATE OF BIRTH'
+            },
+            'relationship_to_student' => {
+              key: 'form1[0].#subform[0].Relationship[0]',
+              limit: 19,
+              question_num: 16,
+              question_suffix: 'A',
+              question_text: 'RELATIONSHIP TO STUDENT'
             }
           }, # end student_name_and_ssn
           'student_address_marriage_tuition' => {
