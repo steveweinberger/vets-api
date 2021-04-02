@@ -19,7 +19,7 @@ describe VAProfile::Service do
     end
     service = VAProfile::Communication::Service.new(user)
 
-    va_profile_id = '20221'
+    va_profile_id = '16445'
     oid = ERB::Util.url_encode('2.16.840.1.113883.4.349')
     idWithAaid = ERB::Util.url_encode("#{va_profile_id}^PI^200VETS^USDVA")
     sourceDate = Time.zone.now.iso8601
