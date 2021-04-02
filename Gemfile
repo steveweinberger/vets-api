@@ -183,7 +183,7 @@ group :development, :test do
   gem 'guard-rspec', '~> 4.7'
   gem 'overcommit'
   gem 'parallel_tests'
-  gem 'pry-byebug'
+  gem 'pry-rails'
   gem 'rack-test', require: 'rack/test'
   gem 'rack-vcr'
   gem 'rainbow' # Used to colorize output for rake tasks
