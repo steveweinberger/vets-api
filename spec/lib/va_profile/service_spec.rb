@@ -46,7 +46,7 @@ describe VAProfile::Service do
         sourceDate: sourceDate
       }
     }.to_json
-    res = service.perform(:post, "#{oid}/#{idWithAaid}")
+    res = service.perform(:post, "#{oid}/#{idWithAaid}", body)
     binding.pry; fail
   end
 
