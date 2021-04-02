@@ -58,7 +58,7 @@ module ClaimsApi
 
       resource 'veterans/:veteranId' do
         resource 'claims' do
-          resource 'disability-claims' do
+          resource 'disability' do
             resource 'queue' do
               desc 'Check status of asynchronous claim submission.' do
                 detail <<~X
