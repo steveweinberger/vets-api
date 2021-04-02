@@ -59,11 +59,9 @@ module ClaimsApi
       end
 
       mount ClaimsApi::V2::Veterans
-      mount ClaimsApi::V2::Claims
-      mount ClaimsApi::V2::PowerOfAttorneys
-      mount ClaimsApi::V2::Forms::DisabilityCompensation
-      mount ClaimsApi::V2::Forms::IntentToFile
-      mount ClaimsApi::V2::Forms::PowerOfAttorney
+      mount ClaimsApi::V2::DisabilityClaims
+      mount ClaimsApi::V2::IntentToFiles
+      mount ClaimsApi::V2::PowerOfAttorney
 
       add_swagger_documentation \
         mount_path: '/docs/v2/api',
@@ -78,8 +76,9 @@ module ClaimsApi
         },
         tags: [
           { name: 'Veteran Identifiers', description: 'Unique Veteran Identifier' },
-          { name: 'Claims', description: 'Benefits Claims retrieval and monitoring' },
-          { name: 'Forms', description: 'Benefits Claim requests' }
+          { name: 'Power of Attorney', description: '' },
+          { name: 'Disability Claims', description: '' },
+          { name: 'Intent to Files', description: '' }
         ],
         servers: [
           {

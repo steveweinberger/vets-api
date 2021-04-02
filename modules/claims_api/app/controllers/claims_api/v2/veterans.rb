@@ -8,6 +8,7 @@ module ClaimsApi
       end
 
       desc 'Generate unique identifier for Veteran.' do
+        detail ''
         success ClaimsApi::Entities::V2::VeteranTokenEntity
         failure [
           [401, 'Unauthorized', 'ClaimsApi::Entities::V2::ErrorsEntity'],
