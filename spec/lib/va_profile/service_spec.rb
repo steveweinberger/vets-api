@@ -22,17 +22,32 @@ describe VAProfile::Service do
     va_profile_id = '18277'
     oid = ERB::Util.url_encode('2.16.840.1.113883.4.349')
     idWithAaid = ERB::Util.url_encode("#{va_profile_id}^PI^200VETS^USDVA")
+    sourceDate = Time.zone.now.iso8601
+
     body = {
       bio: {
-        communicationPermissionId: 46,
-        allowed: false,
-        communicationChannelId: 1,
-        communicationItemId: 2,
+        communicationPermissions: [
+          {
+            communicationPermissionId: 46,
+            allowed: true,
+            communicationChannelId: 1,
+            communicationItemId: 2,
+            vaProfileId: va_profile_id,
+            sourceDate: sourceDate
+          },
+          {
+            allowed: true,
+            communicationChannelId: 1,
+            communicationItemId: 3,
+            vaProfileId: va_profile_id,
+            sourceDate: sourceDate
+          }
+        ],
         vaProfileId: va_profile_id,
-        sourceDate: Time.zone.now.iso8601
+        sourceDate: sourceDate
       }
     }.to_json
-    res = service.perform(:put, "#{oid}/#{idWithAaid}/communication-permissions", body)
+    res = service.perform(:post, "#{oid}/#{idWithAaid}", body)
     binding.pry; fail
   end
 
