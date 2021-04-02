@@ -59,6 +59,7 @@ module ClaimsApi
       end
 
       mount ClaimsApi::V2::Veterans
+      mount ClaimsApi::V2::Claims
       mount ClaimsApi::V2::DisabilityClaims
       mount ClaimsApi::V2::IntentToFiles
       mount ClaimsApi::V2::PowerOfAttorney
@@ -77,6 +78,7 @@ module ClaimsApi
         tags: [
           { name: 'Veteran Identifiers', description: 'Unique Veteran Identifier' },
           { name: 'Power of Attorney', description: '' },
+          { name: 'Claims', description: '' },
           { name: 'Disability Claims', description: '' },
           { name: 'Intent to Files', description: '' }
         ],
