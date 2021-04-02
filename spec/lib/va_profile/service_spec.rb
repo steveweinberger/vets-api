@@ -28,7 +28,6 @@ describe VAProfile::Service do
       bio: {
         communicationPermissions: [
           {
-            communicationPermissionId: 46,
             allowed: true,
             communicationChannelId: 1,
             communicationItemId: 2,
