@@ -28,14 +28,14 @@ describe VAProfile::Service do
       bio: {
         communicationPermissions: [
           {
-            allowed: true,
+            allowed: false,
             communicationChannelId: 1,
             communicationItemId: 2,
             vaProfileId: va_profile_id,
             sourceDate: sourceDate
           },
           {
-            allowed: true,
+            allowed: false,
             communicationChannelId: 1,
             communicationItemId: 3,
             vaProfileId: va_profile_id,
