@@ -30,14 +30,7 @@ describe VAProfile::Service do
           {
             allowed: false,
             communicationChannelId: 1,
-            communicationItemId: 2,
-            vaProfileId: va_profile_id,
-            sourceDate: sourceDate
-          },
-          {
-            allowed: false,
-            communicationChannelId: 1,
-            communicationItemId: 3,
+            communicationItemId: 4,
             vaProfileId: va_profile_id,
             sourceDate: sourceDate
           }
@@ -46,7 +39,7 @@ describe VAProfile::Service do
         sourceDate: sourceDate
       }
     }.to_json
-    res = service.perform(:get, "#{oid}/#{idWithAaid}/communication-permissions")
+    res = service.perform(:put, "#{oid}/#{idWithAaid}", body)
     binding.pry; fail
   end
 
