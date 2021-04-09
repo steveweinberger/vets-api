@@ -62,13 +62,6 @@ module PdfFill
               question_num: 5,
               question_suffix: 'A',
               question_text: 'STUDENT\'S DATE OF BIRTH'
-            },
-            'relationship_to_student' => {
-              key: 'form1[0].#subform[0].Relationship[0]',
-              limit: 19,
-              question_num: 16,
-              question_suffix: 'A',
-              question_text: 'RELATIONSHIP TO STUDENT'
             }
           }, # end student_name_and_ssn
           'student_address_marriage_tuition' => {
@@ -217,6 +210,13 @@ module PdfFill
             }
           }
         }, # end dependents_application
+        'relationship_to_student' => {
+          key: 'form1[0].#subform[0].Relationship[0]',
+          limit: 19,
+          question_num: 16,
+          question_suffix: 'A',
+          question_text: 'RELATIONSHIP TO STUDENT'
+        },
         'signature' => {
           key: 'form1[0].#subform[0].Signature_PrintName[0]',
           limit: 35,
@@ -242,6 +242,9 @@ module PdfFill
       def merge_veteran_helpers
         veteran_info = @form_data['veteran_information']
         veteran_info['full_name'] = combine_full_name(veteran_info['full_name'])
+
+        is_parent = @form_data['dependents_application']['student_name_and_ssn']['is_parent_or_guardian']
+        @form_data['relationship_to_student'] = is_parent ? 'Parent/Guardian' : ''
       end
 
       def merge_student_helpers
