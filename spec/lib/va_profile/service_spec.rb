@@ -44,18 +44,30 @@ describe VAProfile::Service do
             sourceDate: sourceDate
           },
           {
-            allowed: false,
+            allowed: true,
+            communicationPermissionId: 729,
             communicationChannelId: 1,
             communicationItemId: 4,
             vaProfileId: va_profile_id,
             sourceDate: sourceDate
-          }
+          },
+          {
+            allowed: true,
+            communicationChannelId: 1,
+            communicationItemId: 5,
+            vaProfileId: va_profile_id,
+            sourceDate: sourceDate
+          },
         ],
         vaProfileId: va_profile_id,
         sourceDate: sourceDate
       }
     }.to_json
-    res = service.perform(:get, "#{oid}/#{idWithAaid}/communication-permissions")
+
+    VCR.use_cassette('update_all_communication_permissions', record: :once) do
+      res = service.perform(:get, "#{oid}/#{idWithAaid}/communication-permissions")
+    end
+
     binding.pry; fail
   end
 
