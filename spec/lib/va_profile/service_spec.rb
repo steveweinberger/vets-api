@@ -65,10 +65,9 @@ describe VAProfile::Service do
     }.to_json
 
     VCR.use_cassette('update_all_communication_permissions', record: :once) do
-      res = service.perform(:get, "#{oid}/#{idWithAaid}/communication-permissions")
+      res = service.perform(:put, "#{oid}/#{idWithAaid}", body)
+      binding.pry; fail
     end
-
-    binding.pry; fail
   end
 
   describe '#handle_error' do
