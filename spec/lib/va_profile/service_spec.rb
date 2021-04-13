@@ -53,7 +53,7 @@ describe VAProfile::Service do
           },
           {
             allowed: true,
-            communicationChannelId: 1,
+            communicationChannelId: 2,
             communicationItemId: 5,
             vaProfileId: va_profile_id,
             sourceDate: sourceDate
