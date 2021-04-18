@@ -713,6 +713,18 @@ RSpec.describe Form1010cg::Service do
     end
   end
 
+  describe '#set_icn_cache' do
+    it 'spawns a thread for each MPI search' do
+      VCR.use_cassette('mpi/find_candidate/valid') do
+        subject.set_icn_cache
+      end
+
+      expect(subject.icn_for('veteran')).to eq('1008714701V416111')
+      expect(subject.icn_for('primaryCaregiver')).to eq('NOT_FOUND')
+      expect(subject.icn_for('secondaryCaregiverOne')).to eq('NOT_FOUND')
+    end
+  end
+
   describe '#process_claim!' do
     it 'raises error when ICN not found for veteran' do
       expect(subject).to receive(:icn_for).with('veteran').and_return('NOT_FOUND')

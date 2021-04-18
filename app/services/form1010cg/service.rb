@@ -171,32 +171,76 @@ module Form1010cg
     #
     # @param form_subject [String] The key in the claim's data that contains this person's info (ex: "veteran")
     # @return [String | NOT_FOUND] Returns the icn of the form subject if found, and NOT_FOUND otherwise.
+    # def icn_for(form_subject)
+    #   cached_icn = @cache[:icns][form_subject]
+    #   return cached_icn unless cached_icn.nil?
+
+    #   form_subject_data = claim.parsed_form[form_subject]
+
+    #   if form_subject_data['ssnOrTin'].nil?
+    #     log_mpi_search_result form_subject, :skipped
+    #     return @cache[:icns][form_subject] = NOT_FOUND
+    #   end
+
+    #   response = mpi_service.find_profile(build_user_identity_for(form_subject_data))
+
+    #   set_icn_for(form_subject, response)
+    # end
+
     def icn_for(form_subject)
-      cached_icn = @cache[:icns][form_subject]
-      return cached_icn unless cached_icn.nil?
+      set_icn_cache if @cache[:icns][form_subject].nil?
+      @cache[:icns][form_subject]
+    end
 
-      form_subject_data = claim.parsed_form[form_subject]
-
-      if form_subject_data['ssnOrTin'].nil?
-        log_mpi_search_result form_subject, :skipped
-        return @cache[:icns][form_subject] = NOT_FOUND
-      end
-
-      response = mpi_service.find_profile(build_user_identity_for(form_subject_data))
-
-      if response.status == 'OK'
+    def set_icn_for(form_subject, mpi_response)
+      if mpi_response.status == 'OK'
         log_mpi_search_result form_subject, :found
-        return @cache[:icns][form_subject] = response.profile.icn
+        return @cache[:icns][form_subject] = mpi_response.profile.icn
       end
 
-      if response.status == 'NOT_FOUND'
+      if mpi_response.status == 'NOT_FOUND'
         log_mpi_search_result form_subject, :not_found
         return @cache[:icns][form_subject] = NOT_FOUND
       end
 
-      raise response.error if response.error
+      raise mpi_response.error if mpi_response.error
 
       @cache[:icns][form_subject] = NOT_FOUND
+    end
+
+    def fetch_mpi_profile_async(user_identity)
+      Thread.new do
+        MPI::Service.new.find_profile(user_identity)
+      end
+    end
+
+    # Will fetch the MPI profile for each form_subject concurrently
+    # and set @cache[:icns] to the resepctive values.
+    def set_icn_cache
+      mpi_responses = {}
+
+      claim.form_subjects.each do |form_subject|
+        form_subject_data = claim.parsed_form[form_subject]
+
+        if form_subject_data['ssnOrTin'].nil?
+          log_mpi_search_result form_subject, :skipped
+          @cache[:icns][form_subject] = NOT_FOUND
+          next
+        end
+
+        mpi_responses[form_subject] = fetch_mpi_profile_async(
+          build_user_identity_for(
+            form_subject_data
+          )
+        )
+      end
+
+      mpi_responses.each do |form_subject, thread|
+        mpi_response = thread.value
+        set_icn_for(form_subject, mpi_response)
+      end
+
+      true
     end
 
     # Will search eMIS for the provided form subject and return `true` if the subject is a verteran.
