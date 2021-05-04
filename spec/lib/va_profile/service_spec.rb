@@ -65,6 +65,7 @@ describe VAProfile::Service do
     }.to_json
 
     res = service.perform(:get, "#{oid}/#{idWithAaid}/communication-permissions")
+    binding.pry; fail
   end
 
   describe '#handle_error' do
