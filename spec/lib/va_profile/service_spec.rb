@@ -64,8 +64,9 @@ describe VAProfile::Service do
       }
     }.to_json
 
-    res = service.perform(:get, "#{oid}/#{idWithAaid}/communication-permissions")
-    binding.pry; fail
+    VCR.use_cassette('communication_permissions_not_found', record: :once) do
+      res = service.perform(:get, "#{oid}/#{idWithAaid}/communication-permissions")
+    end
   end
 
   describe '#handle_error' do
