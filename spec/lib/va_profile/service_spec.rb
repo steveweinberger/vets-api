@@ -19,7 +19,7 @@ describe VAProfile::Service do
     end
     service = VAProfile::Communication::Service.new(user)
 
-    va_profile_id = '16445'
+    va_profile_id = '7909'
     oid = ERB::Util.url_encode('2.16.840.1.113883.4.349')
     idWithAaid = ERB::Util.url_encode("#{va_profile_id}^PI^200VETS^USDVA")
     sourceDate = Time.zone.now.iso8601
@@ -64,10 +64,7 @@ describe VAProfile::Service do
       }
     }.to_json
 
-    VCR.use_cassette('update_all_communication_permissions', record: :once) do
-      res = service.perform(:put, "#{oid}/#{idWithAaid}", body)
-      binding.pry; fail
-    end
+    res = service.perform(:get, "#{oid}/#{idWithAaid}/communication-permissions")
   end
 
   describe '#handle_error' do
