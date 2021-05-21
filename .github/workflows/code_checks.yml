@@ -46,6 +46,46 @@ jobs:
       "Settings.test_database_url": "postgis://vets-api:postgres@127.0.0.1:5432/vets_api_test"
       TERM: xterm-256color
     runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        spec_path:
+          - modules/appeals_api
+          - modules/apps_api
+          - modules/claims_api
+          - modules/covid_research
+          - modules/covid_vaccine
+          - modules/facilities_api
+          - modules/health_quest
+          # - modules/identity # No tests so simplecov fails
+          - modules/mobile
+          - modules/openid_auth
+          - modules/test_user_dashboard
+          - modules/va_forms
+          - modules/vaos
+          - modules/vba_documents
+          - modules/veteran
+          - modules/veteran_confirmation
+          - modules/veteran_verification
+          - spec/config
+          - spec/controllers
+          # - spec/factories # No tests so simplecov fails
+          # - spec/fixtures # No tests so simplecov fails
+          - spec/jobs
+          - spec/lib
+          - spec/mailers
+          - spec/middleware
+          - spec/models
+          - spec/policies
+          - spec/rakelib
+          - spec/request
+          - spec/routing
+          - spec/serializers
+          # - spec/service_consumers # No tests so simplecov fails
+          - spec/services
+          # - spec/support # No tests so simplecov fails
+          - spec/uploaders
+          - spec/validators
+          - spec/workers
 
     services:
       postgres:
@@ -76,7 +116,7 @@ jobs:
         run: bundle exec rake db:reset
 
       - name: Run Specs
-        run: bundle exec rspec spec/ modules --color --tty
+        run: bundle exec rspec '${{ matrix.spec_path }}' --color --tty
 
       - name: Upload Coverage Report
         uses: actions/upload-artifact@v2
