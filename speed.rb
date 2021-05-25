@@ -15,6 +15,8 @@ end
 payload = { metadata: metadata, content:pdf, attachment1: pdf, attachement2: pdf, attachment3: pdf }
 
 t1 = Time.now
-conn.post('/submit', payload)
+response = conn.post('/submit', payload)
 t2 = Time.now
+puts response.body
+puts response.status
 print "I took #{t2- t1} seconds"
