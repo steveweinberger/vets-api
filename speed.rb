@@ -6,8 +6,8 @@ url = 'https://dev-api.va.gov/services/vba_documents/v2/uploads'
 pdf = Faraday::UploadIO.new('./v1.pdf', 'application/pdf')
 metadata = Faraday::UploadIO.new('./valid_metadata.json', 'application/json')
 
-conn = Faraday.new(url: URL) do |faraday|
-  faraday.request :multipart #make sure this is set before url_encoded
+conn = Faraday.new(url: url) do |faraday|
+  faraday.request :multipart
   faraday.request :url_encoded
   faraday.adapter Faraday.default_adapter
 end
