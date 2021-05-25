@@ -32,9 +32,8 @@ end
 payload = { metadata: metadata, content: pdf1, attachment1: pdf2, attachement2: pdf3}
 
 t1 = Time.now
-puts "Starting post...."
-headers = {apikey: "mulgyIRUpqY8SeJoM89e3t2iZucbZVSH"}
-response = conn.post('', payload, headers)
+puts "Starting put...."
+response = conn.put('', payload)
 t2 = Time.now
 puts response.body
 puts response.status
