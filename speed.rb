@@ -12,7 +12,7 @@ conn = Faraday.new(url: url) do |faraday|
   faraday.adapter Faraday.default_adapter
 end
 
-payload = { metadata: metadata, content:pdf, attachment1: pdf, attachement2: pdf, attachment3: pdf }
+payload = { metadata: metadata, content:pdf, attachment1: pdf, attachement2: pdf}
 
 t1 = Time.now
 response = conn.post('/submit', payload)
