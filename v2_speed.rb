@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 # sample invocation
-# ruby v1_speed.rb ./modules/vba_documents/spec/fixtures/valid_metadata.json ./modules/vba_documents/spec/fixtures/valid_doc.pdf 10
+# ruby v1_speed.rb ./modules/vba_documents/spec/fixtures/valid_metadata.json ./modules/vba_documents/spec/fixtures/valid_doc.pdf 10 dev mulgyIRUpqY8SeJoM89e3t2iZucbZVSH
 require 'faraday'
 
 #curl -v -L -X POST 'https://dev-api.va.gov/services/vba_documents/v2/uploads/submit' -F 'metadata="{\"veteranFirstName\": \"Matsumoto\",\"veteranLastName\": \"Test\",\"fileNumber\": \"012345678\",\"zipCode\": \"97202\",\"source\": \"MyVSO\",\"docType\": \"21-22\"}";type=application/json' -F 'content=@"1.pdf"' -F 'attachment1=@"v1.pdf"' -F 'attachment2=@"v1.pdf"' -F 'attachment3=@"v1.pdf"'
@@ -8,6 +8,7 @@ metadata = ARGV[0].to_s
 pdf_file = ARGV[1].to_s
 num_times = ARGV[2].to_i
 env = ARGV[3].to_s
+api_key = ARGV[4].to_s
 URL = 'https://#{env}-api.va.gov'
 pids = []
 directory = File.join(Dir.pwd, "v2")
@@ -31,7 +32,7 @@ num_times.times do |i|
 
     t1 = Time.now
     puts "Starting post...."
-    headers = {apikey: "mulgyIRUpqY8SeJoM89e3t2iZucbZVSH"}
+    headers = {apikey: "#{api_key}"}
     response = conn.post('/services/vba_documents/v2/uploads/submit', payload, headers)
     t2 = Time.now
     File.write("#{directory}/start_time_#{i}", t1.to_s + "\n")
