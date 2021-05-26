@@ -7,6 +7,8 @@ metadata = ARGV[0].to_s
 pdf_file = ARGV[1].to_s
 num_times = ARGV[2].to_i
 pids = []
+directory = File.join(Dir.pwd, "v2")
+Dir.mkdir(directory, 0700) rescue nil
 num_times.times do |i|
   pids << fork do
 
@@ -29,11 +31,12 @@ num_times.times do |i|
     headers = {apikey: "mulgyIRUpqY8SeJoM89e3t2iZucbZVSH"}
     response = conn.post('/services/vba_documents/v2/uploads/submit', payload, headers)
     t2 = Time.now
-    File.write("body_#{i}", response.body+ "\n")
-    File.write("status_#{i}", response.status.to_s + "\n")
-    File.write("time_#{i}", "I took #{t2 - t1} seconds\n")
+    File.write("#{directory}/body_#{i}", response.body+ "\n")
+    File.write("#{directory}/status_#{i}", response.status.to_s + "\n")
+    File.write("#{directory}/time_#{i}", "I took #{t2 - t1} seconds\n")
   end
 end
 puts "Waiting"
 pids.each { |pid| Process.waitpid(pid) } # wait for my children to completeputs "Summary:"
 puts "Done!"
+puts "Wrote to #{directory}"
