@@ -9,7 +9,7 @@ pdf_file = ARGV[1].to_s
 num_times = ARGV[2].to_i
 env = ARGV[3].to_s
 api_key = ARGV[4].to_s
-URL = 'https://#{env}-api.va.gov'
+URL = "https://#{env}-api.va.gov"
 pids = []
 directory = File.join(Dir.pwd, "v2")
 Dir.mkdir(directory, 0700) rescue nil
