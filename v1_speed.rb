@@ -44,6 +44,8 @@ num_times.times do |i|
     t2 = Time.now
     puts response.body
     puts response.status
+    File.write("#{directory}/start_time_#{i}", t1.to_s + "\n")
+    File.write("#{directory}/end_time_#{i}", t2.to_s + "\n")
     File.write("#{directory}/body_#{i}", response.body+ "\n")
     File.write("#{directory}/status_#{i}", response.status.to_s + "\n")
     File.write("#{directory}/time_#{i}", "I took #{t2 - t1} seconds\n")  end

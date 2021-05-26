@@ -33,6 +33,8 @@ num_times.times do |i|
     headers = {apikey: "mulgyIRUpqY8SeJoM89e3t2iZucbZVSH"}
     response = conn.post('/services/vba_documents/v2/uploads/submit', payload, headers)
     t2 = Time.now
+    File.write("#{directory}/start_time_#{i}", t1.to_s + "\n")
+    File.write("#{directory}/end_time_#{i}", t2.to_s + "\n")
     File.write("#{directory}/body_#{i}", response.body+ "\n")
     File.write("#{directory}/status_#{i}", response.status.to_s + "\n")
     File.write("#{directory}/time_#{i}", "I took #{t2 - t1} seconds\n")
