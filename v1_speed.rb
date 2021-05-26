@@ -5,12 +5,13 @@ pdf_file = ARGV[1].to_s
 metadata = ARGV[0].to_s
 num_times = ARGV[2].to_i
 env = ARGV[3].to_s
+api_key = ARGV[4].to_s
 
 pids = []
 directory = File.join(Dir.pwd, "v1")
 Dir.mkdir(directory, 0700) rescue nil
 command = <<EOF
-curl -v -L -X POST 'https://#{env}-api.va.gov/services/vba_documents/v1/uploads/' -H 'apikey: mulgyIRUpqY8SeJoM89e3t2iZucbZVSH'
+curl -v -L -X POST 'https://#{env}-api.va.gov/services/vba_documents/v1/uploads/' -H 'apikey: #{api_key}{}'
 EOF
 
 num_times.times do |i|
