@@ -1,4 +1,6 @@
 #!/usr/bin/ruby
+# sample invocation
+# ruby v1_speed.rb ./modules/vba_documents/spec/fixtures/valid_metadata.json ./modules/vba_documents/spec/fixtures/valid_doc.pdf 10
 require 'faraday'
 URL = 'https://dev-api.va.gov'
 
@@ -37,6 +39,6 @@ num_times.times do |i|
   end
 end
 puts "Waiting"
-pids.each { |pid| Process.waitpid(pid) } # wait for my children to completeputs "Summary:"
+pids.each { |pid| Process.waitpid(pid) } # wait for my children to complete
 puts "Done!"
 puts "Wrote to #{directory}"

@@ -1,3 +1,5 @@
+# sample invocation
+# ruby v2_speed.rb ./modules/vba_documents/spec/fixtures/valid_metadata.json ./modules/vba_documents/spec/fixtures/valid_doc.pdf 10
 require 'json'
 pdf_file = ARGV[1].to_s
 metadata = ARGV[0].to_s
@@ -47,6 +49,6 @@ num_times.times do |i|
     File.write("#{directory}/time_#{i}", "I took #{t2 - t1} seconds\n")  end
 end
 puts "Waiting"
-pids.each { |pid| Process.waitpid(pid) } # wait for my children to completeputs "Summary:"
+pids.each { |pid| Process.waitpid(pid) } # wait for my children to complete
 puts "Done!"
 puts "Wrote to #{directory}"
