@@ -1,5 +1,5 @@
 # sample invocation
-# ruby v2_speed.rb ./modules/vba_documents/spec/fixtures/valid_metadata.json ./modules/vba_documents/spec/fixtures/valid_doc.pdf 10
+# ruby v2_speed.rb ./modules/vba_documents/spec/fixtures/valid_metadata.json ./modules/vba_documents/spec/fixtures/valid_doc.pdf 10 sandbox zxGIWB0sgDaaCaNxyvXES1ZKHUX3L2ZM
 require 'json'
 pdf_file = ARGV[1].to_s
 metadata = ARGV[0].to_s
@@ -11,7 +11,7 @@ pids = []
 directory = File.join(Dir.pwd, "v1")
 Dir.mkdir(directory, 0700) rescue nil
 command = <<EOF
-curl -v -L -X POST 'https://#{env}-api.va.gov/services/vba_documents/v1/uploads/' -H 'apikey: #{api_key}{}'
+curl -v -L -X POST 'https://#{env}-api.va.gov/services/vba_documents/v1/uploads/' -H 'apikey: #{api_key}'
 EOF
 
 num_times.times do |i|
