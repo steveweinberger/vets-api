@@ -51,7 +51,9 @@ num_times.times do |i|
     File.write("#{directory}/end_time_#{i}", t2.to_s + "\n")
     File.write("#{directory}/body_#{i}", response.body+ "\n")
     File.write("#{directory}/status_#{i}", response.status.to_s + "\n")
-    File.write("#{directory}/time_#{i}", "I took #{t2 - t1} seconds\n")  end
+    File.write("#{directory}/time_#{i}", "I took #{t2 - t1} seconds\n")
+    File.write("#{directory}/url_#{i}", "#{url}\n")
+  end
 end
 puts "Waiting"
 pids.each { |pid| Process.waitpid(pid) } # wait for my children to complete
