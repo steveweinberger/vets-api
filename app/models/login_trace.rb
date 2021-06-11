@@ -1,0 +1,2 @@
+class LoginTrace < ApplicationRecord
+end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_05_28_151724) do
+ActiveRecord::Schema.define(version: 2021_06_03_165343) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -545,6 +545,19 @@ ActiveRecord::Schema.define(version: 2021_05_28_151724) do
     t.index ["edipi"], name: "index_invalid_letter_address_edipis_on_edipi"
   end
 
+  create_table "login_traces", force: :cascade do |t|
+    t.string "request_id"
+    t.integer "account_id"
+    t.integer "idp"
+    t.string "ip_address"
+    t.datetime "started_at"
+    t.datetime "completed_at"
+    t.boolean "success"
+    t.text "response"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
   create_table "maintenance_windows", id: :serial, force: :cascade do |t|
     t.string "pagerduty_id"
     t.string "external_service"
@@ -734,10 +747,10 @@ ActiveRecord::Schema.define(version: 2021_05_28_151724) do
     t.datetime "checkout_time"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.text "services"
     t.string "id_type"
     t.string "loa"
     t.string "account_type"
-    t.text "services"
     t.uuid "idme_uuid"
   end
 
@@ -814,6 +827,7 @@ ActiveRecord::Schema.define(version: 2021_05_28_151724) do
     t.string "whodunnit"
     t.text "object"
     t.datetime "created_at"
+    t.text "object_changes"
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
