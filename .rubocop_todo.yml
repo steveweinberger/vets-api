@@ -129,7 +129,6 @@ Lint/UselessMethodDefinition:
     - 'lib/evss/gi_bill_status/external_service_unavailable.rb'
     - 'lib/evss/gi_bill_status/outside_working_hours.rb'
     - 'modules/health_quest/app/services/health_quest/middleware/health_quest_logging.rb'
-    - 'modules/vaos/app/services/vaos/middleware/vaos_logging.rb'
 
 # Offense count: 1
 # Cop supports --auto-correct.

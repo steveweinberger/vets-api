@@ -32,8 +32,6 @@ module Mobile
 
             conn.response :snakecase
             conn.response :json, content_type: /\bjson$/
-            conn.response :vaos_errors
-            conn.use :vaos_logging
             conn.adapter :typhoeus
           end
         end

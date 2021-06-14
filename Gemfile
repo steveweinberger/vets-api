@@ -33,7 +33,7 @@ end
 
 # needed for PGHero performance dashboard
 gem 'sass-rails', '>= 6'
-
+gem 'rails-erd'
 # Anchored versions, do not change
 gem 'puma', '~> 5.3.2'
 gem 'puma-plugin-statsd', '~> 1.2.1'

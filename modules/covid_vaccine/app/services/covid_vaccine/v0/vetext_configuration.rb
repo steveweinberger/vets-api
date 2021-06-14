@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'common/client/configuration/rest'
-require_relative '../middleware/response/errors'
 
 module CovidVaccine
   module V0

@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative './middleware/response/errors'
-require_relative './middleware/vaos_logging'
 require 'common/client/configuration/rest'
 
 module VAOS
@@ -34,8 +32,6 @@ module VAOS
         conn.response :betamocks if mock_enabled?
         conn.response :snakecase
         conn.response :json, content_type: /\bjson$/
-        conn.response :vaos_errors
-        conn.use :vaos_logging
         conn.adapter Faraday.default_adapter
       end
     end

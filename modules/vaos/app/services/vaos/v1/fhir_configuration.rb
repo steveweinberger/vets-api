@@ -23,8 +23,7 @@ module VAOS
           end
 
           conn.response :betamocks if mock_enabled?
-          conn.response :vaos_errors
-          conn.use :vaos_logging
+
           conn.adapter Faraday.default_adapter
         end
       end
