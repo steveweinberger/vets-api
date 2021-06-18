@@ -6,12 +6,13 @@ require 'saml/post_url_service'
 require 'saml/responses/login'
 require 'saml/responses/logout'
 require 'saml/ssoe_settings_service'
+require 'httparty'
 
 module V1
   class SessionsController < ApplicationController
     skip_before_action :verify_authenticity_token
 
-    REDIRECT_URLS = %w[signup mhv dslogon idme custom mfa verify slo].freeze
+    REDIRECT_URLS = %w[signup mhv dslogon idme login custom mfa verify slo].freeze
     STATSD_SSO_NEW_KEY = 'api.auth.new'
     STATSD_SSO_SAMLREQUEST_KEY = 'api.auth.saml_request'
     STATSD_SSO_SAMLRESPONSE_KEY = 'api.auth.saml_response'
@@ -49,6 +50,50 @@ module V1
     def ssoe_slo_callback
       Rails.logger.info("SessionsController version:v1 ssoe_slo_callback, user_uuid=#{@current_user&.uuid}")
       redirect_to url_service.logout_redirect_url
+    end
+
+    def saml_login_callback
+      if params['code']
+        auth = { username: '25fbdo1k3tu6cbtiako9nc5imu',
+                 password: '1jg5vn33dhofvbf8n1fq1prcbj9n6k1s9h9t3h8jkmgvibhvseff' }
+        code = params['code']
+        redirect_uri = 'https://localhost:3000/v1/sessions/callback'
+        options = {
+          query:
+              {
+                grant_type: 'authorization_code',
+                client_id: '25fbdo1k3tu6cbtiako9nc5imu',
+                code: code,
+                redirect_uri: redirect_uri
+              },
+          basic_auth: auth
+        }
+        response = HTTParty.post('https://identitytest1.auth-fips.us-gov-west-1.amazoncognito.com/oauth2/token', options)
+
+        if response
+          token = response['access_token']
+          userinfo_headers = { 'Authorization' => "Bearer #{token}" }
+          userinfo_response = HTTParty.get('https://identitytest1.auth-fips.us-gov-west-1.amazoncognito.com/oauth2/userInfo',
+                                           headers: userinfo_headers)
+          identity_hash = UserIdentity.new(
+            uuid: userinfo_response['username'],
+            first_name: userinfo_response['given_name'],
+            last_name: userinfo_response['family_name'],
+            birth_date: userinfo_response['birthdate'],
+            gender: nil,
+            ssn: userinfo_response['custom:ssn1'].tr('-',''),
+            icn: nil,
+            mhv_icn: nil,
+            sign_in: { service_name: 'login' },
+            loa: {
+              current: LOA::THREE,
+              highest: LOA::THREE
+            }
+          )
+
+          user_login(identity_hash)
+        end
+      end
     end
 
     def saml_callback
@@ -134,12 +179,9 @@ module V1
       @current_user, @session_object = user_session_form.persist
       set_cookies
       after_login_actions
-      if url_service.should_uplevel?
-        render_login('verify')
-      else
-        redirect_to url_service.login_redirect_url
-        login_stats(:success)
-      end
+
+      redirect_to url_service.login_redirect_url
+      login_stats(:success)
     end
 
     def render_login(type)
@@ -147,16 +189,29 @@ module V1
       tracker = url_service.tracker
       renderer = ActionController::Base.renderer
       renderer.controller.prepend_view_path(Rails.root.join('lib', 'saml', 'templates'))
-      result = renderer.render template: 'sso_post_form',
-                               locals: {
-                                 url: login_url,
-                                 params: post_params,
-                                 id: tracker.uuid,
-                                 authn: tracker.payload_attr(:authn_context),
-                                 type: tracker.payload_attr(:type),
-                                 sentrydsn: Settings.sentry.dsn
-                               },
-                               format: :html
+      result = if type == 'login'
+                 renderer.render template: 'login_get_form',
+                                 locals: {
+                                   url: login_url,
+                                   params: post_params,
+                                   id: tracker.uuid,
+                                   authn: tracker.payload_attr(:authn_context),
+                                   type: tracker.payload_attr(:type),
+                                   sentrydsn: Settings.sentry.dsn
+                                 },
+                                 format: :html
+               else
+                 renderer.render template: 'sso_post_form',
+                                 locals: {
+                                   url: login_url,
+                                   params: post_params,
+                                   id: tracker.uuid,
+                                   authn: tracker.payload_attr(:authn_context),
+                                   type: tracker.payload_attr(:type),
+                                   sentrydsn: Settings.sentry.dsn
+                                 },
+                                 format: :html
+               end
       render body: result, content_type: 'text/html'
       set_sso_saml_cookie!
       saml_request_stats
@@ -189,6 +244,9 @@ module V1
         url_service.signup_url
       when 'mhv'
         url_service.mhv_url
+      when 'login'
+        ['https://identitytest1.auth-fips.us-gov-west-1.amazoncognito.com/login', nil]
+        # ['https://identitytest1.auth-fips.us-gov-west-1.amazoncognito.com/login?client_id=25fbdo1k3tu6cbtiako9nc5imu&response_type=code&scope=email+openid&redirect_uri=https://localhost:3000/v1/sessions/callback', nil]
       when 'dslogon'
         url_service.dslogon_url
       when 'idme'

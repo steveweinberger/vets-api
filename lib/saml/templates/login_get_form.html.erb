@@ -1,0 +1,44 @@
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>VA.gov sign-in</title>
+</head>
+
+<body>
+  <noscript>
+    <p>Your browser does not support JavaScript. 
+    Please press the Continue button once to proceed with sign-in.
+    </p>
+  </noscript>
+
+  <%= form_tag url, authenticity_token: false, method: :get, id: "login-form" do %>
+    <input type="hidden" name="client_id" value="25fbdo1k3tu6cbtiako9nc5imu" /> 
+    <input type="hidden" name="response_type" value="code" /> 
+    <input type="hidden" name="scope" value="profile email openid" /> 
+    <input type="hidden" name="redirect_uri" value="https://localhost:3000/v1/sessions/callback" /> 
+    <noscript>
+      <div>
+        <input type=\”submit\” value=\”Continue\”/>
+      </div>
+    </noscript>
+  <% end %>
+
+  <script nonce="**CSP_NONCE**">
+    (function() {
+      var req = new XMLHttpRequest();
+      var qs = "id=" + encodeURIComponent("<%= id %>") +
+                "&authn=" + encodeURIComponent("<%= authn %>") +
+                "&type=" + encodeURIComponent("<%= type %>");
+      var url = location.origin + "/v1/sessions/trace?" + qs;
+      req.open("GET", url);
+      req.onreadystatechange = function (evt) {
+        if (req.readyState == 2) {
+          document.getElementById("login-form").submit();
+        }
+      };
+      req.send();
+    })();
+  </script>
+</body>
+</html>
+

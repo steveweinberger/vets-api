@@ -487,6 +487,9 @@ GEM
     http-accept (1.7.0)
     http-cookie (1.0.3)
       domain_name (~> 0.5)
+    httparty (0.18.1)
+      mime-types (~> 3.0)
+      multi_xml (>= 0.5.2)
     httpclient (2.8.3)
     httpi (2.4.5)
       rack
@@ -1037,6 +1040,7 @@ DEPENDENCIES
   gyoku
   health_quest!
   holidays
+  httparty
   httpclient
   ice_nine
   identity!

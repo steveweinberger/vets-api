@@ -20,32 +20,15 @@ class UserSessionForm
 
   # rubocop:disable Metrics/MethodLength
   def initialize(saml_response)
-    @saml_uuid = saml_response.in_response_to
-    saml_user = SAML::User.new(saml_response)
-    normalized_attributes = normalize_saml(saml_user)
-    existing_user = User.find(normalized_attributes[:uuid])
-    @user_identity = UserIdentity.new(normalized_attributes)
+    @user_identity = saml_response
     @user = User.new(uuid: @user_identity.attributes[:uuid])
     @user.instance_variable_set(:@identity, @user_identity)
-    if saml_user.changing_multifactor?
-      if existing_user.present?
-        @user.mhv_last_signed_in = existing_user.last_signed_in
-        @user.last_signed_in = existing_user.last_signed_in
-      else
-        @user.last_signed_in = Time.current.utc
-        @user.mhv_last_signed_in = Time.current.utc
-        log_message_to_sentry(
-          "Couldn't locate exiting user after MFA establishment",
-          :warn,
-          { saml_uuid: normalized_attributes[:uuid], saml_icn: normalized_attributes[:mhv_icn] }
-        )
-      end
-    else
-      @user.last_signed_in = Time.current.utc
-    end
+
+    @user.last_signed_in = Time.current.utc
+
     @session = Session.new(
       uuid: @user.uuid,
-      ssoe_transactionid: saml_user.user_attributes.try(:transactionid)
+      ssoe_transactionid: @user.uuid
     )
   end
   # rubocop:enable Metrics/MethodLength

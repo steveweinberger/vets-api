@@ -12,7 +12,7 @@ module SAML
   #
   class PostURLService < URLService
     def initialize(saml_settings, session: nil, user: nil, params: {}, loa3_context: LOA::IDME_LOA3_VETS)
-      unless %w[new saml_callback saml_logout_callback ssoe_slo_callback].include?(params[:action])
+      unless %w[new saml_callback saml_login_callback saml_logout_callback ssoe_slo_callback].include?(params[:action])
         raise Common::Exceptions::RoutingError, params[:path]
       end
 

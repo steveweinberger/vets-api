@@ -4,7 +4,7 @@ vsp_environment:
 virtual_hosts: ["127.0.0.1", "localhost"] # Safe host names
 
 # For CORS requests; separate multiple origins with a comma
-web_origin: http://localhost:3000,http://localhost:3001,http://127.0.0.1:3000,http://127.0.0.1:3001,null
+web_origin: https://localhost:3000,http://localhost:3001,http://127.0.0.1:3000,http://127.0.0.1:3001,null
 web_origin_regex: \Ahttps?:\/\/www\.va\.gov\z
 
 # Settings for SAML authentication
@@ -24,7 +24,7 @@ saml_ssoe:
   cert_new_path: ~
   key_path: ~
   issuer: https://ssoe-sp-localhost.va.gov
-  callback_url: http://localhost:3000/v1/sessions/callback
+  callback_url: https://localhost:3000/v1/sessions/callback
   logout_url: https://int.eauth.va.gov/slo/globallogout?appKey=https%253A%252F%252Fssoe-sp-dev.va.gov
   request_signing: false
   response_signing: false
