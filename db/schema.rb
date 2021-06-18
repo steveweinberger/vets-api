@@ -545,10 +545,10 @@ ActiveRecord::Schema.define(version: 2021_06_03_165343) do
     t.index ["edipi"], name: "index_invalid_letter_address_edipis_on_edipi"
   end
 
-  create_table "login_traces", force: :cascade do |t|
+  create_table "login_audits", force: :cascade do |t|
     t.string "request_id"
     t.integer "account_id"
-    t.integer "idp"
+    t.string "idp"
     t.string "ip_address"
     t.datetime "started_at"
     t.datetime "completed_at"

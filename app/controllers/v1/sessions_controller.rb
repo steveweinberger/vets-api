@@ -68,6 +68,7 @@ module V1
       handle_callback_error(e, :failed_unknown, resp)
     ensure
       callback_stats(:total)
+      audit_login(saml: saml_response)
     end
 
     def tracker
@@ -160,6 +161,7 @@ module V1
       render body: result, content_type: 'text/html'
       set_sso_saml_cookie!
       saml_request_stats
+      audit_login(idp: type, request_id: tracker.uuid)
     end
 
     def set_sso_saml_cookie!
@@ -292,6 +294,10 @@ module V1
       when :total
         StatsD.increment(STATSD_SSO_CALLBACK_TOTAL_KEY, tags: [VERSION_TAG])
       end
+    end
+
+    def audit_login(options={})
+       AuditLoginJob.perform_async(options.merge!({request: request, params: params}))
     end
 
     # rubocop:disable Metrics/ParameterLists
