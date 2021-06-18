@@ -200,6 +200,12 @@ RSpec.describe V1::SessionsController, type: :controller do
     end
 
     describe 'POST saml_callback' do
+
+
+      it "creates an audit login job" do
+        expect { post :saml_callback }.to change(AuditLoginJob.jobs, :size).by(1)
+      end
+
       context 'when too much time passed to consume the SAML Assertion' do
         before { allow(SAML::Responses::Login).to receive(:new).and_return(saml_response_too_late) }
 

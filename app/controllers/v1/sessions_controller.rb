@@ -68,7 +68,6 @@ module V1
       handle_callback_error(e, :failed_unknown, resp)
     ensure
       callback_stats(:total)
-      audit_login(saml: saml_response)
     end
 
     def tracker
@@ -140,6 +139,7 @@ module V1
       else
         redirect_to url_service.login_redirect_url
         login_stats(:success)
+        audit_login(:callback, response: saml_response)
       end
     end
 
@@ -161,7 +161,7 @@ module V1
       render body: result, content_type: 'text/html'
       set_sso_saml_cookie!
       saml_request_stats
-      audit_login(idp: type, request_id: tracker.uuid)
+      audit_login(:new, {idp: type, request_id: tracker&.payload_attr(:transaction_id)})
     end
 
     def set_sso_saml_cookie!
@@ -222,6 +222,15 @@ module V1
     end
 
     def saml_response_stats(saml_response)
+      values = get_saml_response_values(saml_response)
+      Rails.logger.info("SSOe: SAML Response => #{values}")
+      StatsD.increment(STATSD_SSO_SAMLRESPONSE_KEY,
+                       tags: ["type:#{tracker&.payload_attr(:type)}",
+                              "context:#{saml_response.authn_context}",
+                              VERSION_TAG])
+    end
+
+    def get_saml_response_values(saml_response)
       uuid = saml_response.in_response_to
       tracker = SAMLRequestTracker.find(uuid)
       values = {
@@ -230,11 +239,7 @@ module V1
         'type' => tracker&.payload_attr(:type),
         'transaction_id' => tracker&.payload_attr(:transaction_id)
       }
-      Rails.logger.info("SSOe: SAML Response => #{values}")
-      StatsD.increment(STATSD_SSO_SAMLRESPONSE_KEY,
-                       tags: ["type:#{tracker&.payload_attr(:type)}",
-                              "context:#{saml_response.authn_context}",
-                              VERSION_TAG])
+      return values
     end
 
     def user_logout(saml_response)
@@ -296,8 +301,14 @@ module V1
       end
     end
 
-    def audit_login(options={})
-       AuditLoginJob.perform_async(options.merge!({request: request, params: params}))
+    def audit_login(action, options={})
+      case action
+       when :new
+        AuditLoginJob.perform_async(options)
+       when :callback
+        values = get_saml_response_values(options[:response])
+        AuditLoginJob.perform_async(options.merge!(request_id: values['transaction_id']))
+      end
     end
 
     # rubocop:disable Metrics/ParameterLists
