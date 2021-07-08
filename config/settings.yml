@@ -628,6 +628,9 @@ iam_ssoe:
   oauth_url: "https://int.fed.eauth.va.gov:444"
   sts_url: "https://preprod.services.eauth.va.gov:9301"
 
+cognito_oauth:
+  base_url: https://identitytest1.auth-fips.us-gov-west-1.amazoncognito.com
+
 statsd:
   host: ~
   port: ~

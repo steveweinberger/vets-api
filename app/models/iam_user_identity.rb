@@ -12,6 +12,7 @@ class IAMUserIdentity < ::UserIdentity
   PREMIUM_LOAS = [2, 3].freeze
   UPGRADE_AUTH_TYPES = %w[DSL MHV].freeze
   MULTIFACTOR_AUTH_TYPES = %w[IDME].freeze
+  IAL2 = 'http://idmanagement.gov/ns/assurance/ial/2'
 
   redis_store REDIS_CONFIG[:iam_user_identity][:namespace]
   redis_ttl REDIS_CONFIG[:iam_user_identity][:each_ttl]
@@ -48,6 +49,29 @@ class IAMUserIdentity < ::UserIdentity
       middle_name: iam_profile[:middle_name],
       multifactor: multifactor?(loa_level, iam_auth_n_type),
       sign_in: { service_name: "oauth_#{iam_auth_n_type}", account_type: iam_profile[:fediamassur_level] }
+    )
+
+    identity.set_expire
+    identity
+  end
+
+  def self.build_from_external_profile(userinfo, mpi_profile, expiry)
+    loa_level = 3 if userinfo['custom:ial'] == IAL2
+    auth_n_type = userinfo['username'].split('_').first
+
+    identity = new(
+      email: userinfo['email'],
+      expiration_timestamp: expiry,
+      first_name: mpi_profile.given_names.first,
+      icn: mpi_profile.icn,
+      iam_edipi: mpi_profile.edipi,
+      iam_sec_id: mpi_profile.sec_id,
+      iam_mhv_id: mpi_profile.active_mhv_ids&.first,
+      last_name: mpi_profile.family_name,
+      loa: { current: loa_level, highest: loa_level },
+      middle_name: mpi_profile.given_names.second,
+      multifactor: true, # Make sure this holds -- only if IAL2
+      sign_in: { service_name: "oauth_#{auth_n_type}", account_type: loa_level }
     )
 
     identity.set_expire

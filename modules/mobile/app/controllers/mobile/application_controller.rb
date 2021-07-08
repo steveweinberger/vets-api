@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'cognito_oauth/session_manager'
+
 module Mobile
   class ApplicationController < ActionController::API
     include ExceptionHandling
@@ -42,7 +44,9 @@ module Mobile
       raise_unauthorized('Missing Authorization header') if request.headers['Authorization'].nil?
       raise_unauthorized('Authorization header Bearer token is blank') if access_token.blank?
 
-      session_manager = IAMSSOeOAuth::SessionManager.new(access_token)
+      # TODO: To carry this work forward, we'll need to detect the issuer of the token and
+      # use the correct session manager class accordingly
+      session_manager = CognitoOAuth::SessionManager.new(access_token)
       @current_user = session_manager.find_or_create_user
       link_user_with_vets360 if @current_user.vet360_id.blank?
       @current_user
