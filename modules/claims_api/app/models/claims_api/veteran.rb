@@ -111,6 +111,14 @@ module ClaimsApi
       mpi.icn
     end
 
+    def icn
+      mpi_icn
+    end
+
+    def email
+      nil
+    end
+
     private
 
     def mpi_profile
