@@ -130,12 +130,21 @@ module V1
     def user_login(saml_response)
       user_session_form = UserSessionForm.new(saml_response)
       raise_saml_error(user_session_form) unless user_session_form.valid?
-
       @current_user, @session_object = user_session_form.persist
       set_cookies
       after_login_actions
-      if url_service.should_uplevel?
-        render_login('verify')
+
+      existing_icn = Account.where(idme_uuid: @current_user&.idme_uuid).first&.icn
+      if existing_icn
+        @current_user.identity.loa = { current: 3, highest: 3 }
+        @current_user.identity.icn = existing_icn
+        @current_user.identity.mhv_icn = existing_icn
+        @current_user.identity.save
+
+        redirect_to url_service.login_redirect_url
+        login_stats(:success)
+      elsif url_service.should_uplevel?
+          render_login('verify')
       else
         redirect_to url_service.login_redirect_url
         login_stats(:success)
