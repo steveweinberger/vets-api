@@ -26,6 +26,8 @@ module Identity
               select(extension, :id)
             when :facility
               select(extension, :assigning_facility)
+            when :facility_id_composite
+              build_composite(select(extension, :assigning_facility), select(extension, :id))
             when :icn_with_aaid
               select_icn_with_aaid(extension)
             end
@@ -91,6 +93,11 @@ module Identity
         return unless status == 'P'
 
         identifiers_array.join(IDENTIFIERS_SPLIT_TOKEN)
+      end
+
+      def build_composite(item_1, item_2)
+        padding_size = 16 - (item_1.size + item_2.size)
+        "#{item_1}#{'0'.repeat(padding_size)}#{item_2}"
       end
     end
   end
