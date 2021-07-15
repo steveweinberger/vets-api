@@ -62,7 +62,9 @@ module VeteranVerification
         {
           decision: rating[:disability_decision_type_name],
           effective_date: get_formatted_date(rating[:begin_date]),
-          rating_percentage: rating[:diagnostic_percent].to_i
+          rating_percentage: rating[:diagnostic_percent].to_i,
+          diagnostic_code: rating[:diagnostic_type_code].to_i,
+          rated_disability_id: rating[:disability_id]
         }
       end
       filtered_ratings = ratings.select do |rating|
