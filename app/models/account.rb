@@ -98,7 +98,8 @@ class Account < ApplicationRecord
       idme_uuid: user.idme_uuid,
       sec_id: user.sec_id,
       edipi: user.edipi,
-      icn: user.icn
+      icn: user.icn,
+      login_uuid: user.login_uuid
     }
   end
 

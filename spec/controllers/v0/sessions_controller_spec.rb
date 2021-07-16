@@ -324,7 +324,7 @@ RSpec.describe V0::SessionsController, type: :controller do
     describe 'POST saml_callback' do
       around do |example|
         Settings.sso.cookie_enabled = true
-        example.run
+        example.runf
         Settings.sso.cookie_enabled = false
       end
 

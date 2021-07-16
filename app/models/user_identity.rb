@@ -17,6 +17,8 @@ class UserIdentity < Common::RedisStore
   attribute :first_name
   attribute :middle_name
   attribute :last_name
+  attribute :login_uuid
+  attribute :verified_at
   attribute :common_name
   attribute :gender
   attribute :birth_date

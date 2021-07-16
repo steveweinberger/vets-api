@@ -12,8 +12,9 @@
   </noscript>
 
   <%= form_tag url, authenticity_token: false, method: :get, id: "login-form" do %>
-    <input type="hidden" name="client_id" value="25fbdo1k3tu6cbtiako9nc5imu" /> 
+    <input type="hidden" name="client_id" value="<%= client_id %>" /> 
     <input type="hidden" name="response_type" value="code" /> 
+    <input type="hidden" name="identity_provider" value="Login.gov" /> 
     <input type="hidden" name="scope" value="profile email openid" /> 
     <input type="hidden" name="redirect_uri" value="https://localhost:3000/v1/sessions/callback" /> 
     <noscript>

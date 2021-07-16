@@ -34,6 +34,9 @@ class User < Common::RedisStore
   end
 
   attribute :uuid
+  
+  delegate :login_uuid, to: :identity, allow_nil: true
+
   attribute :last_signed_in, Common::UTCTime # vaafi attributes
   attribute :mhv_last_signed_in, Common::UTCTime # MHV audit logging
 

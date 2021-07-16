@@ -25,7 +25,6 @@ class UserSessionForm
     @user.instance_variable_set(:@identity, @user_identity)
 
     @user.last_signed_in = Time.current.utc
-
     @session = Session.new(
       uuid: @user.uuid,
       ssoe_transactionid: @user.uuid

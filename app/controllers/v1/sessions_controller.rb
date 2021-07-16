@@ -12,7 +12,7 @@ module V1
   class SessionsController < ApplicationController
     skip_before_action :verify_authenticity_token
 
-    REDIRECT_URLS = %w[signup mhv dslogon idme login custom mfa verify slo].freeze
+    REDIRECT_URLS = %w[signup mhv dslogon idme login login_ial2 custom mfa verify slo].freeze
     STATSD_SSO_NEW_KEY = 'api.auth.new'
     STATSD_SSO_SAMLREQUEST_KEY = 'api.auth.saml_request'
     STATSD_SSO_SAMLRESPONSE_KEY = 'api.auth.saml_response'
@@ -53,6 +53,65 @@ module V1
     end
 
     def saml_login_callback
+      ial1_callback
+    end
+
+    def ial1_callback
+      if params['code']
+        auth = { username: '3cacc30hop163m7867bp7qbvft',
+                 password: '15hka6otp3n75mb7l6q6bme2h0f17ufitljr59dq66dithgs60cq' }
+        code = params['code']
+        redirect_uri = 'https://localhost:3000/v1/sessions/callback'
+        options = {
+          query:
+              {
+                grant_type: 'authorization_code',
+                client_id: '3cacc30hop163m7867bp7qbvft',
+                code: code,
+                redirect_uri: redirect_uri
+              },
+          basic_auth: auth
+        }
+        response = HTTParty.post('https://va-gov-login-ial1.auth-fips.us-gov-west-1.amazoncognito.com/oauth2/token', options)
+
+        if response
+          if response['error'] == 'invalid_client' || response['error'] == 'invalid_grant'
+            ial2_callback
+          else
+            token = response['access_token']
+            userinfo_headers = { 'Authorization' => "Bearer #{token}" }
+            userinfo_response = HTTParty.get('https://va-gov-login-ial1.auth-fips.us-gov-west-1.amazoncognito.com/oauth2/userInfo',
+                                            headers: userinfo_headers)
+            loa_level = 1
+            if userinfo_response['verified_at']
+              loa_level = 3
+            end
+
+            identity_hash = UserIdentity.new(
+              uuid: userinfo_response['username']&.downcase,
+              first_name: userinfo_response['given_name'],
+              last_name: userinfo_response['family_name'],
+              verified_at: userinfo_response['verified_at'],
+              login_uuid: userinfo_response['username']&.downcase,
+              birth_date: nil,
+              gender: nil,
+              ssn: nil,
+              icn: nil,
+              mhv_icn: nil,
+              sign_in: { service_name: 'login' },
+              loa: {
+                current: LOA::ONE,
+                highest: loa_level
+              }
+            )
+
+            user_login(identity_hash)
+          end
+        end
+      end
+    end
+
+    def ial2_callback
       if params['code']
         auth = { username: '25fbdo1k3tu6cbtiako9nc5imu',
                  password: '1jg5vn33dhofvbf8n1fq1prcbj9n6k1s9h9t3h8jkmgvibhvseff' }
@@ -74,12 +133,15 @@ module V1
           token = response['access_token']
           userinfo_headers = { 'Authorization' => "Bearer #{token}" }
           userinfo_response = HTTParty.get('https://identitytest1.auth-fips.us-gov-west-1.amazoncognito.com/oauth2/userInfo',
-                                           headers: userinfo_headers)
+                                          headers: userinfo_headers)
+
           identity_hash = UserIdentity.new(
-            uuid: userinfo_response['username'],
+            uuid: userinfo_response['username']&.downcase,
             first_name: userinfo_response['given_name'],
             last_name: userinfo_response['family_name'],
             birth_date: userinfo_response['birthdate'],
+            verified_at: userinfo_response['verified_at'],
+            login_uuid: userinfo_response['username']&.downcase,
             gender: nil,
             ssn: userinfo_response['custom:ssn1'].tr('-',''),
             icn: nil,
@@ -175,13 +237,26 @@ module V1
     def user_login(saml_response)
       user_session_form = UserSessionForm.new(saml_response)
       raise_saml_error(user_session_form) unless user_session_form.valid?
-
       @current_user, @session_object = user_session_form.persist
       set_cookies
-      after_login_actions
+      existing_icn = Account.where(login_uuid: @current_user&.login_uuid).first&.icn
+      if existing_icn && @current_user.identity.verified_at
+        @current_user.identity.loa = { current: 3, highest: 3 }
+        @current_user.identity.icn = existing_icn
+        @current_user.identity.mhv_icn = existing_icn
+        @current_user.identity.save
 
-      redirect_to url_service.login_redirect_url
-      login_stats(:success)
+        redirect_to url_service.login_redirect_url
+        login_stats(:success)
+      elsif url_service.should_uplevel?
+        render_login('login_ial2')
+      else
+        if @current_user.identity.loa[:current] == 3
+          Account.new(uuid: @current_user.identity.uuid, login_uuid: @current_user.identity.uuid, idme_uuid: @current_user.identity.uuid, icn: @current_user.mpi_icn).save
+        end
+        redirect_to url_service.login_redirect_url
+        login_stats(:success)
+      end
     end
 
     def render_login(type)
@@ -197,6 +272,19 @@ module V1
                                    id: tracker.uuid,
                                    authn: tracker.payload_attr(:authn_context),
                                    type: tracker.payload_attr(:type),
+                                   client_id: '3cacc30hop163m7867bp7qbvft',
+                                   sentrydsn: Settings.sentry.dsn
+                                 },
+                                 format: :html
+               elsif type == 'login_ial2'
+                 renderer.render template: 'login_get_form',
+                                 locals: {
+                                   url: login_url,
+                                   params: post_params,
+                                   id: tracker.uuid,
+                                   authn: tracker.payload_attr(:authn_context),
+                                   type: tracker.payload_attr(:type),
+                                   client_id: '25fbdo1k3tu6cbtiako9nc5imu',
                                    sentrydsn: Settings.sentry.dsn
                                  },
                                  format: :html
@@ -245,7 +333,9 @@ module V1
       when 'mhv'
         url_service.mhv_url
       when 'login'
-        ['https://identitytest1.auth-fips.us-gov-west-1.amazoncognito.com/login', nil]
+        ['https://va-gov-login-ial1.auth-fips.us-gov-west-1.amazoncognito.com/oauth2/authorize', nil]
+      when 'login_ial2'
+        ['https://identitytest1.auth-fips.us-gov-west-1.amazoncognito.com/oauth2/authorize', nil]
         # ['https://identitytest1.auth-fips.us-gov-west-1.amazoncognito.com/login?client_id=25fbdo1k3tu6cbtiako9nc5imu&response_type=code&scope=email+openid&redirect_uri=https://localhost:3000/v1/sessions/callback', nil]
       when 'dslogon'
         url_service.dslogon_url

@@ -20,7 +20,7 @@ class AfterLoginJob
     @current_user = User.find(user_uuid)
     return if @current_user.blank?
 
-    evss_create_account
+    # evss_create_account
     create_user_account
     TestUserDashboard::CheckoutUser.new(@current_user.account_uuid).call unless Rails.env.production?
   end

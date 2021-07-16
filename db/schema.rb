@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_05_28_151724) do
+ActiveRecord::Schema.define(version: 2021_07_14_221812) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -29,6 +29,7 @@ ActiveRecord::Schema.define(version: 2021_05_28_151724) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "sec_id"
+    t.string "login_uuid"
     t.index ["icn"], name: "index_accounts_on_icn"
     t.index ["idme_uuid"], name: "index_accounts_on_idme_uuid", unique: true
     t.index ["sec_id"], name: "index_accounts_on_sec_id"
@@ -53,7 +54,14 @@ ActiveRecord::Schema.define(version: 2021_05_28_151724) do
     t.bigint "byte_size", null: false
     t.string "checksum", null: false
     t.datetime "created_at", null: false
+    t.string "service_name", null: false
     t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
+  end
+
+  create_table "active_storage_variant_records", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.string "variation_digest", null: false
+    t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
   create_table "appeal_submission_uploads", force: :cascade do |t|
@@ -739,6 +747,7 @@ ActiveRecord::Schema.define(version: 2021_05_28_151724) do
     t.string "account_type"
     t.text "services"
     t.uuid "idme_uuid"
+    t.text "notes"
   end
 
   create_table "user_preferences", id: :serial, force: :cascade do |t|
@@ -814,6 +823,7 @@ ActiveRecord::Schema.define(version: 2021_05_28_151724) do
     t.string "whodunnit"
     t.text "object"
     t.datetime "created_at"
+    t.text "object_changes"
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
@@ -854,4 +864,5 @@ ActiveRecord::Schema.define(version: 2021_05_28_151724) do
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
 end

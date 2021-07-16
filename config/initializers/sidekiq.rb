@@ -46,3 +46,8 @@ Sidekiq.configure_client do |config|
   # Remove the default error handler
   config.error_handlers.delete_if { |handler| handler.is_a?(Sidekiq::ExceptionHandler::Logger) }
 end
+
+if Rails.env.development?
+  require 'sidekiq/testing'
+  Sidekiq::Testing.inline!
+end
