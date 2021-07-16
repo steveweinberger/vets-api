@@ -36,6 +36,11 @@ module GI
       gids_response(response)
     end
 
+    def get_yellow_ribbon_autocomplete_suggestions_v0(params = {})
+      response = perform(:get, 'v0/yellow_ribbon_programs/autocomplete', params)
+      gids_response(response)
+    end
+
     def get_yellow_ribbon_programs_v0(params = {})
       response = perform(:get, 'v0/yellow_ribbon_programs', params)
       gids_response(response)
@@ -71,6 +76,11 @@ module GI
     def get_institution_children_v1(params = {})
       facility_code = params[:id]
       response = perform(:get, "v1/institutions/#{facility_code}/children", params.except(:id))
+      gids_response(response)
+    end
+
+    def get_yellow_ribbon_autocomplete_suggestions_v1(params = {})
+      response = perform(:get, 'v1/yellow_ribbon_programs/autocomplete', params)
       gids_response(response)
     end
 

@@ -202,7 +202,9 @@ Rails.application.routes.draw do
 
       resources :calculator_constants, only: :index, defaults: { format: :json }
 
-      resources :yellow_ribbon_programs, only: :index, defaults: { format: :json }
+      resources :yellow_ribbon_programs, only: :index, defaults: { format: :json } do
+        get :autocomplete, on: :collection
+      end
 
       resources :zipcode_rates, only: :show, defaults: { format: :json }
     end
@@ -353,7 +355,9 @@ Rails.application.routes.draw do
 
       resources :calculator_constants, only: :index, defaults: { format: :json }
 
-      resources :yellow_ribbon_programs, only: :index, defaults: { format: :json }
+      resources :yellow_ribbon_programs, only: :index, defaults: { format: :json } do
+        get :autocomplete, on: :collection
+      end
 
       resources :zipcode_rates, only: :show, defaults: { format: :json }
     end
