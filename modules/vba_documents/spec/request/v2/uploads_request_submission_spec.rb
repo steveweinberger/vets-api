@@ -3,6 +3,7 @@
 require 'rails_helper'
 require './lib/central_mail/utilities'
 require_relative '../../support/vba_document_fixtures'
+require 'central_mail/utilities'
 
 require_dependency 'vba_documents/object_store'
 require_dependency 'vba_documents/multipart_parser'
@@ -237,9 +238,9 @@ RSpec.describe 'VBA Document Uploads Endpoint', type: :request, retry: 3 do
         @attributes = json['data']['attributes']
         expect(@attributes['status']).to eq('error')
         expect(@attributes['code']).to eq('DOC102')
-        expect(@attributes['detail']).to
-        match("The businessLine metadata field is missing or empty. Valid values are: #{VALID_LOB.keys.join(',')}")
-        expect(@attributes['detail']).to match(/BAD_STATUS/)
+        # rubocop:disable Layout/LineLength
+        expect(@attributes['detail']).to eq("The businessLine metadata field is missing or empty. Valid values are: #{CentralMail::Utilities::VALID_LOB.keys.join(',')}")
+        # rubocop:enable Layout/LineLength
       end
 
       it 'Returns a 400 error when line of business is missing' do
@@ -255,9 +256,9 @@ RSpec.describe 'VBA Document Uploads Endpoint', type: :request, retry: 3 do
         @attributes = json['data']['attributes']
         expect(@attributes['status']).to eq('error')
         expect(@attributes['code']).to eq('DOC102')
-        expect(@attributes['detail']).to
-        match("The businessLine metadata field is missing or empty. Valid values are: #{VALID_LOB.keys.join(',')}")
-        expect(@attributes['detail']).to match(/BAD_STATUS/)
+        # rubocop:disable Layout/LineLength
+        expect(@attributes['detail']).to eq("The businessLine metadata field is missing or empty. Valid values are: #{CentralMail::Utilities::VALID_LOB.keys.join(',')}")
+        # rubocop:enable Layout/LineLength
       end
 
       %w[veteranFirstName veteranLastName fileNumber zipCode].each do |key|
