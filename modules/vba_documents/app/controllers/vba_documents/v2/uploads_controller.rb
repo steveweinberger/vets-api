@@ -19,6 +19,7 @@ module VBADocuments
         upload_model = UploadFile.new
         begin
           upload_model.multipart.attach(io: StringIO.new(request.raw_post), filename: upload_model.guid)
+          upload_model.metadata['v2'] = true
           upload_model.save!
           parts = VBADocuments::MultipartParser.parse(StringIO.new(request.raw_post))
           inspector = VBADocuments::PDFInspector.new(pdf: parts)
