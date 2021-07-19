@@ -13,6 +13,12 @@ module Facilities
       # Dev swagger site for testing endpoints
       # https://dev.dws.ppms.va.gov/swagger
       class Client < Common::Client::Base
+        class << self
+          extend Gem::Deprecate
+          deprecate :new, 'FacilitiesApi::V1::PPMS::Client.new', 2021, 10
+        end
+        extend Gem::Deprecate
+
         MIN_RESULTS = 1
         MAX_RESULTS = 50
 
@@ -30,6 +36,7 @@ module Facilities
 
           Facilities::PPMS::V1::Response.new(response.body, params).providers
         end
+        deprecate :provider_locator, 'FacilitiesApi::V1::PPMS::Client.new.provider_locator', 2021, 10
 
         def pos_locator(params)
           qparams = pos_locator_params(params, '17,20')
@@ -42,6 +49,7 @@ module Facilities
 
           Facilities::PPMS::V1::Response.new(response.body, params).places_of_service
         end
+        deprecate :pos_locator, 'FacilitiesApi::V1::PPMS::Client.new.pos_locator', 2021, 10
 
         # https://dev.dws.ppms.va.gov/swagger/ui/index#!/Providers/Providers_Get_0
         def provider_info(identifier)
@@ -55,6 +63,7 @@ module Facilities
 
           Facilities::PPMS::V1::Response.new(response.body[0]).provider
         end
+        deprecate :provider_info, :none, 2021, 10
 
         def provider_services(identifier)
           response = perform(:get, "v1.0/Providers(#{identifier})/ProviderServices", {})
@@ -64,12 +73,14 @@ module Facilities
 
           Facilities::PPMS::V1::Response.new(response.body).providers
         end
+        deprecate :provider_services, :none, 2021, 10
 
         # https://dev.dws.ppms.va.gov/swagger/ui/index#!/Specialties/Specialties_Get_0
         def specialties
           response = perform(:get, 'v1.0/Specialties', {})
           response.body
         end
+        deprecate :specialties, 'FacilitiesApi::V1::PPMS::Client.new.specialties', 2021, 10
 
         private
 
