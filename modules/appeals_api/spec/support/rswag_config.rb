@@ -53,10 +53,7 @@ class AppealsApi::RswagConfig
           title: 'Decision Reviews',
           version: 'v2',
           termsOfService: 'https://developer.va.gov/terms-of-service',
-          description: <<~VERBIAGE
-            ### v2 Description
-            details here...
-          VERBIAGE
+          description: File.read(AppealsApi::Engine.root.join('app', 'swagger', 'appeals_api', 'v2', 'api_description.md'))
         },
         tags: [
           {
