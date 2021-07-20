@@ -43,36 +43,7 @@ describe 'Higher-Level Reviews', swagger_doc: 'modules/appeals_api/app/swagger/a
       response '200', 'Info about a single Higher-Level Review' do
         let(:hlr_body) { JSON.parse(File.read(AppealsApi::Engine.root.join('spec','fixtures','valid_200996_v2.json'))) }
 
-        schema type: :object,
-          properties: {
-            id: {
-              type: :string,
-              pattern: '^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$'
-            },
-            type: {
-              type: :string,
-              enum: ['higherLevelReview']
-            },
-            attributes: {
-              properties: {
-                status: {
-                  type: :string,
-                  enum: AppealsApi::HlrStatus::V2_STATUSES
-                },
-                updatedAt: {
-                  type: :string,
-                  pattern: '\d{4}(-\d{2}){2}T\d{2}(:\d{2}){2}\.\d{3}Z'
-                },
-                createdAt: {
-                  type: :string,
-                  pattern: '\d{4}(-\d{2}){2}T\d{2}(:\d{2}){2}\.\d{3}Z'
-                },
-                formData: {
-                  '$ref' => '#/components/schemas/higherLevelReview'
-                }
-              }
-            }
-          }
+        schema AppealsApi::SwaggerSharedComponents.response_schemas[:hlr_response_schema]
 
         before do |example|
           submit_request(example.metadata)
@@ -132,36 +103,7 @@ describe 'Higher-Level Reviews', swagger_doc: 'modules/appeals_api/app/swagger/a
 
       response '200', 'Info about a single Higher-Level Review' do
 
-        schema type: :object,
-          properties: {
-            id: {
-              type: :string,
-              pattern: '^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$'
-            },
-            type: {
-              type: :string,
-              enum: ['higherLevelReview']
-            },
-            attributes: {
-              properties: {
-                status: {
-                  type: :string,
-                  enum: AppealsApi::HlrStatus::V2_STATUSES
-                },
-                updatedAt: {
-                  type: :string,
-                  pattern: '\d{4}(-\d{2}){2}T\d{2}(:\d{2}){2}\.\d{3}Z'
-                },
-                createdAt: {
-                  type: :string,
-                  pattern: '\d{4}(-\d{2}){2}T\d{2}(:\d{2}){2}\.\d{3}Z'
-                },
-                formData: {
-                  '$ref' => '#/components/schemas/higherLevelReview'
-                }
-              }
-            }
-          }
+        schema AppealsApi::SwaggerSharedComponents.response_schemas[:hlr_response_schema]
 
         hlr = FactoryBot.create(:higher_level_review)
         let(:uuid) { hlr.id }

@@ -93,5 +93,42 @@ class AppealsApi::SwaggerSharedComponents
       }
     }
   end
+
+  def self.response_schemas # rubocop:disable Metrics/MethodLength
+    {
+      hlr_response_schema: {
+        type: :object,
+        properties: {
+          id: {
+            type: :string,
+            pattern: '^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$'
+          },
+          type: {
+            type: :string,
+            enum: ['higherLevelReview']
+          },
+          attributes: {
+            properties: {
+              status: {
+                type: :string,
+                enum: AppealsApi::HlrStatus::V2_STATUSES
+              },
+              updatedAt: {
+                type: :string,
+                pattern: '\d{4}(-\d{2}){2}T\d{2}(:\d{2}){2}\.\d{3}Z'
+              },
+              createdAt: {
+                type: :string,
+                pattern: '\d{4}(-\d{2}){2}T\d{2}(:\d{2}){2}\.\d{3}Z'
+              },
+              formData: {
+                '$ref' => '#/components/schemas/higherLevelReview'
+              }
+            }
+          }
+        }
+      }
+    }
+  end
 end
 
