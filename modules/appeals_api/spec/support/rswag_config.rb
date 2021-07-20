@@ -77,7 +77,7 @@ class AppealsApi::RswagConfig
             },
           },
           schemas: {
-            higherLevelReview: JSON.parse(File.read(AppealsApi::Engine.root.join('spec', 'support', 'schemas', 'v2', '200996.json')))
+            higherLevelReview: JSON.parse(File.read(AppealsApi::Engine.root.join('config', 'schemas', 'v2', '200996.json')))
           }
         },
         paths: {},

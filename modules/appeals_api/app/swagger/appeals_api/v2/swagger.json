@@ -26,6 +26,8 @@
     },
     "schemas": {
       "higherLevelReview": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "description": "JSON Schema for VA Form 20-0996",
         "type": "object",
         "properties": {
           "data": {
@@ -1097,7 +1099,6 @@
             "uniqueItems": true
           }
         },
-        "additionalProperties": false,
         "required": [
           "data",
           "included"
@@ -1210,12 +1211,12 @@
               "application/json": {
                 "example": {
                   "data": {
-                    "id": "6447967d-7f78-4bf9-aaac-381329f0dbb8",
+                    "id": "ea88c0a7-2b3b-4620-bb2f-38ecd68b9bb7",
                     "type": "higherLevelReview",
                     "attributes": {
                       "status": "pending",
-                      "updatedAt": "2021-07-19T23:21:35.222Z",
-                      "createdAt": "2021-07-19T23:21:35.222Z",
+                      "updatedAt": "2021-07-20T18:37:12.731Z",
+                      "createdAt": "2021-07-20T18:37:12.731Z",
                       "formData": {
                         "data": {
                           "type": "higherLevelReview",
@@ -1480,12 +1481,12 @@
               "application/json": {
                 "example": {
                   "data": {
-                    "id": "dd5d327e-3f6f-4eaf-9078-194ff6286420",
+                    "id": "7d32d90c-966d-423c-9d2d-3e90d423c63e",
                     "type": "higherLevelReview",
                     "attributes": {
                       "status": "pending",
-                      "updatedAt": "2021-07-19T23:21:34.961Z",
-                      "createdAt": "2021-07-19T23:21:34.961Z",
+                      "updatedAt": "2021-07-20T18:37:12.486Z",
+                      "createdAt": "2021-07-20T18:37:12.486Z",
                       "formData": {
                         "data": {
                           "type": "higherLevelReview",
