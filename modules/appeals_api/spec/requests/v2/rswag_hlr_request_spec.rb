@@ -125,13 +125,7 @@ describe 'Higher-Level Reviews', swagger_doc: 'modules/appeals_api/app/swagger/a
       end
 
       response '404', 'Higher-Level Review not found' do
-        schema type: :object,
-               errors: [
-                 {
-                   status: 404,
-                   detail: 'HigherLevelReview with uuid "invalid" not found.'
-                 }
-               ]
+        schema JSON.parse(File.read(AppealsApi::Engine.root.join('spec', 'support', 'schemas', 'errors', '404.json')))
 
         let(:uuid) { 'invalid' }
 
@@ -245,13 +239,7 @@ describe 'Higher-Level Reviews', swagger_doc: 'modules/appeals_api/app/swagger/a
           JSON.parse(File.read(AppealsApi::Engine.root.join('spec', 'fixtures', 'valid_200996_v2.json')))
         end
 
-        schema type: :object,
-               data: {
-                 type: 'higherLevelReviewValidation',
-                 attributes: {
-                   status: 'valid'
-                 }
-               }
+        schema JSON.parse(File.read(AppealsApi::Engine.root.join('spec', 'support', 'schemas', 'hlr_validate.json')))
 
         before do |example|
           submit_request(example.metadata)

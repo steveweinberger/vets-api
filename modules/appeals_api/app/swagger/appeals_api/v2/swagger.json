@@ -1211,12 +1211,12 @@
               "application/json": {
                 "example": {
                   "data": {
-                    "id": "131389ea-3418-45a9-b74a-67e4daa7c548",
+                    "id": "1176fb4c-6439-4348-ad1a-786df556e611",
                     "type": "higherLevelReview",
                     "attributes": {
                       "status": "pending",
-                      "updatedAt": "2021-07-21T16:18:03.351Z",
-                      "createdAt": "2021-07-21T16:18:03.351Z",
+                      "updatedAt": "2021-07-21T22:40:25.854Z",
+                      "createdAt": "2021-07-21T22:40:25.854Z",
                       "formData": {
                         "data": {
                           "type": "higherLevelReview",
@@ -1481,12 +1481,12 @@
               "application/json": {
                 "example": {
                   "data": {
-                    "id": "1d6e8606-f354-4b00-8de7-7b4d3b0ad676",
+                    "id": "924fd81b-1e87-40e5-9610-45ef4ea6abcb",
                     "type": "higherLevelReview",
                     "attributes": {
                       "status": "pending",
-                      "updatedAt": "2021-07-21T16:18:03.088Z",
-                      "createdAt": "2021-07-21T16:18:03.088Z",
+                      "updatedAt": "2021-07-21T22:40:25.589Z",
+                      "createdAt": "2021-07-21T22:40:25.589Z",
                       "formData": {
                         "data": {
                           "type": "higherLevelReview",
@@ -1638,13 +1638,28 @@
                   ]
                 },
                 "schema": {
-                  "type": "object",
-                  "errors": [
-                    {
-                      "status": 404,
-                      "detail": "HigherLevelReview with uuid \"invalid\" not found."
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "errors": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "status": {
+                              "type": "integer",
+                              "enum": [
+                                404
+                              ]
+                            },
+                            "detail": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
                     }
-                  ]
+                  }
                 }
               }
             }
@@ -2867,11 +2882,31 @@
                   }
                 },
                 "schema": {
-                  "type": "object",
-                  "data": {
-                    "type": "higherLevelReviewValidation",
-                    "attributes": {
-                      "status": "valid"
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "object",
+                        "properties": {
+                          "type": {
+                            "type": "string",
+                            "enum": [
+                              "higherLevelReviewValidation"
+                            ]
+                          },
+                          "attributes": {
+                            "type": "object",
+                            "properties": {
+                              "status": {
+                                "type": "string",
+                                "enum": [
+                                  "valid"
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      }
                     }
                   }
                 }
