@@ -90,6 +90,13 @@ class AppealsApi::SwaggerSharedComponents
         name: 'X-Consumer-ID',
         required: false,
         description: 'Consumer GUID'
+      },
+      va_receipt_date: {
+        in: :header,
+        type: :string,
+        name: 'X-VA-Receipt-Date',
+        required: true,
+        description: '(yyyy-mm-dd) In order to determine contestability of issues, the receipt date of a hypothetical Decision Review must be specified.'
       }
     }
   end
