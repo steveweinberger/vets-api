@@ -17,13 +17,13 @@ module FacilitiesApi
         end
       end
 
-      render_json(serializer, lighthouse_params, api_results)
+      render_json(serializer, lighthouse_params, api_results, fields_params)
     end
 
     def show
       api_result = api.get_by_id(params[:id])
 
-      render_json(serializer, lighthouse_params, api_result)
+      render_json(serializer, lighthouse_params, api_result, fields_params)
     end
 
     private
@@ -47,6 +47,10 @@ module FacilitiesApi
         bbox: [],
         services: []
       )
+    end
+
+    def fields_params
+      params.permit(fields: [facility: []]).to_h
     end
 
     def serializer
