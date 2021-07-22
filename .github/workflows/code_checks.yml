@@ -46,15 +46,15 @@ jobs:
       TERM: xterm-256color
     runs-on: asg
 
-    services:
-      postgres:
-        image: postgis/postgis:11-2.5
-        env:
-          POSTGRES_USER: vets-api
-          POSTGRES_PASSWORD: postgres
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 15
-        ports:
-          - 5432:5432
+    # services:
+    #   postgres:
+    #     image: postgis/postgis:11-2.5
+    #     env:
+    #       POSTGRES_USER: vets-api
+    #       POSTGRES_PASSWORD: postgres
+    #     options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 15
+    #     ports:
+    #       - 5432:5432
 
     steps:
       - uses: actions/checkout@v2
@@ -65,64 +65,67 @@ jobs:
         with:
           bundler-cache: true
 
-      - name: Setup Database
-        run: bundle exec parallel_test -n 14 -e 'bundle exec rake db:reset'
+      - name: Build
+        run: make build
 
-      - name: Run Specs
-        run: bundle exec parallel_rspec spec/ modules -n 14 -o '--color --tty'
+  #     - name: Setup Database
+  #       run: bundle exec parallel_test -n 14 -e 'bundle exec rake db:reset'
 
-      - name: Upload Coverage Report
-        uses: actions/upload-artifact@v2
-        if: always()
-        with:
-          name: Coverage Report
-          path: coverage
+  #     - name: Run Specs
+  #       run: bundle exec parallel_rspec spec/ modules -n 14 -o '--color --tty'
 
-      - name: Upload Test Results
-        uses: actions/upload-artifact@v2
-        if: always()
-        with:
-          name: Test Results
-          path: log/*.xml
-          if-no-files-found: ignore
+  #     - name: Upload Coverage Report
+  #       uses: actions/upload-artifact@v2
+  #       if: always()
+  #       with:
+  #         name: Coverage Report
+  #         path: coverage
 
-  publish_results:
-    name: Publish Results
-    if: always()
-    needs: [linting_and_security, tests]
-    runs-on: ubuntu-20.04 # Doesn't run on self-hosted runners as there are SSL issues within the TIC
+  #     - name: Upload Test Results
+  #       uses: actions/upload-artifact@v2
+  #       if: always()
+  #       with:
+  #         name: Test Results
+  #         path: log/*.xml
+  #         if-no-files-found: ignore
 
-    steps:
-      - uses: actions/download-artifact@v2
+  # publish_results:
+  #   name: Publish Results
+  #   if: always()
+  #   needs: [linting_and_security, tests]
+  #   runs-on: ubuntu-20.04 # Doesn't run on self-hosted runners as there are SSL issues within the TIC
 
-      - uses: duderman/rubocop-annotate-action@v0.1.0
-        with:
-          path: Linting and Security Results/rubocop.json
-        if: hashFiles('Linting and Security Results/rubocop.json') != ''
+  #   steps:
+  #     - uses: actions/download-artifact@v2
 
-      - uses: devmasx/brakeman-linter-action@v1.0.0
-        env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-          REPORT_PATH: Linting and Security Results/brakeman.json
-        if: hashFiles('Linting and Security/brakeman.json') != ''
+  #     - uses: duderman/rubocop-annotate-action@v0.1.0
+  #       with:
+  #         path: Linting and Security Results/rubocop.json
+  #       if: hashFiles('Linting and Security Results/rubocop.json') != ''
 
-      - name: Publish Test Results
-        uses: docker://ghcr.io/enricomi/publish-unit-test-result-action:v1
-        if: always()
-        with:
-          check_name: Test Results
-          comment_mode: off
-          files: Test Results/*.xml
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+  #     - uses: devmasx/brakeman-linter-action@v1.0.0
+  #       env:
+  #         GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+  #         REPORT_PATH: Linting and Security Results/brakeman.json
+  #       if: hashFiles('Linting and Security/brakeman.json') != ''
 
-      - name: Fix up coverage report to work with coverage-check-action
-        run: sed -i 's/"line"/"covered_percent"/g' 'Coverage Report/.last_run.json'
+  #     - name: Publish Test Results
+  #       uses: docker://ghcr.io/enricomi/publish-unit-test-result-action:v1
+  #       if: always()
+  #       with:
+  #         check_name: Test Results
+  #         comment_mode: off
+  #         files: Test Results/*.xml
+  #         github_token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Publish Coverage Report
-        uses: devmasx/coverage-check-action@v1.2.0
-        if: hashFiles('Coverage Report/.last_run.json') != ''
-        with:
-          type: simplecov
-          result_path: Coverage Report/.last_run.json
-          min_coverage: 90
-          token: ${{ secrets.GITHUB_TOKEN }}
+  #     - name: Fix up coverage report to work with coverage-check-action
+  #       run: sed -i 's/"line"/"covered_percent"/g' 'Coverage Report/.last_run.json'
+
+  #     - name: Publish Coverage Report
+  #       uses: devmasx/coverage-check-action@v1.2.0
+  #       if: hashFiles('Coverage Report/.last_run.json') != ''
+  #       with:
+  #         type: simplecov
+  #         result_path: Coverage Report/.last_run.json
+  #         min_coverage: 90
+  #         token: ${{ secrets.GITHUB_TOKEN }}
