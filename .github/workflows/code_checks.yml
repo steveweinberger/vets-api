@@ -68,6 +68,12 @@ jobs:
       - name: Build
         run: make build
 
+      - name: Setup Database
+        run: make spec_parallel_setup
+
+      - name: Run Specs
+        run: make spec_parallel
+
   #     - name: Setup Database
   #       run: bundle exec parallel_test -n 14 -e 'bundle exec rake db:reset'
 
