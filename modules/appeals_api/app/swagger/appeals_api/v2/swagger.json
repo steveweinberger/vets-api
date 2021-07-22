@@ -1209,102 +1209,141 @@
             "description": "Info about a single Higher-Level Review",
             "content": {
               "application/json": {
-                "example": {
-                  "data": {
-                    "id": "1176fb4c-6439-4348-ad1a-786df556e611",
-                    "type": "higherLevelReview",
-                    "attributes": {
-                      "status": "pending",
-                      "updatedAt": "2021-07-21T22:40:25.854Z",
-                      "createdAt": "2021-07-21T22:40:25.854Z",
-                      "formData": {
-                        "data": {
-                          "type": "higherLevelReview",
-                          "attributes": {
-                            "informalConference": true,
-                            "benefitType": "compensation",
-                            "veteran": {
-                              "address": {
-                                "zipCode5": "66002"
-                              },
-                              "phone": {
-                                "countryCode": "1",
-                                "areaCode": "555",
-                                "phoneNumber": "8001111"
-                              },
-                              "email": "josie@example.com",
-                              "timezone": "America/Chicago",
-                              "homeless": false
-                            },
-                            "socOptIn": true,
-                            "informalConferenceContact": "veteran",
-                            "informalConferenceTime": "800-1200 ET",
-                            "informalConferenceRep": {
-                              "firstName": "Helen",
-                              "lastName": "Holly",
-                              "phone": {
-                                "countryCode": "6",
-                                "areaCode": "555",
-                                "phoneNumber": "8001111"
+                "examples": {
+                  "minimum fields used": {
+                    "value": {
+                      "data": {
+                        "id": "5d992fe3-a586-44ad-af73-bfa833920bd9",
+                        "type": "higherLevelReview",
+                        "attributes": {
+                          "status": "pending",
+                          "updatedAt": "2021-07-22T21:32:42.398Z",
+                          "createdAt": "2021-07-22T21:32:42.398Z",
+                          "formData": {
+                            "data": {
+                              "type": "higherLevelReview",
+                              "attributes": {
+                                "informalConference": false,
+                                "benefitType": "compensation",
+                                "veteran": {
+                                  "homeless": false
+                                },
+                                "socOptIn": true
                               }
-                            }
+                            },
+                            "included": [
+                              {
+                                "type": "contestableIssue",
+                                "attributes": {
+                                  "issue": "left shoulder",
+                                  "decisionDate": "1920-12-01"
+                                }
+                              }
+                            ]
                           }
-                        },
-                        "included": [
-                          {
-                            "type": "contestableIssue",
-                            "attributes": {
-                              "issue": "tinnitus",
-                              "decisionDate": "1900-01-01",
-                              "decisionIssueId": 1,
-                              "ratingIssueReferenceId": "2",
-                              "ratingDecisionReferenceId": "3",
-                              "socDate": "2020-08-01"
-                            }
-                          },
-                          {
-                            "type": "contestableIssue",
-                            "attributes": {
-                              "issue": "left knee",
-                              "decisionDate": "1900-01-02",
-                              "decisionIssueId": 4,
-                              "ratingIssueReferenceId": "5"
-                            }
-                          },
-                          {
-                            "type": "contestableIssue",
-                            "attributes": {
-                              "issue": "right knee",
-                              "decisionDate": "1900-01-03",
-                              "ratingIssueReferenceId": "6",
-                              "ratingDecisionReferenceId": "7"
-                            }
-                          },
-                          {
-                            "type": "contestableIssue",
-                            "attributes": {
-                              "issue": "PTSD",
-                              "decisionDate": "1900-01-04",
-                              "decisionIssueId": 8,
-                              "ratingDecisionReferenceId": "9"
-                            }
-                          },
-                          {
-                            "type": "contestableIssue",
-                            "attributes": {
-                              "issue": "Traumatic Brain Injury",
-                              "decisionDate": "1900-01-05",
-                              "decisionIssueId": 10
-                            }
-                          },
-                          {
-                            "type": "contestableIssue",
-                            "attributes": {
-                              "issue": "right shoulder",
-                              "decisionDate": "1900-01-06"
-                            }
+                        }
+                      }
+                    }
+                  },
+                  "all fields used": {
+                    "value": {
+                      "data": {
+                        "id": "86fd3299-26b4-427a-b061-faf16f227517",
+                        "type": "higherLevelReview",
+                        "attributes": {
+                          "status": "pending",
+                          "updatedAt": "2021-07-22T21:32:42.443Z",
+                          "createdAt": "2021-07-22T21:32:42.443Z",
+                          "formData": {
+                            "data": {
+                              "type": "higherLevelReview",
+                              "attributes": {
+                                "informalConference": true,
+                                "benefitType": "compensation",
+                                "veteran": {
+                                  "address": {
+                                    "zipCode5": "66002"
+                                  },
+                                  "phone": {
+                                    "countryCode": "1",
+                                    "areaCode": "555",
+                                    "phoneNumber": "8001111"
+                                  },
+                                  "email": "josie@example.com",
+                                  "timezone": "America/Chicago",
+                                  "homeless": false
+                                },
+                                "socOptIn": true,
+                                "informalConferenceContact": "veteran",
+                                "informalConferenceTime": "800-1200 ET",
+                                "informalConferenceRep": {
+                                  "firstName": "Helen",
+                                  "lastName": "Holly",
+                                  "phone": {
+                                    "countryCode": "6",
+                                    "areaCode": "555",
+                                    "phoneNumber": "8001111"
+                                  }
+                                }
+                              }
+                            },
+                            "included": [
+                              {
+                                "type": "contestableIssue",
+                                "attributes": {
+                                  "issue": "tinnitus",
+                                  "decisionDate": "1900-01-01",
+                                  "decisionIssueId": 1,
+                                  "ratingIssueReferenceId": "2",
+                                  "ratingDecisionReferenceId": "3",
+                                  "socDate": "2020-08-01"
+                                }
+                              },
+                              {
+                                "type": "contestableIssue",
+                                "attributes": {
+                                  "issue": "left knee",
+                                  "decisionDate": "1900-01-02",
+                                  "decisionIssueId": 4,
+                                  "ratingIssueReferenceId": "5"
+                                }
+                              },
+                              {
+                                "type": "contestableIssue",
+                                "attributes": {
+                                  "issue": "right knee",
+                                  "decisionDate": "1900-01-03",
+                                  "ratingIssueReferenceId": "6",
+                                  "ratingDecisionReferenceId": "7"
+                                }
+                              },
+                              {
+                                "type": "contestableIssue",
+                                "attributes": {
+                                  "issue": "PTSD",
+                                  "decisionDate": "1900-01-04",
+                                  "decisionIssueId": 8,
+                                  "ratingDecisionReferenceId": "9"
+                                }
+                              },
+                              {
+                                "type": "contestableIssue",
+                                "attributes": {
+                                  "issue": "Traumatic Brain Injury",
+                                  "decisionDate": "1900-01-05",
+                                  "decisionIssueId": 10
+                                }
+                              },
+                              {
+                                "type": "contestableIssue",
+                                "attributes": {
+                                  "issue": "right shoulder",
+                                  "decisionDate": "1900-01-06"
+                                }
+                              }
+                            ]
                           }
-                        ]
+                        }
                       }
                     }
                   }
@@ -1443,6 +1482,123 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/higherLevelReview"
+              },
+              "examples": {
+                "minimum fields used": {
+                  "value": {
+                    "data": {
+                      "type": "higherLevelReview",
+                      "attributes": {
+                        "informalConference": false,
+                        "benefitType": "compensation",
+                        "veteran": {
+                          "homeless": false
+                        },
+                        "socOptIn": true
+                      }
+                    },
+                    "included": [
+                      {
+                        "type": "contestableIssue",
+                        "attributes": {
+                          "issue": "left shoulder",
+                          "decisionDate": "1920-12-01"
+                        }
+                      }
+                    ]
+                  }
+                },
+                "all fields used": {
+                  "value": {
+                    "data": {
+                      "type": "higherLevelReview",
+                      "attributes": {
+                        "informalConference": true,
+                        "benefitType": "compensation",
+                        "veteran": {
+                          "address": {
+                            "zipCode5": "66002"
+                          },
+                          "phone": {
+                            "countryCode": "1",
+                            "areaCode": "555",
+                            "phoneNumber": "8001111"
+                          },
+                          "email": "josie@example.com",
+                          "timezone": "America/Chicago",
+                          "homeless": false
+                        },
+                        "socOptIn": true,
+                        "informalConferenceContact": "veteran",
+                        "informalConferenceTime": "800-1200 ET",
+                        "informalConferenceRep": {
+                          "firstName": "Helen",
+                          "lastName": "Holly",
+                          "phone": {
+                            "countryCode": "6",
+                            "areaCode": "555",
+                            "phoneNumber": "8001111"
+                          }
+                        }
+                      }
+                    },
+                    "included": [
+                      {
+                        "type": "contestableIssue",
+                        "attributes": {
+                          "issue": "tinnitus",
+                          "decisionDate": "1900-01-01",
+                          "decisionIssueId": 1,
+                          "ratingIssueReferenceId": "2",
+                          "ratingDecisionReferenceId": "3",
+                          "socDate": "2020-08-01"
+                        }
+                      },
+                      {
+                        "type": "contestableIssue",
+                        "attributes": {
+                          "issue": "left knee",
+                          "decisionDate": "1900-01-02",
+                          "decisionIssueId": 4,
+                          "ratingIssueReferenceId": "5"
+                        }
+                      },
+                      {
+                        "type": "contestableIssue",
+                        "attributes": {
+                          "issue": "right knee",
+                          "decisionDate": "1900-01-03",
+                          "ratingIssueReferenceId": "6",
+                          "ratingDecisionReferenceId": "7"
+                        }
+                      },
+                      {
+                        "type": "contestableIssue",
+                        "attributes": {
+                          "issue": "PTSD",
+                          "decisionDate": "1900-01-04",
+                          "decisionIssueId": 8,
+                          "ratingDecisionReferenceId": "9"
+                        }
+                      },
+                      {
+                        "type": "contestableIssue",
+                        "attributes": {
+                          "issue": "Traumatic Brain Injury",
+                          "decisionDate": "1900-01-05",
+                          "decisionIssueId": 10
+                        }
+                      },
+                      {
+                        "type": "contestableIssue",
+                        "attributes": {
+                          "issue": "right shoulder",
+                          "decisionDate": "1900-01-06"
+                        }
+                      }
+                    ]
+                  }
+                }
               }
             }
           }
@@ -1481,12 +1637,12 @@
               "application/json": {
                 "example": {
                   "data": {
-                    "id": "924fd81b-1e87-40e5-9610-45ef4ea6abcb",
+                    "id": "38942e75-9b7e-4398-b63d-06ddc29503be",
                     "type": "higherLevelReview",
                     "attributes": {
                       "status": "pending",
-                      "updatedAt": "2021-07-21T22:40:25.589Z",
-                      "createdAt": "2021-07-21T22:40:25.589Z",
+                      "updatedAt": "2021-07-22T21:32:42.146Z",
+                      "createdAt": "2021-07-22T21:32:42.146Z",
                       "formData": {
                         "data": {
                           "type": "higherLevelReview",
@@ -2870,14 +3026,28 @@
         ],
         "responses": {
           "200": {
-            "description": "Valid",
+            "description": "Info about a single Higher-Level Review",
             "content": {
               "application/json": {
-                "example": {
-                  "data": {
-                    "type": "higherLevelReviewValidation",
-                    "attributes": {
-                      "status": "valid"
+                "examples": {
+                  "minimum fields used": {
+                    "value": {
+                      "data": {
+                        "type": "higherLevelReviewValidation",
+                        "attributes": {
+                          "status": "valid"
+                        }
+                      }
+                    }
+                  },
+                  "all fields used": {
+                    "value": {
+                      "data": {
+                        "type": "higherLevelReviewValidation",
+                        "attributes": {
+                          "status": "valid"
+                        }
+                      }
                     }
                   }
                 },
@@ -2908,32 +3078,87 @@
                         }
                       }
                     }
+                  },
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$"
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "higherLevelReview"
+                      ]
+                    },
+                    "attributes": {
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "enum": [
+                            "pending",
+                            "submitting",
+                            "submitted",
+                            "success",
+                            "processing",
+                            "error",
+                            "caseflow"
+                          ]
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "pattern": "\\d{4}(-\\d{2}){2}T\\d{2}(:\\d{2}){2}\\.\\d{3}Z"
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "pattern": "\\d{4}(-\\d{2}){2}T\\d{2}(:\\d{2}){2}\\.\\d{3}Z"
+                        },
+                        "formData": {
+                          "$ref": "#/components/schemas/higherLevelReview"
+                        }
+                      }
+                    }
                   }
                 }
               }
             }
           },
           "422": {
-            "description": "Violates JSON schema",
+            "description": "Error",
             "content": {
               "application/json": {
-                "example": {
-                  "errors": [
-                    {
-                      "title": "Missing required fields",
-                      "detail": "One or more expected fields were not found",
-                      "code": "145",
-                      "source": {
-                        "pointer": "/data/attributes"
-                      },
-                      "status": "422",
-                      "meta": {
-                        "missing_fields": [
-                          "informalConference"
-                        ]
-                      }
+                "examples": {
+                  "Violates JSON schema": {
+                    "value": {
+                      "errors": [
+                        {
+                          "title": "Missing required fields",
+                          "detail": "One or more expected fields were not found",
+                          "code": "145",
+                          "source": {
+                            "pointer": "/data/attributes"
+                          },
+                          "status": "422",
+                          "meta": {
+                            "missing_fields": [
+                              "informalConference"
+                            ]
+                          }
+                        }
+                      ]
                     }
-                  ]
+                  },
+                  "Not JSON object": {
+                    "value": {
+                      "errors": [
+                        {
+                          "status": 422,
+                          "detail": "The request body isn't a JSON object",
+                          "source": null
+                        }
+                      ]
+                    }
+                  }
                 },
                 "schema": {
                   "required": [
@@ -2945,9 +3170,8 @@
                       "items": {
                         "additionalProperties": false,
                         "required": [
-                          "title",
                           "detail",
-                          "code",
+                          "source",
                           "status"
                         ],
                         "properties": {
@@ -2957,14 +3181,17 @@
                           },
                           "detail": {
                             "type": "string",
-                            "description": "HTTP error detail"
+                            "description": "HTTP error detail",
+                            "enum": [
+                              "The request body isn't a JSON object"
+                            ]
                           },
                           "code": {
                             "type": "string",
                             "description": "HTTP error code"
                           },
                           "source": {
-                            "type": "object",
+                            "type": "null",
                             "additionalProperties": false,
                             "description": "Source of error",
                             "properties": {
@@ -2972,11 +3199,17 @@
                                 "type": "string",
                                 "description": "Pointer to source of error"
                               }
-                            }
+                            },
+                            "enum": [
+                              null
+                            ]
                           },
                           "status": {
-                            "type": "string",
-                            "description": "HTTP error code"
+                            "type": "integer",
+                            "description": "HTTP error code",
+                            "enum": [
+                              422
+                            ]
                           },
                           "meta": {
                             "type": "object",
@@ -3002,6 +3235,123 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/higherLevelReview"
+              },
+              "examples": {
+                "minimum fields used": {
+                  "value": {
+                    "data": {
+                      "type": "higherLevelReview",
+                      "attributes": {
+                        "informalConference": false,
+                        "benefitType": "compensation",
+                        "veteran": {
+                          "homeless": false
+                        },
+                        "socOptIn": true
+                      }
+                    },
+                    "included": [
+                      {
+                        "type": "contestableIssue",
+                        "attributes": {
+                          "issue": "left shoulder",
+                          "decisionDate": "1920-12-01"
+                        }
+                      }
+                    ]
+                  }
+                },
+                "all fields used": {
+                  "value": {
+                    "data": {
+                      "type": "higherLevelReview",
+                      "attributes": {
+                        "informalConference": true,
+                        "benefitType": "compensation",
+                        "veteran": {
+                          "address": {
+                            "zipCode5": "66002"
+                          },
+                          "phone": {
+                            "countryCode": "1",
+                            "areaCode": "555",
+                            "phoneNumber": "8001111"
+                          },
+                          "email": "josie@example.com",
+                          "timezone": "America/Chicago",
+                          "homeless": false
+                        },
+                        "socOptIn": true,
+                        "informalConferenceContact": "veteran",
+                        "informalConferenceTime": "800-1200 ET",
+                        "informalConferenceRep": {
+                          "firstName": "Helen",
+                          "lastName": "Holly",
+                          "phone": {
+                            "countryCode": "6",
+                            "areaCode": "555",
+                            "phoneNumber": "8001111"
+                          }
+                        }
+                      }
+                    },
+                    "included": [
+                      {
+                        "type": "contestableIssue",
+                        "attributes": {
+                          "issue": "tinnitus",
+                          "decisionDate": "1900-01-01",
+                          "decisionIssueId": 1,
+                          "ratingIssueReferenceId": "2",
+                          "ratingDecisionReferenceId": "3",
+                          "socDate": "2020-08-01"
+                        }
+                      },
+                      {
+                        "type": "contestableIssue",
+                        "attributes": {
+                          "issue": "left knee",
+                          "decisionDate": "1900-01-02",
+                          "decisionIssueId": 4,
+                          "ratingIssueReferenceId": "5"
+                        }
+                      },
+                      {
+                        "type": "contestableIssue",
+                        "attributes": {
+                          "issue": "right knee",
+                          "decisionDate": "1900-01-03",
+                          "ratingIssueReferenceId": "6",
+                          "ratingDecisionReferenceId": "7"
+                        }
+                      },
+                      {
+                        "type": "contestableIssue",
+                        "attributes": {
+                          "issue": "PTSD",
+                          "decisionDate": "1900-01-04",
+                          "decisionIssueId": 8,
+                          "ratingDecisionReferenceId": "9"
+                        }
+                      },
+                      {
+                        "type": "contestableIssue",
+                        "attributes": {
+                          "issue": "Traumatic Brain Injury",
+                          "decisionDate": "1900-01-05",
+                          "decisionIssueId": 10
+                        }
+                      },
+                      {
+                        "type": "contestableIssue",
+                        "attributes": {
+                          "issue": "right shoulder",
+                          "decisionDate": "1900-01-06"
+                        }
+                      }
+                    ]
+                  }
+                }
               }
             }
           }
