@@ -11,16 +11,12 @@ module Rswag
                 is_hash = value.is_a?(Hash)
                 if is_hash && value.dig(:parameters)
                   schema_param = value.dig(:parameters)&.find { |p| (p[:in] == :body || p[:in] == :formData) && p[:schema] }
-
-                  examples = value.dig(:parameters)&.find { |p| (p[:in] == :body || p[:in] == :formData) && p[:examples] }
                   mime_list = value.dig(:consumes) || doc[:consumes]
                   if value && schema_param && mime_list
                     value[:requestBody] = { content: {} } unless value.dig(:requestBody, :content)
                     value[:requestBody][:required] = true if schema_param[:required]
                     mime_list.each do |mime|
-
-                      mime_examples = (examples && {examples: examples[:examples]}) || {}
-                      value[:requestBody][:content][mime] = { schema: schema_param[:schema] }.merge(mime_examples)
+                      value[:requestBody][:content][mime] = { schema: schema_param[:schema] }.merge(request_examples(value)) # Changed line
                     end
                   end
 
@@ -40,6 +36,18 @@ module Rswag
           end
 
           @output.puts "Swagger doc generated at #{file_path}"
+        end
+      end
+
+      # Added stuff
+      private
+
+      def request_examples(value)
+        examples = value.dig(:parameters)&.find { |p| (p[:in] == :body || p[:in] == :formData) && p[:examples] }
+        if examples && examples[:examples]
+          { examples: examples[:examples] }
+        else
+          {}
         end
       end
     end
