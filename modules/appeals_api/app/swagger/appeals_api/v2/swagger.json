@@ -1213,12 +1213,12 @@
                   "minimum fields used": {
                     "value": {
                       "data": {
-                        "id": "5d992fe3-a586-44ad-af73-bfa833920bd9",
+                        "id": "7e336c39-3e0a-4e4f-8401-f2da55ee6562",
                         "type": "higherLevelReview",
                         "attributes": {
                           "status": "pending",
-                          "updatedAt": "2021-07-22T21:32:42.398Z",
-                          "createdAt": "2021-07-22T21:32:42.398Z",
+                          "updatedAt": "2021-07-23T17:38:44.326Z",
+                          "createdAt": "2021-07-23T17:38:44.326Z",
                           "formData": {
                             "data": {
                               "type": "higherLevelReview",
@@ -1248,12 +1248,12 @@
                   "all fields used": {
                     "value": {
                       "data": {
-                        "id": "86fd3299-26b4-427a-b061-faf16f227517",
+                        "id": "65ec51ba-82fa-4080-9121-e467b6961ba5",
                         "type": "higherLevelReview",
                         "attributes": {
                           "status": "pending",
-                          "updatedAt": "2021-07-22T21:32:42.443Z",
-                          "createdAt": "2021-07-22T21:32:42.443Z",
+                          "updatedAt": "2021-07-23T17:38:44.376Z",
+                          "createdAt": "2021-07-23T17:38:44.376Z",
                           "formData": {
                             "data": {
                               "type": "higherLevelReview",
@@ -1387,8 +1387,16 @@
                           "$ref": "#/components/schemas/higherLevelReview"
                         }
                       }
-                    }
-                  }
+                    },
+                    "required": [
+                      "id",
+                      "type",
+                      "attributes"
+                    ]
+                  },
+                  "required": [
+                    "data"
+                  ]
                 }
               }
             }
@@ -1637,12 +1645,12 @@
               "application/json": {
                 "example": {
                   "data": {
-                    "id": "38942e75-9b7e-4398-b63d-06ddc29503be",
+                    "id": "242d75d3-51e7-419f-8e8e-7a96f4e54fc9",
                     "type": "higherLevelReview",
                     "attributes": {
                       "status": "pending",
-                      "updatedAt": "2021-07-22T21:32:42.146Z",
-                      "createdAt": "2021-07-22T21:32:42.146Z",
+                      "updatedAt": "2021-07-23T17:38:44.001Z",
+                      "createdAt": "2021-07-23T17:38:44.001Z",
                       "formData": {
                         "data": {
                           "type": "higherLevelReview",
@@ -1775,8 +1783,16 @@
                           "$ref": "#/components/schemas/higherLevelReview"
                         }
                       }
-                    }
-                  }
+                    },
+                    "required": [
+                      "id",
+                      "type",
+                      "attributes"
+                    ]
+                  },
+                  "required": [
+                    "data"
+                  ]
                 }
               }
             }
@@ -3117,8 +3133,16 @@
                           "$ref": "#/components/schemas/higherLevelReview"
                         }
                       }
-                    }
-                  }
+                    },
+                    "required": [
+                      "id",
+                      "type",
+                      "attributes"
+                    ]
+                  },
+                  "required": [
+                    "data"
+                  ]
                 }
               }
             }

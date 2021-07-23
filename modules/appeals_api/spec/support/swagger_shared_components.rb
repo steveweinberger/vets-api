@@ -132,8 +132,10 @@ class AppealsApi::SwaggerSharedComponents
                 '$ref' => '#/components/schemas/higherLevelReview'
               }
             }
-          }
-        }
+          },
+          required: ['id', 'type', 'attributes']
+        },
+        required: ['data']
       }
     }
   end
