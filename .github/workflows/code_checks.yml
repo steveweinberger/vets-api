@@ -89,7 +89,8 @@ jobs:
         with:
           context: .
           push: false
-          tags: user/app:latest
+          load: true
+          tags: app:latest
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new
 
@@ -97,10 +98,10 @@ jobs:
       #   run: make build
 
       - name: Setup Database
-        run: bundle exec parallel_test -n 14 -e 'bundle exec rake db:reset'
+        run: docker run app:latest /bin/sh -c 'bundle exec parallel_test -n 14 -e 'bundle exec rake db:reset';'
 
       - name: Run Specs
-        run: bundle exec parallel_rspec spec/ modules -n 14 -o '--color --tty'
+        run: docker run app:latest /bin/sh -c 'bundle exec parallel_rspec spec/ modules -n 14 -o '--color --tty';'
 
       # - name: Run Specs
       #   run: make spec_parallel
