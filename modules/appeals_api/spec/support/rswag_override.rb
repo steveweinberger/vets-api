@@ -27,15 +27,17 @@ module Rswag
             end
           end
 
-          file_path = File.join(@config.swagger_root, url_path)
-          dirname = File.dirname(file_path)
-          FileUtils.mkdir_p dirname unless File.exist?(dirname)
+          if relevant_path?(url_path) # Added line
+            file_path = File.join(@config.swagger_root, url_path)
+            dirname = File.dirname(file_path)
+            FileUtils.mkdir_p dirname unless File.exist?(dirname)
 
-          File.open(file_path, 'w') do |file|
-            file.write(pretty_generate(doc))
-          end
+            File.open(file_path, 'w') do |file|
+              file.write(pretty_generate(doc))
+            end
 
-          @output.puts "Swagger doc generated at #{file_path}"
+            @output.puts "Swagger doc generated at #{file_path}"
+          end # Added line
         end
       end
 
@@ -49,6 +51,10 @@ module Rswag
         else
           {}
         end
+      end
+
+      def relevant_path?(url_path)
+        url_path.include?(ENV.fetch('RAILS_ENGINE'))
       end
     end
   end
