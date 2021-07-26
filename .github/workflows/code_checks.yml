@@ -95,7 +95,7 @@ jobs:
       #     cache-to: type=local,dest=/tmp/.buildx-cache-new
 
       - name: Build
-        run: docker-compose -f docker-compose.test.yml
+        run: docker-compose build -f docker-compose.test.yml
 
       - name: Setup Database
         run: docker run vets-api:latest bash -c 'bundle exec parallel_test -n 14 -e 'bundle exec rake db:reset';'
