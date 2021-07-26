@@ -3,6 +3,7 @@
 module Rswag
   module Specs
     class SwaggerFormatter < ::RSpec::Core::Formatters::BaseTextFormatter
+      # rubocop:disable Metrics/BlockNesting, Layout/LineLength, Style/CommentedKeyword, Metrics/MethodLength
       def stop(_notification = nil)
         @config.swagger_docs.each do |url_path, doc|
           unless doc_version(doc).start_with?('2')
@@ -40,6 +41,7 @@ module Rswag
           end # Added line
         end
       end
+      # rubocop:enable Metrics/BlockNesting, Layout/LineLength, Style/CommentedKeyword, Metrics/MethodLength
 
       # Added stuff
       private
@@ -59,4 +61,3 @@ module Rswag
     end
   end
 end
-

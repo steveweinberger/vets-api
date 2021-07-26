@@ -5,6 +5,8 @@ require 'rails_helper'
 require_relative '../../support/swagger_shared_components'
 require_relative '../../support/rswag_override'
 
+# rubocop:disable RSpec/VariableName, RSpec/ScatteredSetup, RSpec/RepeatedExample, RSpec/RepeatedDescription
+
 describe 'Higher-Level Reviews', swagger_doc: 'modules/appeals_api/app/swagger/appeals_api/v2/swagger.json' do # rubocop:disable RSpec/DescribeClass
   let(:apikey) { 'apikey' }
 
@@ -205,9 +207,10 @@ describe 'Higher-Level Reviews', swagger_doc: 'modules/appeals_api/app/swagger/a
       parameter name: :benefit_type, in: :path, type: :string,
                 description: 'benefit type - Available values: compensation'
 
-      parameter AppealsApi::SwaggerSharedComponents.header_params[:veteran_ssn_header].merge({ required: false,
-                                                                                               description: 'Either X-VA-SSN or X-VA-File-Number is required' })
-      parameter AppealsApi::SwaggerSharedComponents.header_params[:veteran_file_number_header].merge({ description: 'Either X-VA-SSN or X-VA-File-Number is required' })
+      ssn_override = { required: false, description: 'Either X-VA-SSN or X-VA-File-Number is required' }
+      parameter AppealsApi::SwaggerSharedComponents.header_params[:veteran_ssn_header].merge(ssn_override)
+      file_num_override = { description: 'Either X-VA-SSN or X-VA-File-Number is required' }
+      parameter AppealsApi::SwaggerSharedComponents.header_params[:veteran_file_number_header].merge(file_num_override)
       parameter AppealsApi::SwaggerSharedComponents.header_params[:va_receipt_date]
 
       response '200', 'JSON:API response returning all contestable issues for a specific veteran.' do
@@ -380,10 +383,6 @@ describe 'Higher-Level Reviews', swagger_doc: 'modules/appeals_api/app/swagger/a
         schema JSON.parse(File.read(AppealsApi::Engine.root.join('spec', 'support', 'schemas', 'errors',
                                                                  'not_json.json')))
         let(:hlr_body) do
-          request_body = JSON.parse(File.read(AppealsApi::Engine.root.join('spec', 'fixtures', 'valid_200996_v2.json')))
-          request_body['data']['attributes'].delete('informalConference')
-          request_body
-          ""
           nil
         end
 
@@ -411,3 +410,4 @@ describe 'Higher-Level Reviews', swagger_doc: 'modules/appeals_api/app/swagger/a
     end
   end
 end
+# rubocop:enable RSpec/VariableName, RSpec/ScatteredSetup, RSpec/RepeatedExample, RSpec/RepeatedDescription

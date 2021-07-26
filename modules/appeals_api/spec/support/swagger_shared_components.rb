@@ -26,7 +26,8 @@
 # ]
 
 class AppealsApi::SwaggerSharedComponents
-  def self.header_params # rubocop:disable Metrics/MethodLength
+  # rubocop:disable Metrics/MethodLength, Layout/LineLength
+  def self.header_params
     {
       veteran_ssn_header: {
         in: :header,
@@ -100,6 +101,7 @@ class AppealsApi::SwaggerSharedComponents
       }
     }
   end
+  # rubocop:enable Metrics/MethodLength, Layout/LineLength
 
   def self.response_schemas # rubocop:disable Metrics/MethodLength
     {
@@ -133,11 +135,10 @@ class AppealsApi::SwaggerSharedComponents
               }
             }
           },
-          required: ['id', 'type', 'attributes']
+          required: %w[id type attributes]
         },
         required: ['data']
       }
     }
   end
 end
-
