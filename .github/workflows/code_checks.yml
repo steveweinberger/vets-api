@@ -44,20 +44,7 @@ jobs:
       "Settings.saml.key_path": "spec/support/certificates/ruby-saml.key"
       "Settings.test_database_url": "postgis://vets-api:postgres@127.0.0.1:5432/vets_api_test"
       TERM: xterm-256color
-<<<<<<< HEAD
     runs-on: ubuntu-20.04
-
-    # services:
-    #   postgres:
-    #     image: postgis/postgis:11-2.5
-    #     env:
-    #       POSTGRES_USER: vets-api
-    #       POSTGRES_PASSWORD: postgres
-    #     options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 15
-    #     ports:
-    #       - 5432:5432
-=======
-    runs-on: asg
 
     services:
       postgres:
@@ -71,7 +58,6 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 15
         ports:
           - 5432:5432
->>>>>>> master
 
     steps:
       - uses: actions/checkout@v2
@@ -81,6 +67,11 @@ jobs:
           ImageOS: ubuntu20
         with:
           bundler-cache: true
+
+      - uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       - name: Build
         run: make build
