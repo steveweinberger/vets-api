@@ -97,10 +97,13 @@ jobs:
       #   run: make build
 
       - name: Setup Database
-        run: make spec_parallel_setup
+        run: bundle exec parallel_test -n 14 -e 'bundle exec rake db:reset'
 
       - name: Run Specs
-        run: make spec_parallel
+        run: bundle exec parallel_rspec spec/ modules -n 14 -o '--color --tty'
+
+      # - name: Run Specs
+      #   run: make spec_parallel
 
       - name: Move cache
         run: |
