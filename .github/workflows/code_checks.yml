@@ -100,9 +100,9 @@ jobs:
 
       - name: Bundle install
         run: |
-          gem install bundler
-          bundle config enterprise.contribsys.com $BUNDLE_ENTERPRISE__CONTRIBSYS__COM
-          bundle install --deployment
+          docker run vets-api:latest -c 'gem install bundler'
+          docker run vets-api:latest -c 'bundle config enterprise.contribsys.com $BUNDLE_ENTERPRISE__CONTRIBSYS__COM;'
+          docker run vets-api:latest -c 'bundle install --deployment;'
 
       - name: Setup Database
         run: docker run vets-api:latest bash -c 'bundle exec parallel_test -n 14 -e 'bundle exec rake db:reset';'
