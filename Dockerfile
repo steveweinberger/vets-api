@@ -21,7 +21,8 @@ RUN mkdir -p /srv/vets-api/{clamav/database,pki/tls,secure,src} && \
     ln -s /srv/vets-api/pki /etc/pki
 # XXX: get rid of the CA trust manipulation when we have a better model for it
 COPY config/ca-trust/* /usr/local/share/ca-certificates/
-COPY GlobalSignRootCA.pem /etc/ssl/certs/
+COPY GlobalSignRootCA.crt /usr/local/share/ca-certificates/GlobalSignRootCA.crt
+RUN chmod 644 /usr/local/share/ca-certificates/GlobalSignRootCA.crt && update-ca-certificates
 # rename .pem files to .crt because update-ca-certificates ignores files that are not .crt
 RUN cd /usr/local/share/ca-certificates ; for i in *.pem ; do mv $i ${i/pem/crt} ; done ; update-ca-certificates
 WORKDIR /srv/vets-api/src
