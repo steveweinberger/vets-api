@@ -95,8 +95,8 @@ jobs:
       #     cache-from: type=local,src=/tmp/.buildx-cache
       #     cache-to: type=local,dest=/tmp/.buildx-cache-new
 
-      - name: Build
-        run: make build
+      # - name: Build
+      #   run: make build
 
       # - name: Bundle install
       #   run: |
@@ -104,7 +104,7 @@ jobs:
       #     docker run vets-api:latest -c 'bundle config enterprise.contribsys.com $BUNDLE_ENTERPRISE__CONTRIBSYS__COM;'
       #     docker run vets-api:latest -c 'bundle install --deployment;'
 
-      - name: Setup Database
+      - name: Build & Setup Database
         run: make spec_parallel_setup
 
       - name: Run Specs
