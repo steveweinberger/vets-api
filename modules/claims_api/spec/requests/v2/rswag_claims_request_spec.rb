@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'swagger_helper'
+require Rails.root.join('spec', 'rswag_override.rb').to_s
 require 'rails_helper'
 
 describe 'Claims', swagger_doc: 'modules/claims_api/app/swagger/claims_api/v2/swagger.json' do
