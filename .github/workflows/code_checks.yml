@@ -45,7 +45,6 @@ jobs:
       "Settings.test_database_url": "postgis://vets-api:postgres@127.0.0.1:5432/vets_api_test"
       TERM: xterm-256color
       VETS_API_USER_ID: 993
-      ENV_ARG: test
     runs-on: ubuntu-20.04
 
     services:
@@ -106,10 +105,10 @@ jobs:
       #     docker run vets-api:latest -c 'bundle install --deployment;'
 
       - name: Build & Setup Database
-        run: make spec_parallel_setup
+        run: env=$RAILS_ENV make spec_parallel_setup
 
       - name: Run Specs
-        run: make spec_parallel
+        run: env=$RAILS_ENV make spec_parallel
 
       # - name: Run Specs
       #   run: make spec_parallel
