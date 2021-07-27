@@ -108,7 +108,7 @@ jobs:
         run: docker run vets-api:latest bash -c 'bundle exec parallel_test -n 14 -e 'bundle exec rake db:reset';'
 
       - name: Run Specs
-        run: docker run vets-api:latest -c 'bundle exec parallel_rspec spec/ modules -n 14 -o '--color --tty';'
+        run: docker run vets-api:latest bash -c 'bundle exec parallel_rspec spec/ modules -n 14 -o '--color --tty';'
 
       # - name: Run Specs
       #   run: make spec_parallel
