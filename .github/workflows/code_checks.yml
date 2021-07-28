@@ -87,8 +87,8 @@ jobs:
           path: tmp
           key: rubygems-v2-{{ hashFiles('Gemfile.lock') }}
 
-      - name: Build
-        run: env=$RAILS_ENV make build
+      # - name: Build
+      #   run: env=$RAILS_ENV make build
 
       # - name: Run Specs
       #   run: env=$RAILS_ENV make spec_parallel
