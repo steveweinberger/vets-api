@@ -107,10 +107,10 @@ jobs:
       #   run: make spec_parallel
 
       - name: Setup Database
-        run: docker exec vets-api:latest bundle exec parallel_test -n 14 -e 'bundle exec rake db:reset'
+        run: docker run vets-api:latest bash -c 'bundle exec parallel_test -n 14 -e 'bundle exec rake db:reset';'
 
       - name: Run Specs
-        run: docker exec vets-api:latest bundle exec parallel_rspec spec/ modules -n 14 -o '--color --tty'
+        run: docker run vets-api:latest bash -c 'bundle exec parallel_rspec spec/ modules -n 14 -o '--color --tty';'
 
   #     - name: Upload Coverage Report
   #       uses: actions/upload-artifact@v2
