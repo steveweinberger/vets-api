@@ -93,11 +93,10 @@ jobs:
       #   run: make spec_parallel
 
       - name: Setup Database
-        run: nv=$RAILS_ENV make spec_parallel_setup
+        run: env=$RAILS_ENV make spec_parallel_setup
 
       - name: Run Specs
         run: env=$RAILS_ENV make spec_parallel
-          docker-compose -f docker-compose.test.yml run --rm --service-ports vets-api bash -c "DISABLE_BOOTSNAP=true bundle exec parallel_rspec spec/ modules/ -n 14 -o '--color --tty"
 
   #     - name: Upload Coverage Report
   #       uses: actions/upload-artifact@v2
