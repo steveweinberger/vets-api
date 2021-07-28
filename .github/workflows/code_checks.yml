@@ -77,28 +77,14 @@ jobs:
       - name: Copy Certificate
         run: cp /etc/ssl/certs/VA-Internal-S2-RCA1-v1.cer.pem config/ca-trust/
 
-      - name: Build
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          push: false
-          load: true
-          tags: vets-api:latest
-
-      - name: Move cache
-        run: |
-          rm -rf /tmp/.buildx-cache
-          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
-
-
       # - name: Bundle install
       #   run: |
       #     docker run vets-api:latest -c 'gem install bundler'
       #     docker run vets-api:latest -c 'bundle config enterprise.contribsys.com $BUNDLE_ENTERPRISE__CONTRIBSYS__COM;'
       #     docker run vets-api:latest -c 'bundle install --deployment;'
 
-      # - name: Build & Setup Database
-      #   run: env=$RAILS_ENV docker build .
+      - name: Build
+        run: docker-compose -f docker-compose.test.yml
 
       # - name: Run Specs
       #   run: env=$RAILS_ENV make spec_parallel
