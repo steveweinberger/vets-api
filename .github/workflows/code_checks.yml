@@ -82,6 +82,10 @@ jobs:
       #     docker run vets-api:latest -c 'gem install bundler'
       #     docker run vets-api:latest -c 'bundle config enterprise.contribsys.com $BUNDLE_ENTERPRISE__CONTRIBSYS__COM;'
       #     docker run vets-api:latest -c 'bundle install --deployment;'
+      - uses: actions/cache@v1
+        with:
+          path: tmp
+          key: rubygems-v2-{{ hashFiles('Gemfile.lock') }}
 
       - name: Build
         run: env=$RAILS_ENV make build
