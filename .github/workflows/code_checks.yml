@@ -84,7 +84,7 @@ jobs:
       #     docker run vets-api:latest -c 'bundle install --deployment;'
 
       - name: Build
-        run: env=$RAILS_ENV make build
+        run: docker-compose -f docker-compose.test.yml build
 
       # - name: Run Specs
       #   run: env=$RAILS_ENV make spec_parallel
@@ -93,10 +93,10 @@ jobs:
       #   run: make spec_parallel
 
       - name: Setup Database
-        run: docker-compose -f docker-compose.test.yml run --rm --service-ports vets-api bash 'bundle exec parallel_test -n 14 -e 'bundle exec rake db:reset';'
+        run: docker-compose -f docker-compose.test.yml run --rm --service-ports vets-api bash -c 'bundle exec parallel_test -n 14 -e 'bundle exec rake db:reset';'
 
       - name: Run Specs
-        run: docker-compose -f docker-compose.test.yml run --rm --service-ports vets-api bash 'bundle exec parallel_rspec spec/ modules -n 14 -o '--color --tty';'
+        run: docker-compose -f docker-compose.test.yml run --rm --service-ports vets-api bash -c 'bundle exec parallel_rspec spec/ modules -n 14 -o '--color --tty';'
 
   #     - name: Upload Coverage Report
   #       uses: actions/upload-artifact@v2
