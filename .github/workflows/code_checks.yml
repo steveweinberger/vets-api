@@ -84,7 +84,7 @@ jobs:
       #     docker run vets-api:latest -c 'bundle install --deployment;'
 
       - name: Build
-        run: docker-compose -f docker-compose.test.yml
+        run: docker-compose -f docker-compose.test.yml build
 
       # - name: Run Specs
       #   run: env=$RAILS_ENV make spec_parallel
