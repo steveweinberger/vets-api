@@ -144,7 +144,7 @@ spec_parallel:  ## Runs spec tests in parallel
 ifeq ($(ENV_ARG), dev)
 	@$(BASH_DEV) "RAILS_ENV=test DISABLE_BOOTSNAP=true NOCOVERAGE=true bundle exec parallel_rspec ${SPEC_PATH}"
 else
-	@$(COMPOSE_TEST) $(BASH) -c "DISABLE_BOOTSNAP=true bundle exec parallel_rspec ${SPEC_PATH} -n 14 -o '--color --tty"
+	@$(COMPOSE_TEST) $(BASH) -c "DISABLE_BOOTSNAP=true bundle exec parallel_rspec ${SPEC_PATH} -n 14 -o '--color --tty'"
 endif
 
 .PHONY: up
