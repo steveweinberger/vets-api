@@ -95,8 +95,8 @@ jobs:
       #     cache-from: type=local,src=/tmp/.buildx-cache
       #     cache-to: type=local,dest=/tmp/.buildx-cache-new
 
-      # - name: Build
-      #   run: make build
+      - name: Copy Certificate
+        run: cp ../../../etc/ssl/certs/VA-Internal-S2-RCA1-v1.cer.pem
 
       # - name: Bundle install
       #   run: |
