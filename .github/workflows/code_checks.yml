@@ -68,8 +68,9 @@ jobs:
 
       - name: copy to docker
         run: |
-          docker cp config/ca-trust/VA-Internal-S2-RCA1-v1.cer.pem  buildx_buildkit_${{ steps.buildx.outputs.name }}:/usr/local/share/ca-certificates/
-          docker exec -d  buildx_buildkit_${{ steps.buildx.outputs.name }} update-ca-certificates
+          echo "BULDX_CONTAINER_ID=$(docker ps | grep buildkitd | cut -f1 -d' ')" >> $GITHUB_ENV
+          docker cp config/ca-trust/VA-Internal-S2-RCA1-v1.cer.pem ${{ env.BULDX_CONTAINER_ID }}:/usr/local/share/ca-certificates/
+          docker exec -d  ${{ BULDX_CONTAINER_ID }} update-ca-certificates
 
 
 
