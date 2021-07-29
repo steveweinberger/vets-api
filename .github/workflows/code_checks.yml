@@ -59,12 +59,12 @@ jobs:
         id: buildx
         uses: docker/setup-buildx-action@v1
 
-      - name: Copy Certificate
-        run: |
-          docker exec -d ${{ steps.buildx.outputs.name }} mkdir /etc/ssl/certs
-          docker cp /etc/ssl/certs/VA-Internal-S2-RCA1-v1.cer.pem ${{ steps.buildx.outputs.name }}:/etc/ssl/certs
-          docker exec -d ${{ steps.buildx.outputs.name }} update-ca-certificates
-          cp /etc/ssl/certs/VA-Internal-S2-RCA1-v1.cer.pem config/ca-trust/
+      # - name: Copy Certificate
+      #   run: |
+      #     docker exec -d ${{ steps.buildx.outputs.name }} mkdir /etc/ssl/certs
+      #     docker cp /etc/ssl/certs/VA-Internal-S2-RCA1-v1.cer.pem ${{ steps.buildx.outputs.name }}:/etc/ssl/certs
+      #     docker exec -d ${{ steps.buildx.outputs.name }} update-ca-certificates
+      #     cp /etc/ssl/certs/VA-Internal-S2-RCA1-v1.cer.pem config/ca-trust/
 
       - name: View Containers
         run: docker ps --all
