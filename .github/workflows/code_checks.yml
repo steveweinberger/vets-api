@@ -83,13 +83,13 @@ jobs:
           key: rubygems-v2-{{ hashFiles('Gemfile.lock') }}
 
       - name: Build
-        run: VETS_API_USER_ID=993 docker-compose -f docker-compose.test.yml run
+        run: VETS_API_USER_ID=993 docker-compose -f docker-compose.test.yml build
 
       # - name: Run Specs
       #   run: env=$RAILS_ENV make spec_parallel
 
       - name: View Containers
-        run: docker container ls
+        run: docker ps
 
       - name: Setup Database
         run: VETS_API_USER_ID=993 docker-compose -f docker-compose.test.yml run --rm --service-ports vets-api:${{ env.DOCKER_IMAGE }} bash -c "RAILS_ENV=test DISABLE_BOOTSNAP=true parallel_test -e 'bundle exec rake db:reset'"
