@@ -63,6 +63,7 @@ jobs:
 
       - name: Copy Certificate
         run: |
+          docker exec -d ${{ steps.buildx.output.name }} mkdir /etc/ssl/certs
           docker cp /etc/ssl/certs/VA-Internal-S2-RCA1-v1.cer.pem ${{ steps.buildx.output.name }}:/etc/ssl/certs
           docker exec -d ${{ steps.buildx.output.name }} update-ca-certificates
           cp /etc/ssl/certs/VA-Internal-S2-RCA1-v1.cer.pem config/ca-trust/
