@@ -61,9 +61,10 @@ jobs:
 
       - name: Copy Certificate
         run: |
-          docker cp /etc/ssl/certs/VA-Internal-S2-RCA1-v1.cer.pem  buildx_buildkit_${{ steps.buildx.outputs.name }}:/
-          docker exec -d  buildx_buildkit_${{ steps.buildx.outputs.name }} update-ca-certificates
           cp /etc/ssl/certs/VA-Internal-S2-RCA1-v1.cer.pem config/ca-trust/
+          docker cp config/ca-trust/VA-Internal-S2-RCA1-v1.cer.pem  buildx_buildkit_${{ steps.buildx.outputs.name }}:/
+          docker exec -d  buildx_buildkit_${{ steps.buildx.outputs.name }} update-ca-certificates
+
 
       - name: View Containers
         run: docker ps --all
