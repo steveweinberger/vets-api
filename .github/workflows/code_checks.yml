@@ -50,12 +50,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: ruby/setup-ruby@v1
-        env:
-          ImageOS: ubuntu20
-        with:
-          bundler-cache: true
-
       - uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKERHUB_USER }}
@@ -64,29 +58,39 @@ jobs:
       - name: Copy Certificate
         run: cp /etc/ssl/certs/VA-Internal-S2-RCA1-v1.cer.pem config/ca-trust/
 
-      - uses: actions/cache@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build and push
+        uses: docker/build-push-action@v2
         with:
-          path: tmp
-          key: rubygems-v2-{{ hashFiles('Gemfile.lock') }}
+          context: .
+          target: builder
+          push: false
+          local: true
+          tags: vets-api:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      # - name: Build
+      #   run: env=$RAILS_ENV make build
 
-      - name: Build
-        run: env=$RAILS_ENV make build
-
-      - name: Start
-        run: VETS_API_USER_ID=993 docker-compose -f docker-compose.test.yml run --rm --service-ports vets-api
+      # - name: Start
+      #   run: VETS_API_USER_ID=993 docker-compose -f docker-compose.test.yml up --rm --service-ports vets-api
 
       # - name: Run Specs
       #   run: env=$RAILS_ENV make spec_parallel
 
-      - name: View Containers
-        run: docker-compose ps --all
+      # - name: View Containers
+      #   run: docker-compose ps --all
 
-      - name: Setup Database
-        run: VETS_API_USER_ID=993 docker-compose -f docker-compose.test.yml run --rm --service-ports vets-api bash -c "RAILS_ENV=test DISABLE_BOOTSNAP=true parallel_test -e 'bundle exec rake db:reset'"
+      # - name: Setup Database
+      #   run: VETS_API_USER_ID=993 docker-compose -f docker-compose.test.yml run --rm --service-ports vets-api bash -c "RAILS_ENV=test DISABLE_BOOTSNAP=true parallel_test -e 'bundle exec rake db:reset'"
 
-      - name: Run Specs
-        run: VETS_API_USER_ID=993 docker-compose -f docker-compose.test.yml run --rm --service-ports vets-api bash -c "DISABLE_BOOTSNAP=true bundle exec parallel_rspec spec/ modules/ -n 14 -o '--color --tty'"
+      # - name: Run Specs
+      #   run: VETS_API_USER_ID=993 docker-compose -f docker-compose.test.yml run --rm --service-ports vets-api bash -c "DISABLE_BOOTSNAP=true bundle exec parallel_rspec spec/ modules/ -n 14 -o '--color --tty'"
 
+      # - name: Remove
+      #   run: docker-compose -f docker-compose.test.yml rm --rm --service-ports vets-api
   #     - name: Upload Coverage Report
   #       uses: actions/upload-artifact@v2
   #       if: always()
