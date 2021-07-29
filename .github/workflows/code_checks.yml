@@ -83,10 +83,10 @@ jobs:
           key: rubygems-v2-{{ hashFiles('Gemfile.lock') }}
 
       - name: Build
-        run: VETS_API_USER_ID=993 docker-compose -f docker-compose.test.yml build
+        run: env=$RAILS_ENV make build
 
       - name: Start
-        run: VETS_API_USER_ID=993 docker-compose -f docker-compose.test.yml start vets-api
+        run: VETS_API_USER_ID=993 docker-compose -f docker-compose.test.yml run --rm --service-ports vets-api
 
       # - name: Run Specs
       #   run: env=$RAILS_ENV make spec_parallel
