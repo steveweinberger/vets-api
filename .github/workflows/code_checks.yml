@@ -62,6 +62,9 @@ jobs:
       - name: Copy Certificate
         run: |
           cp /etc/ssl/certs/VA-Internal-S2-RCA1-v1.cer.pem config/ca-trust/
+
+      - name: copy to docker
+        run: |
           docker cp config/ca-trust/VA-Internal-S2-RCA1-v1.cer.pem  buildx_buildkit_${{ steps.buildx.outputs.name }}:/
           docker exec -d  buildx_buildkit_${{ steps.buildx.outputs.name }} update-ca-certificates
 
