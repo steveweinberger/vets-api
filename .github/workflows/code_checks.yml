@@ -86,7 +86,7 @@ jobs:
         run: VETS_API_USER_ID=993 docker-compose -f docker-compose.test.yml build
 
       - name: Start
-        run: VETS_API_USER_ID=993 docker-compose -f docker-compose.test.yml vets-api start
+        run: VETS_API_USER_ID=993 docker-compose -f docker-compose.test.yml start vets-api
 
       # - name: Run Specs
       #   run: env=$RAILS_ENV make spec_parallel
