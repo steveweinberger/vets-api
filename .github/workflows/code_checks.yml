@@ -60,7 +60,7 @@ jobs:
 
       - name: Copy Certificate
         run: |
-          docker cp /etc/ssl/certs/VA-Internal-S2-RCA1-v1.cer.pem moby/buildkit:/config/ca-trust/
+          docker run -v /etc/ssl/certs:config/ca-trust -d moby/buildkit
           cp /etc/ssl/certs/VA-Internal-S2-RCA1-v1.cer.pem config/ca-trust/
 
       - name: View Containers
