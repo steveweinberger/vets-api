@@ -71,15 +71,14 @@ jobs:
         run: |
           cp /etc/ssl/certs/VA-Internal-S2-RCA1-v1.cer.pem config/ca-trust/
 
+      - name: Get container ID
+        run: |
+          echo "BUILDX_CONTAINER_ID=$(docker ps | grep buildkitd | cut -f1 -d' ' | tr -d '[:space:]')" >> $GITHUB_ENV
+
       - name: copy to docker
         run: |
-          echo "BULDX_CONTAINER_ID=$(docker ps | grep buildkitd | cut -f1 -d' ' | tr -d '[:space:]')" >> $GITHUB_ENV
-          echo $BULDX_CONTAINER_ID
-          docker cp config/ca-trust/VA-Internal-S2-RCA1-v1.cer.pem $BULDX_CONTAINER_ID:/usr/local/share/ca-certificates/
-          docker exec -d  $BULDX_CONTAINER_ID update-ca-certificates
-
-
-
+          docker cp config/ca-trust/VA-Internal-S2-RCA1-v1.cer.pem ${{ env.BUILDX_CONTAINER_ID }}:/usr/local/share/ca-certificates/
+          docker exec -d  ${{ env.BUILDX_CONTAINER_ID }} update-ca-certificates
 
       - name: Cache Docker layers
         uses: actions/cache@v2
