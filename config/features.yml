@@ -93,6 +93,10 @@ features:
     actor_type: user
     description: Feature gates the dependency verification modal for updating the diaries service.
     enable_in_development: true
+  dependents_pension_check:
+    actor_type: user
+    description: Manage whether or not Pension check is enabled for the 686/674
+    enable_in_development: true
   dependents_management:
     actor_type: user
     description: Manage dependent removal from view dependent page
@@ -107,6 +111,10 @@ features:
   evss_upload_limit_150mb:
     actor_type: user
     description: Allow user to upload files up to 150 MB in size (EVSS endpoint for 526 & CST)
+    enable_in_development: true
+  discharge_wizard_features:
+    actor_type: user
+    description: Iteration of new features for discharge wizard
     enable_in_development: true
   facilities_ppms_suppress_community_care:
     actor_type: user
@@ -156,9 +164,17 @@ features:
     actor_type: user
     description: Display new field operationalHoursSpecialInstructions for VA facilities
     enable_in_development: true
-  find_forms_mvp_enhancement:
+  find_forms_first_flag:
     actor_type: user
-    description: Enhances Find A Forms MVP.
+    description: Enhances Find A Forms Flag 1.
+    enable_in_development: true
+  find_forms_second_flag:
+    actor_type: user
+    description: Enhances Find A Forms Flag 2.
+    enable_in_development: true
+  find_forms_third_flag:
+    actor_type: user
+    description: Enhances Find A Forms Flag 3.
     enable_in_development: true
   file_upload_short_workflow_enabled:
     actor_type: user
@@ -333,10 +349,6 @@ features:
     actor_type: user
     description: Allows veterans to directly schedule VA appointments
     enable_in_development: true
-  va_online_scheduling_express_care_new:
-    actor_type: user
-    description: Enables Express Care request flow in VAOS
-    enable_in_development: true
   va_online_scheduling_facility_selection_v2_2:
     actor_type: user
     description: Set up toggle in anticipation of the next iteration of facility selection, version 2.2.
@@ -369,6 +381,10 @@ features:
     actor_type: user
     description: Toggle for new vaos service va appointments.
     enable_in_development: true
+  va_online_scheduling_facilities_service_v2:
+    actor_type: user
+    description: Toggle for new mobile facility service v2 endpoints
+    enable_in_development: true
   va_online_scheduling_variant_testing:
     actor_type: user
     enable_in_development: true
@@ -388,15 +404,10 @@ features:
     actor_type: user
     description: Enhances Yellow Ribbon MVP.
     enable_in_development: true
-  edu_form5490_updates:
-    actor_type: user
-    description: Form 5490 updates in support of Isakson and Roe legislation
-    enable_in_development: true
-  edu_form10203_updates:
-    actor_type: user
-    description: Form 10203 updates in support of Isakson and Roe legislation
-    enable_in_development: true
   check_in_experience_enabled:
     actor_type: user
     description: Enables the health care check-in experiences
     enable_in_development: true
+  ezcg_use_facility_api:
+    actor_type: user
+    description: Enables 1010EZ & 1010CG to use the Facility API instead of JSON schema
