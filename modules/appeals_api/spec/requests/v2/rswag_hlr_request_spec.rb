@@ -199,7 +199,10 @@ describe 'Higher-Level Reviews', swagger_doc: 'modules/appeals_api/app/swagger/a
     get 'Returns all contestable issues for a specific veteran.' do
       tags 'Higher-Level Reviews'
       operationId 'hlrContestableIssues'
-      description 'TBD'
+      description = 'Returns all issues associated with a Veteran that have not previously been decided by a ' \
+      'Higher-Level Review as of the receiptDate and bound by benefitType. Not all issues returned are guaranteed '\
+      'to be eligible for appeal. Associate these results when creating a new Higher-Level Review.'
+      description description
       security [
         { apikey: [] }
       ]
@@ -215,7 +218,109 @@ describe 'Higher-Level Reviews', swagger_doc: 'modules/appeals_api/app/swagger/a
       parameter AppealsApi::SwaggerSharedComponents.header_params[:va_receipt_date]
 
       response '200', 'JSON:API response returning all contestable issues for a specific veteran.' do
-        # still needs to be implemented
+        schema '$ref' => '#/components/schemas/contestableIssues'
+
+        let(:benefit_type) { 'compensation' }
+        let(:'X-VA-SSN') { '872958715' }
+        let(:'X-VA-Receipt-Date') { '2019-12-01' }
+
+        before do |example|
+          VCR.use_cassette('caseflow/higher_level_reviews/contestable_issues') do
+            submit_request(example.metadata)
+          end
+        end
+
+        after do |example|
+          example.metadata[:response][:content] = {
+            'application/json' => {
+              example: JSON.parse(response.body, symbolize_names: true)
+            }
+          }
+        end
+
+        it 'returns a 200 response' do |example|
+          assert_response_matches_metadata(example.metadata)
+        end
+      end
+
+      response '404', 'Veteran not found' do
+        schema JSON.parse(File.read(AppealsApi::Engine.root.join('spec', 'support', 'schemas', 'errors', '404.json')))
+
+        let(:benefit_type) { 'compensation' }
+        let(:'X-VA-SSN') { '000000000' }
+        let(:'X-VA-Receipt-Date') { '2019-12-01' }
+
+        before do |example|
+          VCR.use_cassette('caseflow/higher_level_reviews/not_found') do
+            submit_request(example.metadata)
+          end
+        end
+
+        after do |example|
+          example.metadata[:response][:content] = {
+            'application/json' => {
+              example: JSON.parse(response.body, symbolize_names: true)
+            }
+          }
+        end
+
+        it 'returns a 404 response' do |example|
+          assert_response_matches_metadata(example.metadata)
+        end
+      end
+
+      response '422', 'Bad receipt date' do
+        schema JSON.parse(File.read(AppealsApi::Engine.root.join('spec', 'support', 'schemas', 'errors',
+                                                                 'default.json')))
+
+        let(:benefit_type) { 'compensation' }
+        let(:'X-VA-SSN') { '872958715' }
+        let(:'X-VA-Receipt-Date') { '1900-01-01' }
+
+        before do |example|
+          VCR.use_cassette('caseflow/higher_level_reviews/bad_date') do
+            submit_request(example.metadata)
+          end
+        end
+
+        after do |example|
+          example.metadata[:response][:content] = {
+            'application/json' => {
+              example: JSON.parse(response.body, symbolize_names: true)
+            }
+          }
+        end
+
+        it 'returns a 422 response' do |example|
+          assert_response_matches_metadata(example.metadata)
+        end
+      end
+
+      response '502', 'Unknown error' do
+        # schema JSON.parse(File.read(AppealsApi::Engine.root.join('spec', 'support', 'schemas', 'errors', 'default.json')))
+        # #/errors/0/source is a string 'Appeals Caseflow' instead of an object...
+
+        let(:benefit_type) { 'compensation' }
+        let(:'X-VA-SSN') { '872958715' }
+        let(:'X-VA-Receipt-Date') { '2019-12-01' }
+
+        before do |example|
+          VCR.use_cassette('caseflow/higher_level_reviews/server_error') do
+            submit_request(example.metadata)
+          end
+        end
+
+        after do |example|
+          example.metadata[:response][:content] = {
+            'application/json' => {
+              example: JSON.parse(response.body, symbolize_names: true)
+            }
+          }
+        end
+
+        it 'returns a 502 response' do |example|
+          assert_response_matches_metadata(example.metadata)
+        end
       end
     end
   end

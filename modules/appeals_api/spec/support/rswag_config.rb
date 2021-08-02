@@ -357,6 +357,15 @@ class AppealsApi::RswagConfig
                 data
                 included
               ]
+            },
+            'contestableIssues': {
+              'type': 'object',
+              'properties': {
+                'data': {
+                  'type': 'array',
+                  'items': JSON.parse(File.read(AppealsApi::Engine.root.join('spec', 'support', 'schemas', 'contestable_issue.json')))
+                }
+              }
             }
           }
         },
