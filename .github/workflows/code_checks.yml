@@ -64,8 +64,6 @@ jobs:
       - name: Set up Docker Buildx
         id: buildx
         uses: docker/setup-buildx-action@v1
-        with:
-          driver-opts: network=host
 
       - name: View Containers
         run: docker ps --all
@@ -97,7 +95,7 @@ jobs:
           context: .
           target: builder
           push: true
-          tags: localhost:5000/vets-api:latest
+          tags: localhost:5000/vets-api:${{ github.sha }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new
 
