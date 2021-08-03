@@ -1344,12 +1344,12 @@
                   "minimum fields used": {
                     "value": {
                       "data": {
-                        "id": "b5dd756c-43db-4895-bef7-08b096ba09bf",
+                        "id": "28d718ba-049b-43e0-a57a-bde362e8d0d3",
                         "type": "higherLevelReview",
                         "attributes": {
                           "status": "pending",
-                          "updatedAt": "2021-08-02T22:05:28.364Z",
-                          "createdAt": "2021-08-02T22:05:28.364Z",
+                          "updatedAt": "2021-08-03T22:53:56.941Z",
+                          "createdAt": "2021-08-03T22:53:56.941Z",
                           "formData": {
                             "data": {
                               "type": "higherLevelReview",
@@ -1379,12 +1379,12 @@
                   "all fields used": {
                     "value": {
                       "data": {
-                        "id": "f1aaa600-c9c3-40e1-b027-cb7cefe42819",
+                        "id": "1dd5b5ef-4d0b-47b8-b6e3-e9d4b93a0113",
                         "type": "higherLevelReview",
                         "attributes": {
                           "status": "pending",
-                          "updatedAt": "2021-08-02T22:05:28.413Z",
-                          "createdAt": "2021-08-02T22:05:28.413Z",
+                          "updatedAt": "2021-08-03T22:53:57.000Z",
+                          "createdAt": "2021-08-03T22:53:57.000Z",
                           "formData": {
                             "data": {
                               "type": "higherLevelReview",
@@ -1776,12 +1776,12 @@
               "application/json": {
                 "example": {
                   "data": {
-                    "id": "19fbc39a-a500-4cbe-8822-38cb6569d382",
+                    "id": "15e35eb1-8254-4bdc-8032-779a91c940d9",
                     "type": "higherLevelReview",
                     "attributes": {
                       "status": "pending",
-                      "updatedAt": "2021-08-02T22:05:28.119Z",
-                      "createdAt": "2021-08-02T22:05:28.119Z",
+                      "updatedAt": "2021-08-03T22:53:56.574Z",
+                      "createdAt": "2021-08-03T22:53:56.574Z",
                       "formData": {
                         "data": {
                           "type": "higherLevelReview",
@@ -1977,7 +1977,7 @@
           "Higher-Level Reviews"
         ],
         "operationId": "hlrContestableIssues",
-        "description": "Returns all issues associated with a Veteran that havenot previously been decided by a Notice of Disagreementas of the `receiptDate`. Not all issues returned are guaranteed to be eligible for appeal.Associate these results when creating a new Notice of Disagreement.",
+        "description": "Returns all issues associated with a Veteran that have not previously been decided by a Higher-Level Review as of the receiptDate and bound by benefitType. Not all issues returned are guaranteed to be eligible for appeal. Associate these results when creating a new Higher-Level Review.",
         "security": [
           {
             "apikey": [
