@@ -123,10 +123,16 @@ jobs:
           rm -rf /tmp/.buildx-cache
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
-      - name: Setup Database
-        run: VETS_API_USER_ID=993 docker-compose -f docker-compose.test.yml run --rm --service-ports vets-api bash -c "RAILS_ENV=test DISABLE_BOOTSNAP=true parallel_test -e 'bundle exec rake db:reset'"
+      - name: Start Container
+        run: VETS_API_USER_ID=993 docker-compose -f docker-compose.test.yml run --service-ports vets-api
 
+      - name: View Containers
+        run: docker ps --all
 
+      - name: Remove containers
+        run: |
+          docker kill $(docker ps -q)
+          docker rm $(docker ps -a -q)
 
       # - name: Build
       #   run: env=$RAILS_ENV make build
