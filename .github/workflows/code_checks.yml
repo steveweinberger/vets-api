@@ -124,7 +124,7 @@ jobs:
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
       - name: Start Container
-        run: VETS_API_USER_ID=993 docker-compose -f docker-compose.test.yml run --service-ports vets-api --build-arg sidekiq_license=${{ env.BUNDLE_ENTERPRISE__CONTRIBSYS__COM }}
+        run: VETS_API_USER_ID=993 docker-compose -f docker-compose.test.yml up --service-ports vets-api --build-arg sidekiq_license=${{ env.BUNDLE_ENTERPRISE__CONTRIBSYS__COM }}
 
       - name: View Containers
         run: docker ps --all
