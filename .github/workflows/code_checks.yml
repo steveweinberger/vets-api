@@ -124,7 +124,7 @@ jobs:
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
       - name: Start Container
-        run: VETS_API_USER_ID=993 docker-compose -f docker-compose.test.yml start
+        run: docker-compose -f docker-compose.test.yml run --service-ports vets-api -d
 
       - name: View Containers
         run: docker ps --all
@@ -147,7 +147,7 @@ jobs:
       #   run: docker ps --all
 
       # - name: Setup Database
-      #   run: VETS_API_USER_ID=993 docker-compose -f docker-compose.test.yml run --rm --service-ports vets-api bash -c "RAILS_ENV=test DISABLE_BOOTSNAP=true parallel_test -e 'bundle exec rake db:reset'"
+      #   run: VETS_API_USER_ID=993 docker-compose -f docker-compose.test.yml run --service-ports vets-api -d
 
       # - name: Run Specs
       #   run: VETS_API_USER_ID=993 docker-compose -f docker-compose.test.yml run --rm --service-ports vets-api bash -c "DISABLE_BOOTSNAP=true bundle exec parallel_rspec spec/ modules/ -n 14 -o '--color --tty'"
