@@ -72,7 +72,6 @@ jobs:
         uses: docker/setup-buildx-action@v1
         with:
           driver-opts: network=host
-          buildkitd-flags: allow-insecure-entitlement
 
       - name: View Containers
         run: docker ps --all
@@ -92,13 +91,13 @@ jobs:
           cat /etc/resolv.conf
           docker exec -i ${{ env.BUILDX_CONTAINER_ID }} cat /etc/resolv.conf
 
-      - name: Cache Docker layers
-        uses: actions/cache@v2
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx2-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx2-
+      # - name: Cache Docker layers
+      #   uses: actions/cache@v2
+      #   with:
+      #     path: /tmp/.buildx-cache
+      #     key: ${{ runner.os }}-buildx2-${{ github.sha }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-buildx2-
 
       - name: Build and push
         uses: docker/build-push-action@v2
@@ -107,16 +106,16 @@ jobs:
           target: builder
           push: true
           tags: localhost:5000/vets-api:${{ github.sha }}
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache-new
+          # cache-from: type=local,src=/tmp/.buildx-cache
+          # cache-to: type=local,dest=/tmp/.buildx-cache-new
 
         # Temp fix
         # https://github.com/docker/build-push-action/issues/252
         # https://github.com/moby/buildkit/issues/1896
-      - name: Move cache
-        run: |
-          rm -rf /tmp/.buildx-cache
-          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+      # - name: Move cache
+      #   run: |
+      #     rm -rf /tmp/.buildx-cache
+      #     mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
       # - name: Build
       #   run: env=$RAILS_ENV make build
