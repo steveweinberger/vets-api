@@ -83,7 +83,7 @@ jobs:
         run: |
           docker cp config/ca-trust/VA-Internal-S2-RCA1-v1.cer.pem ${{ env.BUILDX_CONTAINER_ID }}:/usr/local/share/ca-certificates/
           docker exec -d  ${{ env.BUILDX_CONTAINER_ID }} update-ca-certificates
-          docker run --rm ${{ env.BUILDX_CONTAINER_ID }} "curl -Is https://github.com/department-of-veterans-affairs/apivore"
+          docker run --rm moby/buildkit:buildx-stable-1  "curl -Is https://github.com/department-of-veterans-affairs/apivore"
 
       - name: Cache Docker layers
         uses: actions/cache@v2
