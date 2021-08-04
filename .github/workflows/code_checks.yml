@@ -56,7 +56,9 @@ jobs:
     steps:
 
       - name: Remove containers
-        run: docker rm $(docker ps -a -q)
+        run: |
+          docker kill $(docker ps -q)
+          docker rm $(docker ps -a -q)
 
       - uses: actions/checkout@v2
 
