@@ -126,7 +126,7 @@ jobs:
       - name: Start Container
         run: |
           docker-compose -f docker-compose.test.yml run --service-ports -d vets-api
-          echo "VETS_API_CONTAINER_ID=$(docker ps | grep vets-api | cut -f1 -d' ' | tr -d '[:space:]')" >> $GITHUB_ENV
+          echo "VETS_API_CONTAINER_ID=$(docker ps | grep vets-api_run | cut -f1 -d' ' | tr -d '[:space:]')" >> $GITHUB_ENV
 
       - name: View Containers
         run: docker ps --all
