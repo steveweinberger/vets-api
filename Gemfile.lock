@@ -73,6 +73,21 @@ GIT
       script_utils (= 0.0.4)
 
 PATH
+  remote: /home/lihan/projects/ruby-mpi
+  specs:
+    mpi (0.1.0)
+      activemodel (>= 6.0)
+      activesupport (>= 6.0)
+      faraday (~> 0.17.4)
+      liquid (~> 5.0)
+      nokogiri (~> 1.11)
+      nori (~> 2.6)
+      ox (~> 2.14.4)
+      savon (~> 2.12)
+      semantic_logger (>= 4.7)
+      virtus (~> 2.0)
+
+PATH
   remote: modules
   specs:
     appeals_api (0.0.1)
@@ -1049,6 +1064,7 @@ DEPENDENCIES
   mimemagic (~> 0.4.3)
   mini_magick (~> 4.11.0)
   mobile!
+  mpi!
   net-sftp
   nokogiri (~> 1.11)
   notifications-ruby-client (~> 5.3)
