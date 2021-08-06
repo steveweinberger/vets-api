@@ -4,7 +4,7 @@ class AppealsApi::Docs::V2::DocsController < ApplicationController
   skip_before_action(:authenticate)
 
   SWAGGERED_CLASSES = [
-    # AppealsApi::V2::HigherLevelReviewsControllerSwagger,
+    AppealsApi::V2::HigherLevelReviewsControllerSwagger,
     AppealsApi::V1::NoticeOfDisagreementsControllerSwagger,
     AppealsApi::V1::Schemas::NoticeOfDisagreements,
     AppealsApi::V2::Schemas::HigherLevelReviews,
