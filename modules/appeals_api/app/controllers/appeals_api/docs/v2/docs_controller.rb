@@ -13,7 +13,19 @@ class AppealsApi::Docs::V2::DocsController < ApplicationController
   ].freeze
 
   def decision_reviews
+    # render json: decision_reviews_swagger_json
     swagger = JSON.parse(File.read(AppealsApi::Engine.root.join('app/swagger/appeals_api/v2/swagger.json')))
     render json: swagger
   end
+
+  private
+
+  # def decision_reviews_swagger_json
+  #   Swagger::Blocks.build_root_json(SWAGGERED_CLASSES)
+  #                  .deep_merge(
+  #                    AppealsApi::V2::Schemas::HigherLevelReviews.hlr_legacy_schemas
+  #                  ).deep_merge(
+  #                    AppealsApi::V1::Schemas::NoticeOfDisagreements.nod_json_schemas
+  #                  )
+  # end
 end
