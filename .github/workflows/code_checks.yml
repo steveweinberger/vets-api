@@ -129,6 +129,9 @@ jobs:
       - name: Setup Database
         run: env=$RAILS_ENV make spec_parallel_setup
 
+      - name: Run specs
+        run: env=$RAILS_ENV make spec_parallel
+
       - name: Remove containers
         run: |
           docker kill $(docker ps -q)
