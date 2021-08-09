@@ -49,6 +49,7 @@ USER vets-api
 # XXX: this is tacky
 RUN freshclam --config-file freshclam.conf
 RUN gem install vtk
+RUN bundle install --binstubs="${BUNDLE_APP_CONFIG}/bin" $bundler_opts
 ENTRYPOINT ["/usr/bin/dumb-init", "--", "./docker-entrypoint.sh"]
 
 ###

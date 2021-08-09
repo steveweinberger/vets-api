@@ -104,7 +104,7 @@ jobs:
             sidekiq_license=${{ env.BUNDLE_ENTERPRISE__CONTRIBSYS__COM }}
             BUILDKIT_INLINE_CACHE=1
           context: .
-          target: builder
+          target: development
           push: false
           load: true
           tags: vets-api:latest
