@@ -123,16 +123,16 @@ jobs:
           rm -rf /tmp/.buildx-cache
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
-      - name: Start Container
-        run: |
-          docker-compose -f docker-compose.test.yml run --service-ports -d vets-api
-          echo "VETS_API_CONTAINER_ID=$(docker ps | grep vets-api_run | cut -f1 -d' ' | tr -d '[:space:]')" >> $GITHUB_ENV
+      # - name: Start Container
+      #   run: |
+      #     docker-compose -f docker-compose.test.yml run --service-ports -d vets-api
+      #     echo "VETS_API_CONTAINER_ID=$(docker ps | grep vets-api_run | cut -f1 -d' ' | tr -d '[:space:]')" >> $GITHUB_ENV
 
-      - name: View Containers
-        run: docker ps --all
+      # - name: View Containers
+      #   run: docker ps --all
 
       - name: Setup Database
-        run: docker exec -i ${{ env.VETS_API_CONTAINER_ID }} "RAILS_ENV=test DISABLE_BOOTSNAP=true parallel_test -e 'bundle exec rake db:reset'"
+        run: docker-compose -f docker-compose.test.yml run --rm --service-ports vets-api bash -c "RAILS_ENV=test DISABLE_BOOTSNAP=true parallel_test -e 'bundle exec rake db:reset'"
 
       - name: Remove containers
         run: |
