@@ -132,7 +132,7 @@ jobs:
       #   run: docker ps --all
 
       - name: Setup Database
-        run: docker-compose -f docker-compose.test.yml run --rm --service-ports vets-api bash -c "RAILS_ENV=test DISABLE_BOOTSNAP=true parallel_test -e 'bundle exec rake db:reset'"
+        run: docker-compose -f docker-compose.test.yml run --rm --service-ports vets-api bash -c "touch /srv/vets-api/src/log/test.log && chmod 0666 /srv/vets-api/src/log/test.log && RAILS_ENV=test DISABLE_BOOTSNAP=true parallel_test -e 'bundle exec rake db:reset'"
 
       - name: Remove containers
         run: |
