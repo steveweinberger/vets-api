@@ -21,8 +21,6 @@ RUN mkdir -p /srv/vets-api/{clamav/database,pki/tls,secure,src} && \
     ln -s /srv/vets-api/pki /etc/pki
 # XXX: get rid of the CA trust manipulation when we have a better model for it
 COPY config/ca-trust/* /usr/local/share/ca-certificates/
-# COPY ../../../etc/ssl/certs/VA-Internal-S2-RCA1-v1.cer.pem /usr/local/share/ca-certificates/
-# RUN chmod 644 /usr/local/share/ca-certificates/VA-Internal-S2-RCA1-v1.cer.pem
 # rename .pem files to .crt because update-ca-certificates ignores files that are not .crt
 RUN cd /usr/local/share/ca-certificates ; for i in *.pem ; do mv $i ${i/pem/crt} ; done ; update-ca-certificates
 WORKDIR /srv/vets-api/src
@@ -49,7 +47,6 @@ USER vets-api
 # XXX: this is tacky
 RUN freshclam --config-file freshclam.conf
 RUN gem install vtk
-
 ENTRYPOINT ["/usr/bin/dumb-init", "--", "./docker-entrypoint.sh"]
 
 ###
@@ -67,7 +64,8 @@ COPY --chown=vets-api:vets-api . .
 USER vets-api
 # --no-cache doesn't do the right thing, so trim it during build
 # https://github.com/bundler/bundler/issues/6680
-RUN bundle install --binstubs="${BUNDLE_APP_CONFIG}/bin" $bundler_opts
+RUN bundle install --binstubs="${BUNDLE_APP_CONFIG}/bin" $bundler_opts && \
+    find ${BUNDLE_APP_CONFIG}/cache -type f -name \*.gem -delete
 
 ###
 # prod stage; default if no target given
