@@ -38,5 +38,7 @@ services:
       - postgres
     links:
       - postgres
+    tmpfs:
+      - /tmp
 volumes:
   test_bundle:
