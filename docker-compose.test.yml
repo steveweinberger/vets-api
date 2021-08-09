@@ -9,7 +9,7 @@ services:
   vets-api:
     build:
       context: .
-      target: builder
+      target: development
       args:
         sidekiq_license: "${BUNDLE_ENTERPRISE__CONTRIBSYS__COM}"
         userid: "${VETS_API_USER_ID}"
