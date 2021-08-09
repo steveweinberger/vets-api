@@ -66,8 +66,7 @@ COPY --chown=vets-api:vets-api . .
 USER vets-api
 # --no-cache doesn't do the right thing, so trim it during build
 # https://github.com/bundler/bundler/issues/6680
-RUN bundle install --binstubs="${BUNDLE_APP_CONFIG}/bin" $bundler_opts && \
-    find ${BUNDLE_APP_CONFIG}/cache -type f -name \*.gem -delete
+RUN bundle install --binstubs="${BUNDLE_APP_CONFIG}/bin" $bundler_opts
 
 ###
 # prod stage; default if no target given
