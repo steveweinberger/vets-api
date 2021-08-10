@@ -15,7 +15,7 @@ services:
         userid: "${VETS_API_USER_ID}"
     image: "vets-api:${DOCKER_IMAGE:-latest}"
     volumes:
-      - "/home/runner/runner1/_work/vets-api/vets-api/vendor/bundle:/usr/local/"
+      - "/home/runner/runner1/_work/vets-api/vets-api/vendor/bundle/gems:/usr/local/bundle"
 
     environment:
       "Settings.database_url": "postgis://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@${POSTGRES_HOST:-postgres}:${POSTGRES_PORT:-5432}/${POSTGRES_DATABASE:-vets_api_development}?pool=4"
