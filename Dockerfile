@@ -52,6 +52,7 @@ COPY --chown=vets-api:vets-api . .
 USER vets-api
 RUN bundle install --binstubs="${BUNDLE_APP_CONFIG}/bin" $bundler_opts && \
     find ${BUNDLE_APP_CONFIG}/cache -type f -name \*.gem -delete
+
 ENTRYPOINT ["/usr/bin/dumb-init", "--", "./docker-entrypoint.sh"]
 
 ###
