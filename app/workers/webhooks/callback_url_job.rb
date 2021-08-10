@@ -40,7 +40,7 @@ module Webhooks
           successful = @response.success?
           attempt_response = { 'status' => @response.status, 'body' => @response.body[0...MAX_BODY_LENGTH] }
         else
-          attempt_response = { 'exception' => @response.message }
+          attempt_response = { 'exception' => {'type' => @response.class, 'message' => @response.message} }
         end
 
         # create the notification attempt record
@@ -80,3 +80,4 @@ module Webhooks
     end
   end
 end
+# {401: 5, 543: 6, exception: 7, unseccsful: 5 + 6, total: 5+6+7}
