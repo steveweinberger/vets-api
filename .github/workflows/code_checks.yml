@@ -100,9 +100,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx2-${{ github.sha }}
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
           restore-keys: |
-            ${{ runner.os }}-buildx2-
+            ${{ runner.os }}-buildx-
 
       - name: Build
         uses: docker/build-push-action@v2
@@ -114,16 +114,16 @@ jobs:
           push: false
           load: true
           tags: vets-api:${{ env.DOCKER_IMAGE }}
-          cache-from: type=local,src=/tmp/.buildx2-cache
-          cache-to: type=local,dest=/tmp/.buildx2-cache-new
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new
 
       # Temp fix
       # https://github.com/docker/build-push-action/issues/252
       # https://github.com/moby/buildkit/issues/1896
       - name: Move cache
         run: |
-          rm -rf /tmp/.buildx2-cache
-          mv /tmp/.buildx2-cache-new /tmp/.buildx2-cache
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
       # - name: Start Container
       #   run: |
