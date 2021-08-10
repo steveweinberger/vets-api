@@ -15,6 +15,8 @@ module Webhooks
     class << self
       attr_reader :supported_events, :event_to_api_name, :api_name_to_time_block, :api_name_to_retries
 
+      # Methods here are class methods that do not mix in.
+
       def included(base)
         base.extend ClassMethods
       end
@@ -52,6 +54,14 @@ module Webhooks
     end
 
     module ClassMethods
+
+      # place methods that might be run at class load time here. They mix in as class methods.
+      # For example:
+      # class Foo
+      # include Webhooks::Utilities
+      # register_events ...# method is visible as a mixed in class method
+      # end
+
       def register_events(*event, **keyword_args, &block)
         raise ArgumentError, 'Block required to yield next execution time!' unless block_given?
         raise ArgumentError, 'api_name argument required' unless keyword_args.key? :api_name
@@ -70,6 +80,7 @@ module Webhooks
         end
       end
 
+      # todo move this method out of ClassMethods, it should invoke as an instance method.
       def fetch_events(subscription)
         subscription['subscriptions'].map do |e|
           e['event']
