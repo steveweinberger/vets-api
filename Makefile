@@ -1,5 +1,5 @@
 $stdout.sync = true
-export VETS_API_USER_ID  := 993
+export VETS_API_USER_ID  := $(shell id -u)
 
 ifdef env
     ENV_ARG  := $(env)
