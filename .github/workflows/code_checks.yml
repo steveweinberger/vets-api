@@ -133,16 +133,16 @@ jobs:
       # - name: View Containers
       #   run: docker ps --all
 
-      - name: Setup Database
-        run: env=$RAILS_ENV make spec_parallel_setup
+      # - name: Setup Database
+      #   run: env=$RAILS_ENV make spec_parallel_setup
 
-      - name: Run specs
-        run: env=$RAILS_ENV make spec_parallel
+      # - name: Run specs
+      #   run: env=$RAILS_ENV make spec_parallel
 
-      - name: Remove containers
-        run: |
-          docker kill $(docker ps -q)
-          docker rm $(docker ps -a -q)
+      # - name: Remove containers
+      #   run: |
+      #     docker kill $(docker ps -q)
+      #     docker rm $(docker ps -a -q)
 
       # - name: Build
       #   run: env=$RAILS_ENV make build
