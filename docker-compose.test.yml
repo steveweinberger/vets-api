@@ -15,7 +15,7 @@ services:
         userid: "${VETS_API_USER_ID}"
     image: "vets-api:${DOCKER_IMAGE:-latest}"
     volumes:
-      - test_bundle:/opt/hostedtoolcache/Ruby/2.6.6/x64/bin/bundle
+      - "/usr/local/bundle:/opt/hostedtoolcache/Ruby/2.6.6/x64/bin/bundle"
     environment:
       "Settings.database_url": "postgis://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@${POSTGRES_HOST:-postgres}:${POSTGRES_PORT:-5432}/${POSTGRES_DATABASE:-vets_api_development}?pool=4"
       "Settings.test_database_url": "postgis://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@${POSTGRES_HOST:-postgres}:${POSTGRES_PORT:-5432}/${POSTGRES_DATABASE:-vets_api_test}"
@@ -39,5 +39,3 @@ services:
       - postgres
     tmpfs:
       - /tmp
-volumes:
-  test_bundle:
