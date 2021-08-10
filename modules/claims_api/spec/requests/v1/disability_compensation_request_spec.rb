@@ -18,11 +18,13 @@ RSpec.describe 'Disability Claims ', type: :request do
   end
 
   describe '#526' do
+    let(:claim_date) { (Time.zone.today - 1.day).to_s }
     let(:auto_cest_pdf_generation_disabled) { false }
     let(:data) do
       temp = File.read(Rails.root.join('modules', 'claims_api', 'spec', 'fixtures', 'form_526_json_api.json'))
       temp = JSON.parse(temp)
       temp['data']['attributes']['autoCestPDFGenerationDisabled'] = auto_cest_pdf_generation_disabled
+      temp['data']['attributes']['claimDate'] = claim_date
 
       temp.to_json
     end
@@ -440,6 +442,21 @@ RSpec.describe 'Disability Claims ', type: :request do
           end
         end
       end
+
+      context 'when consumer is Veteran' do
+        it 'adds person to MPI' do
+          with_okta_user(scopes) do |auth_header|
+            VCR.use_cassette('evss/claims/claims') do
+              VCR.use_cassette('mpi/add_person/add_person_success') do
+                VCR.use_cassette('mpi/find_candidate/orch_search_with_attributes') do
+                  expect_any_instance_of(MPIData).to receive(:add_person).once.and_call_original
+                  post path, params: data, headers: auth_header
+                end
+              end
+            end
+          end
+        end
+      end
     end
 
     context 'when Veteran has participant_id' do
@@ -454,6 +471,23 @@ RSpec.describe 'Disability Claims ', type: :request do
               post path, params: data, headers: headers.merge(auth_header)
               expect(response.status).to eq(422)
             end
+          end
+        end
+      end
+    end
+
+    context 'when submitted claim_date is in the future' do
+      let(:claim_date) { (Time.zone.today + 1.day).to_s }
+
+      before do
+        stub_mpi
+      end
+
+      it 'responds with bad request' do
+        with_okta_user(scopes) do |auth_header|
+          VCR.use_cassette('evss/claims/claims') do
+            post path, params: data, headers: headers.merge(auth_header)
+            expect(response.status).to eq(400)
           end
         end
       end
