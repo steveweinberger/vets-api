@@ -83,6 +83,9 @@ jobs:
       - name: Kill cache
         run: |
           rm -rf /tmp/.buildx-cache
+          rm -rf /tmp/.buildx2-cache
+          rm -rf /tmp/.buildx-cache-new
+          rm -rf /tmp/.buildx2-cache-new
           docker buildx prune -f
 
       - name: View Containers
