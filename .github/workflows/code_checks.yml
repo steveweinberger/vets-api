@@ -100,9 +100,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}-${{ env.DOCKER_IMAGE }}
+          key: ${{ runner.os }}-buildx-${{ secrets.CACHE_VERSION }}-${{ github.sha }}
           restore-keys: |
-            ${{ runner.os }}-buildx-
+            ${{ runner.os }}-buildx-${{ secrets.CACHE_VERSION }}-
 
       - name: Build
         uses: docker/build-push-action@v2
