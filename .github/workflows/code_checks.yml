@@ -83,7 +83,7 @@ jobs:
       - name: Kill cache
         run: |
           rm -rf /tmp/.buildx-cache
-          docker buildx prune
+          docker buildx prune -f
 
       - name: View Containers
         run: docker ps --all
