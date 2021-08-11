@@ -1,11 +1,6 @@
 # frozen_string_literal: true
 
 require 'common/exceptions'
-require './lib/webhooks/utilities'
-load './lib/webhooks/utilities.rb'
-load './app/models/webhooks/utilities.rb' #
-# load './lib/webhooks/registrations.rb'
-load './modules/vba_documents/lib/vba_documents/webhooks_registrations'
 
 module V1::Webhooks
   class RegistrationController < ApplicationController

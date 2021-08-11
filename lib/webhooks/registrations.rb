@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-# add registrations here:
-require './modules/vba_documents/lib/vba_documents/webhooks_registrations'
+# add registrations here (The initializer Webhooks.rb kicks things off):
+load './modules/vba_documents/lib/vba_documents/webhooks_registrations.rb'
 
 # Sample registration:
 # Make sure all exceptions are handled (This is critical). If you let it leak, we default to one hour from now.
