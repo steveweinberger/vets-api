@@ -48,4 +48,4 @@ services:
     tmpfs:
       - /tmp
     volumes:
-      test_bundle: {}
+      test_bundle:
