@@ -17,7 +17,7 @@ services:
     user: root
     volumes:
       - ".:/srv/vets-api/src"
-      - "${BUNDLE_PATH}:/usr/local/bundle, readonly"
+      - "${HOST_BUNDLE_PATH}:/usr/local/bundle, readonly"
     environment:
       "Settings.database_url": "postgis://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@${POSTGRES_HOST:-postgres}:${POSTGRES_PORT:-5432}/${POSTGRES_DATABASE:-vets_api_development}?pool=4"
       "Settings.test_database_url": "postgis://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@${POSTGRES_HOST:-postgres}:${POSTGRES_PORT:-5432}/${POSTGRES_DATABASE:-vets_api_test}"

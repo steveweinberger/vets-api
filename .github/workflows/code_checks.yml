@@ -87,7 +87,7 @@ jobs:
         run: |
           $BUNDLE_PATH
           cp /etc/ssl/certs/VA-Internal-S2-RCA1-v1.cer.pem config/ca-trust/
-          echo "BUNDLE_PATH=$(bundle config path | tr -d '[:space:]' | cut -d':' -f2 | tr -d '"')" >> $GITHUB_ENV
+          echo "HOST_BUNDLE_PATH=$(bundle config path | tr -d '[:space:]' | cut -d':' -f2 | tr -d '"')" >> $GITHUB_ENV
 
       - name: Get container ID
         run: |
