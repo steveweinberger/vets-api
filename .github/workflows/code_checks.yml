@@ -85,9 +85,9 @@ jobs:
 
       - name: Copy Certificate
         run: |
-          $PATH
+          $BUNDLE_PATH
           cp /etc/ssl/certs/VA-Internal-S2-RCA1-v1.cer.pem config/ca-trust/
-          echo "BUNDLE_PATH=$($PATH)" >> $GITHUB_ENV
+          echo "BUNDLE_PATH_TEST=$($BUNDLE_PATH)" >> $GITHUB_ENV
 
       - name: Get container ID
         run: |
