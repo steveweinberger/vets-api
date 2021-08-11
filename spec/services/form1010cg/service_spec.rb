@@ -8,6 +8,7 @@ RSpec.describe Form1010cg::Service do
 
   let(:subject) { described_class.new build(:caregivers_assistance_claim) }
   let(:default_email_on_mvi_search) { 'no-email@example.com' }
+  let(:facility_label) { '740 - Harlingen VA Clinic' }
 
   describe '::auditor' do
     it 'is an instance of Form1010cg::Auditor' do
@@ -53,7 +54,7 @@ RSpec.describe Form1010cg::Service do
     let(:poa_attachment_path) { 'tmp/poa_file.jpg' }
 
     before do
-      expect(claim).to receive(:to_pdf).with(sign: true).and_return(claim_pdf_path)
+      expect(claim).to receive(:to_pdf).with(facility_label: facility_label, sign: true).and_return(claim_pdf_path)
     end
 
     context 'when "poaAttachmentId" is not provided on claim' do
@@ -61,7 +62,7 @@ RSpec.describe Form1010cg::Service do
 
       it 'returns the claim pdf path only' do
         expect(
-          described_class.collect_attachments(claim)
+          described_class.collect_attachments(claim, facility_label)
         ).to eq(
           [claim_pdf_path, nil]
         )
@@ -76,7 +77,7 @@ RSpec.describe Form1010cg::Service do
       context 'when the Form1010cg::Attachment is not found' do
         it 'returns the claim pdf path only' do
           expect(
-            described_class.collect_attachments(claim)
+            described_class.collect_attachments(claim, facility_label)
           ).to eq(
             [claim_pdf_path, nil]
           )
@@ -113,7 +114,7 @@ RSpec.describe Form1010cg::Service do
 
         it 'returns the claim pdf path and attachment path' do
           expect(
-            described_class.collect_attachments(claim)
+            described_class.collect_attachments(claim, facility_label)
           ).to eq(
             [claim_pdf_path, poa_attachment_path]
           )

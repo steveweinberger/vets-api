@@ -18,9 +18,9 @@ module Form1010cg
     NOT_FOUND = 'NOT_FOUND'
     AUDITOR = Form1010cg::Auditor.new
 
-    def self.collect_attachments(claim)
+    def self.collect_attachments(claim, facility_label = nil)
       poa_attachment_id   = claim.parsed_form['poaAttachmentId']
-      claim_pdf_path      = claim.to_pdf(sign: true)
+      claim_pdf_path      = claim.to_pdf(sign: true, facility_label: facility_label)
       poa_attachment_path = nil
 
       if poa_attachment_id
@@ -68,7 +68,7 @@ module Form1010cg
     # Will submit the claim to CARMA.
     #
     # @return [Form1010cg::Submission]
-    def process_claim!
+    def process_claim!(facility_label = nil)
       raise 'submission already present' if submission.present?
 
       assert_veteran_status
@@ -81,14 +81,14 @@ module Form1010cg
         metadata: carma_submission.request_body['metadata']
       )
 
-      submit_attachment_async
+      submit_attachment_async(facility_label)
       submission
     end
 
-    def submit_attachment_async
+    def submit_attachment_async(facility_label = nil)
       submission.claim = claim
       submission.save
-      submission.attachments_job_id = Form1010cg::DeliverAttachmentsJob.perform_async(submission.claim_guid)
+      submission.attachments_job_id = Form1010cg::DeliverAttachmentsJob.perform_async(submission.claim_guid, facility_label)
     rescue => e
       Rails.logger.error(e)
     end

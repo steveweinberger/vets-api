@@ -492,7 +492,7 @@ module PdfFill
 
         merge_primary_caregiver_has_health_insurance_helper
         merge_veteran_last_treatment_facility_helper
-        merge_planned_facility_label_helper
+        merge_planned_facility_label_helper(options[:facility_label])
 
         @form_data
       end
@@ -570,12 +570,10 @@ module PdfFill
         }
       end
 
-      def merge_planned_facility_label_helper
-        target_facility_code = @form_data.dig 'veteran', 'plannedClinic'
-        caregiver_facilities = VetsJsonSchema::CONSTANTS['caregiverProgramFacilities'].values.flatten
-        selected_facility = caregiver_facilities.find { |facility| facility['code'] == target_facility_code }
-        display_value = selected_facility.nil? ? nil : "#{selected_facility['code']} - #{selected_facility['label']}"
-        @form_data['helpers']['veteran']['plannedClinic'] = display_value
+      def merge_planned_facility_label_helper(facility_label)
+        # facility_label is an optional parameter, important to fall back to original form value if absent or blank
+        facility_label = @form_data['veteran']['plannedClinic'] if facility_label.blank?
+        @form_data['helpers']['veteran']['plannedClinic'] = facility_label
       end
 
       def generate_signiture_timestamp

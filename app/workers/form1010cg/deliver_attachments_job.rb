@@ -8,10 +8,10 @@ module Form1010cg
 
     include Sidekiq::Worker
 
-    def perform(claim_guid)
+    def perform(claim_guid, facility_label = nil)
       find_submission(claim_guid)
 
-      claim_pdf_path, poa_attachment_path = Form1010cg::Service.collect_attachments(submission.claim)
+      claim_pdf_path, poa_attachment_path = Form1010cg::Service.collect_attachments(submission.claim, facility_label)
 
       # ::submit_attachment! does an "upsert" of the document in CARMA,
       # so this job can safely be executed multiple times.
@@ -23,6 +23,7 @@ module Form1010cg
       )
 
       record_success(claim_guid, submission.carma_case_id, carma_attachments.to_hash)
+
       delete_files(claim_pdf_path, poa_attachment_path)
       delete_resources(poa_attachment_path.present?)
     end

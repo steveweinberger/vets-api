@@ -59,7 +59,8 @@ describe PdfFill::Filler, type: :model do
         input_data_fixture_dir: 'pdf_fill/10-10CG',
         output_pdf_fixture_dir: 'pdf_fill/10-10CG/unsigned',
         fill_options: {
-          sign: false
+          sign: false,
+          facility_label: '740 - Harlingen VA Clinic'
         }
       },
       {
@@ -68,7 +69,18 @@ describe PdfFill::Filler, type: :model do
         input_data_fixture_dir: 'pdf_fill/10-10CG',
         output_pdf_fixture_dir: 'pdf_fill/10-10CG/signed',
         fill_options: {
-          sign: true
+          sign: true,
+          facility_label: '740 - Harlingen VA Clinic'
+        }
+      },
+      # important to have an example that has no facility label to test the default fallback behavior
+      {
+        form_id: '10-10CG',
+        factory: :caregivers_assistance_claim,
+        input_data_fixture_dir: 'pdf_fill/10-10CG',
+        output_pdf_fixture_dir: 'pdf_fill/10-10CG/no_facility_label',
+        fill_options: {
+          sign: false
         }
       },
       {

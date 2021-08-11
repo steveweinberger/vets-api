@@ -11,6 +11,7 @@ RSpec.describe Form1010cg::DeliverAttachmentsJob do
   end
 
   describe '#perform' do
+    let(:facility_label) { '740 - Harlingen VA Clinic' }
     let(:vcr_options) do
       {
         aws: {
@@ -47,7 +48,7 @@ RSpec.describe Form1010cg::DeliverAttachmentsJob do
           expect(Raven).to receive(:tags_context).with(claim_guid: claim_guid)
           expect(Form1010cg::Service).to receive(
             :collect_attachments
-          ).with(claim).and_return([pdf_file_path, nil])
+          ).with(claim, facility_label).and_return([pdf_file_path, nil])
           expect(Form1010cg::Service).to receive(:submit_attachments!).with(
             submission.carma_case_id,
             claim.veteran_data['fullName'],
@@ -72,7 +73,7 @@ RSpec.describe Form1010cg::DeliverAttachmentsJob do
         end
 
         it 'processes the claim PDF' do
-          subject.perform(claim_guid)
+          subject.perform(claim_guid, facility_label)
         end
       end
 
@@ -104,7 +105,7 @@ RSpec.describe Form1010cg::DeliverAttachmentsJob do
           expect(Raven).to receive(:tags_context).with(claim_guid: claim_guid)
           expect(Form1010cg::Service).to receive(
             :collect_attachments
-          ).with(claim).and_return([pdf_file_path, poa_attachment_path])
+          ).with(claim, facility_label).and_return([pdf_file_path, poa_attachment_path])
           expect(Form1010cg::Service).to receive(:submit_attachments!).with(
             submission.carma_case_id,
             claim.veteran_data['fullName'],
@@ -135,13 +136,13 @@ RSpec.describe Form1010cg::DeliverAttachmentsJob do
         end
 
         it 'processes the claim PDF and POA attachment' do
-          subject.perform(claim_guid)
+          subject.perform(claim_guid, facility_label)
         end
       end
 
       it 'requires a claim_guid' do
         expect { subject.perform }.to raise_error(ArgumentError) do |error|
-          expect(error.message).to eq('wrong number of arguments (given 0, expected 1)')
+          expect(error.message).to eq('wrong number of arguments (given 0, expected 1..2)')
         end
       end
 
@@ -199,9 +200,10 @@ RSpec.describe Form1010cg::DeliverAttachmentsJob do
         end
 
         it 'raises error' do
-          expect(Form1010cg::Service).to receive(:collect_attachments).with(claim).and_raise(pdf_generation_exception)
+          expect(Form1010cg::Service).to receive(:collect_attachments)
+            .with(claim, facility_label).and_raise(pdf_generation_exception)
 
-          expect { subject.perform(claim_guid) }.to raise_error(pdf_generation_exception.class) do |error|
+          expect { subject.perform(claim_guid, facility_label) }.to raise_error(pdf_generation_exception.class) do |error|
             expect(error.message).to eq(pdf_generation_exception.message)
           end
         end
@@ -314,7 +316,7 @@ RSpec.describe Form1010cg::DeliverAttachmentsJob do
         it 'sends the claim PDF to CARMA' do
           VCR.use_cassette('carma/auth/token/200', vcr_options[:carma]) do
             VCR.use_cassette('carma/attachments/upload/claim-pdf/201', vcr_options[:carma]) do
-              subject.perform(claim_guid)
+              subject.perform(claim_guid, facility_label)
             end
           end
 
@@ -360,7 +362,7 @@ RSpec.describe Form1010cg::DeliverAttachmentsJob do
             VCR.use_cassette('carma/auth/token/200', vcr_options[:carma]) do
               VCR.use_cassette('carma/attachments/upload/claim-pdf-and-poa/201', vcr_options[:carma]) do
                 VCR.use_cassette("s3/object/delete/#{poa_attachment_guid}/doctors-note.jpg", vcr_options[:aws]) do
-                  subject.perform(claim_guid)
+                  subject.perform(claim_guid, facility_label)
                 end
               end
             end
