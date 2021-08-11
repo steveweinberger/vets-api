@@ -15,11 +15,6 @@ services:
         userid: "${VETS_API_USER_ID}"
     image: "vets-api:${DOCKER_IMAGE:-latest}"
     volumes:
-      - ".:/srv/vets-api/src"
-      - type: volume
-        source: test_bundle
-        target: /usr/local/bundle
-
       - type: bind
         source: ${HOST_BUNDLE_PATH}
         target: /usr/local/bundle
@@ -47,5 +42,3 @@ services:
       - postgres
     tmpfs:
       - /tmp
-    volumes:
-      test_bundle:
