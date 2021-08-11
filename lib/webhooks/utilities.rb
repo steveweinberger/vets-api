@@ -14,6 +14,7 @@ module Webhooks
 
     class << self
       attr_reader :supported_events, :event_to_api_name, :api_name_to_time_block, :api_name_to_retries
+      attr_reader :api_name_to_failure_block
 
       # Methods here are class methods that do not mix in.
 
@@ -35,6 +36,11 @@ module Webhooks
       def register_name_to_event(name, event)
         @event_to_api_name ||= {}
         @event_to_api_name[event] = name
+      end
+
+      def register_name_to_failure_block(name, block)
+        @api_name_to_failure_block ||= {}
+        @api_name_to_failure_block[name] = block
       end
 
       def register_name_to_time_block(name, block)
@@ -78,6 +84,11 @@ module Webhooks
           Webhooks::Utilities.register_name_to_retries(api_name, max_retries)
           Webhooks::Utilities.register_name_to_time_block(api_name, block)
         end
+      end
+
+      def register_failure_handler(api_name:, &block)
+        raise ArgumentError, 'Block required to calculate callback url failure retry times!' unless block_given?
+        Webhooks::Utilities.register_name_to_failure_block(api_name, block)
       end
 
       # todo move this method out of ClassMethods, it should invoke as an instance method.
@@ -143,9 +154,7 @@ module Webhooks
   end
 end
 # rubocop:enable ThreadSafety/InstanceVariableInClassMethod
-# ADD YOUR REGISTRATIONS BELOW
 require './lib/webhooks/registrations'
-# ADD YOUR REGISTRATIONS ABOVE
 # Rails.env = 'test'
 unless Rails.env.test?
   Webhooks::Utilities.supported_events.freeze

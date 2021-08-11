@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 # add registrations here (The initializer Webhooks.rb kicks things off):
+# use load
 load './modules/vba_documents/lib/vba_documents/webhooks_registrations.rb'
 
 # Sample registration:
@@ -9,6 +10,8 @@ load './modules/vba_documents/lib/vba_documents/webhooks_registrations.rb'
 # last_time_async_scheduled is the last time the async call was made to do the batch notification.
 # last_time_async_scheduled always reverts to nil with each deploy.
 #
+# module Registrations
+#     include Webhooks::Utilities
 #     register_events("gov.va.developer.benefits-intake.status_change",
 #                     "gov.va.developer.benefits-intake.status_change2",
 #                      api_name: "PLAY_API", max_retries: 3) do |last_time_async_scheduled|
@@ -22,4 +25,4 @@ load './modules/vba_documents/lib/vba_documents/webhooks_registrations.rb'
 #     rescue
 #       5.seconds.from_now
 #     end
-#
+# end

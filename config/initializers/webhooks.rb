@@ -1,11 +1,14 @@
 # frozen_string_literal: true
 
 Rails.application.reloader.to_prepare do
-  require './lib/webhooks/utilities'
-  events_empty= Webhooks::Utilities.supported_events.empty? rescue true # todo find the incantation to shut the linter up
-  if (Rails.env.development? && events_empty)
-    load './lib/webhooks/utilities.rb'
-    load './app/models/webhooks/utilities.rb' #
-    load './lib/webhooks/registrations.rb'
+  if (Rails.env.development?)
+    Object.send(:remove_const, Webhooks::Utilities) rescue nil # todo shut linter up, don't let it refactor this
+    libs = %w(./lib/webhooks/utilities.rb ./app/models/webhooks/utilities.rb ./lib/webhooks/registrations.rb).map do |f|
+      File.expand_path f
+    end
+    libs.each do |l|
+      $LOADED_FEATURES.delete(l)
+    end
   end
+  require './lib/webhooks/utilities'
 end
