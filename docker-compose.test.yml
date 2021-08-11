@@ -44,5 +44,3 @@ services:
       - postgres
     tmpfs:
       - /tmp
-    volumes:
-      test_bundle:
