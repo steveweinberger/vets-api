@@ -136,7 +136,7 @@ spec_parallel_setup:  ## Setup the parallel test dbs. This resets the current te
 ifeq ($(ENV_ARG), dev)
 	@$(BASH_DEV) "RAILS_ENV=test DISABLE_BOOTSNAP=true parallel_test -e 'bundle exec rake db:reset'"
 else
-	@$(COMPOSE_TEST) $(BASH) -c "rmdir /usr/local/bundle"
+	@$(COMPOSE_TEST) $(BASH) -c "chmod -R 0777 /usr/local/bundle"
 endif
 
 .PHONY: spec_parallel
