@@ -85,12 +85,13 @@ jobs:
 
       - name: Copy Certificate
         run: |
+          $BUNDLE_PATH
           cp /etc/ssl/certs/VA-Internal-S2-RCA1-v1.cer.pem config/ca-trust/
-          echo "BUNDLE_PATH=$(bundle config path | cut -d':' -f2 | cut -d':' -f2)" >> $GITHUB_ENV
+          echo "BUNDLE_PATH=$(bundle config path | cut -d':' -f2 | tr -d '[:space:]')" >> $GITHUB_ENV
 
       - name: Get container ID
         run: |
-          echo "BUILDX_CONTAINER_ID=$(docker ps | grep buildkitd | cut -f1 -d' ' cut -d':' -f2)" >> $GITHUB_ENV
+          echo "BUILDX_CONTAINER_ID=$(docker ps | grep buildkitd | cut -f1 -d' ' | tr -d '[:space:]')" >> $GITHUB_ENV
 
       - name: Copy to Buildx container
         run: |
