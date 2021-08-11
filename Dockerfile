@@ -67,6 +67,15 @@ USER vets-api
 RUN bundle install --binstubs="${BUNDLE_APP_CONFIG}/bin" $bundler_opts && \
     find ${BUNDLE_APP_CONFIG}/cache -type f -name \*.gem -delete
 
+
+FROM base AS k8s
+
+ENV RAILS_ENV=production
+COPY --from=builder $BUNDLE_APP_CONFIG $BUNDLE_APP_CONFIG
+COPY --from=builder --chown=vets-api:vets-api /srv/vets-api/src ./
+USER vets-api
+ENTRYPOINT ["/bin/bash"]
+
 ###
 # prod stage; default if no target given
 # to build prod you probably want options like below to get a good build
