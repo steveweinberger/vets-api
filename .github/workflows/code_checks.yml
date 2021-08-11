@@ -86,7 +86,6 @@ jobs:
       - name: Copy Certificate
         run: |
           cp /etc/ssl/certs/VA-Internal-S2-RCA1-v1.cer.pem config/ca-trust/
-          chmod -R 0777 /home/runner/runner1/_work/vets-api/vets-api/vendor/bundle
 
       - name: Get container ID
         run: |
