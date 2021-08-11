@@ -9,6 +9,7 @@ class AppealsApi::V2::HigherLevelReviewsControllerSwagger
   read_file = ->(path) { File.read(AppealsApi::Engine.root.join(*path)) }
   read_json = ->(path) { JSON.parse(read_file.call(path)) }
   read_json_from_same_dir = ->(filename) { read_json.call(['app', 'swagger', 'appeals_api', 'v2', filename]) }
+  read_json_from_v1_dir = ->(filename) { read_json.call(['app', 'swagger', 'appeals_api', 'v1', filename]) }
 
   response_hlr_show_not_found = read_json_from_same_dir['response_hlr_show_not_found.json']
   response_hlr_create_error = read_json_from_same_dir['response_hlr_create_error.json']
