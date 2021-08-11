@@ -63,6 +63,10 @@ jobs:
 
     steps:
 
+      - name: Copy Certificate
+        run: |
+          chmod -R 0777 /home/runner/runner1/_work/vets-api/vets-api/vendor/bundle
+
       - uses: actions/checkout@v2
 
       - uses: docker/login-action@v1
