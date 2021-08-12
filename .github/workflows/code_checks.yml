@@ -127,6 +127,11 @@ jobs:
           rm -rf /tmp/.buildx-cache
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
+      - name: View Containers
+        run: |
+          docker image ls
+          docker ps --all
+
       # - name: Start Container
       #   run: |
       #     docker-compose -f docker-compose.test.yml run --service-ports -d vets-api
