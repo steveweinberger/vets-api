@@ -141,10 +141,21 @@ jobs:
       #   run: docker ps --all
 
       - name: Setup Database
-        run: VETS_API_USER_ID=993 docker-compose run --rm --service-ports vets-api:${{ env.DOCKER_IMAGE }} bash -c "RAILS_ENV=test DISABLE_BOOTSNAP=true parallel_test -e 'bundle exec rake db:reset'"
+        run: VETS_API_USER_ID=993 docker-compose run --rm --service-ports vets-api bash -c "RAILS_ENV=test DISABLE_BOOTSNAP=true parallel_test -e 'bundle exec rake db:reset'"
 
       - name: Run specs
         run: env=$RAILS_ENV make spec_parallel
+
+      - name: Cleanup
+        if: always()
+        run: |
+          docker image rm vets-api:${{ env.DOCKER_IMAGE }}
+
+      - name: View Containers
+        if: always()
+        run: |
+          docker image ls
+          docker ps --all
 
       # - name: Remove containers
       #   run: |
