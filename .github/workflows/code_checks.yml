@@ -115,7 +115,7 @@ jobs:
           target: development
           push: false
           load: true
-          tags: vets-api:${{ env.DOCKER_IMAGE }}
+          tags: user/vets-api:${{ env.DOCKER_IMAGE }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
 
