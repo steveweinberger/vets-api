@@ -193,6 +193,10 @@
                             "type": "string",
                             "description": "5-digit zipcode. Use \"00000\" if Veteran is outside the United States",
                             "pattern": "^[0-9]{5}$"
+                          },
+                          "internationalPostalCode": {
+                            "type": "string",
+                            "maxLength": 16
                           }
                         },
                         "additionalProperties": false
@@ -1515,19 +1519,11 @@
                           "pattern": "\\d{4}(-\\d{2}){2}T\\d{2}(:\\d{2}){2}\\.\\d{3}Z"
                         },
                         "formData": {
-                          "$ref": "#/components/schemas/higherLevelReview"
+                          "$ref": "#/components/schemas/hlrCreate"
                         }
                       }
-                    },
-                    "required": [
-                      "id",
-                      "type",
-                      "attributes"
-                    ]
-                  },
-                  "required": [
-                    "data"
-                  ]
+                    }
+                  }
                 }
               }
             }
@@ -1911,19 +1907,11 @@
                           "pattern": "\\d{4}(-\\d{2}){2}T\\d{2}(:\\d{2}){2}\\.\\d{3}Z"
                         },
                         "formData": {
-                          "$ref": "#/components/schemas/higherLevelReview"
+                          "$ref": "#/components/schemas/hlrCreate"
                         }
                       }
-                    },
-                    "required": [
-                      "id",
-                      "type",
-                      "attributes"
-                    ]
-                  },
-                  "required": [
-                    "data"
-                  ]
+                    }
+                  }
                 }
               }
             }
@@ -3705,19 +3693,11 @@
                           "pattern": "\\d{4}(-\\d{2}){2}T\\d{2}(:\\d{2}){2}\\.\\d{3}Z"
                         },
                         "formData": {
-                          "$ref": "#/components/schemas/higherLevelReview"
+                          "$ref": "#/components/schemas/hlrCreate"
                         }
                       }
-                    },
-                    "required": [
-                      "id",
-                      "type",
-                      "attributes"
-                    ]
-                  },
-                  "required": [
-                    "data"
-                  ]
+                    }
+                  }
                 }
               }
             }
@@ -3833,7 +3813,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/higherLevelReview"
+                "$ref": "#/components/schemas/hlrCreate"
               },
               "examples": {
                 "minimum fields used": {

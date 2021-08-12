@@ -134,10 +134,8 @@ class AppealsApi::SwaggerSharedComponents
                 '$ref' => '#/components/schemas/hlrCreate'
               }
             }
-          },
-          required: %w[id type attributes]
-        },
-        required: ['data']
+          }
+        }
       }
     }
   end

@@ -76,8 +76,7 @@ class AppealsApi::RswagConfig
           title: 'Decision Reviews',
           version: 'v2',
           termsOfService: 'https://developer.va.gov/terms-of-service',
-          description: File.read(AppealsApi::Engine.root.join('app', 'swagger', 'appeals_api', 'v2',
-                                                              'api_description.md'))
+          description: File.read(AppealsApi::Engine.root.join('app', 'swagger', 'appeals_api', 'v2', 'api_description.md'))
         },
         tags: [
           {
@@ -191,8 +190,7 @@ class AppealsApi::RswagConfig
                                   'type': 'string',
                                   'maxLength': 60
                                 },
-                                'stateCode': JSON.parse(File.read(AppealsApi::Engine.root.join('spec', 'support',
-                                                                                               'state_codes.json'))),
+                                'stateCode': JSON.parse(File.read(AppealsApi::Engine.root.join('spec', 'support', 'state_codes.json'))),
                                 'countryCodeISO2': {
                                   'type': 'string',
                                   'pattern': '^[A-Z]{2}$'
@@ -201,7 +199,8 @@ class AppealsApi::RswagConfig
                                   'type': 'string',
                                   'description': '5-digit zipcode. Use "00000" if Veteran is outside the United States',
                                   'pattern': '^[0-9]{5}$'
-                                }
+                                },
+                                'internationalPostalCode': { 'type': 'string', 'maxLength': 16 }
                               },
                               'additionalProperties': false
                             },
@@ -214,8 +213,7 @@ class AppealsApi::RswagConfig
                               'minLength': 6,
                               'maxLength': 255
                             },
-                            'timezone': JSON.parse(File.read(AppealsApi::Engine.root.join('spec', 'support',
-                                                                                          'time_zones.json')))
+                            'timezone': JSON.parse(File.read(AppealsApi::Engine.root.join('spec', 'support', 'time_zones.json')))
                           },
                           'additionalProperties': false,
                           'required': [
