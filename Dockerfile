@@ -47,7 +47,6 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     git build-essential libxml2-dev libxslt-dev libpq-dev
 COPY --chown=vets-api:vets-api config/freshclam.conf docker-entrypoint.sh ./
 COPY --chown=vets-api:vets-api /srv/vets-api/src ./
-COPY --chown=vets-api:vets-api /srv/vets-api/clamav/database ../clamav/database
 USER vets-api
 # XXX: this is tacky
 RUN freshclam --config-file freshclam.conf
