@@ -59,14 +59,14 @@ jobs:
         id: buildx
         uses: docker/setup-buildx-action@v1
 
-      - name: Copy Certificate
+      - name: Export env variables
         run: |
-          cp /etc/ssl/certs/VA-Internal-S2-RCA1-v1.cer.pem config/ca-trust/
           echo "VETS_API_USER_ID=$(id -u)" >> $GITHUB_ENV
           echo "BUILDX_CONTAINER_ID=$(docker ps | grep buildkitd | cut -f1 -d' ' | tr -d '[:space:]')" >> $GITHUB_ENV
 
-      - name: Copy to Buildx container
+      - name: Copy Certificate to Containers
         run: |
+          cp /etc/ssl/certs/VA-Internal-S2-RCA1-v1.cer.pem config/ca-trust/
           docker cp config/ca-trust/VA-Internal-S2-RCA1-v1.cer.pem ${{ env.BUILDX_CONTAINER_ID }}:/usr/local/share/ca-certificates/
           docker exec -d  ${{ env.BUILDX_CONTAINER_ID }} update-ca-certificates
 
@@ -100,20 +100,6 @@ jobs:
           rm -rf /tmp/.buildx-cache
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
-      - name: View Containers
-        run: |
-          docker image ls
-          docker ps --all
-          docker volume ls
-
-      # - name: Start Container
-      #   run: |
-      #     docker-compose -f docker-compose.test.yml run --service-ports -d vets-api
-      #     echo "VETS_API_CONTAINER_ID=$(docker ps | grep vets-api_run | cut -f1 -d' ' | tr -d '[:space:]')" >> $GITHUB_ENV
-
-      # - name: View Containers
-      #   run: docker ps --all
-
       - name: Setup Database
         run: docker-compose -f docker-compose.test.yml run --rm --service-ports vets-api bash -c "RAILS_ENV=test DISABLE_BOOTSNAP=true parallel_test -n 14 -e 'bundle exec rake db:reset'"
 
@@ -123,38 +109,7 @@ jobs:
       - name: Cleanup
         if: always()
         run: |
-          docker rmi -f $(docker images 'vets-api' -a -q)
-
-      - name: View Containers
-        if: always()
-        run: |
-          docker image ls
-          docker ps --all
-          docker volume ls
-          docker image ls
-
-      # - name: Remove containers
-      #   run: |
-      #     docker kill $(docker ps -q)
-      #     docker rm $(docker ps -a -q)
-
-      # - name: Build
-      #   run: env=$RAILS_ENV make build
-
-      # - name: Start
-      #   run: VETS_API_USER_ID=993 docker-compose -f docker-compose.test.yml up --rm --service-ports vets-api
-
-      # - name: Run Specs
-      #   run: env=$RAILS_ENV make spec_parallel
-
-      # - name: View Containers
-      #   run: docker ps --all
-
-      # - name: Setup Database
-      #   run: VETS_API_USER_ID=993 docker-compose -f docker-compose.test.yml run --service-ports vets-api -d
-
-      # - name: Run Specs
-      #   run: VETS_API_USER_ID=993 docker-compose -f docker-compose.test.yml run --rm --service-ports vets-api bash -c "DISABLE_BOOTSNAP=true bundle exec parallel_rspec spec/ modules/ -n 14 -o '--color --tty'"
+          docker rmi -f vets-api:${{ env.DOCKER_IMAGE }}
 
       # - name: Remove
       #   run: docker-compose -f docker-compose.test.yml rm --rm --service-ports vets-api
