@@ -128,10 +128,10 @@ jobs:
       #   run: docker ps --all
 
       - name: Setup Database
-        run: env=$RAILS_ENV make spec_parallel_setup
+        run: docker-compose -f docker-compose.test.yml run --rm --service-ports vets-api bash -c "RAILS_ENV=test DISABLE_BOOTSNAP=true parallel_test -e 'bundle exec rake db:reset'"
 
       - name: Run specs
-        run: env=$RAILS_ENV make spec_parallel
+        run: docker-compose -f docker-compose.test.yml run --rm --service-ports vets-api bash -c "DISABLE_BOOTSNAP=true bundle exec parallel_rspec spec/ modules/ -n 14 -o '--color --tty'"
 
       - name: Cleanup
         if: always()
