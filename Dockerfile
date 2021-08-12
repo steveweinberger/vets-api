@@ -44,13 +44,13 @@ ENV RAILS_ENV=$rails_env
 
 # only extra dev/build opts go here, common packages go in base 👆
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
-    git build-essential libxml2-dev libxslt-dev libpq-dev && \
-    chown -R 0666 /srv/vets-api
+    git build-essential libxml2-dev libxslt-dev libpq-dev
 COPY --chown=vets-api:vets-api config/freshclam.conf docker-entrypoint.sh ./
 USER vets-api
 # XXX: this is tacky
 RUN freshclam --config-file freshclam.conf
-RUN gem install vtk
+RUN gem install vtk && \
+    chown -R 993 /srv/vets-api
 ENTRYPOINT ["/usr/bin/dumb-init", "--", "./docker-entrypoint.sh"]
 
 ###
