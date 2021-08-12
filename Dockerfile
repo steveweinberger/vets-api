@@ -50,7 +50,7 @@ USER vets-api
 # XXX: this is tacky
 RUN freshclam --config-file freshclam.conf
 RUN gem install vtk && \
-    chown -R 993 /srv/vets-api
+    chmod -R 777 /srv/vets-api
 ENTRYPOINT ["/usr/bin/dumb-init", "--", "./docker-entrypoint.sh"]
 
 ###
