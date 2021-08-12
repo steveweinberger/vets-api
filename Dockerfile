@@ -15,7 +15,8 @@ SHELL ["/bin/bash", "-c"]
 RUN groupadd -g $userid -r vets-api && \
     mkdir /srv/vets-api && \
     useradd -u $userid -r -m -d /srv/vets-api -g vets-api vets-api && \
-    chown vets-api:vets-api /srv/vets-api && \
+    chown vets-api:vets-api /srv/vets-api
+
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     dumb-init clamav clamdscan clamav-daemon imagemagick pdftk curl poppler-utils libpq5 vim
 # The pki work below is for parity with the non-docker BRD deploys to mount certs into
