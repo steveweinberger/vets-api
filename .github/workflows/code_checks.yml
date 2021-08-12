@@ -58,6 +58,11 @@ jobs:
       - name: Set up Docker Buildx
         id: buildx
         uses: docker/setup-buildx-action@v1
+        with:
+          buildkitd-flags: --name buildx_${{ env.DOCKER_IMAGE }}
+
+      - name: View Containers
+        run: docker ps --all
 
       - name: Export env variables
         run: |
@@ -175,3 +180,4 @@ jobs:
           result_path: Coverage Report/.last_run.json
           min_coverage: 90
           token: ${{ secrets.GITHUB_TOKEN }}
+
