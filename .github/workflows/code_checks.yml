@@ -49,18 +49,18 @@ jobs:
       VETS_API_USER_ID: 993
     runs-on: asg
 
-    services:
-      postgres:
-        image: postgis/postgis:11-2.5
-        credentials:
-          username: ${{ secrets.DOCKERHUB_USER }}
-          password: ${{ secrets.DOCKERHUB_PASSWORD }}
-        env:
-          POSTGRES_USER: vets-api
-          POSTGRES_PASSWORD: postgres
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 15
-        ports:
-          - 5432:5432
+    # services:
+    #   postgres:
+    #     image: postgis/postgis:11-2.5
+    #     credentials:
+    #       username: ${{ secrets.DOCKERHUB_USER }}
+    #       password: ${{ secrets.DOCKERHUB_PASSWORD }}
+    #     env:
+    #       POSTGRES_USER: vets-api
+    #       POSTGRES_PASSWORD: postgres
+    #     options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 15
+    #     ports:
+    #       - 5432:5432
 
     steps:
       - uses: actions/checkout@v2
