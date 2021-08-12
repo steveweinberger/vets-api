@@ -135,7 +135,7 @@ jobs:
       # - name: View Containers
       #   run: docker ps --all
       - name: Build
-        run: DOCKER_BUILDKIT=0 docker build -f . --target=development
+        run: DOCKER_BUILDKIT=0 docker build -f .
 
       - name: Setup Database
         run: env=$RAILS_ENV make spec_parallel_setup
