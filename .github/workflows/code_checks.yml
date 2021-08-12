@@ -115,7 +115,7 @@ jobs:
           target: development
           push: false
           load: true
-          tags: user/vets-api:${{ env.DOCKER_IMAGE }}
+          tags: vets-api:${{ env.DOCKER_IMAGE }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
 
@@ -141,7 +141,7 @@ jobs:
       #   run: docker ps --all
 
       - name: Setup Database
-        run: env=$RAILS_ENV make spec_parallel_setup
+        run: VETS_API_USER_ID=993 docker-compose run --rm --service-ports vets-api:${{ env.DOCKER_IMAGE }} bash -c "RAILS_ENV=test DISABLE_BOOTSNAP=true parallel_test -e 'bundle exec rake db:reset'"
 
       - name: Run specs
         run: env=$RAILS_ENV make spec_parallel
