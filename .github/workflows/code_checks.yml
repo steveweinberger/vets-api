@@ -107,6 +107,7 @@ jobs:
         run: docker-compose -f docker-compose.test.yml run --rm --service-ports vets-api bash -c "DISABLE_BOOTSNAP=true bundle exec parallel_rspec spec/ modules/ -n 14 -o '--color --tty'"
 
       - name: Copy coverage
+        run: |
           docker create -i --name vets-api_${{ env.DOCKER_IMAGE }}_copy vets-api:${{ env.DOCKER_IMAGE }} bash
           docker cp vets-api_${{ env.DOCKER_IMAGE }}_copy:/coverage /
           docker rm -f vets-api_${{ env.DOCKER_IMAGE }}_copy
