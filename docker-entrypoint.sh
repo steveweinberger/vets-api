@@ -8,6 +8,7 @@ unset BUNDLE_BIN
 # if you make major alteration here, please check that usage as well
 id
 whoami
+chown -R 939 /srv/vets-api
 bundle check || bundle install --binstubs="${BUNDLE_APP_CONFIG}/bin"
 
 exec "$@"
