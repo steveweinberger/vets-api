@@ -55,27 +55,14 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USER }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      - uses: ruby/setup-ruby@v1
-        env:
-          ImageOS: ubuntu20
-        with:
-          bundler-cache: true
-
       - name: Set up Docker Buildx
         id: buildx
         uses: docker/setup-buildx-action@v1
 
-      - name: View Containers
-        run: docker ps --all
-
       - name: Copy Certificate
         run: |
           cp /etc/ssl/certs/VA-Internal-S2-RCA1-v1.cer.pem config/ca-trust/
-          echo "HOST_BUNDLE_PATH=$(bundle config path | tr -d '[:space:]' | cut -d':' -f2 | tr -d '"')" >> $GITHUB_ENV
           echo "VETS_API_USER_ID=$(id -u)" >> $GITHUB_ENV
-
-      - name: Get container ID
-        run: |
           echo "BUILDX_CONTAINER_ID=$(docker ps | grep buildkitd | cut -f1 -d' ' | tr -d '[:space:]')" >> $GITHUB_ENV
 
       - name: Copy to Buildx container
@@ -128,7 +115,7 @@ jobs:
       #   run: docker ps --all
 
       - name: Setup Database
-        run: docker-compose -f docker-compose.test.yml run --rm --service-ports vets-api bash -c "RAILS_ENV=test DISABLE_BOOTSNAP=true parallel_test -e 'bundle exec rake db:reset'"
+        run: docker-compose -f docker-compose.test.yml run --rm --service-ports vets-api bash -c "RAILS_ENV=test DISABLE_BOOTSNAP=true parallel_test -n 14 -e 'bundle exec rake db:reset'"
 
       - name: Run specs
         run: docker-compose -f docker-compose.test.yml run --rm --service-ports vets-api bash -c "DISABLE_BOOTSNAP=true bundle exec parallel_rspec spec/ modules/ -n 14 -o '--color --tty'"
