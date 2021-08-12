@@ -13,10 +13,7 @@ ENV PATH $GEM_HOME/bin:$GEM_HOME/gems/bin:$PATH
 
 SHELL ["/bin/bash", "-c"]
 RUN groupadd -g $userid -r vets-api && \
-    mkdir /srv/vets-api && \
-    useradd -u $userid -r -m -d /srv/vets-api -g vets-api vets-api && \
-    chown vets-api:vets-api /srv/vets-api
-
+    useradd -u $userid -r -m -d /srv/vets-api -g vets-api vets-api
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     dumb-init clamav clamdscan clamav-daemon imagemagick pdftk curl poppler-utils libpq5 vim
 # The pki work below is for parity with the non-docker BRD deploys to mount certs into
@@ -47,7 +44,8 @@ ENV RAILS_ENV=$rails_env
 
 # only extra dev/build opts go here, common packages go in base 👆
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
-    git build-essential libxml2-dev libxslt-dev libpq-dev
+    git build-essential libxml2-dev libxslt-dev libpq-dev && \
+    chown -R 0666 /srv/vets-api
 COPY --chown=vets-api:vets-api config/freshclam.conf docker-entrypoint.sh ./
 USER vets-api
 # XXX: this is tacky
