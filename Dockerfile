@@ -74,7 +74,7 @@ ENV RAILS_ENV=production
 COPY --from=builder $BUNDLE_APP_CONFIG $BUNDLE_APP_CONFIG
 COPY --from=builder --chown=vets-api:vets-api /srv/vets-api/src ./
 USER vets-api
-ENTRYPOINT ["/bin/bash"]
+ENTRYPOINT ["/bin/bash", "-c"]
 
 ###
 # prod stage; default if no target given

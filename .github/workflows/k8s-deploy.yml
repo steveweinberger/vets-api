@@ -33,8 +33,9 @@ jobs:
           ECR_REPO: ${{ steps.login-ecr.outputs.registry }}/dsva/vets-api
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build --tag ${ECR_REPO}:${IMAGE_TAG} --target k8s -- $PWD
-          docker build --tag ${ECR_REPO}:latest --target k8s -- $PWD
+          sidekiq_license=$(aws ssm get-parameter --name /dsva-vagov/vets-api/common/sidekiq_license --query Parameter.Value --with-decryption --output text)
+          docker build --tag ${ECR_REPO}:${IMAGE_TAG} --build-arg sidekiq_license=${sidekiq_license} --target k8s -- $PWD
+          docker tag ${ECR_REPO}:${IMAGE_TAG} ${ECR_REPO}:latest
           docker push ${ECR_REPO}:${IMAGE_TAG}
           docker push ${ECR_REPO}:latest
           echo "::set-output name=image::$ECR_REPO:$IMAGE_TAG"
