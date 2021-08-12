@@ -366,7 +366,7 @@ describe 'Higher-Level Reviews', swagger_doc: 'modules/appeals_api/app/swagger/a
       consumes 'application/json'
       produces 'application/json'
 
-      parameter name: :hlr_body, in: :body, schema: { '$ref' => '#/components/schemas/higherLevelReview' }
+      parameter name: :hlr_body, in: :body, schema: { '$ref' => '#/components/schemas/hlrCreate' }
 
       parameter in: :body, examples: {
         'minimum fields used' => {

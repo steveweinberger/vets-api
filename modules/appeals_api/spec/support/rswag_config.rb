@@ -2,18 +2,19 @@
 
 class AppealsApi::RswagConfig
   def write_schema
-    v2_schemas = config['modules/appeals_api/app/swagger/appeals_api/v2/swagger.json'][:components][:schemas]
+    rswag_hlr_v2_schema = config['modules/appeals_api/app/swagger/appeals_api/v2/swagger.json'][:components][:schemas]
+    # Rswag expects schemas to live in #/components/schemas
+    # Our controller validation logic expects them to live at #/definitions so we're translating them here...
+    hlr_v2_schema = JSON.parse(rswag_hlr_v2_schema.to_json.gsub('#/components/schemas', '#/definitions'))
     schema = {
       '$schema': 'http://json-schema.org/draft-07/schema#',
       'description': 'JSON Schema for VA Form 20-0996',
-      '$ref': '#/components/schemas/hlrCreate',
-      'components': {
-        'schemas': {
-          'nonBlankString': v2_schemas[:nonBlankString],
-          'date': v2_schemas[:date],
-          'hlrCreatePhone': v2_schemas[:hlrCreatePhone],
-          'hlrCreate': v2_schemas[:hlrCreate]
-        }
+      '$ref': '#/definitions/hlrCreate',
+      'definitions': {
+        'nonBlankString': hlr_v2_schema['nonBlankString'],
+        'date': hlr_v2_schema['date'],
+        'hlrCreatePhone': hlr_v2_schema['hlrCreatePhone'],
+        'hlrCreate': hlr_v2_schema['hlrCreate']
       }
     }
     file_path = AppealsApi::Engine.root.join('config', 'schemas', 'v2', '200996.json')

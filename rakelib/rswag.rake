@@ -16,8 +16,8 @@ namespace :rswag do
     task run: %i[write_json_schema rswag]
 
     task write_json_schema: :environment do
-      # require AppealsApi::Engine.root.join('spec', 'support', 'rswag_config.rb')
-      # AppealsApi::RswagConfig.new.write_schema
+      require AppealsApi::Engine.root.join('spec', 'support', 'rswag_config.rb')
+      AppealsApi::RswagConfig.new.write_schema
     end
 
     task rswag: :environment do
