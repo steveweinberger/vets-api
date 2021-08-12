@@ -110,6 +110,7 @@ jobs:
         run: |
           docker create -i --name vets-api_${{ env.DOCKER_IMAGE }}_copy vets-api:${{ env.DOCKER_IMAGE }} bash
           docker cp vets-api_${{ env.DOCKER_IMAGE }}_copy:/coverage /
+          docker cp vets-api_${{ env.DOCKER_IMAGE }}_copy:/Test Results/*.xml /
           docker rm -f vets-api_${{ env.DOCKER_IMAGE }}_copy
 
       - name: Cleanup
