@@ -159,12 +159,6 @@ jobs:
           docker ps --all
           docker volume ls
           docker image ls
-          docker image ls
-          docker image ls
-          docker image ls
-          docker image ls
-          docker image ls
-          docker image ls
 
       # - name: Remove containers
       #   run: |
