@@ -30,3 +30,5 @@ services:
       DANGER_GITHUB_API_TOKEN: "${DANGER_GITHUB_API_TOKEN}"
     tmpfs:
       - /tmp
+    volumes:
+      test_bundle:
