@@ -163,6 +163,7 @@ jobs:
           docker image ls
           docker image ls
           docker image ls
+          docker image ls
 
       # - name: Remove containers
       #   run: |
