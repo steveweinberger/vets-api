@@ -149,7 +149,7 @@ jobs:
       - name: Cleanup
         if: always()
         run: |
-          docker image rm vets-api:${{ env.DOCKER_IMAGE }}
+          docker image rm vets-api
 
       - name: View Containers
         if: always()
