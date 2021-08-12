@@ -18,7 +18,7 @@ services:
         userid: "${VETS_API_USER_ID}"
     image: "vets-api:${DOCKER_IMAGE:-latest}"
     volumes:
-      - "./:/srv/vets-api/src:rw"
+      - ".:/srv/vets-api/src:rw"
       - test_bundle:/usr/local/bundle
     environment:
       "Settings.database_url": "postgis://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@${POSTGRES_HOST:-postgres}:${POSTGRES_PORT:-5432}/${POSTGRES_DATABASE:-vets_api_development}?pool=4"
@@ -37,6 +37,8 @@ services:
       GIT_URL:             "${GIT_URL}"
       JENKINS_URL:         "${JENKINS_URL}"
       DANGER_GITHUB_API_TOKEN: "${DANGER_GITHUB_API_TOKEN}"
+      UID: 993
+      GID: 993
     depends_on:
       - postgres
     links:
