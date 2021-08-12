@@ -65,13 +65,13 @@ jobs:
       - name: Export env variables
         run: |
           echo "VETS_API_USER_ID=$(id -u)" >> $GITHUB_ENV
-          echo "BUILDX_CONTAINER_ID=$(docker ps | grep buildkitd | cut -f1 -d' ' | tr -d '[:space:]')" >> $GITHUB_ENV
+          echo "BUILDX_CONTAINER_ID=$(docker ps | grep ${{ steps.buildx.outputs.name }} | cut -f1 -d' ' | tr -d '[:space:]')" >> $GITHUB_ENV
 
       - name: Copy Certificate to Containers
         run: |
           cp /etc/ssl/certs/VA-Internal-S2-RCA1-v1.cer.pem config/ca-trust/
-          docker cp config/ca-trust/VA-Internal-S2-RCA1-v1.cer.pem buildx_buildkit_${{ steps.buildx.outputs.name }}:/usr/local/share/ca-certificates/
-          docker exec -d  buildx_buildkit_${{ steps.buildx.outputs.name }} update-ca-certificates
+          docker cp config/ca-trust/VA-Internal-S2-RCA1-v1.cer.pem ${{ env.BUILDX_CONTAINER_ID }}:/usr/local/share/ca-certificates/
+          docker exec -d  ${{ env.BUILDX_CONTAINER_ID }} update-ca-certificates
 
       - name: Cache Docker layers
         uses: actions/cache@v2
