@@ -150,7 +150,7 @@ jobs:
       - name: Cleanup
         if: always()
         run: |
-          docker image rm vets-api
+          ddocker rmi $(docker images | grep 'vets-api')
 
       - name: View Containers
         if: always()
