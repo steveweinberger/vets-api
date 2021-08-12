@@ -1,11 +1,6 @@
 version: '3.4'
 services:
   postgres:
-    image: mdillon/postgis:11-alpine
-    command: postgres -c shared_preload_libraries=pg_stat_statements -c pg_stat_statements.track=all -c max_connections=200
-    environment:
-      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-password}"
-      POSTGRES_USER: "${POSTGRES_USER:-postgres}"
   vets-api:
     build:
       context: .
@@ -15,11 +10,6 @@ services:
         userid: "${VETS_API_USER_ID}"
     image: "vets-api:${DOCKER_IMAGE:-latest}"
     volumes:
-      - type: bind
-        source: ${HOST_BUNDLE_PATH}
-        target: /usr/local/bundle
-        read_only: true
-
       - ".:/srv/vets-api/src"
     environment:
       "Settings.database_url": "postgis://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@${POSTGRES_HOST:-postgres}:${POSTGRES_PORT:-5432}/${POSTGRES_DATABASE:-vets_api_development}?pool=4"
@@ -38,9 +28,5 @@ services:
       GIT_URL:             "${GIT_URL}"
       JENKINS_URL:         "${JENKINS_URL}"
       DANGER_GITHUB_API_TOKEN: "${DANGER_GITHUB_API_TOKEN}"
-    depends_on:
-      - postgres
-    links:
-      - postgres
     tmpfs:
       - /tmp
