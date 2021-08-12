@@ -6,6 +6,9 @@ services:
     environment:
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-password}"
       POSTGRES_USER: "${POSTGRES_USER:-postgres}"
+    credentials:
+      username: "${DOCKERHUB_USER}"
+      password: "${DOCKERHUB_PASSWORD}"
   vets-api:
     build:
       context: .

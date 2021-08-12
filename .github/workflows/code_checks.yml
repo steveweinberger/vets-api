@@ -47,6 +47,8 @@ jobs:
       TERM: xterm-256color
       DOCKER_IMAGE: ${{ github.run_id }}-${{ github.run_number }}
       VETS_API_USER_ID: 993
+      DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
+      DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
     runs-on: asg
 
     # services:
