@@ -131,6 +131,7 @@ jobs:
         run: |
           docker image ls
           docker ps --all
+          docker volume ls
 
       # - name: Start Container
       #   run: |
@@ -156,6 +157,7 @@ jobs:
         run: |
           docker image ls
           docker ps --all
+          docker volume ls
 
       # - name: Remove containers
       #   run: |
