@@ -2,6 +2,7 @@
 unset BUNDLE_PATH
 unset BUNDLE_BIN
 
+# sh -c "sudo chown -R vets-api /srv/vets-api/src"
 
 # note this logic is duplicated in the Dockerfile for prod builds,
 # if you make major alteration here, please check that usage as well
