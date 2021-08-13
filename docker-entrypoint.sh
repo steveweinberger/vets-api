@@ -3,6 +3,8 @@
 # note this logic is duplicated in the Dockerfile for prod builds,
 # if you make major alteration here, please check that usage as well
 
+ls /usr/local/bundle/gems
+cat /usr/local/bundle/config
 bundle check || bundle install --binstubs="${BUNDLE_APP_CONFIG}/bin" --jobs=4
 
 exec "$@"
