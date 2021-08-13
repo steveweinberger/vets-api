@@ -64,7 +64,7 @@ jobs:
 
       - name: Export env variables
         run: |
-          pwd
+          echo "RUNNER_HOME=$(pwd)" >> $GITHUB_ENV
           echo "VETS_API_USER_ID=$(id -u)" >> $GITHUB_ENV
           echo "BUILDX_CONTAINER_ID=$(docker ps | grep ${{ steps.buildx.outputs.name }} | cut -f1 -d' ' | tr -d '[:space:]')" >> $GITHUB_ENV
 
@@ -113,8 +113,8 @@ jobs:
       - name: Copy coverage
         run: |
           docker create -i --name vets-api_${{ env.DOCKER_IMAGE }}_copy vets-api:${{ env.DOCKER_IMAGE }} bash
-          docker cp vets-api_${{ env.DOCKER_IMAGE }}_copy:/coverage /
-          docker cp vets-api_${{ env.DOCKER_IMAGE }}_copy:/Test Results/*.xml /
+          docker cp vets-api_${{ env.DOCKER_IMAGE }}_copy:/coverage /${{ env.RUNNER_HOME }}
+          docker cp vets-api_${{ env.DOCKER_IMAGE }}_copy:/Test Results/*.xml /${{ env.RUNNER_HOME }}
           docker rm -f vets-api_${{ env.DOCKER_IMAGE }}_copy
 
       - name: Cleanup
