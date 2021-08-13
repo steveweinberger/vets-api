@@ -3,9 +3,6 @@
 # note this logic is duplicated in the Dockerfile for prod builds,
 # if you make major alteration here, please check that usage as well
 
-bundle config --local path $PWD/vendor/bundle
-export PATH="$PATH:$PWD/vendor/bundle/ruby/2.6.0/bin"
-export GEM_PATH="$GEM_PATH:$PWD/vendor/bundle/ruby/2.6.0/gems"
 bundle check || bundle install --binstubs="${BUNDLE_APP_CONFIG}/bin" --jobs=4
 
 exec "$@"
