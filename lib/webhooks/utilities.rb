@@ -14,6 +14,9 @@ module Webhooks
 
     class << self
       attr_reader :supported_events, :event_to_api_name, :api_name_to_time_block, :api_name_to_retries
+      attr_reader :api_name_to_failure_block
+
+      # Methods here are class methods that do not mix in.
 
       def included(base)
         base.extend ClassMethods
@@ -35,6 +38,11 @@ module Webhooks
         @event_to_api_name[event] = name
       end
 
+      def register_name_to_failure_block(name, block)
+        @api_name_to_failure_block ||= {}
+        @api_name_to_failure_block[name] = block
+      end
+
       def register_name_to_time_block(name, block)
         @api_name_to_time_block ||= {}
         @api_name_to_time_block[name] = block
@@ -52,6 +60,14 @@ module Webhooks
     end
 
     module ClassMethods
+
+      # place methods that might be run at class load time here. They mix in as class methods.
+      # For example:
+      # class Foo
+      # include Webhooks::Utilities
+      # register_events ...# method is visible as a mixed in class method
+      # end
+
       def register_events(*event, **keyword_args, &block)
         raise ArgumentError, 'Block required to yield next execution time!' unless block_given?
         raise ArgumentError, 'api_name argument required' unless keyword_args.key? :api_name
@@ -70,6 +86,12 @@ module Webhooks
         end
       end
 
+      def register_failure_handler(api_name:, &block)
+        raise ArgumentError, 'Block required to calculate callback url failure retry times!' unless block_given?
+        Webhooks::Utilities.register_name_to_failure_block(api_name, block)
+      end
+
+      # todo move this method out of ClassMethods, it should invoke as an instance method.
       def fetch_events(subscription)
         subscription['subscriptions'].map do |e|
           e['event']
@@ -132,9 +154,7 @@ module Webhooks
   end
 end
 # rubocop:enable ThreadSafety/InstanceVariableInClassMethod
-# ADD YOUR REGISTRATIONS BELOW
 require './lib/webhooks/registrations'
-# ADD YOUR REGISTRATIONS ABOVE
 # Rails.env = 'test'
 unless Rails.env.test?
   Webhooks::Utilities.supported_events.freeze

@@ -265,4 +265,7 @@ Rails.application.reloader.to_prepare do
 
   StatsD.increment("#{VEText::Service::STATSD_KEY_PREFIX}.app_lookup.success", 0)
   StatsD.increment("#{VEText::Service::STATSD_KEY_PREFIX}.app_lookup.failure", 0)
+rescue => e
+  # todo get feedback from Travis Hilton
+  Rails.logger.error("Error in statsd initialiazer", e)
 end
