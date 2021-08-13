@@ -44,3 +44,4 @@ services:
       - /tmp
 volumes:
   test_bundle:
+    name: test_bundle
