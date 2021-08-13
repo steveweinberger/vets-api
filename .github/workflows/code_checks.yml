@@ -62,9 +62,8 @@ jobs:
       - name: View Containers
         run: |
           docker ps --all
-          docker rm -f e52ba5a9f305
-          docker rm -f e52ba5a9f305
-          docker rm -f 7c3eeb9b46a4
+          docker rm -f 497abf53681b
+          docker rm -f 0812228187ba
           docker ps --all
 
       - name: Export env variables
@@ -118,17 +117,17 @@ jobs:
       - name: Copy coverage
         run: |
           docker create -i --name vets-api_${{ env.DOCKER_IMAGE }}_copy vets-api:${{ env.DOCKER_IMAGE }} bash
-          docker cp vets-api_${{ env.DOCKER_IMAGE }}_copy:/coverage /${{ env.RUNNER_HOME }}
-          docker cp vets-api_${{ env.DOCKER_IMAGE }}_copy:/Test Results/*.xml /${{ env.RUNNER_HOME }}
+          docker cp vets-api_${{ env.DOCKER_IMAGE }}_copy/coverage:/${{ env.RUNNER_HOME }}
+          docker cp vets-api_${{ env.DOCKER_IMAGE }}_copy/Test Results/*.xml:/${{ env.RUNNER_HOME }}
           docker rm -f vets-api_${{ env.DOCKER_IMAGE }}_copy
 
       - name: Cleanup
         if: always()
         run: |
           docker ps --all
-          docker rmi -f vets-api:${{ env.DOCKER_IMAGE }}
-          docker rm -f vets-api_${{ env.DOCKER_IMAGE }}_copy
-          docker rm -f vets-api_postgres_${{ env.DOCKER_IMAGE }}
+          docker rmi -f vets-api:${{ env.DOCKER_IMAGE }} 2> /dev/null || true
+          docker rm -f vets-api_${{ env.DOCKER_IMAGE }}_copy 2> /dev/null || true
+          docker rm -f vets-api_postgres_${{ env.DOCKER_IMAGE }} 2> /dev/null || true
           docker ps --all
 
       # - name: Remove
