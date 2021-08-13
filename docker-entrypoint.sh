@@ -4,8 +4,7 @@
 # if you make major alteration here, please check that usage as well
 
 bundle config --local path $PWD/vendor/bundle
-bundle config --local bin $PWD/vendor/bundle/ruby/2.6.0/bin
-ls vendor/bundle/ruby/2.6.0
+bundle config bin $PWD/vendor/bundle/ruby/2.6.0/bin
 bundle check || bundle install --binstubs="${BUNDLE_APP_CONFIG}/bin" --jobs=4
 
 exec "$@"
