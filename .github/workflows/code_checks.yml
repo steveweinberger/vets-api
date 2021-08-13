@@ -62,9 +62,6 @@ jobs:
       - name: View Containers
         run: |
           docker ps --all
-          docker rm -f 497abf53681b
-          docker rm -f 0812228187ba
-          docker ps --all
 
       - name: Export env variables
         run: |
