@@ -112,11 +112,11 @@ jobs:
         run: docker-compose -f docker-compose.test.yml run --rm --service-ports vets-api bash -c "DISABLE_BOOTSNAP=true bundle exec parallel_rspec spec/ modules/ -n 14 -o '--color --tty'"
 
       - name: Copy coverage
+        if: always()
         run: |
           docker create -i --name vets-api_${{ env.DOCKER_IMAGE }}_copy vets-api:${{ env.DOCKER_IMAGE }} bash
-          docker cp vets-api_${{ env.DOCKER_IMAGE }}_copy/coverage:/${{ env.RUNNER_HOME }}
-          docker cp vets-api_${{ env.DOCKER_IMAGE }}_copy/Test Results/*.xml:/${{ env.RUNNER_HOME }}
-          docker rm -f vets-api_${{ env.DOCKER_IMAGE }}_copy
+          docker cp vets-api_${{ env.DOCKER_IMAGE }}_copy:/coverage /${{ env.RUNNER_HOME }}
+          docker cp vets-api_${{ env.DOCKER_IMAGE }}_copy:/Test Results/*.xml /${{ env.RUNNER_HOME }}
 
       - name: Cleanup
         if: always()
@@ -129,20 +129,20 @@ jobs:
 
       # - name: Remove
       #   run: docker-compose -f docker-compose.test.yml rm --rm --service-ports vets-api
-  #     - name: Upload Coverage Report
-  #       uses: actions/upload-artifact@v2
-  #       if: always()
-  #       with:
-  #         name: Coverage Report
-  #         path: coverage
+      - name: Upload Coverage Report
+        uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: Coverage Report
+          path: coverage
 
-  #     - name: Upload Test Results
-  #       uses: actions/upload-artifact@v2
-  #       if: always()
-  #       with:
-  #         name: Test Results
-  #         path: log/*.xml
-  #         if-no-files-found: ignore
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: Test Results
+          path: log/*.xml
+          if-no-files-found: ignore
 
   publish_results:
     name: Publish Results
