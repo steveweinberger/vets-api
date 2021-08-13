@@ -73,13 +73,13 @@ jobs:
         run: |
           echo "RUNNER_HOME=$(pwd)" >> $GITHUB_ENV
           echo "VETS_API_USER_ID=$(id -u)" >> $GITHUB_ENV
-          echo "HOST_BUNDLER_PATH=$(id -u)" >> $GITHUB_ENV
           echo "BUILDX_CONTAINER_ID=$(docker ps | grep ${{ steps.buildx.outputs.name }} | cut -f1 -d' ' | tr -d '[:space:]')" >> $GITHUB_ENV
           echo "HOST_BUNDLE_PATH=$(bundle config path | tr -d '[:space:]' | cut -d':' -f2 | tr -d '"')" >> $GITHUB_ENV
 
       - name: Copy Certificate to Containers
         run: |
-          ls ${{ env.HOST_BUNDLE_PATH}}/ruby/2.6.0
+          ls ${{ env.HOST_BUNDLE_PATH }}/ruby/2.6.0
+          ls ${{ env.RUNNER_HOME }}/lib/x86_64-linux-gnu
           cp /etc/ssl/certs/VA-Internal-S2-RCA1-v1.cer.pem config/ca-trust/
           docker cp config/ca-trust/VA-Internal-S2-RCA1-v1.cer.pem ${{ env.BUILDX_CONTAINER_ID }}:/usr/local/share/ca-certificates/
           docker exec -d  ${{ env.BUILDX_CONTAINER_ID }} update-ca-certificates
