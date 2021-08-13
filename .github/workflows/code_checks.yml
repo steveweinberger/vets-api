@@ -52,7 +52,7 @@ jobs:
 
       - uses: ruby/setup-ruby@v1
         env:
-          ImageOS: ubuntu20
+          ImageOS: ubuntu18
         with:
           bundler-cache: true
 
