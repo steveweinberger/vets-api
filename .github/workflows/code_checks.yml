@@ -115,8 +115,8 @@ jobs:
         if: always()
         run: |
           docker create -i --name vets-api_${{ env.DOCKER_IMAGE }}_copy vets-api:${{ env.DOCKER_IMAGE }} bash
-          docker cp vets-api_${{ env.DOCKER_IMAGE }}_copy:/coverage /${{ env.RUNNER_HOME }}
-          docker cp vets-api_${{ env.DOCKER_IMAGE }}_copy:/Test Results/*.xml /${{ env.RUNNER_HOME }}
+          docker cp vets-api_${{ env.DOCKER_IMAGE }}_copy:coverage/ /${{ env.RUNNER_HOME }}
+          docker cp vets-api_${{ env.DOCKER_IMAGE }}_copy:Test Results/*.xml/ /${{ env.RUNNER_HOME }}
 
       - name: Cleanup
         if: always()
