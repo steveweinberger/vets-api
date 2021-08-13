@@ -8,8 +8,6 @@
 FROM ruby:2.6.6-slim-stretch AS base
 
 ARG userid=993
-ENV GEM_HOME="/usr/local/bundle"
-ENV PATH $GEM_HOME/bin:$GEM_HOME/gems/bin:$PATH
 
 SHELL ["/bin/bash", "-c"]
 RUN groupadd -g $userid -r vets-api && \
