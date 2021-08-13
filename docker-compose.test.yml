@@ -6,6 +6,7 @@ services:
     environment:
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-password}"
       POSTGRES_USER: "${POSTGRES_USER:-postgres}"
+    container_name: "vets-api_postgres_${DOCKER_IMAGE}"
   vets-api:
     build:
       context: .
