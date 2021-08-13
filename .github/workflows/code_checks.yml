@@ -133,6 +133,7 @@ jobs:
           docker rmi -f vets-api:${{ env.DOCKER_IMAGE }} 2> /dev/null || true
           docker rm -f vets-api_postgres_${{ env.DOCKER_IMAGE }} 2> /dev/null || true
           docker ps --all
+          docker ps --all
 
   publish_results:
     name: Publish Results
