@@ -3,8 +3,8 @@
 # note this logic is duplicated in the Dockerfile for prod builds,
 # if you make major alteration here, please check that usage as well
 
-bundle config set path $PWD/vendor/bundle
-ls vendor/bundle
+bundle config set --local path $PWD/vendor/bundle
+ls vendor/bundle/ruby/2.6.0
 bundle check || bundle install --binstubs="${BUNDLE_APP_CONFIG}/bin" --jobs=4
 
 exec "$@"
