@@ -1,12 +1,12 @@
 version: '3.4'
 services:
   postgres:
+    container_name: "vets-api_postgres_${DOCKER_IMAGE}"
     image: mdillon/postgis:11-alpine
     command: postgres -c shared_preload_libraries=pg_stat_statements -c pg_stat_statements.track=all -c max_connections=200
     environment:
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-password}"
       POSTGRES_USER: "${POSTGRES_USER:-postgres}"
-    container_name: "vets-api_postgres_${DOCKER_IMAGE}"
   vets-api:
     build:
       context: .
@@ -17,6 +17,7 @@ services:
     image: "vets-api:${DOCKER_IMAGE:-latest}"
     volumes:
       - ".:/srv/vets-api/src:rw"
+      - test_bundle:/usr/local/bundle
     environment:
       "Settings.database_url": "postgis://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@${POSTGRES_HOST:-postgres}:${POSTGRES_PORT:-5432}/${POSTGRES_DATABASE:-vets_api_development}?pool=4"
       "Settings.test_database_url": "postgis://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@${POSTGRES_HOST:-postgres}:${POSTGRES_PORT:-5432}/${POSTGRES_DATABASE:-vets_api_test}"
