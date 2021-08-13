@@ -1,7 +1,6 @@
 version: '3.4'
 services:
   postgres:
-    container_name: "vets-api_postgres_${DOCKER_IMAGE}"
     image: mdillon/postgis:11-alpine
     command: postgres -c shared_preload_libraries=pg_stat_statements -c pg_stat_statements.track=all -c max_connections=200
     environment:
