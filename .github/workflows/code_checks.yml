@@ -79,7 +79,7 @@ jobs:
       - name: Copy Certificate to Containers
         run: |
           ls ${{ env.HOST_BUNDLE_PATH }}/ruby/2.6.0
-          ls ${{ env.RUNNER_HOME }}/lib/x86_64-linux-gnu
+          ls ${{ env.RUNNER_HOME }}
           cp /etc/ssl/certs/VA-Internal-S2-RCA1-v1.cer.pem config/ca-trust/
           docker cp config/ca-trust/VA-Internal-S2-RCA1-v1.cer.pem ${{ env.BUILDX_CONTAINER_ID }}:/usr/local/share/ca-certificates/
           docker exec -d  ${{ env.BUILDX_CONTAINER_ID }} update-ca-certificates
@@ -115,10 +115,10 @@ jobs:
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
       - name: Setup Database
-        run: docker-compose -f docker-compose.test.yml -p ${{ env.DOCKER_IMAGE }} run --rm --service-ports vets-api bash -c "RAILS_ENV=test DISABLE_BOOTSNAP=true parallel_test -n 14 -e 'bundle exec rake db:reset'"
+        run: docker-compose -f docker-compose.test.yml run --rm --service-ports vets-api bash -c "RAILS_ENV=test DISABLE_BOOTSNAP=true parallel_test -n 14 -e 'bundle exec rake db:reset'"
 
       - name: Run specs
-        run: docker-compose -f docker-compose.test.yml -p ${{ env.DOCKER_IMAGE }} run --rm --service-ports vets-api bash -c "DISABLE_BOOTSNAP=true bundle exec parallel_rspec spec/ modules/ -n 14 -o '--color --tty'"
+        run: docker-compose -f docker-compose.test.yml run --rm --service-ports vets-api bash -c "DISABLE_BOOTSNAP=true bundle exec parallel_rspec spec/ modules/ -n 14 -o '--color --tty'"
 
       - name: Upload Coverage Report
         uses: actions/upload-artifact@v2
@@ -141,10 +141,6 @@ jobs:
           docker ps --all
           docker rmi -f vets-api:${{ env.DOCKER_IMAGE }} 2> /dev/null || true
           docker rm -f vets-api_postgres_${{ env.DOCKER_IMAGE }} 2> /dev/null || true
-          docker ps --all
-          docker ps --all
-          docker ps --all
-          docker ps --all
           docker ps --all
 
   publish_results:
