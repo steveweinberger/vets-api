@@ -42,8 +42,10 @@ module Webhooks
         c.raw_connection.exec_params(sql, args).to_a
       end
 
-      event_urls = result.first['event_urls'] ||= '[]'
-      JSON.parse(event_urls).flatten.uniq
+      if result.length.positive?
+        result = JSON.parse(result.first['event_urls']).uniq
+      end
+      result
     end
 
     def self.retrieve_observers_by_guid(sql, *args)
