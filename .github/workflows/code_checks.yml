@@ -50,12 +50,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: ruby/setup-ruby@v1
-        env:
-          ImageOS: ubuntu18
-        with:
-          bundler-cache: true
-
       - uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKERHUB_USER }}
