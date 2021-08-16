@@ -97,10 +97,10 @@ jobs:
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
       - name: Setup Database
-        run: docker-compose -f docker-compose.test.yml -p ${{ env.DOCKER_IMAGE }} run --rm --service-ports vets-api bash -c "RAILS_ENV=test DISABLE_BOOTSNAP=true parallel_test -n 14 -e 'bundle exec rake db:reset'"
+        run: docker-compose -f docker-compose.gha.yml -p ${{ env.DOCKER_IMAGE }} run --rm --service-ports vets-api bash -c "RAILS_ENV=test DISABLE_BOOTSNAP=true parallel_test -n 14 -e 'bundle exec rake db:reset'"
 
       - name: Run Specs
-        run: docker-compose -f docker-compose.test.yml -p ${{ env.DOCKER_IMAGE }} run --rm --service-ports vets-api bash -c "DISABLE_BOOTSNAP=true bundle exec parallel_rspec spec/ modules/ -n 14 -o '--color --tty'"
+        run: docker-compose -f docker-compose.gha.yml -p ${{ env.DOCKER_IMAGE }} run --rm --service-ports vets-api bash -c "DISABLE_BOOTSNAP=true bundle exec parallel_rspec spec/ modules/ -n 14 -o '--color --tty'"
 
       - name: Upload Coverage Report
         uses: actions/upload-artifact@v2
