@@ -34,42 +34,42 @@ class AppealsApi::SwaggerSharedComponents
         type: :string,
         name: 'X-VA-SSN',
         required: true,
-        description: 'veteran\'s SSN'
+        description: 'Veteran\'s SSN'
       },
       veteran_first_name_header: {
         in: :header,
         type: :string,
         name: 'X-VA-First-Name',
         required: true,
-        description: 'veteran\'s first name'
+        description: 'Veteran\'s first name'
       },
       veteran_middle_initial_header: {
         in: :header,
         type: :string,
         name: 'X-VA-Middle-Initial',
         required: false,
-        description: 'veteran\'s middle initial'
+        description: 'Veteran\'s middle initial'
       },
       veteran_last_name_header: {
         in: :header,
         type: :string,
         name: 'X-VA-Last-Name',
         required: true,
-        description: 'veteran\'s last name'
+        description: 'Veteran\'s last name'
       },
       veteran_birth_date_header: {
         in: :header,
         type: :string,
         name: 'X-VA-Birth-Date',
         required: true,
-        description: 'veteran\'s birth date'
+        description: 'Veteran\'s birth date'
       },
       veteran_file_number_header: {
         in: :header,
         type: :string,
         name: 'X-VA-File-Number',
         required: false,
-        description: 'veteran\'s file number'
+        description: 'VA file number (c-file / css)'
       },
       veteran_insurance_policy_number_header: {
         in: :header,
@@ -120,6 +120,7 @@ class AppealsApi::SwaggerSharedComponents
             properties: {
               status: {
                 type: :string,
+                example: AppealsApi::HlrStatus::V2_STATUSES.first,
                 enum: AppealsApi::HlrStatus::V2_STATUSES
               },
               updatedAt: {
