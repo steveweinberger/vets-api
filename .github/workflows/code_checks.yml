@@ -37,13 +37,7 @@ jobs:
     env:
       BUNDLE_ENTERPRISE__CONTRIBSYS__COM: ${{ secrets.BUNDLE_ENTERPRISE__CONTRIBSYS__COM }}
       CI: true
-      DATABASE_URL: "postgis://vets-api:postgres@127.0.0.1:5432/vets_api_test?pool=4"
-      NODE_EXTRA_CA_CERTS: '/etc/ssl/certs/VA-Internal-S2-RCA1-v1.cer.pem' # Needed for self-hosted runners (setup-ruby)
       RAILS_ENV: test
-      "Settings.binaries.clamdscan": "clamscan"
-      "Settings.saml.cert_path": "spec/support/certificates/ruby-saml.crt"
-      "Settings.saml.key_path": "spec/support/certificates/ruby-saml.key"
-      "Settings.test_database_url": "postgis://vets-api:postgres@127.0.0.1:5432/vets_api_test"
       TERM: xterm-256color
       DOCKER_IMAGE: ${{ github.run_id }}-${{ github.run_number }}
     runs-on: asg
