@@ -1,4 +1,5 @@
 version: '3.4'
+project-name: ${DOCKER_IMAGE}
 services:
   vets-api:
     tmpfs:
