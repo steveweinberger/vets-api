@@ -2,24 +2,18 @@
 
 class AppealsApi::RswagConfig
   def write_schema
-    rswag_hlr_v2_schema = config['modules/appeals_api/app/swagger/appeals_api/v2/swagger.json'][:components][:schemas]
-    # Rswag expects schemas to live in #/components/schemas
-    # Our controller validation logic expects them to live at #/definitions so we're translating them here...
-    hlr_v2_schema = JSON.parse(rswag_hlr_v2_schema.to_json.gsub('#/components/schemas', '#/definitions'))
-    schema = {
+    hlr_schema = {
       '$schema': 'http://json-schema.org/draft-07/schema#',
       'description': 'JSON Schema for VA Form 20-0996',
       '$ref': '#/definitions/hlrCreate',
-      'definitions': {
-        'nonBlankString': hlr_v2_schema['nonBlankString'],
-        'date': hlr_v2_schema['date'],
-        'hlrCreatePhone': hlr_v2_schema['hlrCreatePhone'],
-        'hlrCreate': hlr_v2_schema['hlrCreate']
-      }
+      'definitions': [
+        generic_schemas,
+        hlr_v2_schemas('#/definitions')
+      ].reduce(&:merge)
     }
     file_path = AppealsApi::Engine.root.join('config', 'schemas', 'v2', '200996.json')
     File.open(file_path, 'w') do |f|
-      f.write(JSON.pretty_generate(schema))
+      f.write(JSON.pretty_generate(hlr_schema))
     end
   end
 
@@ -98,7 +92,8 @@ class AppealsApi::RswagConfig
           },
           schemas: [
             generic_schemas,
-            hlr_v2_schemas
+            hlr_v2_schemas('#/components/schemas'),
+            contestable_issues_schema
           ].reduce(&:merge)
         },
         paths: {},
@@ -139,7 +134,12 @@ class AppealsApi::RswagConfig
       'date': {
         'type': 'string',
         'pattern': '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'
-      },
+      }
+    }
+  end
+
+  def contestable_issues_schema
+    {
       'contestableIssues': {
         'type': 'object',
         'properties': {
@@ -152,7 +152,7 @@ class AppealsApi::RswagConfig
     }
   end
 
-  def hlr_v2_schemas
+  def hlr_v2_schemas(ref_root)
     {
       'hlrCreatePhone': {
         'type': 'object',
@@ -253,7 +253,7 @@ class AppealsApi::RswagConfig
                         'additionalProperties': false
                       },
                       'phone': {
-                        '$ref': '#/components/schemas/hlrCreatePhone'
+                        '$ref': "#{ref_root}/hlrCreatePhone"
                       },
                       'email': {
                         'type': 'string',
@@ -295,7 +295,7 @@ class AppealsApi::RswagConfig
                         'maxLength': 40
                       },
                       'phone': {
-                        '$ref': '#/components/schemas/hlrCreatePhone'
+                        '$ref': "#{ref_root}/hlrCreatePhone"
                       },
                       'email': {
                         'type': 'string',
@@ -359,7 +359,7 @@ class AppealsApi::RswagConfig
                     'issue': {
                       'allOf': [
                         {
-                          '$ref': '#/components/schemas/nonBlankString'
+                          '$ref': "#{ref_root}/nonBlankString"
                         },
                         {
                           'maxLength': 140
@@ -367,7 +367,7 @@ class AppealsApi::RswagConfig
                       ]
                     },
                     'decisionDate': {
-                      '$ref': '#/components/schemas/date'
+                      '$ref': "#{ref_root}/date"
                     },
                     'decisionIssueId': {
                       'type': 'integer'
@@ -379,7 +379,7 @@ class AppealsApi::RswagConfig
                       'type': 'string'
                     },
                     'socDate': {
-                      '$ref': '#/components/schemas/date'
+                      '$ref': "#{ref_root}/date"
                     }
                   },
                   'additionalProperties': false,
