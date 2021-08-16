@@ -22,7 +22,7 @@ endif
 
 
 COMPOSE_DEV  := docker-compose
-COMPOSE_TEST := docker-compose -f docker-compose.test.yml --verbose
+COMPOSE_TEST := docker-compose -f docker-compose.test.yml
 BASH         := run --rm --service-ports vets-api bash
 BASH_DEV     := $(COMPOSE_DEV) $(BASH) -c
 BASH_TEST    := $(COMPOSE_TEST) $(BASH) --login -c
@@ -144,7 +144,7 @@ spec_parallel:  ## Runs spec tests in parallel
 ifeq ($(ENV_ARG), dev)
 	@$(BASH_DEV) "RAILS_ENV=test DISABLE_BOOTSNAP=true NOCOVERAGE=true bundle exec parallel_rspec ${SPEC_PATH}"
 else
-	@$(COMPOSE_TEST) $(BASH) -c "DISABLE_BOOTSNAP=true bundle exec parallel_rspec ${SPEC_PATH} -n 14 -o '--color --tty'"
+	@$(COMPOSE_TEST) $(BASH) -c "DISABLE_BOOTSNAP=true bundle exec parallel_rspec ${SPEC_PATH}"
 endif
 
 .PHONY: up
