@@ -1,13 +1,6 @@
 version: '3.4'
 services:
-  postgres:
-    extends:
-      file: docker-compose.test.yml
-      service: postgres
   vets-api:
-    extends:
-      file: docker-compose.test.yml
-      service: vets-api
     tmpfs:
       - /tmp
 volumes:
