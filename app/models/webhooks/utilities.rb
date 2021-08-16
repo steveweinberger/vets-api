@@ -13,23 +13,22 @@ module Webhooks
 
       # todo All of these methods should be moved out of ClassMethods
       # We assume the subscription parameter has already been through validate_subscription()
-      def register_webhook(consumer_id, consumer_name, subscription, api_guid = null)
+      def register_webhook(consumer_id, consumer_name, subscription)
         event = subscription['subscriptions'].first['event']
         api_name = Webhooks::Utilities.event_to_api_name[event]
-        wh = fetch_subscription(consumer_id, subscription, api_guid) || Webhooks::Subscription.new
+        wh = fetch_subscription(consumer_id, subscription) || Webhooks::Subscription.new
         wh.api_name = api_name
         wh.consumer_id = consumer_id
         wh.consumer_name = consumer_name
         wh.events = subscription
-        wh.api_guid = api_guid if api_guid
         wh.save!
         wh
       end
 
-      def fetch_subscription(consumer_id, subscription, api_guid = null)
+      def fetch_subscription(consumer_id, subscription)
         event = subscription['subscriptions'].first['event']
         api_name = Webhooks::Utilities.event_to_api_name[event]
-        Webhooks::Subscription.where(consumer_id: consumer_id, api_name: api_name, api_guid: api_guid).first
+        Webhooks::Subscription.where(api_name: api_name, consumer_id: consumer_id)&.first
       end
 
       def fetch_subscriptions(consumer_id) #api_name?
@@ -38,9 +37,7 @@ module Webhooks
 
       def record_notifications(consumer_id:, consumer_name:, event:, api_guid:, msg:)
         api_name = Webhooks::Utilities.event_to_api_name[event]
-        webhook_urls = Webhooks::Subscription.get_notification_urls(
-          api_name: api_name, consumer_id: consumer_id, event: event, api_guid: api_guid
-        )
+        webhook_urls = Webhooks::Subscription.get_notification_urls(api_name: api_name, consumer_id: consumer_id, event: event)
         return [] unless webhook_urls.size.positive?
 
         notifications = []

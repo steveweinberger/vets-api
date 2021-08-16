@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_07_23_134730) do
+ActiveRecord::Schema.define(version: 2021_08_13_888888) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -858,6 +858,7 @@ ActiveRecord::Schema.define(version: 2021_07_23_134730) do
   end
 
   create_table "webhooks_notification_attempts", force: :cascade do |t|
+    t.string "callback_url", null: false
     t.boolean "success", default: false
     t.jsonb "response", null: false
     t.datetime "created_at", precision: 6, null: false
@@ -874,23 +875,25 @@ ActiveRecord::Schema.define(version: 2021_07_23_134730) do
     t.jsonb "msg", null: false
     t.integer "final_attempt_id"
     t.integer "processing"
+    t.bigint "webhooks_subscriptions_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["api_name", "consumer_id", "api_guid", "event", "final_attempt_id"], name: "index_wh_notify"
-    t.index ["final_attempt_id", "api_name", "event", "api_guid"], name: "index_wk_notify_processing"
+    t.index ["api_name", "consumer_id", "final_attempt_id"], name: "index_wh_notify"
+    t.index ["webhooks_subscriptions_id"], name: "index_webhooks_notifications_on_webhooks_subscriptions_id"
   end
 
   create_table "webhooks_subscriptions", force: :cascade do |t|
     t.string "api_name", null: false
     t.string "consumer_name", null: false
     t.uuid "consumer_id", null: false
-    t.uuid "api_guid"
     t.jsonb "events", default: {"subscriptions"=>[]}
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["api_name", "consumer_id", "api_guid"], name: "index_webhooks_subscription", unique: true
+    t.index ["api_name", "consumer_id"], name: "index_webhooks_subscription", unique: true
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "webhooks_notifications", "webhooks_subscriptions", column: "webhooks_subscriptions_id"
 end

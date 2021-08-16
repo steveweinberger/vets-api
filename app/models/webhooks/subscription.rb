@@ -2,12 +2,11 @@
 
 module Webhooks
   class Subscription < ApplicationRecord
+    # self.ignored_columns = ["api_guid"]
     self.table_name = 'webhooks_subscriptions'
-    def self.get_notification_urls(api_name:, consumer_id:, event:, api_guid: nil)
+    def self.get_notification_urls(api_name:, consumer_id:, event:)
       sql = "
-        select json_agg(agg.urls)::jsonb as event_urls
-        from (
-        select distinct (event_json.sub_event_array -> 'urls') as urls
+        select distinct (event_json.sub_event_array -> 'urls') as event_urls
         from (
           select jsonb_array_elements(subs.api_consumer_subscriptions) as sub_event_array
           from (
@@ -16,13 +15,11 @@ module Webhooks
             where a.api_name = $1
             and a.consumer_id = $2
             and a.events -> 'subscriptions' is not null
-            and ( a.api_guid is null or a.api_guid = $4 )
           ) as subs
         ) as event_json
         where event_json.sub_event_array ->> 'event' = $3
-        ) as agg
       "
-      retrieve_event_urls(sql, api_name, consumer_id, event, api_guid)
+      retrieve_event_urls(sql, api_name, consumer_id, event)
     end
 
     def self.get_observers_by_guid(api_name:, consumer_id:, api_guid:)

@@ -37,21 +37,14 @@ module V1::Webhooks
       # todo all events must be under one api_name in the subscription
       webhook = params[:webhook]
       raise ParameterMissing('webhook', detail: 'You must provide a webhook subscription!') unless webhook
-      api_guid = params[:api_guid]
-      subscriptions = false
-
-      if webhook.respond_to? :read
-        subscriptions = validate_subscription(JSON.parse(webhook.read))
-      elsif webhook
-        subscriptions = validate_subscription(JSON.parse(webhook))
-      end
+      subscription_json = webhook.respond_to?(:read) ? webhook.read : webhook
+      subscriptions = validate_subscription(JSON.parse(subscription_json))
 
       resp = {}
-      prev_wh = Webhooks::Utilities.fetch_subscription(@consumer_id, subscriptions, api_guid)
-      wh = Webhooks::Utilities.register_webhook(@consumer_id, @consumer_name, subscriptions, api_guid)
+      prev_wh = Webhooks::Utilities.fetch_subscription(@consumer_id, subscriptions)
+      wh = Webhooks::Utilities.register_webhook(@consumer_id, @consumer_name, subscriptions)
       resp['consumer_name'] = wh.consumer_name
       resp['api_name'] = wh.api_name
-      resp['api_guid'] = wh.api_guid if wh.api_guid
       resp['previous_subscription'] = prev_wh&.events || {}
       resp['current_subscription'] = wh.events
       render status: :accepted,
