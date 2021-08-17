@@ -134,9 +134,11 @@ class AppealsApi::SwaggerSharedComponents
               formData: {
                 '$ref' => '#/components/schemas/hlrCreate'
               }
-            }
+            },
+            required: %w[id type attributes]
           }
-        }
+        },
+        required: ['data']
       },
       nod_response_schema: {
         type: :object,
