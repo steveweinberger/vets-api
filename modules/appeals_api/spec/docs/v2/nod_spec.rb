@@ -25,7 +25,7 @@ describe 'Notice of Disagreements', swagger_doc: 'modules/appeals_api/app/swagge
       consumes 'application/json'
       produces 'application/json'
 
-      parameter name: :hlr_body, in: :body, schema: { '$ref' => '#/components/schemas/nodCreateRoot' }
+      parameter name: :nod_body, in: :body, schema: { '$ref' => '#/components/schemas/nodCreateRoot' }
 
       parameter in: :body, examples: {
         'minimum fields used' => {
@@ -56,7 +56,7 @@ describe 'Notice of Disagreements', swagger_doc: 'modules/appeals_api/app/swagge
       parameter AppealsApi::SwaggerSharedComponents.header_params[:consumer_id_header]
 
       response '200', 'Info about a single Notice of Disagreement' do
-        let(:hlr_body) do
+        let(:nod_body) do
           JSON.parse(File.read(AppealsApi::Engine.root.join('spec', 'fixtures', 'valid_10182_minimum.json')))
         end
 
@@ -85,7 +85,7 @@ describe 'Notice of Disagreements', swagger_doc: 'modules/appeals_api/app/swagge
       end
 
       response '200', 'Info about a single Notice of Disagreement' do
-        let(:hlr_body) do
+        let(:nod_body) do
           JSON.parse(File.read(AppealsApi::Engine.root.join('spec', 'fixtures', 'valid_10182.json')))
         end
 
@@ -116,7 +116,7 @@ describe 'Notice of Disagreements', swagger_doc: 'modules/appeals_api/app/swagge
       response '422', 'Violates JSON schema' do
         schema JSON.parse(File.read(AppealsApi::Engine.root.join('spec', 'support', 'schemas', 'errors',
                                                                  'default.json')))
-        let(:hlr_body) do
+        let(:nod_body) do
           request_body = JSON.parse(File.read(AppealsApi::Engine.root.join('spec', 'fixtures', 'valid_10182.json')))
           request_body['data']['attributes'].delete('socOptIn')
           request_body
