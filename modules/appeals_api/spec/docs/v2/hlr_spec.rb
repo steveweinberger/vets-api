@@ -7,7 +7,6 @@ require 'rails_helper'
 require_relative '../../support/swagger_shared_components'
 
 # rubocop:disable RSpec/VariableName, RSpec/ScatteredSetup, RSpec/RepeatedExample, RSpec/RepeatedDescription, Layout/LineLength
-
 describe 'Higher-Level Reviews', swagger_doc: 'modules/appeals_api/app/swagger/appeals_api/v2/swagger.json', type: :request do
   let(:apikey) { 'apikey' }
 
