@@ -151,7 +151,7 @@ describe 'Higher-Level Reviews', swagger_doc: 'modules/appeals_api/app/swagger/a
       response '200', 'Info about a single Higher-Level Review' do
         schema AppealsApi::SwaggerSharedComponents.response_schemas[:hlr_response_schema]
 
-        hlr = FactoryBot.create(:higher_level_review)
+        hlr = FactoryBot.create(:minimal_higher_level_review_v2)
         let(:uuid) { hlr.id }
 
         before do |example|
@@ -425,12 +425,12 @@ describe 'Higher-Level Reviews', swagger_doc: 'modules/appeals_api/app/swagger/a
         end
       end
 
-      response '200', 'Info about a single Higher-Level Review' do
+      response '200', 'Valid' do
         let(:hlr_body) do
           JSON.parse(File.read(AppealsApi::Engine.root.join('spec', 'fixtures', 'valid_200996_v2.json')))
         end
 
-        schema AppealsApi::SwaggerSharedComponents.response_schemas[:hlr_response_schema]
+        schema JSON.parse(File.read(AppealsApi::Engine.root.join('spec', 'support', 'schemas', 'hlr_validate.json')))
 
         before do |example|
           submit_request(example.metadata)
