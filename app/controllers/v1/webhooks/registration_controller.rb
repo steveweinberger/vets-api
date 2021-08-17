@@ -40,16 +40,12 @@ module V1::Webhooks
       subscription_json = webhook.respond_to?(:read) ? webhook.read : webhook
       subscriptions = validate_subscription(JSON.parse(subscription_json))
 
-      resp = {}
       prev_wh = Webhooks::Utilities.fetch_subscription(@consumer_id, subscriptions)
       wh = Webhooks::Utilities.register_webhook(@consumer_id, @consumer_name, subscriptions)
-      resp['consumer_name'] = wh.consumer_name
-      resp['api_name'] = wh.api_name
-      resp['previous_subscription'] = prev_wh&.events || {}
-      resp['current_subscription'] = wh.events
       render status: :accepted,
-             json: resp
-             # serializer: VBADocuments::V2::UploadSerializer todo Kevin explore using a serializer here
+             json: wh,
+             previous_subscription: prev_wh&.events,
+             serializer: Webhooks::SubscriptionSerializer
     rescue JSON::ParserError => e
       raise Common::Exceptions::SchemaValidationErrors, ["invalid JSON. #{e.message}"] if e.is_a? JSON::ParserError
     end
