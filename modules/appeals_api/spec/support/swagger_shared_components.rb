@@ -69,14 +69,14 @@ class AppealsApi::SwaggerSharedComponents
         type: :string,
         name: 'X-VA-File-Number',
         required: false,
-        description: 'VA file number (c-file / css)'
+        description: 'Veteran\'s file number'
       },
       veteran_insurance_policy_number_header: {
         in: :header,
         type: :string,
         name: 'X-VA-Insurance-Policy-Number',
         required: false,
-        description: 'veteran\'s insurance policy number'
+        description: 'Veteran\'s insurance policy number'
       },
       consumer_username_header: {
         in: :header,
