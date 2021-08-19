@@ -102,8 +102,7 @@ module Webhooks
 
     # Validates a subscription request for an upload submission.  Returns an object representing the subscription
     def validate_subscription(subscriptions)
-      # TODO: move out of vba documents
-      schema_path = Pathname.new('modules/vba_documents/spec/fixtures/subscriptions/webhook_subscriptions_schema.json')
+      schema_path = Pathname.new('lib/webhooks/webhook_subscriptions_schema.json')
       schemer_formats = {
         'valid_urls' => ->(urls, _schema_info) { validate_urls(urls) },
         'valid_events' => ->(subscription, _schema_info) { validate_events(subscription) }
@@ -121,8 +120,14 @@ module Webhooks
       events = subscriptions.select { |s| s.key?('event') }.map { |s| s['event'] }
       raise SchemaValidationErrors, ["Duplicate Event(s) submitted! #{events}"] if Set.new(events).size != events.length
 
-      unsupported_events = events - Webhooks::Utilities.supported_events
+      api_names = subscriptions.select { |s| s.key?('event') }.map do |s|
+        Webhooks::Utilities.event_to_api_name[s['event']]
+      end
+      if Set.new(api_names).size > 1
+        raise SchemaValidationErrors, ["Subscription cannot span multiple APIs! #{api_names}"]
+      end
 
+      unsupported_events = events - Webhooks::Utilities.supported_events
       if unsupported_events.length.positive?
         raise SchemaValidationErrors, ["Invalid Event(s) submitted! #{unsupported_events}"]
       end

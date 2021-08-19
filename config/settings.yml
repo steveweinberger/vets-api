@@ -442,6 +442,9 @@ preneeds:
 
 webhooks:
   require_https: true
+  registration_next_run_in_minutes: 15
+  registration_max_retries: 5
+  enabled: false
 
 # Settings for VBA Document upload service module
 vba_documents:
@@ -462,9 +465,6 @@ vba_documents:
     topic_arns:
       - vetsgov-arn
       - vagov-arn
-  webhooks:
-    registration_next_run_in_minutes: 15
-    registration_max_retries: 3
 
 #Settings for Claims Api Module
 claims_api:

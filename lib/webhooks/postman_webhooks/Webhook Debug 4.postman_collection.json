@@ -1,7 +1,7 @@
 {
 	"info": {
-		"_postman_id": "6b8a4eb0-5a6a-4bb3-a714-f454a4b4743f",
-		"name": "Webhook Debug 1",
+		"_postman_id": "6f947962-204c-44ea-b0dd-d7c48ca38413",
+		"name": "Webhook Debug 4",
 		"description": "This collection will be executed sequently once hit by the incoming webhook.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -25,22 +25,7 @@
 							"var previousRequest = JSON.parse(globals.previousRequest),",
 							"    webhookRequestData = previousRequest;",
 							"",
-							"console.log(webhookRequestData)",
-							"",
-							"webhookRequestData.data.notifications.forEach(function(message, index){",
-							"    pm.test(`Webhook message ${index+1} has a guid`, function () {",
-							"        pm.expect(message).to.have.property('guid');",
-							"    });",
-							"    ",
-							"    pm.test(`Webhook message ${index+1} has an event`, function () {",
-							"        pm.expect(message).to.have.property('event');",
-							"    });",
-							"    ",
-							"    pm.test(`Webhook message ${index+1} has an api_name`, function () {",
-							"        pm.expect(message).to.have.property('api_name');",
-							"    });",
-							"    console.log(message['status_from'])",
-							"});"
+							"console.log(webhookRequestData)"
 						],
 						"type": "text/javascript"
 					}

@@ -8,11 +8,11 @@ module VBADocuments
 
     register_events('gov.va.developer.benefits-intake.status_change',
                     api_name: 'vba_documents-v2',
-                    max_retries: Settings.vba_documents.webhooks.registration_max_retries) do |ltas|
+                    max_retries: Settings.webhooks.registration_max_retries.presence || 3)  do |ltas|
       next_run = if ltas.nil?
                    0.seconds.from_now
                  else
-                   Settings.vba_documents.webhooks.registration_next_run_in_minutes.minutes.from_now
+                   Settings.webhooks.registration_next_run_in_minutes.minutes.from_now.presence || 15
                  end
       next_run
     rescue

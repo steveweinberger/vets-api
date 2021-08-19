@@ -18,36 +18,18 @@ module VBADocuments
       skip_before_action(:authenticate)
       before_action :verify_settings, only: [:download]
 
-      #  rubocop:disable Metrics/MethodLength
       def create
-        submission = nil
-        subscriptions = nil
-        VBADocuments::UploadSubmission.transaction do
-          submission = VBADocuments::UploadSubmission.create(
-            consumer_name: request.headers['X-Consumer-Username'],
-            consumer_id: request.headers['X-Consumer-ID']
-          )
-          observers = params[:observers]
-          if observers.respond_to? :read
-            subscriptions = validate_subscription(JSON.parse(observers.read))
-          elsif observers
-            subscriptions = validate_subscription(JSON.parse(observers))
-          end
-
-          if subscriptions
-            Webhooks::Utilities.register_webhook(
-              submission.consumer_id, submission.consumer_name, subscriptions, submission.guid
-            )
-          end
-        end
+        submission = VBADocuments::UploadSubmission.create(
+          consumer_name: request.headers['X-Consumer-Username'],
+          consumer_id: request.headers['X-Consumer-ID']
+        )
+        submission.metadata['version'] = 2
+        submission.save!
         render status: :accepted,
                json: submission,
                serializer: VBADocuments::V2::UploadSerializer,
                render_location: true
-      rescue JSON::ParserError => e
-        raise Common::Exceptions::SchemaValidationErrors, ["invalid JSON. #{e.message}"] if e.is_a? JSON::ParserError
       end
-      # rubocop:enable Metrics/MethodLength
 
       def show
         submission = VBADocuments::UploadSubmission.find_by(guid: params[:id])
