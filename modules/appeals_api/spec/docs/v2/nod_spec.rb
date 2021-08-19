@@ -389,5 +389,49 @@ describe 'Notice of Disagreements', swagger_doc: 'modules/appeals_api/app/swagge
       end
     end
   end
+
+  path '/path' do
+    put 'Accepts Notice of Disagreement Evidence Submission document upload.' do
+      tags 'Notice of Disagreements'
+      operationId 'putNoticeOfDisagreementEvidenceSubmission'
+      description File.read(AppealsApi::Engine.root.join('app', 'swagger', 'appeals_api', 'v1', 'put_description.md'))
+
+      parameter name: :'Content-MD5', in: :header, type: :string, description: 'Base64-encoded 128-bit MD5 digest of the message. Use for integrity control.'
+      let(:'Content-MD5') { nil }
+
+      response '200', 'Document upload staged' do
+        it 'returns a 200 response' do |example|
+          # noop
+        end
+      end
+
+      response '400', 'Document upload failed' do
+        produces 'application/xml'
+
+        schema type: :object,
+               description: 'Document upload failed',
+               xml: { 'name': 'Error' },
+               properties: {
+                 Code: {
+                   type: :string, description: 'Error code', example: 'Bad Digest'
+                 },
+                 Message: {
+                   type: :string, description: 'Error detail',
+                   example: 'A client error (InvalidDigest) occurred when calling the PutObject operation - The Content-MD5 you specified was invalid.'
+                 },
+                 Resource: {
+                   type: :string, description: 'Resource description', example: '/example_path_here/6d8433c1-cd55-4c24-affd-f592287a7572.upload'
+                 },
+                 RequestId: {
+                   type: :string, description: 'Identifier for debug purposes'
+                 }
+               }
+
+        it 'returns a 400 response' do |example|
+          # noop
+        end
+      end
+    end
+  end
 end
 # rubocop:enable RSpec/VariableName, RSpec/ScatteredSetup, RSpec/RepeatedExample, Layout/LineLength, RSpec/RepeatedDescription
