@@ -1015,6 +1015,7 @@ DEPENDENCIES
   faraday_middleware
   fast_jsonapi
   fastimage
+  ffi
   fhir_client (~> 4.0.6)
   flipper (~> 0.21.0)
   flipper-active_record (~> 0.21.0)
