@@ -35,6 +35,10 @@ module Webhooks
        Webhooks::Subscription.where(consumer_id: consumer_id).all
       end
 
+      def fetch_subscriptions_by_api_name(api_name) #api_name?
+        Webhooks::Subscription.where(api_name: api_name).all
+      end
+
       def record_notifications(consumer_id:, consumer_name:, event:, api_guid:, msg:)
         api_name = Webhooks::Utilities.event_to_api_name[event]
         webhook_urls = Webhooks::Subscription.get_notification_urls(api_name: api_name, consumer_id: consumer_id, event: event)

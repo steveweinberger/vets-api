@@ -5,7 +5,6 @@ require 'common/exceptions'
 module V1::Webhooks
   class RegistrationController < ApplicationController
     include Webhooks::Utilities
-    include Common::Exceptions
     skip_before_action(:verify_authenticity_token)
     skip_after_action :set_csrf_header
     skip_before_action :set_tags_and_extra_context, raise: false
@@ -15,7 +14,25 @@ module V1::Webhooks
     def list
       #  todo mandate api_name to simplify rspec tests. We don't have to spoof subscriptions across apis to test the list method
       api_name = params['api_name']
-      raise ParameterMissing('api_name', detail: 'You must provide an api name!') unless api_name
+      consumer_id = params['consumer_id']
+      unless api_name || consumer_id
+        raise Common::Exceptions::ParameterMissing.new(
+          'webhook',
+          detail: 'You must provide an API Name or Consumer ID!'
+        )
+      end
+      if consumer_id
+        wh = Webhooks::Utilities.fetch_subscriptions(consumer_id)
+      elsif api_name
+        wh = Webhooks::Utilities.fetch_subscriptions_by_api_name(api_name)
+      end
+
+      render status: :ok,
+             json: wh,
+             serializer: ActiveModel::Serializer::CollectionSerializer,
+             each_serializer: Webhooks::SubscriptionSerializer
+    rescue JSON::ParserError => e
+        raise Common::Exceptions::SchemaValidationErrors, ["invalid JSON. #{e.message}"] if e.is_a? JSON::ParserError
       #include data about callback urls in maintenance mode
     end
 
@@ -36,7 +53,13 @@ module V1::Webhooks
       # todo kevin - ensure we have an rspec test that you can only subscribe to one api / subscription
       # todo all events must be under one api_name in the subscription
       webhook = params[:webhook]
-      raise ParameterMissing('webhook', detail: 'You must provide a webhook subscription!') unless webhook
+      unless webhook
+        raise Common::Exceptions::ParameterMissing.new(
+          'webhook',
+          detail: 'You must provide a webhook subscription!'
+        )
+      end
+
       subscription_json = webhook.respond_to?(:read) ? webhook.read : webhook
       subscriptions = validate_subscription(JSON.parse(subscription_json))
 
