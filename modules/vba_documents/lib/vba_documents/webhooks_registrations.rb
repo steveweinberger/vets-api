@@ -19,12 +19,14 @@ module VBADocuments
       15.minutes.from_now
     end
     # todo place documentation outlining structure of failure data.  Something like:
-    # {401 => 3, 404 => 2, 501 => 1, 'Faraday::ClientError' => 3, 'total' => 9}
+    #  {"404"=>6, "420"=>4, "503"=>7, "total"=>27, "Faraday::Error"=>6, "Faraday::ClientError"=>4}
     register_failure_handler(api_name: "vba_documents-v2") do |failure_data|
       r_val = {}
       # failure_data
       # todo put in real impl
-      return 1.hour.from_now
+      Rails.logger.info("Webhooks: failure handler got #{failure_data}")
+      # {"404"=>6, "420"=>4, "503"=>7, "total"=>27, "Faraday::Error"=>6, "Faraday::ClientError"=>4}
+      1.hour.from_now
     end
   end
 end

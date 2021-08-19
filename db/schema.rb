@@ -875,11 +875,11 @@ ActiveRecord::Schema.define(version: 2021_08_13_888888) do
     t.jsonb "msg", null: false
     t.integer "final_attempt_id"
     t.integer "processing"
-    t.bigint "webhooks_subscriptions_id"
+    t.bigint "webhooks_subscription_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["api_name", "consumer_id", "final_attempt_id"], name: "index_wh_notify"
-    t.index ["webhooks_subscriptions_id"], name: "index_webhooks_notifications_on_webhooks_subscriptions_id"
+    t.index ["webhooks_subscription_id"], name: "index_webhooks_notifications_on_webhooks_subscription_id"
   end
 
   create_table "webhooks_subscriptions", force: :cascade do |t|
@@ -895,5 +895,5 @@ ActiveRecord::Schema.define(version: 2021_08_13_888888) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
-  add_foreign_key "webhooks_notifications", "webhooks_subscriptions", column: "webhooks_subscriptions_id"
+  add_foreign_key "webhooks_notifications", "webhooks_subscriptions"
 end

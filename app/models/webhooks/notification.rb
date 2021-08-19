@@ -13,6 +13,8 @@ module Webhooks
              class_name: 'Webhooks::NotificationAttempt',
              through: :webhooks_notification_attempt_assocs
 
+    belongs_to :webhooks_subscription, :class_name => 'Webhooks::Subscription'
+
     def final_attempt
       return nil unless final_attempt_id
 

@@ -37,9 +37,10 @@ module Webhooks
 
       def record_notifications(consumer_id:, consumer_name:, event:, api_guid:, msg:)
         api_name = Webhooks::Utilities.event_to_api_name[event]
+        # todo replace query with looking against the subscription
         webhook_urls = Webhooks::Subscription.get_notification_urls(api_name: api_name, consumer_id: consumer_id, event: event)
+        subscription = Webhooks::Subscription.where(consumer_id: consumer_id, api_name: api_name).first
         return [] unless webhook_urls.size.positive?
-
         notifications = []
         webhook_urls.each do |url|
           wh_notify = Webhooks::Notification.new
@@ -50,6 +51,7 @@ module Webhooks
           wh_notify.event = event
           wh_notify.callback_url = url
           wh_notify.msg = msg
+          wh_notify.webhooks_subscription = subscription
           notifications << wh_notify
         end
         ActiveRecord::Base.transaction { notifications.each(&:save!) }

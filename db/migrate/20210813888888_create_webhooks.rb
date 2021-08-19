@@ -20,8 +20,8 @@ class CreateWebhooks < ActiveRecord::Migration[6.1]
       t.string :callback_url, null: false
       t.jsonb :msg, null: false
       t.integer :final_attempt_id, null: true, default: nil
-      t.integer :processing, default: nil # this is used with the processing job to lock the records. Valid values are null or an epoch timestamp
-      t.references :webhooks_subscriptions, foreign_key: true
+      t.integer :processing, default: nil # used to lock the records. Valid values are null or an epoch timestamp
+      t.references :webhooks_subscription, index: true, foreign_key: true
       t.timestamps
 
       t.index %i[ api_name consumer_id final_attempt_id ], name: "index_wh_notify"

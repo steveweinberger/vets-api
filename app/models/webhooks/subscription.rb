@@ -4,6 +4,9 @@ module Webhooks
   class Subscription < ApplicationRecord
     # self.ignored_columns = ["api_guid"]
     self.table_name = 'webhooks_subscriptions'
+
+    has_many :webhooks_notifications, :class_name => 'Webhooks::Notification'
+
     def self.get_notification_urls(api_name:, consumer_id:, event:)
       sql = "
         select distinct (event_json.sub_event_array -> 'urls') as event_urls
