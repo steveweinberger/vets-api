@@ -2,7 +2,6 @@
 
 module Webhooks
   class Subscription < ApplicationRecord
-    # self.ignored_columns = ["api_guid"]
     self.table_name = 'webhooks_subscriptions'
 
     has_many :webhooks_notifications, :class_name => 'Webhooks::Notification'
