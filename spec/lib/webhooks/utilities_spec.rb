@@ -33,6 +33,10 @@ RSpec.describe 'Webhooks::Utilities' do
                                         api_name: 'TEST_API', max_retries: 3) do
       'working!'
     end
+    Webhooks::Utilities.register_events('test_event_multiple_APIs',
+                                        api_name: 'TEST_API_multiple_APIs', max_retries: 3) do
+      'working!'
+    end
   end
 
   before do
@@ -107,6 +111,16 @@ RSpec.describe 'Webhooks::Utilities' do
       TestHelper.new.validate_events(observers['subscriptions'])
     end.to raise_error do |e|
       expect(e.errors.first.detail).to match(/^invalid/i)
+    end
+  end
+
+  it 'detects events spanning multiple APIs' do
+    observers['subscriptions'] << observers['subscriptions'].first.deep_dup
+    observers['subscriptions'].last['event'] = 'test_event_multiple_APIs'
+    expect do
+      TestHelper.new.validate_events(observers['subscriptions'])
+    end.to raise_error do |e|
+      expect(e.errors.first.detail).to match(/^Subscription cannot span multiple APIs/i)
     end
   end
 
