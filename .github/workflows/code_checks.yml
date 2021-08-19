@@ -51,10 +51,9 @@ jobs:
 
       - uses: ruby/setup-ruby@v1
         env:
-          ImageOS: ubuntu18
+          ImageOS: ubuntu20
         with:
           bundler-cache: true
-          cache-version: 3
 
       - name: Setup Docker Buildx
         id: buildx
