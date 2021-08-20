@@ -2,7 +2,6 @@
 
 # note this logic is duplicated in the Dockerfile for prod builds,
 # if you make major alteration here, please check that usage as well
-gem pristine ffi
 
 bundle check || bundle install --binstubs="${BUNDLE_APP_CONFIG}/bin" --jobs=4 --deployment
 
@@ -14,3 +13,4 @@ if [ -e  "./docker_debugging" ] ; then
   rake docker_debugging:setup
 fi
 
+ln -s /usr/lib/x86_64-linux-gnu/libffi.so.6 /usr/lib/x86_64-linux-gnu/libffi.so.7
