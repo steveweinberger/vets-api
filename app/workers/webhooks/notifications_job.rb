@@ -14,8 +14,8 @@ module Webhooks
       Rails.logger.info "Webhooks::NotificationsJob on api_name  #{api_name}"
       # lock the rows that will be updated in this job run. The update releases the lock.
       # rubocop:disable Rails/SkipsModelValidations
-      ids = Webhooks::Notification.lock('FOR UPDATE').where(final_attempt_id: nil, processing: nil,
-                                                            api_name: api_name).pluck(:id)
+      args = {api_name: api_name, final_attempt_id: nil, processing: nil}
+      ids = Webhooks::Notification.lock('FOR UPDATE').where(args).pluck(:id)
       Webhooks::Notification.where(id: ids).update_all(processing: processing_time.to_i)
       # rubocop:enable Rails/SkipsModelValidations
 

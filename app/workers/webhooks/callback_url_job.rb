@@ -6,6 +6,7 @@ module Webhooks
     include Webhooks
 
     MAX_BODY_LENGTH = 500 # denotes the how large of a body from the client url we record in our db.
+    FAILURE_KEY = 'failure_hash'
 
     SPOOF = Struct.new(:success?, :status, :body)
 
@@ -13,21 +14,33 @@ module Webhooks
       @url = url
       @ids = ids
       @max_retries = max_retries
-      @subscription = Webhooks::Notification.find_by(id: ids.first).webhooks_subscription
-      r = Webhooks::Notification.where(id: ids)
-      @msg = {'notifications' => []}
-      r.each do |notification|
-        @msg['notifications'] << notification.msg
+      @subscription = Webhooks::Notification.find_by(id: @ids.first).webhooks_subscription
+
+      if run_later?
+        # wait to run later based on the api failure schedule so update the processing column to nil
+        # for these ids so they will be checked on the next run
+        Notification.where(id: @ids).update_all(processing: nil)
+      else
+        @msg = {'api_name' => @subscription.api_name, 'notifications' => []}
+        Webhooks::Notification.where(id: ids).order(:event, :api_guid, :created_at).each do |notification|
+          @msg['notifications'] << notification.msg
+        end
+        Rails.logger.debug "Webhooks::CallbackUrlJob Notifying on callback url #{url} for ids #{ids} with msg #{@msg}"
+        notify
       end
-      Rails.logger.debug "Webhooks::CallbackUrlJob Notifying on callback url #{url} for ids #{ids} with msg #{@msg}"
-      notify
     end
 
     private
 
+    def run_later?
+      metadata = @subscription.metadata
+      run_after_epoch = metadata[@url][FAILURE_KEY]['run_after_epoch'].to_i rescue 0
+      run_after_epoch > Time.now.to_i
+    end
+
     def exception_testing
       should_fail = @redis.get('faraday_failure')
-      unless (should_fail.to_s.empty?)
+      unless should_fail.to_s.empty?
         raise eval(should_fail)
         #Faraday::ClientError.new("I am bad")
         # @redis.set('faraday_failure', %q(Faraday::ClientError.new("I am bad")))
@@ -43,7 +56,7 @@ module Webhooks
       @redis = Redis.new(host: 'redis', port: 6379)
       exception_testing
       should_fail = @redis.get('hook_failure')
-      if (!should_fail.to_s.empty?)
+      if !should_fail.to_s.empty?
         status = @redis.get('hook_status')
         @response = SPOOF.new(false, status.to_i, 'billy')
       else
@@ -92,15 +105,14 @@ module Webhooks
     end
 
     def record_attempt_metadata(attempt_response)
-      #
       @subscription.with_lock do
         metadata = @subscription.metadata
-        failure_key = 'failure_hash'
         metadata[@url] ||= {}
-        if (@successful)
+
+        if @successful
           metadata[@url] = {} # todo preserve maintenance
         else
-          metadata[@url][failure_key] ||= {}
+          metadata[@url][FAILURE_KEY] ||= {}
           status_code = nil
           if attempt_response.has_key? NotificationAttempt::RESPONSE_EXCEPTION
             status_code =
@@ -108,25 +120,24 @@ module Webhooks
           else
             status_code = attempt_response[NotificationAttempt::RESPONSE_STATUS]
           end
-          metadata[@url][failure_key][NotificationAttempt::RESPONSE_STATUS] ||= {}
-          metadata[@url][failure_key][NotificationAttempt::RESPONSE_STATUS]['total'] ||= 0
-          metadata[@url][failure_key][NotificationAttempt::RESPONSE_STATUS]['total'] += 1
-          metadata[@url][failure_key][NotificationAttempt::RESPONSE_STATUS][status_code.to_s] ||= 0
-          metadata[@url][failure_key][NotificationAttempt::RESPONSE_STATUS][status_code.to_s] += 1
+          metadata[@url][FAILURE_KEY][NotificationAttempt::RESPONSE_STATUS] ||= {}
+          metadata[@url][FAILURE_KEY][NotificationAttempt::RESPONSE_STATUS]['total'] ||= 0
+          metadata[@url][FAILURE_KEY][NotificationAttempt::RESPONSE_STATUS]['total'] += 1
+          metadata[@url][FAILURE_KEY][NotificationAttempt::RESPONSE_STATUS][status_code.to_s] ||= 0
+          metadata[@url][FAILURE_KEY][NotificationAttempt::RESPONSE_STATUS][status_code.to_s] += 1
 
           # calculate next time via block and record
           failure_block = Utilities.api_name_to_failure_block[@subscription.api_name]
           next_time = 1.hour.from_now
           begin
-            next_time = failure_block.call(metadata[@url][failure_key][NotificationAttempt::RESPONSE_STATUS])
+            next_time = failure_block.call(metadata[@url][FAILURE_KEY][NotificationAttempt::RESPONSE_STATUS])
           rescue => e
             Rails.logger.error("For #{@subscription.api_name} the webhook failure block failed to execute.", e)
           end
           # todo wrap in handlers and default to a time if a bad time is given (say one hour)
-          metadata[@url][failure_key]['run_after'] = next_time
+          metadata[@url][FAILURE_KEY]['run_after_epoch'] = next_time.to_i
         end
         @subscription.metadata = metadata
-
         @subscription.save!
       end
     end
@@ -151,4 +162,3 @@ module Webhooks
     end
   end
 end
-# {401: 5, 543: 6, exception: 7, unseccsful: 5 + 6, total: 5+6+7}

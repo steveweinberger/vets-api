@@ -4,29 +4,40 @@ module VBADocuments
   module Registrations
     include Webhooks::Utilities
 
-    WEBHOOK_STATUS_CHANGE_EVENT = 'gov.va.developer.benefits-intake.status_change'
+    WEBHOOK_STATUS_CHANGE_EVENT = 'gov.va.benefits-intake.status_change'
+    WEBHOOK_API_NAME = 'GOV.VA.BENEFITS-INTAKE'
+    WEBHOOK_DEFAULT_RUN_MINS = 5
 
-    register_events('gov.va.developer.benefits-intake.status_change',
-                    api_name: 'vba_documents-v2',
-                    max_retries: Settings.webhooks.registration_max_retries.presence || 3)  do |ltas|
-      next_run = if ltas.nil?
-                   0.seconds.from_now
-                 else
-                   Settings.webhooks.registration_next_run_in_minutes.minutes.from_now.presence || 15
-                 end
-      next_run
+    register_events(WEBHOOK_STATUS_CHANGE_EVENT,
+                    api_name: WEBHOOK_API_NAME,
+                    max_retries: Settings.vba_documents.webhooks.registration_max_retries || 3) do |last|
+      registration_next_run_mins = Settings.vba_documents.webhooks.registration_next_run_in_minutes
+      next_run = last ? (registration_next_run_mins || WEBHOOK_DEFAULT_RUN_MINS) : 0
+      next_run.minutes.from_now
     rescue
-      15.minutes.from_now
+      WEBHOOK_DEFAULT_RUN_MINS.minutes.from_now
     end
+
     # todo place documentation outlining structure of failure data.  Something like:
     #  {"404"=>6, "420"=>4, "503"=>7, "total"=>27, "Faraday::Error"=>6, "Faraday::ClientError"=>4}
-    register_failure_handler(api_name: "vba_documents-v2") do |failure_data|
-      r_val = {}
-      # failure_data
-      # todo put in real impl
+    register_failure_handler(api_name: WEBHOOK_API_NAME) do |failure_data|
       Rails.logger.info("Webhooks: failure handler got #{failure_data}")
       # {"404"=>6, "420"=>4, "503"=>7, "total"=>27, "Faraday::Error"=>6, "Faraday::ClientError"=>4}
-      1.hour.from_now
+      next_run_mins =
+        case failure_data['total']
+        when 1..3
+          0
+        when 4..10
+          5
+        when 11..20
+          20
+        when 21..50
+          40
+        else
+          80
+        end
+
+      next_run_mins.minutes.from_now.to_i
     end
   end
 end
