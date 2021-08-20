@@ -60,4 +60,8 @@ Mobile::Engine.routes.draw do
       end
     end
   end
+
+  namespace :v1 do
+    get '/appointments', to: 'appointments#index'
+  end
 end

@@ -61,7 +61,7 @@ module Mobile
 
       def fetch_cached_or_service(validated_params)
         appointments = nil
-        appointments = Mobile::V0::Appointment.get_cached(@current_user) if use_cache?(validated_params)
+        appointments = appointment_class.get_cached(@current_user) if use_cache?(validated_params)
 
         # if appointments has been retrieved from redis, delete the cached version and return recovered appointments
         # otherwise fetch appointments from the upstream service
@@ -72,7 +72,7 @@ module Mobile
             start_date: [validated_params[:start_date], one_year_ago].min,
             end_date: [validated_params[:end_date], one_year_from_now].max
           )
-          Mobile::V0::Appointment.set_cached(@current_user, appointments)
+          appointment_class.set_cached(@current_user, appointments)
           Rails.logger.info('mobile appointments service fetch', user_uuid: @current_user.uuid)
         end
 
@@ -118,6 +118,10 @@ module Mobile
 
       def appointments_proxy
         Mobile::V0::Appointments::Proxy.new(@current_user)
+      end
+      
+      def appointment_class
+        Mobile::V0::Appointment
       end
     end
   end
