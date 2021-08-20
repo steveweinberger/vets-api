@@ -24,8 +24,6 @@ COPY config/ca-trust/* /usr/local/share/ca-certificates/
 # rename .pem files to .crt because update-ca-certificates ignores files that are not .crt
 RUN cd /usr/local/share/ca-certificates ; for i in *.pem ; do mv $i ${i/pem/crt} ; done ; update-ca-certificates
 
-RUN curl -LO http://mirrors.kernel.org/ubuntu/pool/main/libf/libffi/libffi6_3.2.1-8_amd64.deb && \
-    dpkg -i libffi6_3.2.1-8_amd64.deb
 WORKDIR /srv/vets-api/src
 
 ###
@@ -49,7 +47,7 @@ COPY --chown=vets-api:vets-api config/freshclam.conf docker-entrypoint.sh ./
 USER vets-api
 # XXX: this is tacky
 RUN freshclam --config-file freshclam.conf
-RUN gem install vtk
+RUN gem install vtk && gem install ffi
 ENTRYPOINT ["/usr/bin/dumb-init", "--", "./docker-entrypoint.sh"]
 
 ###
