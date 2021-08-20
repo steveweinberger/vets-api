@@ -12,5 +12,3 @@ if [ -e  "./docker_debugging" ] ; then
   echo starting rake docker_debugging:setup
   rake docker_debugging:setup
 fi
-
-ln -s /usr/lib/x86_64-linux-gnu/libffi.so.6 /usr/lib/x86_64-linux-gnu/libffi.so.7
