@@ -3,7 +3,6 @@
 module Mobile
   module V1
     class AppointmentsController < Mobile::V0::AppointmentsController
-    
       private
 
       def appointments_proxy

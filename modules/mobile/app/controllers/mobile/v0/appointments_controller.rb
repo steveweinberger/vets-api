@@ -119,7 +119,7 @@ module Mobile
       def appointments_proxy
         Mobile::V0::Appointments::Proxy.new(@current_user)
       end
-      
+
       def appointment_class
         Mobile::V0::Appointment
       end

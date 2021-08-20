@@ -83,10 +83,10 @@ module Mobile
 
         # rubocop:disable Metrics/MethodLength
         def build_appointment_model(appointment_hash, facilities)
-          facility_id = Mobile::V0::Appointment.toggle_non_prod_id!(
+          facility_id = appointment_model.toggle_non_prod_id!(
             appointment_hash[:facility_id]
           )
-          sta6aid = Mobile::V0::Appointment.toggle_non_prod_id!(
+          sta6aid = appointment_model.toggle_non_prod_id!(
             appointment_hash[:sta6aid]
           )
 
@@ -98,7 +98,7 @@ module Mobile
           status = status(details, type, start_date_utc)
 
           cancel_id = if booked_va_appointment?(status, type)
-                        Mobile::V0::Appointment.encode_cancel_id(
+                        appointment_model.encode_cancel_id(
                           start_date_local: start_date_local,
                           clinic_id: appointment_hash[:clinic_id],
                           facility_id: facility_id,
@@ -125,7 +125,7 @@ module Mobile
 
           Rails.logger.info('metric.mobile.appointment.type', type: type)
 
-          model = Mobile::V0::Appointment.new(adapted_hash)
+          model = appointment_model.new(adapted_hash)
           facilities.add(model.id_for_address)
 
           model
@@ -289,6 +289,10 @@ module Mobile
           return nil unless provider
 
           provider.first.dig(:location, :facility, :name)
+        end
+
+        def appointment_model
+          Mobile::V0::Appointment
         end
       end
     end
