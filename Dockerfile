@@ -25,7 +25,7 @@ COPY config/ca-trust/* /usr/local/share/ca-certificates/
 RUN cd /usr/local/share/ca-certificates ; for i in *.pem ; do mv $i ${i/pem/crt} ; done ; update-ca-certificates
 
 RUN curl -LO http://mirrors.kernel.org/ubuntu/pool/main/libf/libffi/libffi6_3.2.1-8_amd64.deb && \
-    apt install ./libffi6_3.2.1-8_amd64.deb
+    dpkg -i libffi6_3.2.1-8_amd64.deb
 WORKDIR /srv/vets-api/src
 
 ###
