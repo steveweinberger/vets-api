@@ -390,6 +390,285 @@ describe 'Notice of Disagreements', swagger_doc: 'modules/appeals_api/app/swagge
     end
   end
 
+  path '/notice_of_disagreements/evidence_submissions/' do
+    post 'Get a location for subsequent evidence submission document upload PUT request' do
+      tags 'Notice of Disagreements'
+      operationId 'postNoticeOfDisagreementEvidenceSubmission'
+      description <<~DESC
+        This is the first step to submitting supporting evidence for an NOD.  (See the Evidence Uploads section above for additional information.)
+
+        The Notice of Disagreement GUID that is returned when the NOD is submitted, is supplied to this endpoint to ensure the NOD is in a valid state for sending supporting evidence documents.  Only NODs that selected the Evidence Submission lane are allowed to submit evidence documents up to 90 days after the NOD is received by VA.
+      DESC
+
+      parameter name: :nod_uuid, in: :query, type: :string, required: true, description: 'Associated Notice of Disagreement UUID'
+
+      parameter AppealsApi::SwaggerSharedComponents.header_params[:veteran_ssn_header]
+      let(:'X-VA-SSN') { '123456789' }
+
+      security [
+        { apikey: [] }
+      ]
+      produces 'application/json'
+
+      response '202', 'Accepted. Location generated' do
+        nod = FactoryBot.create(:minimal_notice_of_disagreement, board_review_option: 'evidence_submission')
+        let(:nod_uuid) { nod.id }
+
+        schema type: :object,
+               required: ['data'],
+               properties: {
+                 data: {
+                   description: 'Status record for a previously initiated document submission.',
+                   required: %w[id type attributes],
+                   properties: {
+                     id: {
+                       description: 'JSON API identifier',
+                       type: :string,
+                       format: :uuid,
+                       example: '6d8433c1-cd55-4c24-affd-f592287a7572'
+                     },
+                     type: {
+                       description: 'JSON API type specification',
+                       type: :string,
+                       example: 'document_upload'
+                     },
+                     attributes: {
+                       required: %w[guid status],
+                       properties: {
+                         guid: {
+                           description: 'The document upload identifier',
+                           type: :string,
+                           format: :uuid,
+                           example: '6d8433c1-cd55-4c24-affd-f592287a7572'
+                         },
+                         status: {
+                           type: :string,
+                           example: 'pending',
+                           enum: ['pending', '...']
+                         },
+                         code: {
+                           type: :string
+                         },
+                         detail: {
+                           type: :string,
+                           description: 'Human readable error detail. Only present if status = "error"'
+                         },
+                         location: {
+                           description: 'Location to which to PUT document Payload',
+                           type: :string,
+                           format: 'uri',
+                           example: 'https://sandbox-api.va.gov/example_path_here/{idpath}'
+                         },
+                         updated_at: {
+                           description: 'The last time the submission was updated',
+                           type: :string,
+                           format: 'date-time',
+                           example: '2018-07-30T17:31:15.958Z'
+                         },
+                         uploaded_pdf: {
+                           description: 'Only populated after submission starts processing',
+                           example: 'null'
+                         }
+                       }
+                     }
+                   }
+                 }
+               }
+
+        before do |example|
+          submit_request(example.metadata)
+        end
+
+        after do |example|
+          example.metadata[:response][:content] = {
+            'application/json' => {
+              example: JSON.parse(response.body, symbolize_names: true)
+            }
+          }
+        end
+
+        it 'returns a 202 response' do |example|
+          assert_response_matches_metadata(example.metadata)
+        end
+      end
+
+      response '400', 'Bad Request' do
+        let(:nod_uuid) { nil }
+
+        schema type: :object,
+               properties: {
+                 errors: {
+                   type: :array,
+                   items: {
+                     properties: {
+                       status: {
+                         type: 'integer',
+                         example: 400
+                       },
+                       detail: {
+                         type: 'string',
+                         example: 'Must supply a corresponding NOD id in order to submit evidence'
+                       }
+                     }
+                   }
+                 }
+               }
+
+        before do |example|
+          submit_request(example.metadata)
+        end
+
+        after do |example|
+          example.metadata[:response][:content] = {
+            'application/json' => {
+              example: JSON.parse(response.body, symbolize_names: true)
+            }
+          }
+        end
+
+        it 'returns a 400 response' do |example|
+          # assert_response_matches_metadata(example.metadata)
+        end
+      end
+
+      response '404', 'Associated Notice of Disagreement not found' do
+        let(:nod_uuid) { nil }
+
+        schema type: :object,
+               properties: {
+                 errors: {
+                   type: :array,
+                   items: {
+                     properties: {
+                       status: {
+                         type: 'integer',
+                         example: 404
+                       },
+                       detail: {
+                         type: 'string',
+                         example: 'The record identified by {nod_uuid} not found.'
+                       }
+                     }
+                   }
+                 }
+               }
+
+        before do |example|
+          submit_request(example.metadata)
+        end
+
+        after do |example|
+          example.metadata[:response][:content] = {
+            'application/json' => {
+              example: JSON.parse(response.body, symbolize_names: true)
+            }
+          }
+        end
+
+        it 'returns a 404 response' do |example|
+          assert_response_matches_metadata(example.metadata)
+        end
+      end
+
+      response '422', 'Validation errors' do
+        nod = FactoryBot.create(:minimal_notice_of_disagreement, board_review_option: 'evidence_submission')
+        let(:nod_uuid) { nod.id }
+        let(:'X-VA-SSN') { '000000000' }
+
+        schema type: :object,
+               properties: {
+                 title: {
+                   type: 'string',
+                   enum: [
+                     'unprocessable_entity'
+                   ],
+                   example: 'unprocessable_entity'
+                 },
+                 detail: {
+                   type: 'string',
+                   enum: [
+                     "Request header 'X-VA-SSN' does not match the associated Notice of Disagreement's SSN",
+                     "Corresponding Notice of Disagreement 'boardReviewOption' must be 'evidence_submission'"
+                   ],
+                   example: "Corresponding Notice of Disagreement 'boardReviewOption' must be 'evidence_submission'"
+                 },
+                 status: {
+                   type: 'integer',
+                   description: 'Standard HTTP error response code.',
+                   example: 422
+                 }
+               }
+
+        before do |example|
+          submit_request(example.metadata)
+        end
+
+        after do |example|
+          example.metadata[:response][:content] = {
+            'application/json' => {
+              example: JSON.parse(response.body, symbolize_names: true)
+            }
+          }
+        end
+
+        it 'returns a 422 response' do |example|
+          assert_response_matches_metadata(example.metadata)
+        end
+      end
+
+      response '500', 'Unknown Error' do
+        let(:nod_uuid) { nil }
+
+        schema type: :object,
+               properties: {
+                 errors: {
+                   type: :array,
+                   items: {
+                     properties: {
+                       status: {
+                         type: 'integer',
+                         example: 500
+                       },
+                       detail: {
+                         type: 'string',
+                         example: 'An unknown error has occurred.'
+                       },
+                       code: {
+                         type: 'string',
+                         example: '151'
+                       },
+                       title: {
+                         type: 'string',
+                         example: 'Internal Server Error'
+                       }
+                     }
+                   }
+                 },
+                 status: {
+                   type: 'integer',
+                   example: 500
+                 }
+               }
+
+        before do |example|
+          submit_request(example.metadata)
+        end
+
+        # after do |example|
+        #   example.metadata[:response][:content] = {
+        #     'application/json' => {
+        #       example: JSON.parse(response.body, symbolize_names: true)
+        #     }
+        #   }
+        # end
+
+        it 'returns a 500 response' do |example|
+          # assert_response_matches_metadata(example.metadata)
+        end
+      end
+    end
+  end
+
   path '/path' do
     put 'Accepts Notice of Disagreement Evidence Submission document upload.' do
       tags 'Notice of Disagreements'
