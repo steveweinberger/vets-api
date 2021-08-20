@@ -182,6 +182,60 @@ class AppealsApi::SwaggerSharedComponents
           }
         },
         required: ['data']
+      },
+
+      evidence_submission_response_schema: {
+        type: :object,
+        properties: {
+          data: {
+            properties: {
+              id: {
+                type: :string,
+                pattern: '^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$'
+              },
+              type: {
+                type: :string,
+                enum: ['evidenceSubmission']
+              },
+              attributes: {
+                properties: {
+                  status: {
+                    type: :string,
+                    example: VBADocuments::UploadSubmission::ALL_STATUSES.first,
+                    enum: VBADocuments::UploadSubmission::ALL_STATUSES
+                  },
+                  # code: {
+                  #   type: :string
+                  # },
+                  # detail: {
+                  #   type: :string
+                  # },
+                  appealType: {
+                    type: :string,
+                    enum: ['NoticeOfDisagreement']
+                  },
+                  appealId: {
+                    type: :string,
+                    pattern: '^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$'
+                  },
+                  # location: {
+                  #   type: :string,
+                  # },
+                  updatedAt: {
+                    type: :string,
+                    pattern: '\d{4}(-\d{2}){2}T\d{2}(:\d{2}){2}\.\d{3}Z'
+                  },
+                  createdAt: {
+                    type: :string,
+                    pattern: '\d{4}(-\d{2}){2}T\d{2}(:\d{2}){2}\.\d{3}Z'
+                  }
+                }
+              }
+            },
+            required: %w[id type attributes]
+          }
+        },
+        required: ['data']
       }
     }
   end

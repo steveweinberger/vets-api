@@ -712,5 +712,65 @@ describe 'Notice of Disagreements', swagger_doc: 'modules/appeals_api/app/swagge
       end
     end
   end
+
+  path '/notice_of_disagreements/evidence_submissions/{uuid}' do
+    get 'Returns all of the data associated with a specific Notice of Disagreement Evidence Submission.' do
+      tags 'Notice of Disagreements'
+      operationId 'getNoticeOfDisagreementEvidenceSubmission'
+      description 'Returns all of the data associated with a specific Notice of Disagreement Evidence Submission.'
+
+      security [
+        { apikey: [] }
+      ]
+      produces 'application/json'
+
+      parameter name: :uuid, in: :path, type: :string, description: 'Notice of Disagreement UUID Evidence Submission'
+
+      response '200', 'Info about a single Notice of Disagreement Evidence Submission.' do
+        schema AppealsApi::SwaggerSharedComponents.response_schemas[:evidence_submission_response_schema]
+
+        evidence_submission = FactoryBot.create(:evidence_submission)
+        let(:uuid) { evidence_submission.guid }
+
+        before do |example|
+          submit_request(example.metadata)
+        end
+
+        after do |example|
+          example.metadata[:response][:content] = {
+            'application/json' => {
+              example: JSON.parse(response.body, symbolize_names: true)
+            }
+          }
+        end
+
+        it 'returns a 200 response' do |example|
+          assert_response_matches_metadata(example.metadata)
+        end
+      end
+
+      response '404', 'Notice of Disagreement Evidence Submission not found' do
+        schema JSON.parse(File.read(AppealsApi::Engine.root.join('spec', 'support', 'schemas', 'errors', '404.json')))
+
+        let(:uuid) { 'invalid' }
+
+        before do |example|
+          submit_request(example.metadata)
+        end
+
+        after do |example|
+          example.metadata[:response][:content] = {
+            'application/json' => {
+              example: JSON.parse(response.body, symbolize_names: true)
+            }
+          }
+        end
+
+        it 'returns a 404 response' do |example|
+          assert_response_matches_metadata(example.metadata)
+        end
+      end
+    end
+  end
 end
 # rubocop:enable RSpec/VariableName, RSpec/ScatteredSetup, RSpec/RepeatedExample, Layout/LineLength, RSpec/RepeatedDescription
