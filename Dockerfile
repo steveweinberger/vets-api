@@ -43,7 +43,8 @@ ENV RAILS_ENV=$rails_env
 # only extra dev/build opts go here, common packages go in base 👆
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     git build-essential libxml2-dev libxslt-dev libpq-dev && \
-    ln -s /usr/lib/x86_64-linux-gnu/libffi.so.6 /usr/lib/x86_64-linux-gnu/libffi.so.7
+    ln -s /usr/lib/x86_64-linux-gnu/libffi.so.6 /usr/lib/x86_64-linux-gnu/libffi.so.7 && \
+    ln -s /usr/lib/x86_64-linux-gnu/libm.so.6 /usr/lib/x86_64-linux-gnu/libm.so.7
 COPY --chown=vets-api:vets-api config/freshclam.conf docker-entrypoint.sh ./
 USER vets-api
 # XXX: this is tacky
