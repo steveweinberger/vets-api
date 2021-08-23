@@ -5,6 +5,19 @@ module Webhooks
     self.table_name = 'webhooks_subscriptions'
 
     has_many :webhooks_notifications, :class_name => 'Webhooks::Notification'
+    BLOCKED_CALLBACK = 100.years.from_now
+    FAILURE_KEY = 'failure_hash'
+    RUN_AFTER = 'run_after_epoch'
+
+    def blocked_callback_urls
+      metadata = self.metadata
+      ret = []
+      metadata.keys.each do |url|
+        run_after = metadata[url][FAILURE_KEY][RUN_AFTER].to_i rescue 0
+        ret << url if run_after > 10.years.from_now
+      end
+      ret
+    end
 
     def self.get_notification_urls(api_name:, consumer_id:, event:)
       sql = "

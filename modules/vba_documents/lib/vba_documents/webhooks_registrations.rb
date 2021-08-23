@@ -4,8 +4,8 @@ module VBADocuments
   module Registrations
     include Webhooks::Utilities
 
-    WEBHOOK_STATUS_CHANGE_EVENT = 'gov.va.benefits-intake.status_change'
-    WEBHOOK_API_NAME = 'GOV.VA.BENEFITS-INTAKE'
+    WEBHOOK_STATUS_CHANGE_EVENT = 'gov.va.developer.benefits-intake.status_change'
+    WEBHOOK_API_NAME = 'vba_documents-v2'
     WEBHOOK_DEFAULT_RUN_MINS = 5
 
     register_events(WEBHOOK_STATUS_CHANGE_EVENT,
@@ -34,7 +34,7 @@ module VBADocuments
         when 21..50
           40
         else
-          80
+          Webhooks::Subscription::BLOCKED_CALLBACK
         end
 
       next_run_mins.minutes.from_now.to_i
