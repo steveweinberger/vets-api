@@ -47,6 +47,7 @@ module Webhooks
         return [] unless webhook_urls.size.positive?
         notifications = []
         webhook_urls.each do |url|
+          next if subscription.blocked_callback_urls.include? url
           wh_notify = Webhooks::Notification.new
           wh_notify.api_name = api_name
           wh_notify.consumer_id = consumer_id

@@ -36,6 +36,10 @@ module Webhooks
       run_after_epoch > Time.current.to_i
     end
 
+    def seal_off_blocked?
+      @subscription.blocked_callback_urls.include? @url
+    end
+
     def exception_testing
       should_fail = @redis.get('faraday_failure')
       unless should_fail.to_s.empty?
@@ -87,6 +91,7 @@ module Webhooks
         # create the notification attempt record
         attempt = create_attempt(attempt_response)
         # write an association record tied to each notification used in this attempt
+        notifications = []
         Webhooks::Notification.where(id: @ids).each do |notification|
           create_attempt_assoc(notification, attempt)
 
@@ -96,13 +101,14 @@ module Webhooks
           end
 
           notification.processing = nil
-          notification.save!
+          notifications << notification
         end
-        record_attempt_metadata(attempt_response)
+        record_attempt_metadata(attempt_response, notifications,  attempt)
+        notifications.each(&:save!)
       end
     end
 
-    def record_attempt_metadata(attempt_response)
+    def record_attempt_metadata(attempt_response, notifications, attempt)
       @subscription.with_lock do
         metadata = @subscription.metadata
         metadata[@url] ||= {}
@@ -137,6 +143,11 @@ module Webhooks
         end
         @subscription.metadata = metadata
         @subscription.save!
+        if seal_off_blocked?
+          notifications.each do |n|
+            n.final_attempt_id = attempt.id
+          end
+        end
       end
     end
 

@@ -14,7 +14,7 @@ module Webhooks
       ret = []
       metadata.keys.each do |url|
         run_after = metadata[url][FAILURE_KEY][RUN_AFTER].to_i rescue 0
-        ret << url if run_after > 10.years.from_now
+        ret << url if run_after > 10.years.from_now.to_i
       end
       ret
     end

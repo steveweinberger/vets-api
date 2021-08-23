@@ -11,4 +11,5 @@ Rails.application.reloader.to_prepare do
     end
   end
   require './lib/webhooks/utilities'
+  Webhooks::Notification.where('processing is not null').update_all(processing: nil)
 end

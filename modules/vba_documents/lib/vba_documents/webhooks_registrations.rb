@@ -23,21 +23,21 @@ module VBADocuments
     register_failure_handler(api_name: WEBHOOK_API_NAME) do |failure_data|
       Rails.logger.info("Webhooks: failure handler got #{failure_data}")
       # {"404"=>6, "420"=>4, "503"=>7, "total"=>27, "Faraday::Error"=>6, "Faraday::ClientError"=>4}
-      next_run_mins =
+      next_run =
         case failure_data['total']
         when 1..3
-          0
-        when 4..10
-          5
-        when 11..20
-          20
-        when 21..50
-          40
+          0.minutes.from_now
+        # when 4..10
+        #   5.minutes.from_now
+        # when 11..20
+        #   20.minutes.from_now
+        # when 21..50
+        #   40.minutes.from_now
         else
           Webhooks::Subscription::BLOCKED_CALLBACK
         end
 
-      next_run_mins.minutes.from_now.to_i
+      next_run
     end
   end
 end
