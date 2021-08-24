@@ -65,6 +65,10 @@ describe 'Notice of Disagreements', swagger_doc: 'modules/appeals_api/app/swagge
           submit_request(example.metadata)
         end
 
+        it 'minimum fields used' do |example|
+          assert_response_matches_metadata(example.metadata)
+        end
+
         after do |example|
           response_title = example.metadata[:description]
           example.metadata[:response][:content] = {
@@ -76,10 +80,6 @@ describe 'Notice of Disagreements', swagger_doc: 'modules/appeals_api/app/swagge
               }
             }
           }
-        end
-
-        it 'minimum fields used' do |example|
-          assert_response_matches_metadata(example.metadata)
         end
       end
 
@@ -94,6 +94,10 @@ describe 'Notice of Disagreements', swagger_doc: 'modules/appeals_api/app/swagge
           submit_request(example.metadata)
         end
 
+        it 'all fields used' do |example|
+          assert_response_matches_metadata(example.metadata)
+        end
+
         after do |example|
           response_title = example.metadata[:description]
           example.metadata[:response][:content] = {
@@ -105,10 +109,6 @@ describe 'Notice of Disagreements', swagger_doc: 'modules/appeals_api/app/swagge
               }
             }
           }
-        end
-
-        it 'all fields used' do |example|
-          assert_response_matches_metadata(example.metadata)
         end
       end
 
@@ -125,16 +125,16 @@ describe 'Notice of Disagreements', swagger_doc: 'modules/appeals_api/app/swagge
           submit_request(example.metadata)
         end
 
+        it 'returns a 422 response' do |example|
+          assert_response_matches_metadata(example.metadata)
+        end
+
         after do |example|
           example.metadata[:response][:content] = {
             'application/json' => {
               example: JSON.parse(response.body, symbolize_names: true)
             }
           }
-        end
-
-        it 'returns a 422 response' do |example|
-          assert_response_matches_metadata(example.metadata)
         end
       end
     end
@@ -163,16 +163,16 @@ describe 'Notice of Disagreements', swagger_doc: 'modules/appeals_api/app/swagge
           submit_request(example.metadata)
         end
 
+        it 'returns a 200 response' do |example|
+          assert_response_matches_metadata(example.metadata)
+        end
+
         after do |example|
           example.metadata[:response][:content] = {
             'application/json' => {
               example: JSON.parse(response.body, symbolize_names: true)
             }
           }
-        end
-
-        it 'returns a 200 response' do |example|
-          assert_response_matches_metadata(example.metadata)
         end
       end
 
@@ -185,16 +185,16 @@ describe 'Notice of Disagreements', swagger_doc: 'modules/appeals_api/app/swagge
           submit_request(example.metadata)
         end
 
+        it 'returns a 404 response' do |example|
+          assert_response_matches_metadata(example.metadata)
+        end
+
         after do |example|
           example.metadata[:response][:content] = {
             'application/json' => {
               example: JSON.parse(response.body, symbolize_names: true)
             }
           }
-        end
-
-        it 'returns a 404 response' do |example|
-          assert_response_matches_metadata(example.metadata)
         end
       end
     end
@@ -215,16 +215,16 @@ describe 'Notice of Disagreements', swagger_doc: 'modules/appeals_api/app/swagge
           submit_request(example.metadata)
         end
 
+        it 'returns a 200 response' do |example|
+          assert_response_matches_metadata(example.metadata)
+        end
+
         after do |example|
           example.metadata[:response][:content] = {
             'application/json' => {
               example: JSON.parse(response.body, symbolize_names: true)
             }
           }
-        end
-
-        it 'returns a 200 response' do |example|
-          assert_response_matches_metadata(example.metadata)
         end
       end
     end
@@ -281,6 +281,10 @@ describe 'Notice of Disagreements', swagger_doc: 'modules/appeals_api/app/swagge
           submit_request(example.metadata)
         end
 
+        it 'minimum fields used' do |example|
+          assert_response_matches_metadata(example.metadata)
+        end
+
         after do |example|
           response_title = example.metadata[:description]
           example.metadata[:response][:content] = {
@@ -292,10 +296,6 @@ describe 'Notice of Disagreements', swagger_doc: 'modules/appeals_api/app/swagge
               }
             }
           }
-        end
-
-        it 'minimum fields used' do |example|
-          assert_response_matches_metadata(example.metadata)
         end
       end
 
@@ -310,6 +310,10 @@ describe 'Notice of Disagreements', swagger_doc: 'modules/appeals_api/app/swagge
           submit_request(example.metadata)
         end
 
+        it 'all fields used' do |example|
+          assert_response_matches_metadata(example.metadata)
+        end
+
         after do |example|
           response_title = example.metadata[:description]
           example.metadata[:response][:content] = {
@@ -321,10 +325,6 @@ describe 'Notice of Disagreements', swagger_doc: 'modules/appeals_api/app/swagge
               }
             }
           }
-        end
-
-        it 'all fields used' do |example|
-          assert_response_matches_metadata(example.metadata)
         end
       end
 
@@ -341,6 +341,10 @@ describe 'Notice of Disagreements', swagger_doc: 'modules/appeals_api/app/swagge
           submit_request(example.metadata)
         end
 
+        it 'Violates JSON schema' do |example|
+          assert_response_matches_metadata(example.metadata)
+        end
+
         after do |example|
           response_title = example.metadata[:description]
           example.metadata[:response][:content] = {
@@ -352,10 +356,6 @@ describe 'Notice of Disagreements', swagger_doc: 'modules/appeals_api/app/swagge
               }
             }
           }
-        end
-
-        it 'Violates JSON schema' do |example|
-          assert_response_matches_metadata(example.metadata)
         end
       end
 
@@ -370,6 +370,10 @@ describe 'Notice of Disagreements', swagger_doc: 'modules/appeals_api/app/swagge
           submit_request(example.metadata)
         end
 
+        it 'Not JSON object' do |example|
+          assert_response_matches_metadata(example.metadata)
+        end
+
         after do |example|
           response_title = example.metadata[:description]
           example.metadata[:response][:content] = {
@@ -381,10 +385,6 @@ describe 'Notice of Disagreements', swagger_doc: 'modules/appeals_api/app/swagge
               }
             }
           }
-        end
-
-        it 'Not JSON object' do |example|
-          assert_response_matches_metadata(example.metadata)
         end
       end
     end
@@ -479,16 +479,16 @@ describe 'Notice of Disagreements', swagger_doc: 'modules/appeals_api/app/swagge
           submit_request(example.metadata)
         end
 
+        it 'returns a 202 response' do |example|
+          assert_response_matches_metadata(example.metadata)
+        end
+
         after do |example|
           example.metadata[:response][:content] = {
             'application/json' => {
               example: JSON.parse(response.body, symbolize_names: true)
             }
           }
-        end
-
-        it 'returns a 202 response' do |example|
-          assert_response_matches_metadata(example.metadata)
         end
       end
 
@@ -518,16 +518,16 @@ describe 'Notice of Disagreements', swagger_doc: 'modules/appeals_api/app/swagge
           submit_request(example.metadata)
         end
 
+        it 'returns a 400 response' do |example|
+          # assert_response_matches_metadata(example.metadata)
+        end
+
         after do |example|
           example.metadata[:response][:content] = {
             'application/json' => {
               example: JSON.parse(response.body, symbolize_names: true)
             }
           }
-        end
-
-        it 'returns a 400 response' do |example|
-          # assert_response_matches_metadata(example.metadata)
         end
       end
 
@@ -557,16 +557,16 @@ describe 'Notice of Disagreements', swagger_doc: 'modules/appeals_api/app/swagge
           submit_request(example.metadata)
         end
 
+        it 'returns a 404 response' do |example|
+          assert_response_matches_metadata(example.metadata)
+        end
+
         after do |example|
           example.metadata[:response][:content] = {
             'application/json' => {
               example: JSON.parse(response.body, symbolize_names: true)
             }
           }
-        end
-
-        it 'returns a 404 response' do |example|
-          assert_response_matches_metadata(example.metadata)
         end
       end
 
@@ -603,16 +603,16 @@ describe 'Notice of Disagreements', swagger_doc: 'modules/appeals_api/app/swagge
           submit_request(example.metadata)
         end
 
+        it 'returns a 422 response' do |example|
+          assert_response_matches_metadata(example.metadata)
+        end
+
         after do |example|
           example.metadata[:response][:content] = {
             'application/json' => {
               example: JSON.parse(response.body, symbolize_names: true)
             }
           }
-        end
-
-        it 'returns a 422 response' do |example|
-          assert_response_matches_metadata(example.metadata)
         end
       end
 
@@ -654,6 +654,10 @@ describe 'Notice of Disagreements', swagger_doc: 'modules/appeals_api/app/swagge
           submit_request(example.metadata)
         end
 
+        it 'returns a 500 response' do |example|
+          # assert_response_matches_metadata(example.metadata)
+        end
+
         # after do |example|
         #   example.metadata[:response][:content] = {
         #     'application/json' => {
@@ -661,10 +665,6 @@ describe 'Notice of Disagreements', swagger_doc: 'modules/appeals_api/app/swagge
         #     }
         #   }
         # end
-
-        it 'returns a 500 response' do |example|
-          # assert_response_matches_metadata(example.metadata)
-        end
       end
     end
   end
@@ -736,16 +736,16 @@ describe 'Notice of Disagreements', swagger_doc: 'modules/appeals_api/app/swagge
           submit_request(example.metadata)
         end
 
+        it 'returns a 200 response' do |example|
+          assert_response_matches_metadata(example.metadata)
+        end
+
         after do |example|
           example.metadata[:response][:content] = {
             'application/json' => {
               example: JSON.parse(response.body, symbolize_names: true)
             }
           }
-        end
-
-        it 'returns a 200 response' do |example|
-          assert_response_matches_metadata(example.metadata)
         end
       end
 
@@ -758,16 +758,16 @@ describe 'Notice of Disagreements', swagger_doc: 'modules/appeals_api/app/swagge
           submit_request(example.metadata)
         end
 
+        it 'returns a 404 response' do |example|
+          assert_response_matches_metadata(example.metadata)
+        end
+
         after do |example|
           example.metadata[:response][:content] = {
             'application/json' => {
               example: JSON.parse(response.body, symbolize_names: true)
             }
           }
-        end
-
-        it 'returns a 404 response' do |example|
-          assert_response_matches_metadata(example.metadata)
         end
       end
     end
