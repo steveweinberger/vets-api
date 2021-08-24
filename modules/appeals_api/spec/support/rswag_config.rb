@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/MethodLength, Layout/LineLength
+# rubocop:disable Metrics/MethodLength, Layout/LineLength, Metrics/ClassLength
 class AppealsApi::RswagConfig
   def write_schema
     write_hlr_v2_schema!
@@ -534,4 +534,4 @@ class AppealsApi::RswagConfig
     end
   end
 end
-# rubocop:enable Metrics/MethodLength, Layout/LineLength
+# rubocop:enable Metrics/MethodLength, Layout/LineLength, Metrics/ClassLength
