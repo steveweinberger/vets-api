@@ -25,6 +25,10 @@ module Webhooks
         wh
       end
 
+      def create_blocked_attempt(url)
+        Webhooks::NotificationAttempt.create(callback_url: url, response: {'status' => -1, 'body' => ''})
+      end
+
       def fetch_subscription(consumer_id, subscription)
         event = subscription['subscriptions'].first['event']
         api_name = Webhooks::Utilities.event_to_api_name[event]

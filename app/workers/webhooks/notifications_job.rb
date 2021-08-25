@@ -26,7 +26,7 @@ module Webhooks
         CallbackUrlJob.perform_async(url, notify_ids, max_retries)
       end
 
-      Rails.logger.info "Webhooks::NotificationsJob Webhooks::StartupJob.new.perform #{processing_time} for #{api_name}"
+      Rails.logger.info "Webhooks::NotificationsJob CallbackUrlJob.new.perform #{processing_time} for #{api_name}"
       -> { job_id } # Used under test
     rescue => e
       Rails.logger.error("Webhooks::NotificationsJob Error in NotificationsJob #{e.message}", e)

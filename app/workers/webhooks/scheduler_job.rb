@@ -11,6 +11,8 @@ module Webhooks
       results = []
       Rails.logger.info "Webhooks::SchedulerJob SchedulerJob.perform #{api_name} at time #{processing_time}"
       if api_name.nil?
+        # this block is run once on a deploy
+        Webhooks::Notification.where('processing is not null').update_all(processing: nil)
         Webhooks::Utilities.api_name_to_time_block.each_pair do |name, block|
           results << go(name, processing_time, block)
         end
@@ -37,7 +39,7 @@ module Webhooks
         end
         result << time_to_start
         result << Webhooks::NotificationsJob.perform_in(time_to_start, api_name)
-        Rails.logger.info "Webhooks::SchedulerJob kicked off #{api_name} at time #{time_to_start}"
+        Rails.logger.info "Webhooks::SchedulerJob kicked off #{api_name} for time #{time_to_start}"
       rescue => e
         Rails.logger.error("Webhooks::SchedulerJob Failed to kick of jobs for api_name #{api_name}", e)
         result = nil

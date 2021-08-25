@@ -103,12 +103,12 @@ module Webhooks
           notification.processing = nil
           notifications << notification
         end
-        record_attempt_metadata(attempt_response, notifications,  attempt)
+        record_attempt_metadata(attempt_response, notifications)
         notifications.each(&:save!)
       end
     end
 
-    def record_attempt_metadata(attempt_response, notifications, attempt)
+    def record_attempt_metadata(attempt_response, notifications)
       @subscription.with_lock do
         metadata = @subscription.metadata
         metadata[@url] ||= {}
@@ -144,8 +144,10 @@ module Webhooks
         @subscription.metadata = metadata
         @subscription.save!
         if seal_off_blocked?
+          attempt = Webhooks::Utilities.create_blocked_attempt(@url)
           notifications.each do |n|
             n.final_attempt_id = attempt.id
+            create_attempt_assoc(n, attempt)
           end
         end
       end
