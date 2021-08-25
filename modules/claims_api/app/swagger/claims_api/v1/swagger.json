@@ -496,7 +496,7 @@
               "application/json": {
                 "example": {
                   "data": {
-                    "id": "f08a1a28-3d66-4278-90af-9905090ed644",
+                    "id": "6d5f6f8f-b497-4ff2-8156-2371389982be",
                     "type": "claims_api_claim",
                     "attributes": {
                       "evss_id": 600118851,
@@ -545,11 +545,11 @@
                       "status": "Initial review",
                       "supporting_documents": [
                         {
-                          "id": "fd3b9411-2a1b-4005-a537-f4912e2dc832",
+                          "id": "fd4a03bf-1c3c-410a-8ecf-57f1e6528186",
                           "type": "claim_supporting_document",
                           "md5": "d927c7e283b3158a54822a493d06181d",
                           "filename": "extras.pdf",
-                          "uploaded_at": "2021-08-18T21:41:28.871Z"
+                          "uploaded_at": "2021-08-24T19:20:02.869Z"
                         }
                       ]
                     }
@@ -1120,10 +1120,24 @@
                               "description": "A Change of Address Object being submitted.",
                               "type": "object",
                               "additionalProperties": false,
+                              "required": [
+                                "country",
+                                "type",
+                                "addressLine1",
+                                "addressChangeType",
+                                "beginningDate"
+                              ],
                               "properties": {
                                 "beginningDate": {
                                   "description": "Date in YYYY-MM-DD the Veteran changed address.",
+                                  "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$",
                                   "type": "string",
+                                  "example": "2018-06-04"
+                                },
+                                "endingDate": {
+                                  "description": "Date in YYYY-MM-DD the changed address expires, if change is temporary.",
+                                  "type": "string",
+                                  "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$",
                                   "example": "2018-06-04"
                                 },
                                 "addressChangeType": {
@@ -1199,6 +1213,20 @@
                                 {
                                   "if": {
                                     "properties": {
+                                      "addressChangeType": {
+                                        "const": "TEMPORARY"
+                                      }
+                                    }
+                                  },
+                                  "then": {
+                                    "required": [
+                                      "endingDate"
+                                    ]
+                                  }
+                                },
+                                {
+                                  "if": {
+                                    "properties": {
                                       "type": {
                                         "const": "INTERNATIONAL"
                                       }
@@ -1206,12 +1234,7 @@
                                   },
                                   "then": {
                                     "required": [
-                                      "beginningDate",
-                                      "addressChangeType",
-                                      "addressLine1",
                                       "city",
-                                      "country",
-                                      "type",
                                       "internationalPostalCode"
                                     ]
                                   }
@@ -1226,13 +1249,8 @@
                                   },
                                   "then": {
                                     "required": [
-                                      "beginningDate",
-                                      "addressChangeType",
-                                      "addressLine1",
                                       "city",
-                                      "country",
                                       "zipFirstFive",
-                                      "type",
                                       "state"
                                     ]
                                   }
@@ -1247,14 +1265,9 @@
                                   },
                                   "then": {
                                     "required": [
-                                      "beginningDate",
-                                      "addressChangeType",
-                                      "addressLine1",
-                                      "country",
                                       "zipFirstFive",
                                       "militaryStateCode",
-                                      "militaryPostOfficeTypeCode",
-                                      "type"
+                                      "militaryPostOfficeTypeCode"
                                     ]
                                   }
                                 }
@@ -1421,13 +1434,13 @@
                                   "activeDutyBeginDate": {
                                     "description": "Date Started Active Duty.",
                                     "type": "string",
-                                    "pattern": "^(\\d{4}|XXXX)-(0[1-9]|1[0-2]|XX)-(0[1-9]|[1-2][0-9]|3[0-1]|XX)$",
+                                    "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$",
                                     "example": "1980-02-05"
                                   },
                                   "activeDutyEndDate": {
                                     "description": "Date Completed Active Duty.",
                                     "type": "string",
-                                    "pattern": "^(\\d{4}|XXXX)-(0[1-9]|1[0-2]|XX)-(0[1-9]|[1-2][0-9]|3[0-1]|XX)$",
+                                    "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$",
                                     "example": "1990-01-02"
                                   },
                                   "separationLocationCode": {
@@ -1451,11 +1464,11 @@
                                 "properties": {
                                   "confinementBeginDate": {
                                     "type": "string",
-                                    "pattern": "^(\\d{4}|XXXX)-(0[1-9]|1[0-2]|XX)-(0[1-9]|[1-2][0-9]|3[0-1]|XX)$"
+                                    "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$"
                                   },
                                   "confinementEndDate": {
                                     "type": "string",
-                                    "pattern": "^(\\d{4}|XXXX)-(0[1-9]|1[0-2]|XX)-(0[1-9]|[1-2][0-9]|3[0-1]|XX)$"
+                                    "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$"
                                   }
                                 }
                               }
@@ -1482,21 +1495,21 @@
                                   "properties": {
                                     "anticipatedSeparationDate": {
                                       "type": "string",
-                                      "pattern": "^(\\d{4}|XXXX)-(0[1-9]|1[0-2]|XX)-(0[1-9]|[1-2][0-9]|3[0-1]|XX)$"
+                                      "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$"
                                     },
                                     "title10ActivationDate": {
                                       "type": "string",
-                                      "pattern": "^(\\d{4}|XXXX)-(0[1-9]|1[0-2]|XX)-(0[1-9]|[1-2][0-9]|3[0-1]|XX)$"
+                                      "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$"
                                     }
                                   }
                                 },
                                 "obligationTermOfServiceFromDate": {
                                   "type": "string",
-                                  "pattern": "^(\\d{4}|XXXX)-(0[1-9]|1[0-2]|XX)-(0[1-9]|[1-2][0-9]|3[0-1]|XX)$"
+                                  "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$"
                                 },
                                 "obligationTermOfServiceToDate": {
                                   "type": "string",
-                                  "pattern": "^(\\d{4}|XXXX)-(0[1-9]|1[0-2]|XX)-(0[1-9]|[1-2][0-9]|3[0-1]|XX)$"
+                                  "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$"
                                 },
                                 "unitName": {
                                   "type": "string"
@@ -1755,9 +1768,7 @@
                                 "enum": [
                                   "NONE",
                                   "NEW",
-                                  "SECONDARY",
-                                  "INCREASE",
-                                  "REOPEN"
+                                  "INCREASE"
                                 ],
                                 "example": "NEW"
                               },
@@ -1792,8 +1803,7 @@
                                         "NONE",
                                         "NEW",
                                         "SECONDARY",
-                                        "INCREASE",
-                                        "REOPEN"
+                                        "INCREASE"
                                       ],
                                       "example": "SECONDARY"
                                     },
@@ -2011,13 +2021,13 @@
                               "startDate": {
                                 "description": "Date Veteran started treatment.",
                                 "type": "string",
-                                "pattern": "^(\\d{4}|XXXX)-(0[1-9]|1[0-2]|XX)-(0[1-9]|[1-2][0-9]|3[0-1]|XX)$",
+                                "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$",
                                 "example": "2018-03-02"
                               },
                               "endDate": {
                                 "description": "Date Veteran ended treatment.",
                                 "type": "string",
-                                "pattern": "^(\\d{4}|XXXX)-(0[1-9]|1[0-2]|XX)-(0[1-9]|[1-2][0-9]|3[0-1]|XX)$",
+                                "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$",
                                 "example": "2018-03-02"
                               },
                               "treatedDisabilityNames": {
@@ -2149,6 +2159,21 @@
                                   "type": "string",
                                   "example": "Will be retiring soon."
                                 }
+                              },
+                              "if": {
+                                "properties": {
+                                  "willReceiveInFuture": {
+                                    "const": true
+                                  }
+                                },
+                                "required": [
+                                  "willReceiveInFuture"
+                                ]
+                              },
+                              "then": {
+                                "required": [
+                                  "futurePayExplanation"
+                                ]
                               }
                             },
                             "hasSeparationPay": {
@@ -2215,7 +2240,7 @@
                                 "receivedDate": {
                                   "description": "Approximate date separation pay was received.",
                                   "type": "string",
-                                  "pattern": "^(\\d{4}|XXXX)-(0[1-9]|1[0-2]|XX)-(0[1-9]|[1-2][0-9]|3[0-1]|XX)$",
+                                  "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$",
                                   "example": "2018-03-02"
                                 }
                               }
@@ -2285,7 +2310,7 @@
                         "claimDate": {
                           "description": "Date when claim is being submitted to the VA.",
                           "type": "string",
-                          "pattern": "^(\\d{4}|XXXX)-(0[1-9]|1[0-2]|XX)-(0[1-9]|[1-2][0-9]|3[0-1]|XX)$",
+                          "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$",
                           "example": "2018-08-28"
                         }
                       }
@@ -2368,7 +2393,7 @@
               "application/json": {
                 "example": {
                   "data": {
-                    "id": "e3485ba4-39af-410e-9fb8-0335156ad749",
+                    "id": "c88b87bd-4be1-4f5b-b31f-ad69ce7e3d18",
                     "type": "claims_api_claim",
                     "attributes": {
                       "evss_id": null,
@@ -2386,13 +2411,13 @@
                       "current_phase_back": null,
                       "requested_decision": null,
                       "claim_type": null,
-                      "updated_at": "2021-08-18T21:41:29.378Z",
+                      "updated_at": "2021-08-24T19:20:03.276Z",
                       "contention_list": null,
                       "va_representative": null,
                       "events_timeline": [
 
                       ],
-                      "token": "e3485ba4-39af-410e-9fb8-0335156ad749",
+                      "token": "c88b87bd-4be1-4f5b-b31f-ad69ce7e3d18",
                       "status": "pending",
                       "flashes": [
                         "Hardship",
@@ -2913,10 +2938,24 @@
                                 "description": "A Change of Address Object being submitted.",
                                 "type": "object",
                                 "additionalProperties": false,
+                                "required": [
+                                  "country",
+                                  "type",
+                                  "addressLine1",
+                                  "addressChangeType",
+                                  "beginningDate"
+                                ],
                                 "properties": {
                                   "beginningDate": {
                                     "description": "Date in YYYY-MM-DD the Veteran changed address.",
+                                    "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$",
                                     "type": "string",
+                                    "example": "2018-06-04"
+                                  },
+                                  "endingDate": {
+                                    "description": "Date in YYYY-MM-DD the changed address expires, if change is temporary.",
+                                    "type": "string",
+                                    "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$",
                                     "example": "2018-06-04"
                                   },
                                   "addressChangeType": {
@@ -2992,6 +3031,20 @@
                                   {
                                     "if": {
                                       "properties": {
+                                        "addressChangeType": {
+                                          "const": "TEMPORARY"
+                                        }
+                                      }
+                                    },
+                                    "then": {
+                                      "required": [
+                                        "endingDate"
+                                      ]
+                                    }
+                                  },
+                                  {
+                                    "if": {
+                                      "properties": {
                                         "type": {
                                           "const": "INTERNATIONAL"
                                         }
@@ -2999,12 +3052,7 @@
                                     },
                                     "then": {
                                       "required": [
-                                        "beginningDate",
-                                        "addressChangeType",
-                                        "addressLine1",
                                         "city",
-                                        "country",
-                                        "type",
                                         "internationalPostalCode"
                                       ]
                                     }
@@ -3019,13 +3067,8 @@
                                     },
                                     "then": {
                                       "required": [
-                                        "beginningDate",
-                                        "addressChangeType",
-                                        "addressLine1",
                                         "city",
-                                        "country",
                                         "zipFirstFive",
-                                        "type",
                                         "state"
                                       ]
                                     }
@@ -3040,14 +3083,9 @@
                                     },
                                     "then": {
                                       "required": [
-                                        "beginningDate",
-                                        "addressChangeType",
-                                        "addressLine1",
-                                        "country",
                                         "zipFirstFive",
                                         "militaryStateCode",
-                                        "militaryPostOfficeTypeCode",
-                                        "type"
+                                        "militaryPostOfficeTypeCode"
                                       ]
                                     }
                                   }
@@ -3214,13 +3252,13 @@
                                     "activeDutyBeginDate": {
                                       "description": "Date Started Active Duty.",
                                       "type": "string",
-                                      "pattern": "^(\\d{4}|XXXX)-(0[1-9]|1[0-2]|XX)-(0[1-9]|[1-2][0-9]|3[0-1]|XX)$",
+                                      "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$",
                                       "example": "1980-02-05"
                                     },
                                     "activeDutyEndDate": {
                                       "description": "Date Completed Active Duty.",
                                       "type": "string",
-                                      "pattern": "^(\\d{4}|XXXX)-(0[1-9]|1[0-2]|XX)-(0[1-9]|[1-2][0-9]|3[0-1]|XX)$",
+                                      "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$",
                                       "example": "1990-01-02"
                                     },
                                     "separationLocationCode": {
@@ -3244,11 +3282,11 @@
                                   "properties": {
                                     "confinementBeginDate": {
                                       "type": "string",
-                                      "pattern": "^(\\d{4}|XXXX)-(0[1-9]|1[0-2]|XX)-(0[1-9]|[1-2][0-9]|3[0-1]|XX)$"
+                                      "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$"
                                     },
                                     "confinementEndDate": {
                                       "type": "string",
-                                      "pattern": "^(\\d{4}|XXXX)-(0[1-9]|1[0-2]|XX)-(0[1-9]|[1-2][0-9]|3[0-1]|XX)$"
+                                      "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$"
                                     }
                                   }
                                 }
@@ -3275,21 +3313,21 @@
                                     "properties": {
                                       "anticipatedSeparationDate": {
                                         "type": "string",
-                                        "pattern": "^(\\d{4}|XXXX)-(0[1-9]|1[0-2]|XX)-(0[1-9]|[1-2][0-9]|3[0-1]|XX)$"
+                                        "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$"
                                       },
                                       "title10ActivationDate": {
                                         "type": "string",
-                                        "pattern": "^(\\d{4}|XXXX)-(0[1-9]|1[0-2]|XX)-(0[1-9]|[1-2][0-9]|3[0-1]|XX)$"
+                                        "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$"
                                       }
                                     }
                                   },
                                   "obligationTermOfServiceFromDate": {
                                     "type": "string",
-                                    "pattern": "^(\\d{4}|XXXX)-(0[1-9]|1[0-2]|XX)-(0[1-9]|[1-2][0-9]|3[0-1]|XX)$"
+                                    "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$"
                                   },
                                   "obligationTermOfServiceToDate": {
                                     "type": "string",
-                                    "pattern": "^(\\d{4}|XXXX)-(0[1-9]|1[0-2]|XX)-(0[1-9]|[1-2][0-9]|3[0-1]|XX)$"
+                                    "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$"
                                   },
                                   "unitName": {
                                     "type": "string"
@@ -3548,9 +3586,7 @@
                                   "enum": [
                                     "NONE",
                                     "NEW",
-                                    "SECONDARY",
-                                    "INCREASE",
-                                    "REOPEN"
+                                    "INCREASE"
                                   ],
                                   "example": "NEW"
                                 },
@@ -3585,8 +3621,7 @@
                                           "NONE",
                                           "NEW",
                                           "SECONDARY",
-                                          "INCREASE",
-                                          "REOPEN"
+                                          "INCREASE"
                                         ],
                                         "example": "SECONDARY"
                                       },
@@ -3804,13 +3839,13 @@
                                 "startDate": {
                                   "description": "Date Veteran started treatment.",
                                   "type": "string",
-                                  "pattern": "^(\\d{4}|XXXX)-(0[1-9]|1[0-2]|XX)-(0[1-9]|[1-2][0-9]|3[0-1]|XX)$",
+                                  "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$",
                                   "example": "2018-03-02"
                                 },
                                 "endDate": {
                                   "description": "Date Veteran ended treatment.",
                                   "type": "string",
-                                  "pattern": "^(\\d{4}|XXXX)-(0[1-9]|1[0-2]|XX)-(0[1-9]|[1-2][0-9]|3[0-1]|XX)$",
+                                  "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$",
                                   "example": "2018-03-02"
                                 },
                                 "treatedDisabilityNames": {
@@ -3942,6 +3977,21 @@
                                     "type": "string",
                                     "example": "Will be retiring soon."
                                   }
+                                },
+                                "if": {
+                                  "properties": {
+                                    "willReceiveInFuture": {
+                                      "const": true
+                                    }
+                                  },
+                                  "required": [
+                                    "willReceiveInFuture"
+                                  ]
+                                },
+                                "then": {
+                                  "required": [
+                                    "futurePayExplanation"
+                                  ]
                                 }
                               },
                               "hasSeparationPay": {
@@ -4008,7 +4058,7 @@
                                   "receivedDate": {
                                     "description": "Approximate date separation pay was received.",
                                     "type": "string",
-                                    "pattern": "^(\\d{4}|XXXX)-(0[1-9]|1[0-2]|XX)-(0[1-9]|[1-2][0-9]|3[0-1]|XX)$",
+                                    "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$",
                                     "example": "2018-03-02"
                                   }
                                 }
@@ -4078,7 +4128,7 @@
                           "claimDate": {
                             "description": "Date when claim is being submitted to the VA.",
                             "type": "string",
-                            "pattern": "^(\\d{4}|XXXX)-(0[1-9]|1[0-2]|XX)-(0[1-9]|[1-2][0-9]|3[0-1]|XX)$",
+                            "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$",
                             "example": "2018-08-28"
                           }
                         }
@@ -4174,7 +4224,7 @@
               "application/json": {
                 "example": {
                   "data": {
-                    "id": "0ad8e22c-a76f-402b-9078-cc8b51727969",
+                    "id": "d4730b83-3deb-41d5-8592-9747e099dc83",
                     "type": "claims_api_claim",
                     "attributes": {
                       "evss_id": null,
@@ -4192,13 +4242,13 @@
                       "current_phase_back": null,
                       "requested_decision": null,
                       "claim_type": null,
-                      "updated_at": "2021-08-18T21:41:29.707Z",
+                      "updated_at": "2021-08-24T19:20:03.609Z",
                       "contention_list": null,
                       "va_representative": null,
                       "events_timeline": [
 
                       ],
-                      "token": "0ad8e22c-a76f-402b-9078-cc8b51727969",
+                      "token": "d4730b83-3deb-41d5-8592-9747e099dc83",
                       "status": "pending",
                       "flashes": [
                         "Hardship",
@@ -5120,10 +5170,24 @@
                                 "description": "A Change of Address Object being submitted.",
                                 "type": "object",
                                 "additionalProperties": false,
+                                "required": [
+                                  "country",
+                                  "type",
+                                  "addressLine1",
+                                  "addressChangeType",
+                                  "beginningDate"
+                                ],
                                 "properties": {
                                   "beginningDate": {
                                     "description": "Date in YYYY-MM-DD the Veteran changed address.",
+                                    "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$",
                                     "type": "string",
+                                    "example": "2018-06-04"
+                                  },
+                                  "endingDate": {
+                                    "description": "Date in YYYY-MM-DD the changed address expires, if change is temporary.",
+                                    "type": "string",
+                                    "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$",
                                     "example": "2018-06-04"
                                   },
                                   "addressChangeType": {
@@ -5199,6 +5263,20 @@
                                   {
                                     "if": {
                                       "properties": {
+                                        "addressChangeType": {
+                                          "const": "TEMPORARY"
+                                        }
+                                      }
+                                    },
+                                    "then": {
+                                      "required": [
+                                        "endingDate"
+                                      ]
+                                    }
+                                  },
+                                  {
+                                    "if": {
+                                      "properties": {
                                         "type": {
                                           "const": "INTERNATIONAL"
                                         }
@@ -5206,12 +5284,7 @@
                                     },
                                     "then": {
                                       "required": [
-                                        "beginningDate",
-                                        "addressChangeType",
-                                        "addressLine1",
                                         "city",
-                                        "country",
-                                        "type",
                                         "internationalPostalCode"
                                       ]
                                     }
@@ -5226,13 +5299,8 @@
                                     },
                                     "then": {
                                       "required": [
-                                        "beginningDate",
-                                        "addressChangeType",
-                                        "addressLine1",
                                         "city",
-                                        "country",
                                         "zipFirstFive",
-                                        "type",
                                         "state"
                                       ]
                                     }
@@ -5247,14 +5315,9 @@
                                     },
                                     "then": {
                                       "required": [
-                                        "beginningDate",
-                                        "addressChangeType",
-                                        "addressLine1",
-                                        "country",
                                         "zipFirstFive",
                                         "militaryStateCode",
-                                        "militaryPostOfficeTypeCode",
-                                        "type"
+                                        "militaryPostOfficeTypeCode"
                                       ]
                                     }
                                   }
@@ -5421,13 +5484,13 @@
                                     "activeDutyBeginDate": {
                                       "description": "Date Started Active Duty.",
                                       "type": "string",
-                                      "pattern": "^(\\d{4}|XXXX)-(0[1-9]|1[0-2]|XX)-(0[1-9]|[1-2][0-9]|3[0-1]|XX)$",
+                                      "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$",
                                       "example": "1980-02-05"
                                     },
                                     "activeDutyEndDate": {
                                       "description": "Date Completed Active Duty.",
                                       "type": "string",
-                                      "pattern": "^(\\d{4}|XXXX)-(0[1-9]|1[0-2]|XX)-(0[1-9]|[1-2][0-9]|3[0-1]|XX)$",
+                                      "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$",
                                       "example": "1990-01-02"
                                     },
                                     "separationLocationCode": {
@@ -5451,11 +5514,11 @@
                                   "properties": {
                                     "confinementBeginDate": {
                                       "type": "string",
-                                      "pattern": "^(\\d{4}|XXXX)-(0[1-9]|1[0-2]|XX)-(0[1-9]|[1-2][0-9]|3[0-1]|XX)$"
+                                      "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$"
                                     },
                                     "confinementEndDate": {
                                       "type": "string",
-                                      "pattern": "^(\\d{4}|XXXX)-(0[1-9]|1[0-2]|XX)-(0[1-9]|[1-2][0-9]|3[0-1]|XX)$"
+                                      "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$"
                                     }
                                   }
                                 }
@@ -5482,21 +5545,21 @@
                                     "properties": {
                                       "anticipatedSeparationDate": {
                                         "type": "string",
-                                        "pattern": "^(\\d{4}|XXXX)-(0[1-9]|1[0-2]|XX)-(0[1-9]|[1-2][0-9]|3[0-1]|XX)$"
+                                        "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$"
                                       },
                                       "title10ActivationDate": {
                                         "type": "string",
-                                        "pattern": "^(\\d{4}|XXXX)-(0[1-9]|1[0-2]|XX)-(0[1-9]|[1-2][0-9]|3[0-1]|XX)$"
+                                        "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$"
                                       }
                                     }
                                   },
                                   "obligationTermOfServiceFromDate": {
                                     "type": "string",
-                                    "pattern": "^(\\d{4}|XXXX)-(0[1-9]|1[0-2]|XX)-(0[1-9]|[1-2][0-9]|3[0-1]|XX)$"
+                                    "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$"
                                   },
                                   "obligationTermOfServiceToDate": {
                                     "type": "string",
-                                    "pattern": "^(\\d{4}|XXXX)-(0[1-9]|1[0-2]|XX)-(0[1-9]|[1-2][0-9]|3[0-1]|XX)$"
+                                    "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$"
                                   },
                                   "unitName": {
                                     "type": "string"
@@ -5755,9 +5818,7 @@
                                   "enum": [
                                     "NONE",
                                     "NEW",
-                                    "SECONDARY",
-                                    "INCREASE",
-                                    "REOPEN"
+                                    "INCREASE"
                                   ],
                                   "example": "NEW"
                                 },
@@ -5792,8 +5853,7 @@
                                           "NONE",
                                           "NEW",
                                           "SECONDARY",
-                                          "INCREASE",
-                                          "REOPEN"
+                                          "INCREASE"
                                         ],
                                         "example": "SECONDARY"
                                       },
@@ -6011,13 +6071,13 @@
                                 "startDate": {
                                   "description": "Date Veteran started treatment.",
                                   "type": "string",
-                                  "pattern": "^(\\d{4}|XXXX)-(0[1-9]|1[0-2]|XX)-(0[1-9]|[1-2][0-9]|3[0-1]|XX)$",
+                                  "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$",
                                   "example": "2018-03-02"
                                 },
                                 "endDate": {
                                   "description": "Date Veteran ended treatment.",
                                   "type": "string",
-                                  "pattern": "^(\\d{4}|XXXX)-(0[1-9]|1[0-2]|XX)-(0[1-9]|[1-2][0-9]|3[0-1]|XX)$",
+                                  "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$",
                                   "example": "2018-03-02"
                                 },
                                 "treatedDisabilityNames": {
@@ -6149,6 +6209,21 @@
                                     "type": "string",
                                     "example": "Will be retiring soon."
                                   }
+                                },
+                                "if": {
+                                  "properties": {
+                                    "willReceiveInFuture": {
+                                      "const": true
+                                    }
+                                  },
+                                  "required": [
+                                    "willReceiveInFuture"
+                                  ]
+                                },
+                                "then": {
+                                  "required": [
+                                    "futurePayExplanation"
+                                  ]
                                 }
                               },
                               "hasSeparationPay": {
@@ -6215,7 +6290,7 @@
                                   "receivedDate": {
                                     "description": "Approximate date separation pay was received.",
                                     "type": "string",
-                                    "pattern": "^(\\d{4}|XXXX)-(0[1-9]|1[0-2]|XX)-(0[1-9]|[1-2][0-9]|3[0-1]|XX)$",
+                                    "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$",
                                     "example": "2018-03-02"
                                   }
                                 }
@@ -6285,7 +6360,7 @@
                           "claimDate": {
                             "description": "Date when claim is being submitted to the VA.",
                             "type": "string",
-                            "pattern": "^(\\d{4}|XXXX)-(0[1-9]|1[0-2]|XX)-(0[1-9]|[1-2][0-9]|3[0-1]|XX)$",
+                            "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$",
                             "example": "2018-08-28"
                           }
                         }
@@ -6381,7 +6456,7 @@
               "application/json": {
                 "example": {
                   "data": {
-                    "id": "03d43f02-3bb3-4168-9536-e452b53e27f6",
+                    "id": "e36634ec-6863-4cd5-8f35-5b39d21b2e05",
                     "type": "claims_api_claim",
                     "attributes": {
                       "evss_id": null,
@@ -6395,7 +6470,7 @@
                       "decision_letter_sent": null,
                       "requested_decision": null,
                       "claim_type": null,
-                      "updated_at": "2021-08-18T21:41:30.498Z",
+                      "updated_at": "2021-08-24T19:20:04.418Z",
                       "contention_list": null,
                       "va_representative": null,
                       "events_timeline": [
@@ -6404,7 +6479,7 @@
                       "status": "pending",
                       "supporting_documents": [
                         {
-                          "id": "06ef35f1-cb27-4e0a-bf46-a2e88792b311",
+                          "id": "27f52d8a-56d9-4576-9afd-440c92cc960e",
                           "type": "claim_supporting_document",
                           "md5": null,
                           "filename": null,
@@ -8235,7 +8310,7 @@
                             "appointmentDate": {
                               "description": "Date of appointment with Veteran.",
                               "type": "string",
-                              "pattern": "^(\\d{4}|XXXX)-(0[1-9]|1[0-2]|XX)-(0[1-9]|[1-2][0-9]|3[0-1]|XX)$"
+                              "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$"
                             }
                           }
                         },
@@ -8361,11 +8436,11 @@
               "application/json": {
                 "example": {
                   "data": {
-                    "id": "66a84033-91aa-4c94-9997-bbd263b44d0d",
+                    "id": "d9c459c0-b9ef-4349-b8b8-3b230d933f2b",
                     "type": "claims_api_power_of_attorneys",
                     "attributes": {
                       "status": "pending",
-                      "date_request_accepted": "2021-08-18",
+                      "date_request_accepted": "2021-08-24",
                       "representative": {
                         "service_organization": {
                           "poa_code": "074"
@@ -8935,7 +9010,7 @@
                               "appointmentDate": {
                                 "description": "Date of appointment with Veteran.",
                                 "type": "string",
-                                "pattern": "^(\\d{4}|XXXX)-(0[1-9]|1[0-2]|XX)-(0[1-9]|[1-2][0-9]|3[0-1]|XX)$"
+                                "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$"
                               }
                             }
                           },
@@ -9074,11 +9149,11 @@
               "application/json": {
                 "example": {
                   "data": {
-                    "id": "4cba24cc-077e-48c5-86cc-bca46209f7fb",
+                    "id": "c3cac6b8-b4d8-4d17-b34e-36788a0d0a36",
                     "type": "claims_api_power_of_attorneys",
                     "attributes": {
                       "status": "submitted",
-                      "date_request_accepted": "2021-08-18",
+                      "date_request_accepted": "2021-08-24",
                       "representative": {
                         "service_organization": {
                           "poa_code": "074"
@@ -9399,11 +9474,11 @@
               "application/json": {
                 "example": {
                   "data": {
-                    "id": "d1b23f6e-9a3c-4b2a-a827-c5dc66f0b11a",
+                    "id": "4c49f556-b60f-4d59-9c30-b0b6f5ab81eb",
                     "type": "claims_api_power_of_attorneys",
                     "attributes": {
                       "status": "submitted",
-                      "date_request_accepted": "2021-08-18",
+                      "date_request_accepted": "2021-08-24",
                       "representative": {
                         "service_organization": {
                           "poa_code": "074"
@@ -10563,7 +10638,7 @@
                               "appointmentDate": {
                                 "description": "Date of appointment with Veteran.",
                                 "type": "string",
-                                "pattern": "^(\\d{4}|XXXX)-(0[1-9]|1[0-2]|XX)-(0[1-9]|[1-2][0-9]|3[0-1]|XX)$"
+                                "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$"
                               }
                             }
                           },
