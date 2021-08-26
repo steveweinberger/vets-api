@@ -11,7 +11,7 @@ module Webhooks
     include Common::Exceptions
 
     SUBSCRIPTION_EX = JSON.parse(File.read('./modules/vba_documents/spec/fixtures/subscriptions/subscriptions.json'))
-    MAINTENANCE_EX = JSON.parse(File.read('./spec/lib/webhooks/fixtures/maintenance.json'))
+    MAINTENANCE_EX = JSON.parse(File.read('./spec/fixtures/webhooks/maintenance.json'))
 
     class << self
       attr_reader :supported_events, :event_to_api_name, :api_name_to_time_block, :api_name_to_retries
