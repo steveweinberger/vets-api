@@ -19,7 +19,7 @@ class UserIdentity < Common::RedisStore
   attribute :last_name
   attribute :common_name
   attribute :gender
-  attribute :birth_date
+  # attribute :birth_date
   attribute :birls_id
   attribute :participant_id
   attribute :icn
@@ -33,7 +33,7 @@ class UserIdentity < Common::RedisStore
   attribute :mhv_icn # only needed by B/E not serialized in user_serializer
   attribute :mhv_correlation_id # this is the cannonical version of MHV Correlation ID, provided by MHV sign-in users
   attribute :mhv_account_type # this is only available for MHV sign-in users
-  attribute :edipi # this is only available for dslogon users
+  # attribute :edipi # this is only available for dslogon users
   attribute :sign_in, Hash # original sign_in (see sso_service#mergable_identity_attributes)
   attribute :icn_with_aaid
   attribute :search_token
@@ -52,6 +52,18 @@ class UserIdentity < Common::RedisStore
   def loa3?
     loa[:current].try(:to_i) == LOA::THREE
   end
+
+  def edipi
+    '9999999999'
+  end
+
+  def edipi=(value); end
+
+  def birth_date
+    '1926-01-08'
+  end
+
+  def birth_date=(value); end
 
   with_options if: :loa3? do
     validates :ssn, format: /\A\d{9}\z/, allow_blank: true
