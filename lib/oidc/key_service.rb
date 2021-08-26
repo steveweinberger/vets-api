@@ -2,6 +2,7 @@
 
 require 'openssl'
 require 'oidc/service.rb'
+
 module OIDC
   class KeyService
     @mutex = Mutex.new
@@ -24,19 +25,6 @@ module OIDC
       found
     end
 
-    def self.update_missing_kid_cache(kid)
-      if @cache_miss_kids.length >= KID_CACHE_MAX_SIZE && !@cache_miss_kids.key?(kid)
-        oldest_kid = @cache_miss_kids.min_by { |_, timestamp| timestamp }[0]
-        @cache_miss_kids.delete oldest_kid
-      end
-      @cache_miss_kids[kid] = Time.now.utc
-    end
-
-    def self.should_refresh?(kid)
-      last_miss = @cache_miss_kids[kid]
-      last_miss.nil? || Time.now.utc - last_miss > KID_CACHE_PERIOD_SECS
-    end
-
     def self.reset!
       @mutex.synchronize do
         @current_keys = {}
@@ -44,7 +32,22 @@ module OIDC
       end
     end
 
-    def self.refresh(expected_kid)
+    private
+
+    def update_missing_kid_cache(kid)
+      if @cache_miss_kids.length >= KID_CACHE_MAX_SIZE && !@cache_miss_kids.key?(kid)
+        oldest_kid = @cache_miss_kids.min_by { |_, timestamp| timestamp }[0]
+        @cache_miss_kids.delete oldest_kid
+      end
+      @cache_miss_kids[kid] = Time.now.utc
+    end
+
+    def should_refresh?(kid)
+      last_miss = @cache_miss_kids[kid]
+      last_miss.nil? || Time.now.utc - last_miss > KID_CACHE_PERIOD_SECS
+    end
+
+    def refresh(expected_kid)
       @mutex.synchronize do
         break if @current_keys[expected_kid].present?
 
@@ -58,13 +61,13 @@ module OIDC
       end
     end
 
-    def self.fetch_keys
+    def fetch_keys
       service = OIDC::Service.new
       key_response = service.oidc_jwks_keys(@expected_iss)
       key_response.body
     end
 
-    def self.build_key(jwks_object)
+    def build_key(jwks_object)
       key = OpenSSL::PKey::RSA.new
       e = OpenSSL::BN.new(Base64.urlsafe_decode64(jwks_object['e']), 2)
       n = OpenSSL::BN.new(Base64.urlsafe_decode64(jwks_object['n']), 2)
