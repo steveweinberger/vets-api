@@ -444,7 +444,7 @@ webhooks:
   require_https: true
   registration_next_run_in_minutes: 15
   registration_max_retries: 5
-  enabled: true
+  enabled: false
 
 # Settings for VBA Document upload service module
 vba_documents:
