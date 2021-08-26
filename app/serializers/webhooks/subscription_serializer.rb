@@ -3,7 +3,7 @@
 require './lib/webhooks/utilities'
 module Webhooks
   class SubscriptionSerializer < ActiveModel::Serializer
-    attributes :api_name, :consumer_name, :current_subscription, :consumer_id, :events
+    attributes :api_name, :consumer_id, :consumer_name, :current_subscription
     attribute :previous_subscription, if: :previously_subscribed?
 
     def current_subscription
@@ -15,6 +15,6 @@ module Webhooks
       !@previous_subscription.nil?
     end
 
-    attr_reader :previous_subscription, :api_name
+    attr_reader :previous_subscription
   end
 end
