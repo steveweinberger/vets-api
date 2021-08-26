@@ -14,12 +14,12 @@ module Webhooks
       @max_retries = max_retries
       @subscription = Webhooks::Notification.find_by(id: @ids.first).webhooks_subscription
 
-      if run_later?
+      if run_later? || under_maintenance?
         # wait to run later based on the api failure schedule so update the processing column to nil
         # for these ids so they will be checked on the next run
         Notification.where(id: @ids).update_all(processing: nil)
       else
-        @msg = {'api_name' => @subscription.api_name, 'notifications' => []}
+        @msg = {'api_name' => @subscription.api_name, 'timestamp' => Time.current.to_i, 'notifications' => []}
         Webhooks::Notification.where(id: ids).order(:event, :api_guid, :created_at).each do |notification|
           @msg['notifications'] << notification.msg
         end
@@ -32,12 +32,16 @@ module Webhooks
 
     def run_later?
       metadata = @subscription.metadata
-      run_after_epoch = metadata[@url][Subscription::FAILURE_KEY][Subscription::RUN_AFTER].to_i rescue 0
+      run_after_epoch = metadata[@url][Subscription::FAILURE_KEY][Subscription::RUN_AFTER_KEY].to_i rescue 0
       run_after_epoch > Time.current.to_i
     end
 
     def seal_off_blocked?
       @subscription.blocked_callback_urls.include? @url
+    end
+
+    def under_maintenance?
+      @subscription.metadata[@url][Subscription::MAINTENANCE_KEY][Subscription::UNDER_MAINT_KEY] rescue false
     end
 
     def exception_testing
@@ -114,7 +118,7 @@ module Webhooks
         metadata[@url] ||= {}
 
         if @successful
-          metadata[@url] = {} # todo preserve maintenance
+          metadata[@url][Subscription::FAILURE_KEY] = {}
         else
           metadata[@url][Subscription::FAILURE_KEY] ||= {}
           status_code = nil
@@ -139,7 +143,7 @@ module Webhooks
             Rails.logger.error("For #{@subscription.api_name} the webhook failure block failed to execute.", e)
           end
           # todo wrap in handlers and default to a time if a bad time is given (say one hour)
-          metadata[@url][Subscription::FAILURE_KEY][Subscription::RUN_AFTER] = next_time.to_i
+          metadata[@url][Subscription::FAILURE_KEY][Subscription::RUN_AFTER_KEY] = next_time.to_i
         end
         @subscription.metadata = metadata
         @subscription.save!

@@ -7,13 +7,15 @@ module Webhooks
     has_many :webhooks_notifications, :class_name => 'Webhooks::Notification'
     BLOCKED_CALLBACK = 100.years.from_now
     FAILURE_KEY = 'failure_hash'
-    RUN_AFTER = 'run_after_epoch'
+    MAINTENANCE_KEY = 'maintenance_hash'
+    UNDER_MAINT_KEY = 'under_maintenance'
+    RUN_AFTER_KEY = 'run_after_epoch'
 
     def blocked_callback_urls
       metadata = self.metadata
       ret = []
       metadata.keys.each do |url|
-        run_after = metadata[url][FAILURE_KEY][RUN_AFTER].to_i rescue 0
+        run_after = metadata[url][FAILURE_KEY][RUN_AFTER_KEY].to_i rescue 0
         ret << url if run_after > 10.years.from_now.to_i
       end
       ret

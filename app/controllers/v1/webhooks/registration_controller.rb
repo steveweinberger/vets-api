@@ -14,15 +14,15 @@ module V1::Webhooks
     def list
       #  todo mandate api_name to simplify rspec tests. We don't have to spoof subscriptions across apis to test the list method
       api_name = params['api_name']
-      consumer_id = params['consumer_id']
-      unless api_name || consumer_id
+      unless api_name || @consumer_id
         raise Common::Exceptions::ParameterMissing.new(
           'webhook',
           detail: 'You must provide an API Name or Consumer ID!'
         )
       end
-      if consumer_id
-        wh = Webhooks::Utilities.fetch_subscriptions(consumer_id)
+      # todo use new atomic read method
+      if @consumer_id
+        wh = Webhooks::Utilities.fetch_subscriptions(@consumer_id)
       elsif api_name
         wh = Webhooks::Utilities.fetch_subscriptions_by_api_name(api_name)
       end
@@ -37,12 +37,43 @@ module V1::Webhooks
     end
 
     def maintenance
-    #  api_name?
-      urls = params['callback_urls']
-      action_flag = params['on_off_flag']
+=begin
+{
+  "api_name": "vba_documents-v2",
+  "urls": {
+    "https://newman-api.getpostman.com/run/16640245/0531771d-9a3a-4180-accf-08208d154a76": {"maintenance": true},
+    "https://newman-api.getpostman.com/run/16640245/a2be72d6-a0ce-484a-a124-cb589ae14ee1": {"maintenance": false},
+    "https://newman-api.getpostman.com/run/16640245/943a62c3-5987-46df-9de6-d9901d5b3376": {"maintenance": true}
+  }
+}
+=end
+      maint_hash = JSON.parse(params['webhook_maintenance'])
+      api_name = maint_hash['api_name']
+      urls = maint_hash['urls']
 
-      # todo validate that these are their urls based on current subscriptions
-    #  write to new table with consumer, api_name, callback_url, jsonb, maintenance y/n (default n)
+      unless maint_hash
+        raise Common::Exceptions::ParameterMissing.new(
+            'webhook_maintenance',
+            detail: 'You must provide a webhook_maintenance parameter!'
+        )
+      end
+      # todo kevin use schema validation for the structure
+      # get the subscription for this api_name and consumer_id
+      ::Webhooks::Utilities.clean_subscription(api_name, @consumer_id) do |subscription|
+        if subscription
+          maint_key = Webhooks::Subscription::MAINTENANCE_KEY
+          metadata = subscription.metadata
+          # events = subscription.events['subscriptions'] #todo validate that the url is in the subscription
+          urls.each_pair do |url, maint|
+            metadata[url] ||= {}
+            metadata[url][maint_key] = {Webhooks::Subscription::UNDER_MAINT_KEY => maint['maintenance']}
+          end
+          subscription.metadata = metadata
+          subscription.save!
+        else
+          #  todo what do we return
+        end
+      end
     end
 
     def report
@@ -50,6 +81,7 @@ module V1::Webhooks
     end
 
     def subscribe
+      # todo use new atomic read method
       # todo kevin - ensure we have an rspec test that you can only subscribe to one api / subscription
       # todo all events must be under one api_name in the subscription
       webhook = params[:webhook]
