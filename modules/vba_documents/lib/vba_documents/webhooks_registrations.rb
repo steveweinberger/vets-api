@@ -10,8 +10,8 @@ module VBADocuments
 
     register_events(WEBHOOK_STATUS_CHANGE_EVENT,
                     api_name: WEBHOOK_API_NAME,
-                    max_retries: Settings.vba_documents.webhooks.registration_max_retries || 3) do |last|
-      registration_next_run_mins = Settings.vba_documents.webhooks.registration_next_run_in_minutes
+                    max_retries: Settings.webhooks.registration_max_retries || 3) do |last|
+      registration_next_run_mins = Settings.webhooks.registration_next_run_in_minutes
       next_run = last ? (registration_next_run_mins || WEBHOOK_DEFAULT_RUN_MINS) : 0
       next_run.minutes.from_now
     rescue
