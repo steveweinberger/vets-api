@@ -224,9 +224,13 @@ module VBADocuments
     end
 
     def format_msg(event, from_status, to_status, guid)
-      api = Webhooks::Utilities.event_to_api_name[event]
-      { api_name: api, guid: guid, event: event, status_from: from_status, status_to: to_status,
-        epoch_time: Time.now.to_i }
+      msg = {}
+      msg['event'] = event
+      msg['guid'] = guid
+      msg['epoch_time'] = Time.current.to_i
+      msg['status_from'] = from_status
+      msg['status_to'] = to_status
+      msg
     end
   end
 end

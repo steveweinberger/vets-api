@@ -25,14 +25,12 @@ module Webhooks
         wh
       end
 
-      # We hold an application level lock here.  The block passed in should run quickly.
       def clean_subscription(api_name, consumer_id, &block)
         raise ArgumentError.new("A block is required!") unless block_given?
-        Webhooks::Subscription.with_advisory_lock("#{api_name}_#{consumer_id}", timeout_seconds: 120) do
-          s = Subscription.where(api_name: api_name, consumer_id: consumer_id).first
-          ActiveRecord::Base.transaction do
-            block.call(s)
-          end
+        subscription = Subscription.where(api_name: api_name, consumer_id: consumer_id).first
+        subscription.with_lock do
+          subscription.reload
+          block.call(subscription)
         end
       end
 
