@@ -1,0 +1,32 @@
+{
+  "type": "object",
+  "required": [
+    "api_name",
+    "urls"
+  ],
+  "properties": {
+    "api_name": {
+      "type": "string",
+      "format": "valid_api_name"
+    },
+    "urls": {
+      "type": "array",
+      "contains": {
+        "type": "object",
+        "required": [
+          "url",
+          "maintenance"
+        ],
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "valid_url"
+          },
+          "maintenance": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  }
+}

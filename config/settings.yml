@@ -465,6 +465,9 @@ vba_documents:
     topic_arns:
       - vetsgov-arn
       - vagov-arn
+  webhooks:
+    registration_max_retries: 3
+    registration_next_run_in_minutes: 15
 
 #Settings for Claims Api Module
 claims_api:

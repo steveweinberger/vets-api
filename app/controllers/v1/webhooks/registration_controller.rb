@@ -37,36 +37,29 @@ module V1::Webhooks
     end
 
     def maintenance
-=begin
-{
-  "api_name": "vba_documents-v2",
-  "urls": {
-    "https://newman-api.getpostman.com/run/16640245/0531771d-9a3a-4180-accf-08208d154a76": {"maintenance": true},
-    "https://newman-api.getpostman.com/run/16640245/a2be72d6-a0ce-484a-a124-cb589ae14ee1": {"maintenance": false},
-    "https://newman-api.getpostman.com/run/16640245/943a62c3-5987-46df-9de6-d9901d5b3376": {"maintenance": true}
-  }
-}
-=end
-      maint_hash = JSON.parse(params['webhook_maintenance'])
+      maint = params['webhook_maintenance']
+      unless maint
+        raise Common::Exceptions::ParameterMissing.new(
+          'webhook_maintenance',
+          detail: 'You must provide a webhook_maintenance parameter!'
+        )
+      end
+
+      maint = maint.respond_to?(:read) ? maint.read : maint
+      maint_hash = validate_maintenance(JSON.parse(maint), @consumer_id)
       api_name = maint_hash['api_name']
       urls = maint_hash['urls']
 
-      unless maint_hash
-        raise Common::Exceptions::ParameterMissing.new(
-            'webhook_maintenance',
-            detail: 'You must provide a webhook_maintenance parameter!'
-        )
-      end
-      # todo kevin use schema validation for the structure
       # get the subscription for this api_name and consumer_id
       ::Webhooks::Utilities.clean_subscription(api_name, @consumer_id) do |subscription|
         if subscription
           maint_key = Webhooks::Subscription::MAINTENANCE_KEY
           metadata = subscription.metadata
           # events = subscription.events['subscriptions'] #todo validate that the url is in the subscription
-          urls.each_pair do |url, maint|
-            metadata[url] ||= {}
-            metadata[url][maint_key] = {Webhooks::Subscription::UNDER_MAINT_KEY => maint['maintenance']}
+          urls.each do |url_hash|
+            metadata[url_hash['url']] ||= {}
+            metadata[url_hash['url']][maint_key] =
+              { Webhooks::Subscription::UNDER_MAINT_KEY => url_hash['maintenance'] }
           end
           subscription.metadata = metadata
           subscription.save!

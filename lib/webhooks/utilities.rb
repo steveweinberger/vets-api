@@ -11,6 +11,7 @@ module Webhooks
     include Common::Exceptions
 
     SUBSCRIPTION_EX = JSON.parse(File.read('./modules/vba_documents/spec/fixtures/subscriptions/subscriptions.json'))
+    MAINTENANCE_EX = JSON.parse(File.read('./spec/fixtures/webhooks/maintenance.json'))
 
     class << self
       attr_reader :supported_events, :event_to_api_name, :api_name_to_time_block, :api_name_to_retries
@@ -102,7 +103,7 @@ module Webhooks
 
     # Validates a subscription request for an upload submission.  Returns an object representing the subscription
     def validate_subscription(subscriptions)
-      schema_path = Pathname.new('lib/webhooks/webhook_subscriptions_schema.json')
+      schema_path = Pathname.new('lib/webhooks/subscriptions_schema.json')
       schemer_formats = {
         'valid_urls' => ->(urls, _schema_info) { validate_urls(urls) },
         'valid_events' => ->(subscription, _schema_info) { validate_events(subscription) }
@@ -155,6 +156,37 @@ module Webhooks
         valid &= validate_url(url)
       end
       valid
+    end
+
+    # Validates a maintenance request for a consumer declaring a URL under maintenance
+    def validate_maintenance(maint_hash, consumer_id)
+      api_name = maint_hash['api_name']
+      schema_path = Pathname.new('lib/webhooks/maintenance_schema.json')
+      schemer_formats = {
+        'valid_api_name' => ->(_api_name, _schema_info) { Webhooks::Utilities.api_registered?(_api_name) },
+        'valid_url' => ->(url, _schema_info) { url_subscribed?(url, consumer_id, api_name) }
+      }
+      schemer = JSONSchemer.schema(schema_path, formats: schemer_formats)
+      unless schemer.valid?(maint_hash)
+        raise SchemaValidationErrors, 
+          ["Invalid maintenance body! It must match the included example\n#{MAINTENANCE_EX}"]
+      end
+      maint_hash
+    end
+
+    def url_subscribed?(url, consumer_id, api_name)
+      subscription = Webhooks::Subscription.where(api_name: api_name, consumer_id: consumer_id)&.first
+
+      unless subscription
+        raise SchemaValidationErrors, ["Subscription for the given api_name does not exist! api_name: #{api_name}"]
+      end
+
+      subscribed_urls = subscription.events['subscriptions'].map { |sub| sub['urls'] }.flatten
+      unless subscribed_urls.include?(url)
+        raise SchemaValidationErrors, ["The provided URL is not subscribed to the given api_name! URL: #{url}"]
+      else
+        return true
+      end
     end
   end
 end

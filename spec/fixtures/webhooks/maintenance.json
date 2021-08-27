@@ -1,9 +1,17 @@
 {
   "api_name": "vba_documents-v2",
-  "urls": {
-    "https://newman-api.getpostman.com/run/16640245/0531771d-9a3a-4180-accf-08208d154a76": {"maintenance": true},
-    "https://newman-api.getpostman.com/run/16640245/a2be72d6-a0ce-484a-a124-cb589ae14ee1": {"maintenance": false},
-    "https://newman-api.getpostman.com/run/16640245/943a62c3-5987-46df-9de6-d9901d5b3376": {"maintenance": true}
-  }
+  "urls": [
+    {
+      "url": "https://newman-api.getpostman.com/run/16640245/0531771d-9a3a-4180-accf-08208d154a76",
+      "maintenance": true
+    },
+    {
+      "url": "https://newman-api.getpostman.com/run/16640245/a2be72d6-a0ce-484a-a124-cb589ae14ee1",
+      "maintenance": false
+    },
+    {
+      "url": "https://newman-api.getpostman.com/run/16640245/943a62c3-5987-46df-9de6-d9901d5b3376",
+      "maintenance": true
+    }
+  ]
 }
-
