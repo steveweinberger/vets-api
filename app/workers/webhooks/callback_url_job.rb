@@ -6,7 +6,6 @@ module Webhooks
     include Webhooks
 
     MAX_BODY_LENGTH = 500 # denotes the how large of a body from the client url we record in our db.
-    SPOOF = Struct.new(:success?, :status, :body)
 
     def perform(url, ids, max_retries)
       @url = url
@@ -41,33 +40,13 @@ module Webhooks
     end
 
     def under_maintenance?
+      # todo ensure this has latest structure changes after Kevin's check in.
       @subscription.metadata[@url][Subscription::MAINTENANCE_KEY][Subscription::UNDER_MAINT_KEY] rescue false
     end
 
-    def exception_testing
-      should_fail = @redis.get('faraday_failure')
-      unless should_fail.to_s.empty?
-        raise eval(should_fail)
-        #Faraday::ClientError.new("I am bad")
-        # @redis.set('faraday_failure', %q(Faraday::ClientError.new("I am bad")))
-        # @redis.set('faraday_failure', %q(Faraday::Error.new("I am very bad")))
-        # @redis.set('faraday_failure', nil))
-        # @redis.set('hook_failure', 'yup')
-        # @redis.set('hook_status',503)
-        # @redis.set('hook_failure',nil)
-      end
-    end
 
     def notify
-      @redis = Redis.new(host: 'redis', port: 6379)
-      exception_testing
-      should_fail = @redis.get('hook_failure')
-      if !should_fail.to_s.empty?
-        status = @redis.get('hook_status')
-        @response = SPOOF.new(false, status.to_i, 'billy')
-      else
-        @response = Faraday.post(@url, @msg.to_json, 'Content-Type' => 'application/json')
-      end
+      @response = Faraday.post(@url, @msg.to_json, 'Content-Type' => 'application/json')
     rescue Faraday::ClientError, Faraday::Error => e
       Rails.logger.error("Webhooks::CallbackUrlJob Error in CallbackUrlJob #{e.message}", e)
       @response = e
@@ -75,84 +54,83 @@ module Webhooks
       Rails.logger.error("Webhooks::CallbackUrlJob unexpected Error in CallbackUrlJob #{e.message}", e)
       @response = e
     ensure
-      record_attempt
-    end
-
-    def record_attempt
-      attempt_response = nil
-      ActiveRecord::Base.transaction do
-        @successful = false
-        if @response.respond_to? :success?
-          @successful = @response.success?
-          attempt_response = {NotificationAttempt::RESPONSE_STATUS => @response.status,
-                              NotificationAttempt::RESPONSE_BODY => @response.body[0...MAX_BODY_LENGTH]}
-        else
-          attempt_response = {NotificationAttempt::RESPONSE_EXCEPTION =>
-                                  {NotificationAttempt::RESPONSE_EXCEPTION_TYPE => @response.class.to_s,
-                                   NotificationAttempt::RESPONSE_EXCEPTION_MESSAGE => @response.message}}
-        end
-
-        # create the notification attempt record
-        attempt = create_attempt(attempt_response)
-        # write an association record tied to each notification used in this attempt
-        notifications = []
-        Webhooks::Notification.where(id: @ids).each do |notification|
-          create_attempt_assoc(notification, attempt)
-
-          # seal off the attempt if we received a successful response or hit our max retry limit
-          if attempt.success? || notification.webhooks_notification_attempts.count >= @max_retries
-            notification.final_attempt_id = attempt.id
-          end
-
-          notification.processing = nil
-          notifications << notification
-        end
-        record_attempt_metadata(attempt_response, notifications)
-        notifications.each(&:save!)
+      Utilities.clean_subscription(@subscription.api_name, @subscription.consumer_id) do |s|
+        record_attempt(s)
       end
     end
 
-    def record_attempt_metadata(attempt_response, notifications)
-      @subscription.with_lock do
-        metadata = @subscription.metadata
-        metadata[@url] ||= {}
+    def record_attempt(locked_sub)
+      attempt_response = nil
+      @successful = false
+      if @response.respond_to? :success?
+        @successful = @response.success?
+        attempt_response = {NotificationAttempt::RESPONSE_STATUS => @response.status,
+                            NotificationAttempt::RESPONSE_BODY => @response.body[0...MAX_BODY_LENGTH]}
+      else
+        attempt_response = {NotificationAttempt::RESPONSE_EXCEPTION =>
+                                {NotificationAttempt::RESPONSE_EXCEPTION_TYPE => @response.class.to_s,
+                                 NotificationAttempt::RESPONSE_EXCEPTION_MESSAGE => @response.message}}
+      end
 
-        if @successful
-          metadata[@url][Subscription::FAILURE_KEY] = {}
-        else
-          metadata[@url][Subscription::FAILURE_KEY] ||= {}
-          status_code = nil
-          if attempt_response.has_key? NotificationAttempt::RESPONSE_EXCEPTION
-            status_code =
-                attempt_response[NotificationAttempt::RESPONSE_EXCEPTION][NotificationAttempt::RESPONSE_EXCEPTION_TYPE]
-          else
-            status_code = attempt_response[NotificationAttempt::RESPONSE_STATUS]
-          end
-          metadata[@url][Subscription::FAILURE_KEY][NotificationAttempt::RESPONSE_STATUS] ||= {}
-          metadata[@url][Subscription::FAILURE_KEY][NotificationAttempt::RESPONSE_STATUS]['total'] ||= 0
-          metadata[@url][Subscription::FAILURE_KEY][NotificationAttempt::RESPONSE_STATUS]['total'] += 1
-          metadata[@url][Subscription::FAILURE_KEY][NotificationAttempt::RESPONSE_STATUS][status_code.to_s] ||= 0
-          metadata[@url][Subscription::FAILURE_KEY][NotificationAttempt::RESPONSE_STATUS][status_code.to_s] += 1
+      # create the notification attempt record
+      attempt = create_attempt(attempt_response)
+      # write an association record tied to each notification used in this attempt
+      notifications = []
+      Webhooks::Notification.where(id: @ids).each do |notification|
+        create_attempt_assoc(notification, attempt)
 
-          # calculate next time via block and record
-          failure_block = Utilities.api_name_to_failure_block[@subscription.api_name]
-          next_time = 1.hour.from_now
-          begin
-            next_time = failure_block.call(metadata[@url][Subscription::FAILURE_KEY][NotificationAttempt::RESPONSE_STATUS])
-          rescue => e
-            Rails.logger.error("For #{@subscription.api_name} the webhook failure block failed to execute.", e)
-          end
-          # todo wrap in handlers and default to a time if a bad time is given (say one hour)
-          metadata[@url][Subscription::FAILURE_KEY][Subscription::RUN_AFTER_KEY] = next_time.to_i
+        # seal off the attempt if we received a successful response or hit our max retry limit
+        if attempt.success? || notification.webhooks_notification_attempts.count >= @max_retries
+          notification.final_attempt_id = attempt.id
         end
-        @subscription.metadata = metadata
-        @subscription.save!
-        if seal_off_blocked?
-          attempt = Webhooks::Utilities.create_blocked_attempt(@url)
-          notifications.each do |n|
-            n.final_attempt_id = attempt.id
-            create_attempt_assoc(n, attempt)
-          end
+
+        notification.processing = nil
+        notifications << notification
+      end
+      record_attempt_metadata(attempt_response, notifications, locked_sub)
+      notifications.each(&:save!)
+    end
+
+    def record_attempt_metadata(attempt_response, notifications, locked_sub)
+      metadata = locked_sub.metadata
+      metadata[@url] ||= {}
+
+      if @successful
+        metadata[@url][Subscription::FAILURE_KEY] = {}
+      else
+        metadata[@url][Subscription::FAILURE_KEY] ||= {}
+        status_code = nil
+        if attempt_response.has_key? NotificationAttempt::RESPONSE_EXCEPTION
+          status_code =
+              attempt_response[NotificationAttempt::RESPONSE_EXCEPTION][NotificationAttempt::RESPONSE_EXCEPTION_TYPE]
+        else
+          status_code = attempt_response[NotificationAttempt::RESPONSE_STATUS]
+        end
+        metadata[@url][Subscription::FAILURE_KEY][NotificationAttempt::RESPONSE_STATUS] ||= {}
+        metadata[@url][Subscription::FAILURE_KEY][NotificationAttempt::RESPONSE_STATUS]['total'] ||= 0
+        metadata[@url][Subscription::FAILURE_KEY][NotificationAttempt::RESPONSE_STATUS]['total'] += 1
+        metadata[@url][Subscription::FAILURE_KEY][NotificationAttempt::RESPONSE_STATUS][status_code.to_s] ||= 0
+        metadata[@url][Subscription::FAILURE_KEY][NotificationAttempt::RESPONSE_STATUS][status_code.to_s] += 1
+
+        # calculate next time via block and record
+        failure_block = Utilities.api_name_to_failure_block[locked_sub.api_name]
+        next_time = 1.hour.from_now
+        begin
+          next_time = failure_block
+                          .call(metadata[@url][Subscription::FAILURE_KEY][NotificationAttempt::RESPONSE_STATUS])
+        rescue => e
+          Rails.logger.error("For #{locked_sub.api_name} the webhook failure block failed to execute.", e)
+        end
+        # todo wrap in handlers and default to a time if a bad time is given (say one hour)
+        metadata[@url][Subscription::FAILURE_KEY][Subscription::RUN_AFTER_KEY] = next_time.to_i
+      end
+      locked_sub.metadata = metadata
+      locked_sub.save!
+      if seal_off_blocked?
+        attempt = Webhooks::Utilities.create_blocked_attempt(@url)
+        notifications.each do |n|
+          n.final_attempt_id = attempt.id
+          create_attempt_assoc(n, attempt)
         end
       end
     end
