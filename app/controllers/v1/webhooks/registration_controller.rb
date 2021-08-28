@@ -37,7 +37,7 @@ module V1::Webhooks
     end
 
     def maintenance
-      maint = params['webhook_maintenance']
+      maint = params[:webhook_maintenance]
       unless maint
         raise Common::Exceptions::ParameterMissing.new(
           'webhook_maintenance',
