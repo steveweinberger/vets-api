@@ -12,28 +12,15 @@ module V1::Webhooks
     before_action(:verify_consumer)
 
     def list
-      #  todo mandate api_name to simplify rspec tests. We don't have to spoof subscriptions across apis to test the list method
-      api_name = params['api_name']
-      unless api_name || @consumer_id
-        raise Common::Exceptions::ParameterMissing.new(
-          'webhook',
-          detail: 'You must provide an API Name or Consumer ID!'
-        )
-      end
-      # todo use new atomic read method
-      if @consumer_id
-        wh = Webhooks::Utilities.fetch_subscriptions(@consumer_id)
-      elsif api_name
-        wh = Webhooks::Utilities.fetch_subscriptions_by_api_name(api_name)
-      end
-
+      consumer_id = request.headers['X-Consumer-ID']
+      wh = Webhooks::Utilities.fetch_subscriptions(consumer_id)
+      # TODO include data about callback urls in maintenance mode
       render status: :ok,
              json: wh,
              serializer: ActiveModel::Serializer::CollectionSerializer,
              each_serializer: Webhooks::SubscriptionSerializer
     rescue JSON::ParserError => e
-        raise Common::Exceptions::SchemaValidationErrors, ["invalid JSON. #{e.message}"] if e.is_a? JSON::ParserError
-      #include data about callback urls in maintenance mode
+      raise Common::Exceptions::SchemaValidationErrors, ["Invalid JSON. #{e.message}"] if e.is_a? JSON::ParserError
     end
 
     def maintenance
@@ -74,7 +61,7 @@ module V1::Webhooks
     end
 
     def subscribe
-      # todo use new atomic read method
+      # TODO: use new atomic read method
       # todo kevin - ensure we have an rspec test that you can only subscribe to one api / subscription
       # todo all events must be under one api_name in the subscription
       webhook = params[:webhook]
@@ -88,14 +75,37 @@ module V1::Webhooks
       subscription_json = webhook.respond_to?(:read) ? webhook.read : webhook
       subscriptions = validate_subscription(JSON.parse(subscription_json))
 
-      prev_wh = Webhooks::Utilities.fetch_subscription(@consumer_id, subscriptions)
-      wh = Webhooks::Utilities.register_webhook(@consumer_id, @consumer_name, subscriptions)
+      prev_subscription = Webhooks::Utilities.fetch_subscription(@consumer_id, subscriptions)
+      new_subscription = Webhooks::Utilities.register_webhook(@consumer_id, @consumer_name, subscriptions)
+      Webhooks::Utilities.clean_subscription(new_subscription.api_name, new_subscription.consumer_id) do |s|
+        save_metadata(s)
+      end
       render status: :accepted,
-             json: wh,
-             previous_subscription: prev_wh&.events,
+             json: new_subscription,
+             previous_subscription: prev_subscription&.events,
              serializer: Webhooks::SubscriptionSerializer
     rescue JSON::ParserError => e
       raise Common::Exceptions::SchemaValidationErrors, ["invalid JSON. #{e.message}"] if e.is_a? JSON::ParserError
+    end
+
+    def save_metadata(subscription)
+      urls = subscription.events['subscriptions'].map { |sub| sub['urls'] }.flatten
+      removed_urls = []
+      # we remove metadata of any urls that aren't in the request
+      subscription.metadata.keep_if do |k, _|
+        if urls.include? k
+          k
+        else
+          removed_urls.push(k)
+          false
+        end
+      end
+      # clear out the failure metadata
+      subscription.metadata.each do |m|
+        m[1]['failure_hash'] = {}
+      end
+      handle_deleted_urls(removed_urls)
+      subscription.save!
     end
 
     def verify_consumer

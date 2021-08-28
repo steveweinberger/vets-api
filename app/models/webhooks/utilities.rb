@@ -11,7 +11,7 @@ module Webhooks
 
       # place methods that might be run at class load time here. They mix in as class methods.
 
-      # todo All of these methods should be moved out of ClassMethods
+      # TODO: All of these methods should be moved out of ClassMethods
       # We assume the subscription parameter has already been through validate_subscription()
       def register_webhook(consumer_id, consumer_name, subscription)
         event = subscription['subscriptions'].first['event']
@@ -54,7 +54,7 @@ module Webhooks
 
       def record_notifications(consumer_id:, consumer_name:, event:, api_guid:, msg:)
         api_name = Webhooks::Utilities.event_to_api_name[event]
-        # todo replace query with looking against the subscription
+        # TODO: replace query with looking against the subscription
         webhook_urls = Webhooks::Subscription.get_notification_urls(api_name: api_name, consumer_id: consumer_id, event: event)
         subscription = Webhooks::Subscription.where(consumer_id: consumer_id, api_name: api_name).first
         return [] unless webhook_urls.size.positive?
@@ -78,7 +78,10 @@ module Webhooks
     end
     extend ClassMethods
 
-    # todo move methods above here, and refactor calls
+    # TODO: move methods above here, and refactor calls
+    def handle_deleted_urls(urls)
+      Rails.logger.info("#{urls.count} URLS have been deleted: #{urls}")
+    end
 
   end
 end
