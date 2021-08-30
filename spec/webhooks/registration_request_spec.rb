@@ -72,9 +72,9 @@ RSpec.describe 'Webhook registration tests', type: :request, retry: 3 do
     context 'maintenance' do
       before do
         subscription = JSON.parse(File.read(subscription_fixture_path + 'subscriptions.json'))
-        Webhooks::Utilities.register_webhook(dev_headers[:'X-Consumer-ID'],
-                                             dev_headers[:'X-Consumer-Username'],
-                                             subscription)
+        webhook_sub = Webhooks::Utilities.register_webhook(dev_headers[:'X-Consumer-ID'],
+                                                           dev_headers[:'X-Consumer-Username'],
+                                                           subscription)
       end
 
       %i[file text].each do |multipart_fashion|
@@ -87,11 +87,16 @@ RSpec.describe 'Webhook registration tests', type: :request, retry: 3 do
                  'webhook_maintenance': maint
                },
                headers: dev_headers
-          expect(response).to have_http_status(:no_content)
+          expect(response).to have_http_status(:accepted)
+          maint_urls = JSON.parse(maint_json)['urls']
+          url1_maint_value = response['maintenance'][maint_urls.first['url']]['maintenance_hash']['under_maintenance']
+          url2_maint_value = response['maintenance'][maint_urls.last['url']]['maintenance_hash']['under_maintenance']
+          expect(url1_maint_value).to eql(maint_urls.first['maintenance'])
+          expect(url2_maint_value).to eql(maint_urls.last['maintenance'])
         end
       end
 
-      %i[missing_api_name bad_URL unknown_api_name empty_array].each do |test_case|
+      %i[missing_api_name bad_URL unknown_api_name not_JSON empty_array].each do |test_case|
         %i[file text].each do |multipart_fashion|
           it "returns error with invalid #{test_case} maintenance sent as #{multipart_fashion}" do
             maint = if multipart_fashion == :file
