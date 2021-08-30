@@ -32,7 +32,9 @@
       },
       "date": {
         "type": "string",
-        "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+        "maxLength": 10,
+        "minLength": 10
       },
       "hlrCreatePhone": {
         "type": "object",
@@ -199,7 +201,13 @@
                             "maxLength": 16
                           }
                         },
-                        "additionalProperties": false
+                        "additionalProperties": false,
+                        "required": [
+                          "addressLine1",
+                          "city",
+                          "countryCodeISO2",
+                          "zipCode5"
+                        ]
                       },
                       "phone": {
                         "$ref": "#/components/schemas/hlrCreatePhone"
@@ -964,7 +972,19 @@
                     "additionalProperties": false,
                     "required": [
                       "homeless"
-                    ]
+                    ],
+                    "if": {
+                      "properties": {
+                        "homeless": {
+                          "const": false
+                        }
+                      }
+                    },
+                    "then": {
+                      "required": [
+                        "address"
+                      ]
+                    }
                   },
                   "informalConferenceContact": {
                     "type": "string",
@@ -2380,12 +2400,12 @@
                   "minimum fields used": {
                     "value": {
                       "data": {
-                        "id": "ed1bb313-7169-497a-9d5f-c58631a7f5d0",
+                        "id": "69dcb78c-c45d-4b4e-9b9e-f80abd322a32",
                         "type": "higherLevelReview",
                         "attributes": {
                           "status": "pending",
-                          "updatedAt": "2021-08-30T21:11:01.462Z",
-                          "createdAt": "2021-08-30T21:11:01.462Z",
+                          "updatedAt": "2021-08-30T21:56:08.178Z",
+                          "createdAt": "2021-08-30T21:56:08.178Z",
                           "formData": {
                             "data": {
                               "type": "higherLevelReview",
@@ -2421,12 +2441,12 @@
                   "all fields used": {
                     "value": {
                       "data": {
-                        "id": "8e8ce99c-f4b1-4da0-8750-d4b6f0a35e67",
+                        "id": "a3b6508f-661f-4704-9809-4f8d03ccdada",
                         "type": "higherLevelReview",
                         "attributes": {
                           "status": "pending",
-                          "updatedAt": "2021-08-30T21:11:01.514Z",
-                          "createdAt": "2021-08-30T21:11:01.514Z",
+                          "updatedAt": "2021-08-30T21:56:08.228Z",
+                          "createdAt": "2021-08-30T21:56:08.228Z",
                           "formData": {
                             "data": {
                               "type": "higherLevelReview",
@@ -2835,12 +2855,12 @@
               "application/json": {
                 "example": {
                   "data": {
-                    "id": "e5897763-6823-4439-92d6-fb6960448417",
+                    "id": "72487fd9-b518-4ef5-ac4b-60ed0a264b06",
                     "type": "higherLevelReview",
                     "attributes": {
                       "status": "pending",
-                      "updatedAt": "2021-08-30T21:11:01.586Z",
-                      "createdAt": "2021-08-30T21:11:01.586Z",
+                      "updatedAt": "2021-08-30T21:56:08.377Z",
+                      "createdAt": "2021-08-30T21:56:08.377Z",
                       "formData": {
                         "data": {
                           "type": "higherLevelReview",
@@ -3441,7 +3461,9 @@
                     },
                     "date": {
                       "type": "string",
-                      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+                      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+                      "maxLength": 10,
+                      "minLength": 10
                     },
                     "hlrCreatePhone": {
                       "type": "object",
@@ -3608,7 +3630,13 @@
                                           "maxLength": 16
                                         }
                                       },
-                                      "additionalProperties": false
+                                      "additionalProperties": false,
+                                      "required": [
+                                        "addressLine1",
+                                        "city",
+                                        "countryCodeISO2",
+                                        "zipCode5"
+                                      ]
                                     },
                                     "phone": {
                                       "$ref": "#/definitions/hlrCreatePhone"
@@ -4372,7 +4400,19 @@
                                   "additionalProperties": false,
                                   "required": [
                                     "homeless"
-                                  ]
+                                  ],
+                                  "if": {
+                                    "properties": {
+                                      "homeless": {
+                                        "const": false
+                                      }
+                                    }
+                                  },
+                                  "then": {
+                                    "required": [
+                                      "address"
+                                    ]
+                                  }
                                 },
                                 "informalConferenceContact": {
                                   "type": "string",
@@ -5018,12 +5058,12 @@
                   "minimum fields used": {
                     "value": {
                       "data": {
-                        "id": "9e8f594d-aa85-415e-8ae1-93208ef1556d",
+                        "id": "dd2d7384-3302-45be-b7c2-d5ac696eb4e4",
                         "type": "noticeOfDisagreement",
                         "attributes": {
                           "status": "pending",
-                          "updatedAt": "2021-08-30T21:11:02.093Z",
-                          "createdAt": "2021-08-30T21:11:02.093Z",
+                          "updatedAt": "2021-08-30T21:56:09.021Z",
+                          "createdAt": "2021-08-30T21:56:09.021Z",
                           "formData": {
                             "data": {
                               "type": "noticeOfDisagreement",
@@ -5064,12 +5104,12 @@
                   "all fields used": {
                     "value": {
                       "data": {
-                        "id": "2bd85729-ad69-4ae6-8019-4ea649d29b83",
+                        "id": "f8a657b2-aef5-4234-86f7-07de82dc9006",
                         "type": "noticeOfDisagreement",
                         "attributes": {
                           "status": "pending",
-                          "updatedAt": "2021-08-30T21:11:02.135Z",
-                          "createdAt": "2021-08-30T21:11:02.135Z",
+                          "updatedAt": "2021-08-30T21:56:09.062Z",
+                          "createdAt": "2021-08-30T21:56:09.062Z",
                           "formData": {
                             "data": {
                               "type": "noticeOfDisagreement",
@@ -5472,12 +5512,12 @@
               "application/json": {
                 "example": {
                   "data": {
-                    "id": "a8ced748-f2c5-42a7-8b51-b909104ccf10",
+                    "id": "b9a8da9a-1fc8-46c9-8c07-c1f7171ce60b",
                     "type": "noticeOfDisagreement",
                     "attributes": {
                       "status": "pending",
-                      "updatedAt": "2021-08-30T21:11:02.203Z",
-                      "createdAt": "2021-08-30T21:11:02.203Z",
+                      "updatedAt": "2021-08-30T21:56:09.131Z",
+                      "createdAt": "2021-08-30T21:56:09.131Z",
                       "formData": {
                         "data": {
                           "type": "noticeOfDisagreement",
@@ -5645,7 +5685,9 @@
                     },
                     "date": {
                       "type": "string",
-                      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+                      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+                      "maxLength": 10,
+                      "minLength": 10
                     },
                     "nodCreateRoot": {
                       "type": "object",
@@ -7118,17 +7160,17 @@
               "application/json": {
                 "example": {
                   "data": {
-                    "id": "777b5a29-5692-4fee-ba2a-dd4609db1191",
+                    "id": "54b4089e-4cf6-430c-86b0-3eb086e6fba8",
                     "type": "evidenceSubmission",
                     "attributes": {
                       "status": "pending",
                       "code": null,
                       "detail": null,
                       "appealType": "NoticeOfDisagreement",
-                      "appealId": "818c6d9c-f159-4b00-9410-60121b187d8f",
+                      "appealId": "3d30b5fe-19ed-4f04-9a7d-62f5f60757cd",
                       "location": "http://another.fakesite.com/rewrittenpath/uuid",
-                      "createdAt": "2021-08-30T21:11:02.455Z",
-                      "updatedAt": "2021-08-30T21:11:02.455Z"
+                      "createdAt": "2021-08-30T21:56:09.396Z",
+                      "updatedAt": "2021-08-30T21:56:09.396Z"
                     }
                   }
                 },
@@ -7470,17 +7512,17 @@
               "application/json": {
                 "example": {
                   "data": {
-                    "id": "10d71e6b-6b54-440a-ae58-2b8ec6006677",
+                    "id": "2c858d7c-51ec-4225-9c78-48fccb88f47e",
                     "type": "evidenceSubmission",
                     "attributes": {
                       "status": "pending",
                       "code": null,
                       "detail": null,
                       "appealType": "NoticeOfDisagreement",
-                      "appealId": "62cf4cf8-0e12-4973-8a85-259075f84bec",
+                      "appealId": "6ef77cf1-f8de-46bc-8c69-2b098a3b2043",
                       "location": null,
-                      "createdAt": "2021-08-30T21:11:02.677Z",
-                      "updatedAt": "2021-08-30T21:11:02.677Z"
+                      "createdAt": "2021-08-30T21:56:09.596Z",
+                      "updatedAt": "2021-08-30T21:56:09.596Z"
                     }
                   }
                 },
