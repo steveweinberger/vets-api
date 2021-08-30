@@ -89,8 +89,9 @@ RSpec.describe 'Webhook registration tests', type: :request, retry: 3 do
                headers: dev_headers
           expect(response).to have_http_status(:accepted)
           maint_urls = JSON.parse(maint_json)['urls']
-          url1_maint_value = response['maintenance'][maint_urls.first['url']]['maintenance_hash']['under_maintenance']
-          url2_maint_value = response['maintenance'][maint_urls.last['url']]['maintenance_hash']['under_maintenance']
+          response_maint = JSON.parse(response.body)['data']['attributes']['maintenance']
+          url1_maint_value = response_maint[maint_urls.first['url']]['maintenance_hash']['under_maintenance']
+          url2_maint_value = response_maint[maint_urls.last['url']]['maintenance_hash']['under_maintenance']
           expect(url1_maint_value).to eql(maint_urls.first['maintenance'])
           expect(url2_maint_value).to eql(maint_urls.last['maintenance'])
         end
