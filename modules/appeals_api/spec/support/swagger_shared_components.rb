@@ -183,19 +183,21 @@ class AppealsApi::SwaggerSharedComponents
         },
         required: ['data']
       },
-
       evidence_submission_response_schema: {
         type: :object,
         properties: {
           data: {
             properties: {
               id: {
+                description: 'The document upload identifier',
                 type: :string,
-                pattern: '^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$'
+                format: :uuid,
+                example: '6d8433c1-cd55-4c24-affd-f592287a7572'
               },
               type: {
+                description: 'JSON API type specification',
                 type: :string,
-                enum: ['evidenceSubmission']
+                example: 'evidenceSubmission'
               },
               attributes: {
                 properties: {
@@ -204,30 +206,40 @@ class AppealsApi::SwaggerSharedComponents
                     example: VBADocuments::UploadSubmission::ALL_STATUSES.first,
                     enum: VBADocuments::UploadSubmission::ALL_STATUSES
                   },
-                  # code: {
-                  #   type: :string
-                  # },
-                  # detail: {
-                  #   type: :string
-                  # },
+                  code: {
+                    type: %i[string null]
+                  },
+                  detail: {
+                    type: %i[string null],
+                    description: 'Human readable error detail. Only present if status = "error"'
+                  },
                   appealType: {
+                    description: 'Type of associated appeal',
                     type: :string,
-                    enum: ['NoticeOfDisagreement']
+                    example: 'NoticeOfDisagreement'
                   },
                   appealId: {
-                    type: :string,
-                    pattern: '^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$'
+                    description: 'GUID of associated appeal',
+                    type: :uuid,
+                    example: '2926ad2a-9372-48cf-8ec1-69e08e4799ef'
                   },
-                  # location: {
-                  #   type: :string,
-                  # },
+                  location: {
+                    type: %i[string null],
+                    description: 'Location to which to PUT document Payload',
+                    format: 'uri',
+                    example: 'https://sandbox-api.va.gov/example_path_here/{idpath}'
+                  },
                   updatedAt: {
+                    description: 'The last time the submission was updated',
                     type: :string,
-                    pattern: '\d{4}(-\d{2}){2}T\d{2}(:\d{2}){2}\.\d{3}Z'
+                    format: 'date-time',
+                    example: '2018-07-30T17:31:15.958Z'
                   },
                   createdAt: {
+                    description: 'The last time the submission was updated',
                     type: :string,
-                    pattern: '\d{4}(-\d{2}){2}T\d{2}(:\d{2}){2}\.\d{3}Z'
+                    format: 'date-time',
+                    example: '2018-07-30T17:31:15.958Z'
                   }
                 }
               }

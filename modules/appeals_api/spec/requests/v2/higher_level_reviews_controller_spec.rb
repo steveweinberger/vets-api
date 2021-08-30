@@ -26,7 +26,10 @@ describe AppealsApi::V2::DecisionReviews::HigherLevelReviewsController, type: :r
     context 'creates an HLR and persists the data' do
       it 'with all headers' do
         post(path, params: @data, headers: @headers)
-        hlr = AppealsApi::HigherLevelReview.last
+
+        hlr_guid = JSON.parse(response.body)['data']['id']
+        hlr = AppealsApi::HigherLevelReview.find(hlr_guid)
+
         expect(hlr.source).to eq('va.gov')
         expect(parsed['data']['type']).to eq('higherLevelReview')
         expect(parsed['data']['attributes']['status']).to eq('pending')

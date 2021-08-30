@@ -156,8 +156,7 @@ describe 'Notice of Disagreements', swagger_doc: 'modules/appeals_api/app/swagge
       response '200', 'Info about a single Notice of Disagreement' do
         schema AppealsApi::SwaggerSharedComponents.response_schemas[:nod_response_schema]
 
-        nod = FactoryBot.create(:minimal_notice_of_disagreement)
-        let(:uuid) { nod.id }
+        let(:uuid) { FactoryBot.create(:minimal_notice_of_disagreement).id }
 
         before do |example|
           submit_request(example.metadata)
@@ -396,7 +395,6 @@ describe 'Notice of Disagreements', swagger_doc: 'modules/appeals_api/app/swagge
       operationId 'postNoticeOfDisagreementEvidenceSubmission'
       description <<~DESC
         This is the first step to submitting supporting evidence for an NOD.  (See the Evidence Uploads section above for additional information.)
-
         The Notice of Disagreement GUID that is returned when the NOD is submitted, is supplied to this endpoint to ensure the NOD is in a valid state for sending supporting evidence documents.  Only NODs that selected the Evidence Submission lane are allowed to submit evidence documents up to 90 days after the NOD is received by VA.
       DESC
 
@@ -411,72 +409,23 @@ describe 'Notice of Disagreements', swagger_doc: 'modules/appeals_api/app/swagge
       produces 'application/json'
 
       response '202', 'Accepted. Location generated' do
-        nod = FactoryBot.create(:minimal_notice_of_disagreement, board_review_option: 'evidence_submission')
-        let(:nod_uuid) { nod.id }
+        let(:nod_uuid) { FactoryBot.create(:minimal_notice_of_disagreement, board_review_option: 'evidence_submission').id }
 
-        schema type: :object,
-               required: ['data'],
-               properties: {
-                 data: {
-                   description: 'Status record for a previously initiated document submission.',
-                   required: %w[id type attributes],
-                   properties: {
-                     id: {
-                       description: 'JSON API identifier',
-                       type: :string,
-                       format: :uuid,
-                       example: '6d8433c1-cd55-4c24-affd-f592287a7572'
-                     },
-                     type: {
-                       description: 'JSON API type specification',
-                       type: :string,
-                       example: 'document_upload'
-                     },
-                     attributes: {
-                       required: %w[guid status],
-                       properties: {
-                         guid: {
-                           description: 'The document upload identifier',
-                           type: :string,
-                           format: :uuid,
-                           example: '6d8433c1-cd55-4c24-affd-f592287a7572'
-                         },
-                         status: {
-                           type: :string,
-                           example: 'pending',
-                           enum: ['pending', '...']
-                         },
-                         code: {
-                           type: :string
-                         },
-                         detail: {
-                           type: :string,
-                           description: 'Human readable error detail. Only present if status = "error"'
-                         },
-                         location: {
-                           description: 'Location to which to PUT document Payload',
-                           type: :string,
-                           format: 'uri',
-                           example: 'https://sandbox-api.va.gov/example_path_here/{idpath}'
-                         },
-                         updated_at: {
-                           description: 'The last time the submission was updated',
-                           type: :string,
-                           format: 'date-time',
-                           example: '2018-07-30T17:31:15.958Z'
-                         },
-                         uploaded_pdf: {
-                           description: 'Only populated after submission starts processing',
-                           example: 'null'
-                         }
-                       }
-                     }
-                   }
-                 }
-               }
+        schema AppealsApi::SwaggerSharedComponents.response_schemas[:evidence_submission_response_schema]
 
         before do |example|
-          submit_request(example.metadata)
+          with_settings(Settings.modules_appeals_api.evidence_submissions.location,
+                        prefix: 'http://some.fakesite.com/path',
+                        replacement: 'http://another.fakesite.com/rewrittenpath') do
+            s3_client = instance_double(Aws::S3::Resource)
+            allow(Aws::S3::Resource).to receive(:new).and_return(s3_client)
+            s3_bucket = instance_double(Aws::S3::Bucket)
+            s3_object = instance_double(Aws::S3::Object)
+            allow(s3_client).to receive(:bucket).and_return(s3_bucket)
+            allow(s3_bucket).to receive(:object).and_return(s3_object)
+            allow(s3_object).to receive(:presigned_url).and_return(+'http://some.fakesite.com/path/uuid')
+            submit_request(example.metadata)
+          end
         end
 
         it 'returns a 202 response' do |example|
@@ -519,7 +468,7 @@ describe 'Notice of Disagreements', swagger_doc: 'modules/appeals_api/app/swagge
         end
 
         it 'returns a 400 response' do |example|
-          # assert_response_matches_metadata(example.metadata)
+          # NOOP
         end
 
         after do |example|
@@ -571,8 +520,7 @@ describe 'Notice of Disagreements', swagger_doc: 'modules/appeals_api/app/swagge
       end
 
       response '422', 'Validation errors' do
-        nod = FactoryBot.create(:minimal_notice_of_disagreement, board_review_option: 'evidence_submission')
-        let(:nod_uuid) { nod.id }
+        let(:nod_uuid) { FactoryBot.create(:minimal_notice_of_disagreement, board_review_option: 'evidence_submission').id }
         let(:'X-VA-SSN') { '000000000' }
 
         schema type: :object,
@@ -655,16 +603,8 @@ describe 'Notice of Disagreements', swagger_doc: 'modules/appeals_api/app/swagge
         end
 
         it 'returns a 500 response' do |example|
-          # assert_response_matches_metadata(example.metadata)
+          # NOOP
         end
-
-        # after do |example|
-        #   example.metadata[:response][:content] = {
-        #     'application/json' => {
-        #       example: JSON.parse(response.body, symbolize_names: true)
-        #     }
-        #   }
-        # end
       end
     end
   end
@@ -729,8 +669,7 @@ describe 'Notice of Disagreements', swagger_doc: 'modules/appeals_api/app/swagge
       response '200', 'Info about a single Notice of Disagreement Evidence Submission.' do
         schema AppealsApi::SwaggerSharedComponents.response_schemas[:evidence_submission_response_schema]
 
-        evidence_submission = FactoryBot.create(:evidence_submission)
-        let(:uuid) { evidence_submission.guid }
+        let(:uuid) { FactoryBot.create(:evidence_submission).guid }
 
         before do |example|
           submit_request(example.metadata)

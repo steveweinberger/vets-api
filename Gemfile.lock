@@ -42,7 +42,7 @@ GIT
 
 GIT
   remote: https://github.com/department-of-veterans-affairs/bgs-ext.git
-  revision: d78b98cbe56ed32d5bfd40d3bdbda1ec61324a9d
+  revision: 02ee02ba73399580bc5507539f67307bc433612a
   specs:
     bgs_ext (0.21.1)
       httpclient
@@ -65,10 +65,10 @@ GIT
 
 GIT
   remote: https://github.com/department-of-veterans-affairs/vets-json-schema
-  revision: c53691977e6fd6ea717ceb0c4c2bc740f477168b
+  revision: fc6d6a217164f49d2baf5ad2c803923c6ba21206
   branch: master
   specs:
-    vets_json_schema (20.9.0)
+    vets_json_schema (20.11.1)
       multi_json (~> 1.0)
       script_utils (= 0.0.4)
 
@@ -219,7 +219,7 @@ GEM
       i18n
     bindex (0.8.1)
     blueprinter (0.25.3)
-    bootsnap (1.7.7)
+    bootsnap (1.8.1)
       msgpack (~> 1.0)
     brakeman (5.1.1)
     breakers (0.5.0)
@@ -376,7 +376,7 @@ GEM
       activesupport (>= 4.2)
     fastimage (2.2.5)
     ffi (1.15.1)
-    fhir_client (5.0.0)
+    fhir_client (5.0.1)
       activesupport (>= 3)
       addressable (>= 2.3)
       fhir_dstu2_models (>= 1.1.0)
@@ -787,7 +787,7 @@ GEM
       rubocop-ast (>= 1.9.1, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 1.4.0, < 3.0)
-    rubocop-ast (1.10.0)
+    rubocop-ast (1.11.0)
       parser (>= 3.0.1.1)
     rubocop-junit-formatter (0.1.4)
     rubocop-rails (2.11.3)
@@ -1015,7 +1015,7 @@ DEPENDENCIES
   faraday_middleware
   fast_jsonapi
   fastimage
-  fhir_client (~> 5.0.0)
+  fhir_client (~> 5.0.1)
   flipper (~> 0.21.0)
   flipper-active_record (~> 0.21.0)
   flipper-active_support_cache_store (~> 0.21.0)
@@ -1098,7 +1098,7 @@ DEPENDENCIES
   rspec_junit_formatter
   rswag-specs
   rswag-ui
-  rubocop
+  rubocop (= 1.19.1)
   rubocop-junit-formatter
   rubocop-rails
   rubocop-rspec
