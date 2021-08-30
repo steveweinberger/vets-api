@@ -25,6 +25,7 @@ module Webhooks
         wh
       end
 
+      # todo consider moving this to subscription as it only operates on the one model
       def clean_subscription(api_name, consumer_id, &block)
         raise ArgumentError.new("A block is required!") unless block_given?
         subscription = Subscription.where(api_name: api_name, consumer_id: consumer_id).first
@@ -34,6 +35,7 @@ module Webhooks
         end
       end
 
+      # todo either move to named scope in NotificationAttempt or have this setup the associations too.
       def create_blocked_attempt(url)
         Webhooks::NotificationAttempt.create(callback_url: url, response: {'status' => -1, 'body' => ''})
       end
@@ -44,17 +46,14 @@ module Webhooks
         Webhooks::Subscription.where(api_name: api_name, consumer_id: consumer_id)&.first
       end
 
+      # @todo move to named scope in subscription
       def fetch_subscriptions(consumer_id) #api_name?
        Webhooks::Subscription.where(consumer_id: consumer_id).all
       end
 
-      def fetch_subscriptions_by_api_name(api_name) #api_name?
-        Webhooks::Subscription.where(api_name: api_name).all
-      end
-
       def record_notifications(consumer_id:, consumer_name:, event:, api_guid:, msg:)
         api_name = Webhooks::Utilities.event_to_api_name[event]
-        # TODO: replace query with looking against the subscription
+        # TODO: replace query with looking against the subscription Greg Bowman
         webhook_urls = Webhooks::Subscription.get_notification_urls(api_name: api_name, consumer_id: consumer_id, event: event)
         subscription = Webhooks::Subscription.where(consumer_id: consumer_id, api_name: api_name).first
         return [] unless webhook_urls.size.positive?
