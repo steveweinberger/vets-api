@@ -76,8 +76,9 @@ dmc:
 
 mcp:
   vbs:
-    url: https://fake_url.com:9000
-    host: fake_url.com
+    url: https://yf7yvyucfj.execute-api.us-gov-west-1.amazonaws.com
+    host: yf7yvyucfj.execute-api.us-gov-west-1.amazonaws.com
+    base_env: /Prod
     service_name: VBS
     mock: true
 

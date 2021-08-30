@@ -36,19 +36,19 @@ module MedicalCopays
         {
           'type' => 'object',
           'additionalProperties' => false,
-          'required' => %w[edipi vistaAccountNumbers],
+          'required' => %w[edipi],
+          "anyOf" => [ 
+            { 
+              "not" => { "required" => ["vistaAccountNumbers"] }
+            },
+          ],
           'properties' => {
             'edipi' => {
               'type' => 'string'
             },
-            'vistaAccountNumbers' => {
-              'type' => 'array',
-              'items' => {
-                'type' => 'string',
-                'minLength' => 16,
-                'maxLength' => 16
-              }
-            }
+            'vistaAccountNumbers' => { 
+              'type' => 'number'
+             }
           }
         }
       end
@@ -91,6 +91,7 @@ module MedicalCopays
       # @return [Boolean]
       #
       def valid?
+        binding.pry
         errors = JSON::Validator.fully_validate(
           self.class.statements_schema,
           to_hash,

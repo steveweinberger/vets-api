@@ -173,10 +173,11 @@ check_in:
 
 mcp:
   vbs:
-    url: https://fake_url.com:9000
-    host: ~
+    url: https://yf7yvyucfj.execute-api.us-gov-west-1.amazonaws.com
+    host: yf7yvyucfj.execute-api.us-gov-west-1.amazonaws.com
+    base_env: /Prod
     service_name: VBS
-    mock: false
+    mock: true
 
 rack:
   cookie_secret: "xxxxx"
