@@ -496,7 +496,7 @@
               "application/json": {
                 "example": {
                   "data": {
-                    "id": "1822f74c-018e-4ae4-993b-afd4b085d639",
+                    "id": "8c83b991-a67b-4672-baf2-30e33c98aeb6",
                     "type": "claims_api_claim",
                     "attributes": {
                       "evss_id": 600118851,
@@ -545,11 +545,11 @@
                       "status": "Initial review",
                       "supporting_documents": [
                         {
-                          "id": "453cf917-39c3-4087-a49d-78b0acb512e1",
+                          "id": "828994fa-46e7-4c02-8d63-7c24ae04d15c",
                           "type": "claim_supporting_document",
                           "md5": "d927c7e283b3158a54822a493d06181d",
                           "filename": "extras.pdf",
-                          "uploaded_at": "2021-08-27T14:44:19.438Z"
+                          "uploaded_at": "2021-08-30T21:20:54.944Z"
                         }
                       ]
                     }
@@ -1781,6 +1781,12 @@
                                 "type": "string",
                                 "example": "249470"
                               },
+                              "approximateBeginDate": {
+                                "description": "Approximate date disability began.",
+                                "type": "string",
+                                "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$",
+                                "example": "2018-03-02"
+                              },
                               "secondaryDisabilities": {
                                 "description": "Identifies the Secondary Service Disability information of the Veteran.",
                                 "type": "array",
@@ -2038,7 +2044,6 @@
                             "additionalProperties": false,
                             "required": [
                               "startDate",
-                              "endDate",
                               "treatedDisabilityNames",
                               "center"
                             ],
@@ -2418,7 +2423,7 @@
               "application/json": {
                 "example": {
                   "data": {
-                    "id": "b1eb9b36-1c74-4626-b890-ed8648697eee",
+                    "id": "3217451d-719e-4109-81f9-c883abab838d",
                     "type": "claims_api_claim",
                     "attributes": {
                       "evss_id": null,
@@ -2436,13 +2441,13 @@
                       "current_phase_back": null,
                       "requested_decision": null,
                       "claim_type": null,
-                      "updated_at": "2021-08-27T14:44:19.830Z",
+                      "updated_at": "2021-08-30T21:20:55.387Z",
                       "contention_list": null,
                       "va_representative": null,
                       "events_timeline": [
 
                       ],
-                      "token": "b1eb9b36-1c74-4626-b890-ed8648697eee",
+                      "token": "3217451d-719e-4109-81f9-c883abab838d",
                       "status": "pending",
                       "flashes": [
                         "Hardship",
@@ -3624,6 +3629,12 @@
                                   "type": "string",
                                   "example": "249470"
                                 },
+                                "approximateBeginDate": {
+                                  "description": "Approximate date disability began.",
+                                  "type": "string",
+                                  "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$",
+                                  "example": "2018-03-02"
+                                },
                                 "secondaryDisabilities": {
                                   "description": "Identifies the Secondary Service Disability information of the Veteran.",
                                   "type": "array",
@@ -3881,7 +3892,6 @@
                               "additionalProperties": false,
                               "required": [
                                 "startDate",
-                                "endDate",
                                 "treatedDisabilityNames",
                                 "center"
                               ],
@@ -4274,7 +4284,7 @@
               "application/json": {
                 "example": {
                   "data": {
-                    "id": "c274ca16-4fe2-4957-bd31-b757540b7e41",
+                    "id": "004ce6bc-8b40-4ffc-9ba4-44076d4e3c39",
                     "type": "claims_api_claim",
                     "attributes": {
                       "evss_id": null,
@@ -4292,13 +4302,13 @@
                       "current_phase_back": null,
                       "requested_decision": null,
                       "claim_type": null,
-                      "updated_at": "2021-08-27T14:44:20.134Z",
+                      "updated_at": "2021-08-30T21:20:55.881Z",
                       "contention_list": null,
                       "va_representative": null,
                       "events_timeline": [
 
                       ],
-                      "token": "c274ca16-4fe2-4957-bd31-b757540b7e41",
+                      "token": "004ce6bc-8b40-4ffc-9ba4-44076d4e3c39",
                       "status": "pending",
                       "flashes": [
                         "Hardship",
@@ -5881,6 +5891,12 @@
                                   "type": "string",
                                   "example": "249470"
                                 },
+                                "approximateBeginDate": {
+                                  "description": "Approximate date disability began.",
+                                  "type": "string",
+                                  "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$",
+                                  "example": "2018-03-02"
+                                },
                                 "secondaryDisabilities": {
                                   "description": "Identifies the Secondary Service Disability information of the Veteran.",
                                   "type": "array",
@@ -6138,7 +6154,6 @@
                               "additionalProperties": false,
                               "required": [
                                 "startDate",
-                                "endDate",
                                 "treatedDisabilityNames",
                                 "center"
                               ],
@@ -6531,7 +6546,7 @@
               "application/json": {
                 "example": {
                   "data": {
-                    "id": "8d8ccd08-acb0-4fd8-83b6-befa1782eae4",
+                    "id": "c5f08f3b-0293-4768-88ad-6a073dd8f29f",
                     "type": "claims_api_claim",
                     "attributes": {
                       "evss_id": null,
@@ -6545,7 +6560,7 @@
                       "decision_letter_sent": null,
                       "requested_decision": null,
                       "claim_type": null,
-                      "updated_at": "2021-08-27T14:44:20.781Z",
+                      "updated_at": "2021-08-30T21:20:56.688Z",
                       "contention_list": null,
                       "va_representative": null,
                       "events_timeline": [
@@ -6554,7 +6569,7 @@
                       "status": "pending",
                       "supporting_documents": [
                         {
-                          "id": "771d81af-bf4d-48d2-896e-9a3af1185aaa",
+                          "id": "3e7d8e53-3369-41a8-a1c4-45ec9aa96d52",
                           "type": "claim_supporting_document",
                           "md5": null,
                           "filename": null,
@@ -8511,11 +8526,11 @@
               "application/json": {
                 "example": {
                   "data": {
-                    "id": "44d2370e-7221-41a7-a865-a7f86786a02f",
+                    "id": "7f0e2afd-cc83-41c5-bce0-8857125048a3",
                     "type": "claims_api_power_of_attorneys",
                     "attributes": {
                       "status": "pending",
-                      "date_request_accepted": "2021-08-27",
+                      "date_request_accepted": "2021-08-30",
                       "representative": {
                         "service_organization": {
                           "poa_code": "074"
@@ -9224,11 +9239,11 @@
               "application/json": {
                 "example": {
                   "data": {
-                    "id": "74c6f6fd-9935-4c29-996b-18e60f91d6ad",
+                    "id": "690db58e-b04a-4456-a57e-a77c3abcca08",
                     "type": "claims_api_power_of_attorneys",
                     "attributes": {
                       "status": "submitted",
-                      "date_request_accepted": "2021-08-27",
+                      "date_request_accepted": "2021-08-30",
                       "representative": {
                         "service_organization": {
                           "poa_code": "074"
@@ -9549,11 +9564,11 @@
               "application/json": {
                 "example": {
                   "data": {
-                    "id": "1451a510-76a2-4279-97e1-08a43df844de",
+                    "id": "877f227c-9eac-4a5a-9078-1b1f0f364218",
                     "type": "claims_api_power_of_attorneys",
                     "attributes": {
                       "status": "submitted",
-                      "date_request_accepted": "2021-08-27",
+                      "date_request_accepted": "2021-08-30",
                       "representative": {
                         "service_organization": {
                           "poa_code": "074"
