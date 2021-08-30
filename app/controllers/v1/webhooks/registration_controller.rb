@@ -50,10 +50,17 @@ module V1::Webhooks
           end
           subscription.metadata = metadata
           subscription.save!
+          puts "HEEYYYY"
+          render status: :accepted,
+                 json: subscription,
+                 serializer: Webhooks::MaintenanceSerializer
         else
+          puts "YOOOO"
           #  todo what do we return
         end
       end
+    rescue JSON::ParserError => e
+      raise Common::Exceptions::SchemaValidationErrors, ["invalid JSON. #{e.message}"] if e.is_a? JSON::ParserError
     end
 
     def report
