@@ -28,7 +28,7 @@ RSpec.describe Webhooks::NotificationsJob, type: :job do
   end
 
   before do
-    @subscription = Webhooks::Utilities.register_webhook(consumer_id, consumer_name, observers_json, api_id)
+    @subscription = Webhooks::Utilities.register_webhook(consumer_id, consumer_name, observers_json)
     @notifications = Webhooks::Utilities.record_notifications(
       consumer_id: consumer_id,
       consumer_name: consumer_name,
