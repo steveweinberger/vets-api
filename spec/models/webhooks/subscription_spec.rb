@@ -48,4 +48,24 @@ describe Webhooks::Subscription, type: :model do
     expect(query_results).to eq(observer_urls)
     expect(query_results_nil).to eq(observer_urls)
   end
+
+  it 'finds urls that have had too many failures' do
+    urls = {}
+    l = ->(time, url) do
+      urls[url] ||= {}
+      urls[url][Webhooks::Subscription::FAILURE_KEY] ||= {}
+      urls[url][Webhooks::Subscription::FAILURE_KEY][Webhooks::Subscription::RUN_AFTER_KEY] = time.to_i
+    end
+    num_times = 20
+    num_times.times do |i|
+      l.call(1.hour.from_now, "http://some_url_#{i}")
+      l.call(Webhooks::Subscription::BLOCKED_CALLBACK, "http://some_blocked_url_#{i}")
+    end
+    @subscription.metadata = urls
+    blocked_urls = @subscription.blocked_callback_urls
+    expect(blocked_urls.length).to be num_times
+    blocked_urls.each do |url|
+      expect(url).to match(/some_blocked_url_/)
+    end
+  end
 end
