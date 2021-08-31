@@ -496,7 +496,7 @@
               "application/json": {
                 "example": {
                   "data": {
-                    "id": "19cdfe42-d122-452c-aea7-4e3cf8064a9c",
+                    "id": "8c83b991-a67b-4672-baf2-30e33c98aeb6",
                     "type": "claims_api_claim",
                     "attributes": {
                       "evss_id": 600118851,
@@ -545,11 +545,11 @@
                       "status": "Initial review",
                       "supporting_documents": [
                         {
-                          "id": "a519c6d5-24c3-43cb-8341-78bfd3ecf18a",
+                          "id": "828994fa-46e7-4c02-8d63-7c24ae04d15c",
                           "type": "claim_supporting_document",
                           "md5": "d927c7e283b3158a54822a493d06181d",
                           "filename": "extras.pdf",
-                          "uploaded_at": "2021-08-25T20:35:43.222Z"
+                          "uploaded_at": "2021-08-30T21:20:54.944Z"
                         }
                       ]
                     }
@@ -1777,6 +1777,16 @@
                                 "type": "string",
                                 "example": "PTSD (post traumatic stress disorder)"
                               },
+                              "classificationCode": {
+                                "type": "string",
+                                "example": "249470"
+                              },
+                              "approximateBeginDate": {
+                                "description": "Approximate date disability began.",
+                                "type": "string",
+                                "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$",
+                                "example": "2018-03-02"
+                              },
                               "secondaryDisabilities": {
                                 "description": "Identifies the Secondary Service Disability information of the Veteran.",
                                 "type": "array",
@@ -2034,7 +2044,6 @@
                             "additionalProperties": false,
                             "required": [
                               "startDate",
-                              "endDate",
                               "treatedDisabilityNames",
                               "center"
                             ],
@@ -2414,7 +2423,7 @@
               "application/json": {
                 "example": {
                   "data": {
-                    "id": "0815d3fe-80a9-4da2-ac2b-d8043ca0fba7",
+                    "id": "3217451d-719e-4109-81f9-c883abab838d",
                     "type": "claims_api_claim",
                     "attributes": {
                       "evss_id": null,
@@ -2432,13 +2441,13 @@
                       "current_phase_back": null,
                       "requested_decision": null,
                       "claim_type": null,
-                      "updated_at": "2021-08-25T20:35:43.743Z",
+                      "updated_at": "2021-08-30T21:20:55.387Z",
                       "contention_list": null,
                       "va_representative": null,
                       "events_timeline": [
 
                       ],
-                      "token": "0815d3fe-80a9-4da2-ac2b-d8043ca0fba7",
+                      "token": "3217451d-719e-4109-81f9-c883abab838d",
                       "status": "pending",
                       "flashes": [
                         "Hardship",
@@ -3616,6 +3625,16 @@
                                   "type": "string",
                                   "example": "PTSD (post traumatic stress disorder)"
                                 },
+                                "classificationCode": {
+                                  "type": "string",
+                                  "example": "249470"
+                                },
+                                "approximateBeginDate": {
+                                  "description": "Approximate date disability began.",
+                                  "type": "string",
+                                  "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$",
+                                  "example": "2018-03-02"
+                                },
                                 "secondaryDisabilities": {
                                   "description": "Identifies the Secondary Service Disability information of the Veteran.",
                                   "type": "array",
@@ -3873,7 +3892,6 @@
                               "additionalProperties": false,
                               "required": [
                                 "startDate",
-                                "endDate",
                                 "treatedDisabilityNames",
                                 "center"
                               ],
@@ -4266,7 +4284,7 @@
               "application/json": {
                 "example": {
                   "data": {
-                    "id": "f6560143-bdc1-4515-b40f-a06ac2a30589",
+                    "id": "004ce6bc-8b40-4ffc-9ba4-44076d4e3c39",
                     "type": "claims_api_claim",
                     "attributes": {
                       "evss_id": null,
@@ -4284,13 +4302,13 @@
                       "current_phase_back": null,
                       "requested_decision": null,
                       "claim_type": null,
-                      "updated_at": "2021-08-25T20:35:44.205Z",
+                      "updated_at": "2021-08-30T21:20:55.881Z",
                       "contention_list": null,
                       "va_representative": null,
                       "events_timeline": [
 
                       ],
-                      "token": "f6560143-bdc1-4515-b40f-a06ac2a30589",
+                      "token": "004ce6bc-8b40-4ffc-9ba4-44076d4e3c39",
                       "status": "pending",
                       "flashes": [
                         "Hardship",
@@ -5869,6 +5887,16 @@
                                   "type": "string",
                                   "example": "PTSD (post traumatic stress disorder)"
                                 },
+                                "classificationCode": {
+                                  "type": "string",
+                                  "example": "249470"
+                                },
+                                "approximateBeginDate": {
+                                  "description": "Approximate date disability began.",
+                                  "type": "string",
+                                  "pattern": "^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$",
+                                  "example": "2018-03-02"
+                                },
                                 "secondaryDisabilities": {
                                   "description": "Identifies the Secondary Service Disability information of the Veteran.",
                                   "type": "array",
@@ -6126,7 +6154,6 @@
                               "additionalProperties": false,
                               "required": [
                                 "startDate",
-                                "endDate",
                                 "treatedDisabilityNames",
                                 "center"
                               ],
@@ -6519,7 +6546,7 @@
               "application/json": {
                 "example": {
                   "data": {
-                    "id": "f75db8bf-7bab-43ec-8951-96b44a1cee4c",
+                    "id": "c5f08f3b-0293-4768-88ad-6a073dd8f29f",
                     "type": "claims_api_claim",
                     "attributes": {
                       "evss_id": null,
@@ -6533,7 +6560,7 @@
                       "decision_letter_sent": null,
                       "requested_decision": null,
                       "claim_type": null,
-                      "updated_at": "2021-08-25T20:35:45.283Z",
+                      "updated_at": "2021-08-30T21:20:56.688Z",
                       "contention_list": null,
                       "va_representative": null,
                       "events_timeline": [
@@ -6542,7 +6569,7 @@
                       "status": "pending",
                       "supporting_documents": [
                         {
-                          "id": "5eea5626-a2d4-4986-a8c7-ed9f60ed9a60",
+                          "id": "3e7d8e53-3369-41a8-a1c4-45ec9aa96d52",
                           "type": "claim_supporting_document",
                           "md5": null,
                           "filename": null,
@@ -8499,11 +8526,11 @@
               "application/json": {
                 "example": {
                   "data": {
-                    "id": "e2df298c-7cec-437e-89fb-d8314cbd8222",
+                    "id": "7f0e2afd-cc83-41c5-bce0-8857125048a3",
                     "type": "claims_api_power_of_attorneys",
                     "attributes": {
                       "status": "pending",
-                      "date_request_accepted": "2021-08-25",
+                      "date_request_accepted": "2021-08-30",
                       "representative": {
                         "service_organization": {
                           "poa_code": "074"
@@ -9212,11 +9239,11 @@
               "application/json": {
                 "example": {
                   "data": {
-                    "id": "b5873321-c48f-4c81-8405-7d2d76d24ee0",
+                    "id": "690db58e-b04a-4456-a57e-a77c3abcca08",
                     "type": "claims_api_power_of_attorneys",
                     "attributes": {
                       "status": "submitted",
-                      "date_request_accepted": "2021-08-25",
+                      "date_request_accepted": "2021-08-30",
                       "representative": {
                         "service_organization": {
                           "poa_code": "074"
@@ -9537,11 +9564,11 @@
               "application/json": {
                 "example": {
                   "data": {
-                    "id": "f5febae5-4080-4fc9-b193-f7af7f81ff63",
+                    "id": "877f227c-9eac-4a5a-9078-1b1f0f364218",
                     "type": "claims_api_power_of_attorneys",
                     "attributes": {
                       "status": "submitted",
-                      "date_request_accepted": "2021-08-25",
+                      "date_request_accepted": "2021-08-30",
                       "representative": {
                         "service_organization": {
                           "poa_code": "074"

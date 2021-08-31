@@ -156,6 +156,8 @@ module ClaimsApi
           validate_form_526_service_pay!
           validate_form_526_title10_activation_date!
           validate_form_526_change_of_address!
+          validate_form_526_disabilities!
+          validate_form_526_treatments!
         end
 
         def validate_form_526_change_of_address!
@@ -342,6 +344,95 @@ module ClaimsApi
 
           # EVSS does not allow passing a 'pointOfContact' if neither homelessness attribute is provided
           currently_homeless_attr.blank? && homelessness_risk_attr.blank? && homelessness_poc_attr.present?
+        end
+
+        def validate_form_526_disabilities!
+          validate_form_526_disability_classification_code!
+          validate_form_526_disability_approximate_begin_date!
+        end
+
+        def validate_form_526_disability_classification_code!
+          return if (form_attributes['disabilities'].pluck('classificationCode') - [nil]).blank?
+
+          contention_classification_type_codes = bgs_service.data.get_contention_classification_type_code_list
+          classification_ids = contention_classification_type_codes.pluck(:clsfcn_id)
+          form_attributes['disabilities'].each do |disability|
+            next if disability['classificationCode'].blank?
+            next if classification_ids.include?(disability['classificationCode'])
+
+            raise ::Common::Exceptions::InvalidFieldValue.new('disabilities.classificationCode',
+                                                              disability['classificationCode'])
+          end
+        end
+
+        def validate_form_526_disability_approximate_begin_date!
+          disabilities = form_attributes.dig('disabilities')
+          return if disabilities.blank?
+
+          disabilities.each do |disability|
+            approx_begin_date = disability['approximateBeginDate']
+            next if approx_begin_date.blank?
+
+            next if Date.parse(approx_begin_date) < Time.zone.today
+
+            raise ::Common::Exceptions::InvalidFieldValue.new('disability.approximateBeginDate', approx_begin_date)
+          end
+        end
+
+        def validate_form_526_treatments!
+          treatments = form_attributes.dig('treatments')
+          return if treatments.blank?
+
+          validate_treatment_start_dates!
+          validate_treatment_end_dates!
+          validate_treated_disability_names!
+        end
+
+        def validate_treatment_start_dates!
+          treatments = form_attributes.dig('treatments')
+          return if treatments.blank?
+
+          earliest_begin_date = form_attributes['serviceInformation']['servicePeriods'].map do |service_period|
+            Date.parse(service_period['activeDutyBeginDate'])
+          end.min
+
+          treatments.each do |treatment|
+            next if Date.parse(treatment['startDate']) > earliest_begin_date
+
+            raise ::Common::Exceptions::InvalidFieldValue.new('treatments.startDate', treatment['startDate'])
+          end
+        end
+
+        def validate_treatment_end_dates!
+          treatments = form_attributes.dig('treatments')
+          return if treatments.blank?
+
+          treatments.each do |treatment|
+            next if treatment['endDate'].blank?
+
+            treatment_start_date = Date.parse(treatment['startDate'])
+            treatment_end_date   = Date.parse(treatment['endDate'])
+
+            next if treatment_end_date > treatment_start_date
+
+            raise ::Common::Exceptions::InvalidFieldValue.new('treatments.endDate', treatment['endDate'])
+          end
+        end
+
+        def validate_treated_disability_names!
+          treatments = form_attributes.dig('treatments')
+          return if treatments.blank?
+
+          declared_disability_names = form_attributes['disabilities'].pluck('name')
+
+          treatments.each do |treatment|
+            next if treatment['treatedDisabilityNames'].all? { |name| declared_disability_names.include?(name) }
+
+            raise ::Common::Exceptions::InvalidFieldValue.new(
+              'treatments.treatedDisabilityNames',
+              treatment['treatedDisabilityNames']
+            )
+          end
         end
 
         def flashes
