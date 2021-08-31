@@ -49,10 +49,6 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USER }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      - name: Setup Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v1
-
       - name: Setup Environment
         run: |
           echo "VETS_API_USER_ID=$(id -u)" >> $GITHUB_ENV
@@ -63,7 +59,6 @@ jobs:
           docker volume create --name=test_bundle
           cp /etc/ssl/certs/VA-Internal-S2-RCA1-v1.cer.pem config/ca-trust/
           docker cp config/ca-trust/VA-Internal-S2-RCA1-v1.cer.pem ${{ env.BUILDX_CONTAINER_ID }}:/usr/local/share/ca-certificates/
-          docker exec -d  ${{ env.BUILDX_CONTAINER_ID }} update-ca-certificates
 
       - name: Cache Docker Layers
         uses: actions/cache@v2
@@ -125,6 +120,7 @@ jobs:
       - name: Docker Cleanup
         if: always()
         run: |
+          docker network ls
           docker network prune -f
           docker rmi -f vets-api:${{ env.DOCKER_IMAGE }} 2> /dev/null || true
           docker rm -f ${{ env.DOCKER_IMAGE }}_postgres_1 2> /dev/null || true
