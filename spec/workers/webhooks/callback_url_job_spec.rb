@@ -28,9 +28,9 @@ RSpec.describe Webhooks::CallbackUrlJob, type: :job do
   let(:urls) { observers_json['subscriptions'].first['urls'] }
 
   before do
-    @subscription = Webhooks::Utilities.register_webhook(consumer_id, consumer_name, observers_json, api_guid)
+    @subscription = Webhooks::Utilities.register_webhook(consumer_id, consumer_name, observers_json)
     params = { consumer_id: consumer_id, consumer_name: consumer_name,
-               event: 'registrations_test_event', api_guid: api_guid, msg: msg }
+               event: Registrations::TEST_EVENT, api_guid: api_guid, msg: msg }
     @notifications = Webhooks::Utilities.record_notifications(params)
 
     @notification_by_url = lambda do |url|

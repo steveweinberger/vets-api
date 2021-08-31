@@ -11,11 +11,11 @@ describe Webhooks::Notification, type: :model do
   let(:msg) do
     { 'msg' => 'the message' }
   end
-  let(:fixture_path) { './modules/vba_documents/spec/fixtures/subscriptions/' }
+  let(:fixture_path) { './spec/fixtures/webhooks/subscriptions/' }
   let(:observers) { JSON.parse File.read(fixture_path + 'subscriptions.json') }
 
   before do
-    @subscription = Webhooks::Utilities.register_webhook(consumer_id, consumer_name, observers, api_id)
+    @subscription = Webhooks::Utilities.register_webhook(consumer_id, consumer_name, observers)
     @notifications = Webhooks::Utilities.record_notifications(
       consumer_id: consumer_id,
       consumer_name: consumer_name,
