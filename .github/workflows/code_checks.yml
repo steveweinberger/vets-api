@@ -52,7 +52,6 @@ jobs:
       - name: Setup Environment
         run: |
           echo "VETS_API_USER_ID=$(id -u)" >> $GITHUB_ENV
-          echo "BUILDX_CONTAINER_ID=$(docker ps | grep ${{ steps.buildx.outputs.name }} | cut -f1 -d' ' | tr -d '[:space:]')" >> $GITHUB_ENV
 
       - name: Setup Docker
         run: |
