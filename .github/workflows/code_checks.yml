@@ -58,7 +58,6 @@ jobs:
         run: |
           docker volume create --name=test_bundle
           cp /etc/ssl/certs/VA-Internal-S2-RCA1-v1.cer.pem config/ca-trust/
-          docker cp config/ca-trust/VA-Internal-S2-RCA1-v1.cer.pem ${{ env.BUILDX_CONTAINER_ID }}:/usr/local/share/ca-certificates/
 
       - name: Cache Docker Layers
         uses: actions/cache@v2
