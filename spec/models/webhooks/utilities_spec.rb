@@ -3,6 +3,7 @@
 require 'rails_helper'
 require './lib/webhooks/utilities'
 require './app/models/webhooks/utilities'
+require 'tempfile'
 
 # use these loads when running in a rails console
 # load './app/models/webhooks/notification.rb'
@@ -99,7 +100,7 @@ describe Webhooks::Utilities, type: :model do
     it 'requires a block' do
       subscription = Webhooks::Utilities.register_webhook(consumer_id, consumer_name, observers)
 
-      expect {Webhooks::Utilities.clean_subscription(subscription.api_name, subscription.consumer_id) }
+      expect { Webhooks::Utilities.clean_subscription(subscription.api_name, subscription.consumer_id) }
           .to raise_error(ArgumentError)
 
     end
@@ -113,24 +114,35 @@ describe Webhooks::Utilities, type: :model do
 
     it 'allows only one process to modify a subscription under lock at a time' do
       subscription = Webhooks::Utilities.register_webhook(consumer_id, consumer_name, observers)
-      first_pid = fork do
-        Webhooks::Utilities.clean_subscription(subscription.api_name, subscription.consumer_id) do |s|
-          s.metadata = {'pid' => $$, 'key_1' => 'key_1'}
-          s.save!
+      path = Tempfile.new.path
+      l = -> do
+        File.open(path, 'a') do |f|
+          f.flock(File::LOCK_EX)
+          f.write("#{Time.now.to_f}\n")
         end
       end
-      second_pid = fork do
-        Webhooks::Utilities.clean_subscription(subscription.api_name, subscription.consumer_id) do |s|
-          s.metadata = {'pid' => $$, 'key_2' => 'key_2'}
-          s.save!
+      pids = []
+      2.times do
+        pids << fork do
+          Webhooks::Utilities.clean_subscription(subscription.api_name, subscription.consumer_id) do |s|
+            l.call
+            s.metadata = {'pid' => $$, "key_#{$$}" => "key_#{$$}"} # $$ is a special variable containing the current pid
+            s.save!
+            l.call
+          end
         end
       end
-      [first_pid, second_pid].each { |pid| Process.waitpid(pid) }
+      pids.each { |pid| Process.waitpid(pid) }
       subscription.reload
       pid = subscription.metadata['pid']
-      pids = [first_pid, second_pid] - [pid]
-      expect(pids.length).to be 1
+      remaining_pids = pids - [pid]
+      expect(remaining_pids.length).to be 1
       expect(subscription.metadata.keys.length).to be 2
+      times = File.read(path).split("\n").map(&:to_f)
+      expect(times.eql? times.sort)
+      expect(times.length).to be 4
+      # validate all times in sequential order.
+      File.unlink path
     end
   end
 end
