@@ -42,14 +42,13 @@ module Webhooks
     # rubocop:enable Style/RescueModifier
 
     def get_notification_urls(event = nil)
-      hash = self.events['subscriptions'] ||= []
+      subscription_array = self.events['subscriptions'] ||= []
       ret = []
       if event
-        hash.each { |h| ret << h['urls'] if h['event']&.eql? event }
+        subscription_array.each { |h| ret << h['urls'] if h['event']&.eql? event }
       else
-        hash.each { |h| ret << h['urls'] }
+        subscription_array.each { |h| ret << h['urls'] }
       end
-
       ret.flatten.uniq
     end
 

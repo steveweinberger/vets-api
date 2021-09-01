@@ -14,15 +14,21 @@ module Webhooks
 
       # TODO: All of these methods should be moved out of ClassMethods Cris?
       # We assume the subscription parameter has already been through validate_subscription()
-      def register_webhook(consumer_id, consumer_name, subscription)
+      def register_webhook(consumer_id, consumer_name, subscription, &block)
         event = subscription['subscriptions'].first['event']
         api_name = Webhooks::Utilities.event_to_api_name[event]
-        wh = fetch_subscription(consumer_id, subscription) || Webhooks::Subscription.new
-        wh.api_name = api_name
-        wh.consumer_id = consumer_id
-        wh.consumer_name = consumer_name
-        wh.events = subscription
-        wh.save!
+        old_subscription = fetch_subscription(consumer_id, subscription)
+        wh = old_subscription || Webhooks::Subscription.new
+        wh.with_lock do
+          wh.api_name = api_name
+          wh.consumer_id = consumer_id
+          wh.consumer_name = consumer_name
+          wh.events = subscription
+          wh.save!
+          if block_given?
+            block.call(old_subscription, wh)
+          end
+        end
         wh
       end
 
@@ -107,6 +113,7 @@ module Webhooks
       locked_sub.metadata = metadata
       locked_sub.save!
     end
+
     # rubocop:enable Metrics/MethodLength
   end
 end
