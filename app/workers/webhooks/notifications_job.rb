@@ -5,7 +5,6 @@ require './app/workers/webhooks/callback_url_job'
 module Webhooks
   class NotificationsJob
     include Sidekiq::Worker
-    # load './app/workers/webhooks/notifications_job.rb'
 
     def perform(api_name)
       job_id = nil
@@ -14,7 +13,7 @@ module Webhooks
       Rails.logger.info "Webhooks::NotificationsJob on api_name  #{api_name}"
       # lock the rows that will be updated in this job run. The update releases the lock.
       # rubocop:disable Rails/SkipsModelValidations
-      args = {api_name: api_name, final_attempt_id: nil, processing: nil}
+      args = { api_name: api_name, final_attempt_id: nil, processing: nil }
       ids = Webhooks::Notification.lock('FOR UPDATE').where(args).pluck(:id)
       Webhooks::Notification.where(id: ids).update_all(processing: processing_time.to_i)
       # rubocop:enable Rails/SkipsModelValidations

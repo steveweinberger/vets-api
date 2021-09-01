@@ -18,7 +18,7 @@ module VBADocuments
       WEBHOOK_DEFAULT_RUN_MINS.minutes.from_now
     end
 
-    # todo place documentation outlining structure of failure data.  Something like:
+    # TODO: place documentation outlining structure of failure data.  Something like:
     #  {"404"=>6, "420"=>4, "503"=>7, "total"=>27, "Faraday::Error"=>6, "Faraday::ClientError"=>4}
     register_failure_handler(api_name: WEBHOOK_API_NAME) do |failure_data|
       Rails.logger.info("Webhooks: failure handler got #{failure_data}")
@@ -27,8 +27,8 @@ module VBADocuments
         case failure_data['total']
         when 1..3
           0.minutes.from_now
-        when 4..10
-          5.minutes.from_now
+        # when 4..10
+        #   5.minutes.from_now
         # when 11..20
         #   20.minutes.from_now
         # when 21..50

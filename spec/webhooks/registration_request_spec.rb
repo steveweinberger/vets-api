@@ -21,7 +21,9 @@ RSpec.describe 'Webhook registration tests', type: :request, retry: 3 do
       %i[file text].each do |multipart_fashion|
         it "accepts valid #{multipart_fashion} subscription. Returns api_name and current_subscription" do
           webhook_json = File.read(subscription_fixture_path + 'subscriptions.json')
-          webhook = Rack::Test::UploadedFile.new("#{subscription_fixture_path}subscriptions.json", 'application/json')
+          webhook = Rack::Test::UploadedFile.new(
+            "#{subscription_fixture_path}subscriptions.json", 'application/json'
+          )
           webhook = webhook_json if multipart_fashion == :text
           post v1_webhooks_register_path,
                params: {
@@ -38,11 +40,12 @@ RSpec.describe 'Webhook registration tests', type: :request, retry: 3 do
       %i[missing_event bad_URL unknown_event not_https duplicate_events not_JSON empty_array].each do |test_case|
         %i[file text].each do |multipart_fashion|
           it "returns error with invalid #{test_case} registration sent as #{multipart_fashion}" do
+            fixture_path = "#{subscription_fixture_path}invalid_subscription_#{test_case}.json"
+
             webhook = if multipart_fashion == :file
-                        Rack::Test::UploadedFile.new("#{subscription_fixture_path}invalid_subscription_#{test_case}.json",
-                                                     'application/json')
+                        Rack::Test::UploadedFile.new(fixture_path, 'application/json')
                       else
-                        File.read("#{subscription_fixture_path}invalid_subscription_#{test_case}.json")
+                        File.read(fixture_path)
                       end
 
             post v1_webhooks_register_path,

@@ -7,12 +7,13 @@ module Webhooks
   class SchedulerJob
     include Sidekiq::Worker
 
+    # rubocop:disable Rails/SkipsModelValidations
     def perform(api_name = nil, processing_time = nil)
       results = []
       Rails.logger.info "Webhooks::SchedulerJob SchedulerJob.perform #{api_name} at time #{processing_time}"
       if api_name.nil?
         # this block is run once on a deploy
-        Webhooks::Notification.where('processing is not null').update_all(processing: nil)
+        Webhooks::Notification.where.not(processing: nil).update_all(processing: nil)
         Webhooks::Utilities.api_name_to_time_block.each_pair do |name, block|
           results << go(name, processing_time, block)
         end
@@ -25,6 +26,7 @@ module Webhooks
       # we try again in 5 minutes
       Webhooks::SchedulerJob.perform_in(5.minutes.from_now, api_name)
     end
+    # rubocop:enable Rails/SkipsModelValidations
 
     private
 

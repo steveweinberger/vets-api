@@ -13,8 +13,7 @@ module V1::Webhooks
 
     def list
       consumer_id = request.headers['X-Consumer-ID']
-      wh = Webhooks::Utilities.fetch_subscriptions(consumer_id)
-      # TODO include data about callback urls in maintenance mode
+      wh = Webhooks::Subscription.list_subscriptions(consumer_id)
       render status: :ok,
              json: wh,
              serializer: ActiveModel::Serializer::CollectionSerializer,
@@ -23,6 +22,7 @@ module V1::Webhooks
       raise Common::Exceptions::SchemaValidationErrors, ["Invalid JSON. #{e.message}"] if e.is_a? JSON::ParserError
     end
 
+    # rubocop:disable Metrics/MethodLength
     def maintenance
       maint = params[:webhook_maintenance]
       unless maint
@@ -38,11 +38,10 @@ module V1::Webhooks
       urls = maint_hash['urls']
 
       # get the subscription for this api_name and consumer_id
-      ::Webhooks::Utilities.clean_subscription(api_name, @consumer_id) do |subscription|
+      Webhooks::Subscription.clean_subscription(api_name, @consumer_id) do |subscription|
         if subscription
           maint_key = Webhooks::Subscription::MAINTENANCE_KEY
           metadata = subscription.metadata
-          # events = subscription.events['subscriptions'] #todo validate that the url is in the subscription
           urls.each do |url_hash|
             metadata[url_hash['url']] ||= {}
             metadata[url_hash['url']][maint_key] =
@@ -50,43 +49,63 @@ module V1::Webhooks
           end
           subscription.metadata = metadata
           subscription.save!
-          puts "HEEYYYY"
           render status: :accepted,
                  json: subscription,
                  serializer: Webhooks::MaintenanceSerializer
-        else
-          puts "YOOOO"
-          #  todo what do we return
+        # else
+          # TODO: what do we return
         end
       end
     rescue JSON::ParserError => e
       raise Common::Exceptions::SchemaValidationErrors, ["invalid JSON. #{e.message}"] if e.is_a? JSON::ParserError
     end
+    # rubocop:enable Metrics/MethodLength
 
     def report
-    # stats - counts of failures, etc.
+      # stats - counts of failures, etc.
     end
 
     def subscribe
-      # TODO: use new atomic read method
       # todo kevin - ensure we have an rspec test that you can only subscribe to one api / subscription
       # todo all events must be under one api_name in the subscription
       webhook = params[:webhook]
       unless webhook
-        raise Common::Exceptions::ParameterMissing.new(
-          'webhook',
-          detail: 'You must provide a webhook subscription!'
+        raise Common::Exceptions::ParameterMissing.new('webhook',
+                                                       detail: 'You must provide a webhook subscription!'
         )
       end
 
       subscription_json = webhook.respond_to?(:read) ? webhook.read : webhook
-      subscriptions = validate_subscription(JSON.parse(subscription_json))
+      webhook_subscription = validate_subscription(JSON.parse(subscription_json))
 
-      prev_subscription = Webhooks::Utilities.fetch_subscription(@consumer_id, subscriptions)
-      new_subscription = Webhooks::Utilities.register_webhook(@consumer_id, @consumer_name, subscriptions)
-      Webhooks::Utilities.clean_subscription(new_subscription.api_name, new_subscription.consumer_id) do |s|
-        save_metadata(s)
+      prev_subscription = Webhooks::Utilities.fetch_subscription(@consumer_id, webhook_subscription)
+      prev_urls = prev_subscription&.get_notification_urls ||= []
+      new_subscription = Webhooks::Utilities.register_webhook(@consumer_id, @consumer_name, webhook_subscription)
+
+      if prev_subscription
+        Webhooks::Subscription.clean_subscription(new_subscription.api_name, new_subscription.consumer_id) do |subscription|
+          metadata = subscription.metadata
+          new_urls = subscription.get_notification_urls
+          deleted_urls = prev_urls - new_urls
+
+          new_metadata = {}
+          metadata.each_key do |url|
+            unless deleted_urls.include? url
+              new_metadata[url] = {}
+              new_metadata[url][Webhooks::Subscription::FAILURE_KEY] = {}
+
+              # preserve the maintenance information if it is available
+              if metadata[url][Webhooks::Subscription::MAINTENANCE_KEY]
+                new_metadata[url][Webhooks::Subscription::MAINTENANCE_KEY] = metadata[url][Webhooks::Subscription::MAINTENANCE_KEY]
+              end
+            end
+          end
+
+          subscription.metadata = new_metadata
+          subscription.save!
+        end
       end
+
       render status: :accepted,
              json: new_subscription,
              previous_subscription: prev_subscription&.events,
@@ -95,32 +114,10 @@ module V1::Webhooks
       raise Common::Exceptions::SchemaValidationErrors, ["invalid JSON. #{e.message}"] if e.is_a? JSON::ParserError
     end
 
-    def save_metadata(subscription)
-      urls = subscription.events['subscriptions'].map { |sub| sub['urls'] }.flatten
-      removed_urls = []
-      # we remove metadata of any urls that aren't in the request
-      subscription.metadata.keep_if do |k, _|
-        if urls.include? k
-          k
-        else
-          removed_urls.push(k)
-          false
-        end
-      end
-      # clear out the failure metadata
-      subscription.metadata.each do |m|
-        m[1]['failure_hash'] = {}
-      end
-      handle_deleted_urls(removed_urls)
-      subscription.save!
-    end
-
     def verify_consumer
-      @consumer_name = request.headers['X-Consumer-Username'] #before_action to set consumer information
+      @consumer_name = request.headers['X-Consumer-Username'] # before_action to set consumer information
       @consumer_id = request.headers['X-Consumer-ID']
       render plain: 'Consumer data not found', status: :not_found unless @consumer_id && @consumer_name
     end
-
   end
-
 end

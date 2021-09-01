@@ -99,14 +99,14 @@ describe Webhooks::Utilities, type: :model do
     it 'requires a block' do
       subscription = Webhooks::Utilities.register_webhook(consumer_id, consumer_name, observers)
 
-      expect {Webhooks::Utilities.clean_subscription(subscription.api_name, subscription.consumer_id) }
+      expect { Webhooks::Subscription.clean_subscription(subscription.api_name, subscription.consumer_id) }
           .to raise_error(ArgumentError)
 
     end
 
     it 'finds the correct subscription when acquiring the subscription row lock' do
       subscription = Webhooks::Utilities.register_webhook(consumer_id, consumer_name, observers)
-      Webhooks::Utilities.clean_subscription(subscription.api_name, subscription.consumer_id) do |s|
+      Webhooks::Subscription.clean_subscription(subscription.api_name, subscription.consumer_id) do |s|
         expect(s.id).to be subscription.id
       end
     end
@@ -114,13 +114,13 @@ describe Webhooks::Utilities, type: :model do
     it 'allows only one process to modify a subscription under lock at a time' do
       subscription = Webhooks::Utilities.register_webhook(consumer_id, consumer_name, observers)
       first_pid = fork do
-        Webhooks::Utilities.clean_subscription(subscription.api_name, subscription.consumer_id) do |s|
+        Webhooks::Subscription.clean_subscription(subscription.api_name, subscription.consumer_id) do |s|
           s.metadata = {'pid' => $$, 'key_1' => 'key_1'}
           s.save!
         end
       end
       second_pid = fork do
-        Webhooks::Utilities.clean_subscription(subscription.api_name, subscription.consumer_id) do |s|
+        Webhooks::Subscription.clean_subscription(subscription.api_name, subscription.consumer_id) do |s|
           s.metadata = {'pid' => $$, 'key_2' => 'key_2'}
           s.save!
         end

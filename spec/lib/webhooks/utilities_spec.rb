@@ -4,6 +4,8 @@
 require 'rails_helper'
 require './lib/webhooks/utilities'
 
+# TODO: add a test to ensure that max_retries is greater than zero
+
 RSpec.describe 'Webhooks::Utilities' do
   let(:websocket_settings) do
     {

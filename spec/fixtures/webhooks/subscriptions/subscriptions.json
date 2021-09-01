@@ -1,11 +1,12 @@
 {
   "subscriptions": [
     {
-      "event": "gov.va.developer.benefits-intake.status_change",
       "urls": [
-        "https://i/am/listening",
-        "https://i/am/also/listening"
-      ]
+        "https://www.kma1.com/0531771d-9a3a-4180-accf-08208d154a76",
+        "https://newman-api.getpostman.com/run/16640245/a2be72d6-a0ce-484a-a124-cb589ae14ee1",
+        "https://newman-api.getpostman.com/run/16640245/943a62c3-5987-46df-9de6-d9901d5b3376"
+      ],
+      "event": "gov.va.developer.benefits-intake.status_change"
     }
   ]
 }
