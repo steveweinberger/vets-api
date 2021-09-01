@@ -19,6 +19,7 @@ module Webhooks
         api_name = Webhooks::Utilities.event_to_api_name[event]
         old_subscription = fetch_subscription(consumer_id, subscription)
         wh = old_subscription || Webhooks::Subscription.new
+        wh_copy = wh.clone
         wh.with_lock do
           wh.api_name = api_name
           wh.consumer_id = consumer_id
@@ -26,7 +27,7 @@ module Webhooks
           wh.events = subscription
           wh.save!
           if block_given?
-            block.call(old_subscription, wh)
+            block.call(wh_copy, wh)
           end
         end
         wh
