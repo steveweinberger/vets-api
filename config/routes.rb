@@ -10,6 +10,10 @@ Rails.application.routes.draw do
     match '/v1/webhooks/maintenance', to: 'v1/webhooks/registration#maintenance', via: [:post]
   end
 
+  if Settings.webhooks.ping_pong_enabled
+    match '/v1/webhooks/ping', to: 'v1/webhooks/registration#ping', via: [:get, :put, :post]
+  end
+
   match '/v0/*path', to: 'application#cors_preflight', via: [:options]
   match '/services/*path', to: 'application#cors_preflight', via: [:options]
 

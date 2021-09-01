@@ -174,7 +174,7 @@ mdot:
   url: https://internal-dsva-vagov-staging-fwdproxy-1821450725.us-gov-west-1.elb.amazonaws.com:4466
   api_key: abcd1234abcd1234abcd1234abcd1234abcd1234
   mock: false
-  enabled: false
+  enabled: true
 
 # Settings for Decision Reviews
 decision_review:
@@ -441,10 +441,13 @@ preneeds:
   wsdl: "config/preneeds/wsdl/preneeds.wsdl"
 
 webhooks:
+  enabled: false
   require_https: true
   registration_next_run_in_minutes: 15
   registration_max_retries: 5
-  enabled: false
+  ping_pong_enabled: false
+  ping_pong_next_run_in_minutes: 1
+  ping_pong_max_retries: 3
 
 # Settings for VBA Document upload service module
 vba_documents:
