@@ -4,6 +4,8 @@
 require 'rails_helper'
 require './lib/webhooks/utilities'
 
+# TODO: add a test to ensure that max_retries is greater than zero
+
 RSpec.describe 'Webhooks::Utilities' do
   let(:websocket_settings) do
     {
@@ -11,7 +13,13 @@ RSpec.describe 'Webhooks::Utilities' do
     }
   end
 
-  let(:observers) do
+  let(:dev_headers) do
+    {
+      'X-Consumer-ID': '59ac8ab0-1f28-43bd-8099-23adb561815d',
+      'X-Consumer-Username': 'Development'
+    }
+  end
+  let(:webhook) do
     {
       'subscriptions' => [
         {
@@ -24,6 +32,24 @@ RSpec.describe 'Webhooks::Utilities' do
       ]
     }
   end
+  let(:maintenance) do
+    {
+      'api_name' => 'TEST_API',
+      'urls'=> [
+        {
+          'url'=> 'https://i/am/listening',
+          'maintenance'=> true
+        },
+        {
+          'url'=> 'https://i/am/also/listening',
+          'maintenance'=> false
+        }
+      ]
+    }
+  end
+
+  let(:maint_fixture_path) { './spec/fixtures/webhooks/maintenance/' }
+  let(:subscription_fixture_path) { './spec/fixtures/webhooks/subscriptions/' }
 
   before(:all) do
     class TestHelper
@@ -88,14 +114,14 @@ RSpec.describe 'Webhooks::Utilities' do
 
   # assumes subscription has been validated
   it 'fetches all events from a subscription' do
-    events = Webhooks::Utilities.fetch_events(observers)
+    events = Webhooks::Utilities.fetch_events(webhook)
     expect(events.length).to be 1
     expect(events.include?('test_event')).to be true
   end
 
   it 'allows valid subscriptions' do
-    subscription = TestHelper.new.validate_subscription(observers)
-    expect(subscription).to be observers
+    subscription = TestHelper.new.validate_subscription(webhook)
+    expect(subscription).to be webhook
   end
 
   it 'does not allow invalid subscriptions' do
@@ -106,29 +132,29 @@ RSpec.describe 'Webhooks::Utilities' do
 
   # rubocop:disable Style/MultilineBlockChain
   it 'detects invalid events' do
-    observers['subscriptions'].first['event'] = 'bad_event'
+    webhook['subscriptions'].first['event'] = 'bad_event'
     expect do
-      TestHelper.new.validate_events(observers['subscriptions'])
+      TestHelper.new.validate_events(webhook['subscriptions'])
     end.to raise_error do |e|
       expect(e.errors.first.detail).to match(/^invalid/i)
     end
   end
 
   it 'detects events spanning multiple APIs' do
-    observers['subscriptions'] << observers['subscriptions'].first.deep_dup
-    observers['subscriptions'].last['event'] = 'test_event_multiple_APIs'
+    webhook['subscriptions'] << webhook['subscriptions'].first.deep_dup
+    webhook['subscriptions'].last['event'] = 'test_event_multiple_APIs'
     expect do
-      TestHelper.new.validate_events(observers['subscriptions'])
+      TestHelper.new.validate_events(webhook['subscriptions'])
     end.to raise_error do |e|
       expect(e.errors.first.detail).to match(/^Subscription cannot span multiple APIs/i)
     end
   end
 
   it 'detects duplicate events' do
-    duplicate = observers['subscriptions'].first.deep_dup
-    observers['subscriptions'] << duplicate
+    duplicate = webhook['subscriptions'].first.deep_dup
+    webhook['subscriptions'] << duplicate
     expect do
-      TestHelper.new.validate_events(observers['subscriptions'])
+      TestHelper.new.validate_events(webhook['subscriptions'])
     end.to raise_error do |e|
       expect(e.errors.first.detail).to match(/^duplicate/i)
     end
@@ -156,5 +182,66 @@ RSpec.describe 'Webhooks::Utilities' do
       expect(TestHelper.new.validate_urls(valids)).to be true
     end
   end
-  # rubocop:enable Style/MultilineBlockChain
+
+  it 'allows valid maintenance objects' do
+    Webhooks::Utilities.register_webhook(dev_headers[:'X-Consumer-ID'],
+                                         dev_headers[:'X-Consumer-Username'],
+                                         webhook)
+    maint = TestHelper.new.validate_maintenance(maintenance, dev_headers[:'X-Consumer-ID'])
+    expect(maint).to be maintenance
+  end
+
+  it 'does not allow invalid maintenance objects' do
+    expect do
+      TestHelper.new.validate_maintenance({ invalid: :stuff }, dev_headers[:'X-Consumer-ID'])
+    end.to raise_error(StandardError)
+  end
+
+  it 'detects invalid api names' do
+    Webhooks::Utilities.register_webhook(dev_headers[:'X-Consumer-ID'],
+                                         dev_headers[:'X-Consumer-Username'],
+                                         webhook)
+    maintenance['api_name'] = 'bad_api_name'
+    expect do
+      TestHelper.new.validate_maintenance(maintenance, dev_headers[:'X-Consumer-ID'])
+    end.to raise_error do |e|
+      expect(e.errors.first.detail).to match(/^invalid/i)
+    end
+  end
+
+  it 'detects invalid webhook urls through validate_maintenance' do
+    Webhooks::Utilities.register_webhook(dev_headers[:'X-Consumer-ID'],
+                                         dev_headers[:'X-Consumer-Username'],
+                                         webhook)
+    maintenance['urls'].first['url'] = 'https://bad-url.net'
+    expect do
+      TestHelper.new.validate_maintenance(maintenance, dev_headers[:'X-Consumer-ID'])
+    end.to raise_error do |e|
+      expect(e.errors.first.detail).to match(/URL is not subscribed to the given api_name/i)
+    end
+  end
+
+  it 'detects webhook urls that aren\'t subscribed' do
+    Webhooks::Utilities.register_webhook(dev_headers[:'X-Consumer-ID'],
+                                         dev_headers[:'X-Consumer-Username'],
+                                         webhook)
+    url = 'https://bad-url.net'
+    expect do
+      TestHelper.new.url_subscribed?(url,
+                                     dev_headers[:'X-Consumer-ID'],
+                                     Webhooks::Utilities.event_to_api_name[webhook['subscriptions'].first['event']])
+    end.to raise_error do |e|
+      expect(e.errors.first.detail).to match(/URL is not subscribed to the given api_name/i)
+    end
+  end
+
+  it 'detects if maintenance is trying to update a subscription that doesn\'t exist for the given api' do
+    maintenance['urls'].first['url'] = 'https://bad-url.net'
+    expect do
+      TestHelper.new.validate_maintenance(maintenance, dev_headers[:'X-Consumer-ID'])
+    end.to raise_error do |e|
+      expect(e.errors.first.detail).to match(/^Subscription for the given api_name does not exist!/i)
+    end
+  end
+    # rubocop:enable Style/MultilineBlockChain
 end

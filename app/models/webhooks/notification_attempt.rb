@@ -5,7 +5,7 @@ module Webhooks
     self.table_name = 'webhooks_notification_attempts'
 
     RESPONSE_STATUS = 'status'
-    RESPONSE_BODY= 'body'
+    RESPONSE_BODY = 'body'
     RESPONSE_EXCEPTION = 'exception'
     RESPONSE_EXCEPTION_TYPE = 'type'
     RESPONSE_EXCEPTION_MESSAGE = 'message'

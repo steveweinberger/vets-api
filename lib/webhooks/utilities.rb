@@ -6,6 +6,7 @@ require './app/models/webhooks/utilities'
 
 # data structures built up at class load time then frozen.  This is threadsafe.
 # rubocop:disable ThreadSafety/InstanceVariableInClassMethod
+# rubocop:disable Metrics/ModuleLength
 module Webhooks
   module Utilities
     include Common::Exceptions
@@ -14,8 +15,8 @@ module Webhooks
     MAINTENANCE_EX = JSON.parse(File.read('./spec/fixtures/webhooks/maintenance/maintenance.json'))
 
     class << self
-      attr_reader :supported_events, :event_to_api_name, :api_name_to_time_block, :api_name_to_retries
-      attr_reader :api_name_to_failure_block
+      attr_reader :supported_events, :event_to_api_name, :api_name_to_time_block, :api_name_to_retries,
+                  :api_name_to_failure_block
 
       # Methods here are class methods that do not mix in.
 
@@ -61,7 +62,6 @@ module Webhooks
     end
 
     module ClassMethods
-
       # place methods that might be run at class load time here. They mix in as class methods.
       # For example:
       # class Foo
@@ -72,6 +72,7 @@ module Webhooks
       def register_events(*event, **keyword_args, &block)
         raise ArgumentError, 'Block required to yield next execution time!' unless block_given?
         raise ArgumentError, 'api_name argument required' unless keyword_args.key? :api_name
+        raise ArgumentError, 'max_retries argument must be greater than zero' unless keyword_args.key? :max_retries
 
         api_name = keyword_args[:api_name]
         max_retries = keyword_args[:max_retries]
@@ -89,10 +90,11 @@ module Webhooks
 
       def register_failure_handler(api_name:, &block)
         raise ArgumentError, 'Block required to calculate callback url failure retry times!' unless block_given?
+
         Webhooks::Utilities.register_name_to_failure_block(api_name, block)
       end
 
-      # todo move this method out of ClassMethods, it should invoke as an instance method.
+      # TODO: move this method out of ClassMethods, it should invoke as an instance method.
       def fetch_events(subscription)
         subscription['subscriptions'].map do |e|
           e['event']
@@ -158,6 +160,7 @@ module Webhooks
       valid
     end
 
+    # rubocop:disable Lint/UnderscorePrefixedVariableName
     # Validates a maintenance request for a consumer declaring a URL under maintenance
     def validate_maintenance(maint_hash, consumer_id)
       api_name = maint_hash['api_name']
@@ -168,11 +171,12 @@ module Webhooks
       }
       schemer = JSONSchemer.schema(schema_path, formats: schemer_formats)
       unless schemer.valid?(maint_hash)
-        raise SchemaValidationErrors, 
-          ["Invalid maintenance body! It must match the included example\n#{MAINTENANCE_EX}"]
+        raise SchemaValidationErrors,
+              ["Invalid maintenance body! It must match the included example\n#{MAINTENANCE_EX}"]
       end
       maint_hash
     end
+    # rubocop:enable Lint/UnderscorePrefixedVariableName
 
     def url_subscribed?(url, consumer_id, api_name)
       subscription = Webhooks::Subscription.where(api_name: api_name, consumer_id: consumer_id)&.first
@@ -182,15 +186,17 @@ module Webhooks
       end
 
       subscribed_urls = subscription.events['subscriptions'].map { |sub| sub['urls'] }.flatten
-      unless subscribed_urls.include?(url)
-        raise SchemaValidationErrors, ["The provided URL is not subscribed to the given api_name! URL: #{url}"]
+      if subscribed_urls.include?(url)
+        true
       else
-        return true
+        raise SchemaValidationErrors, ["The provided URL is not subscribed to the given api_name! URL: #{url}"]
       end
     end
   end
 end
 # rubocop:enable ThreadSafety/InstanceVariableInClassMethod
+# rubocop:enable Metrics/ModuleLength
+
 require './lib/webhooks/registrations'
 # Rails.env = 'test'
 unless Rails.env.test?

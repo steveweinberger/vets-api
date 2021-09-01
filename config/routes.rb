@@ -4,10 +4,10 @@ require 'flipper/admin_user_constraint'
 
 Rails.application.routes.draw do
   if Settings.webhooks.enabled
-    match '/v1/webhooks/register', to: 'v1/webhooks/registration#subscribe', via: [:post]
-    match '/v1/webhooks/list', to: 'v1/webhooks/registration#list', via: [:get]
-    match '/v1/webhooks/report', to: 'v1/webhooks/registration#report', via: [:get]
-    match '/v1/webhooks/maintenance', to: 'v1/webhooks/registration#maintenance', via: [:post]
+    post '/v1/webhooks/register', to: 'v1/webhooks/registration#subscribe'
+    get '/v1/webhooks/list', to: 'v1/webhooks/registration#list'
+    get '/v1/webhooks/report', to: 'v1/webhooks/registration#report'
+    post '/v1/webhooks/maintenance', to: 'v1/webhooks/registration#maintenance'
   end
 
   if Settings.webhooks.ping_pong_enabled
