@@ -16,18 +16,11 @@ module VAOS
       private
 
       def log_clinic_names(clinic_data)
-        clinic_names = {}
+        clinic_names = []
         clinic_data.each do |clinic|
-          clinic_names.merge! clinic.service_name => clinic_name_metrics(clinic)
+          clinic_names << clinic.service_name
         end
-        Rails.logger.info('Clinic names returned', clinic_names.to_json)
-      end
-
-      def clinic_name_metrics(clinic)
-        {
-          stationId: clinic.station_id,
-          serviceName: clinic.service_name
-        }
+        Rails.logger.info('Clinic names returned', clinic_names)
       end
 
       def systems_service
