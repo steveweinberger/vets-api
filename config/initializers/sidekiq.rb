@@ -11,7 +11,7 @@ require 'sidekiq/middleware/server/statsd'
 
 Rails.application.reloader.to_prepare do
   Sidekiq::Enterprise.unique! if Rails.env.production?
-  Sidekiq::Pro.dogstatsd = ->{ StatsD::Instrument::Client.from_env }
+  Sidekiq::Pro.dogstatsd = -> { StatsD::Instrument::Client.from_env }
 
   Sidekiq.configure_server do |config|
     config.redis = REDIS_CONFIG[:sidekiq]
