@@ -11,6 +11,10 @@ class MigrateToLockbox < ActiveRecord::Migration[6.1]
     add_column :appeals_api_higher_level_reviews, :form_data_ciphertext, :text
     add_column :appeals_api_higher_level_reviews, :auth_headers_ciphertext, :text
 
+    # appeals_api_notice_of_disagreements
+    add_column :appeals_api_notice_of_disagreements, :form_data_ciphertext, :text
+    add_column :appeals_api_notice_of_disagreements, :auth_headers_ciphertext, :text
+
     # appeals_api_supplemental_claims
     add_column :appeals_api_supplemental_claims, :form_data_ciphertext, :text
     add_column :appeals_api_supplemental_claims, :auth_headers_ciphertext, :text
