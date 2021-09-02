@@ -23,10 +23,21 @@ RSpec.describe 'clinics', type: :request do
             allow(Rails.logger).to receive(:info).at_least(:once)
             get '/vaos/v2/locations/983/clinics?clinical_service=audiology', headers: inflection_header
             expect(Rails.logger).to have_received(:info).with('Clinic names returned',
-                                                              ['CHY C&P AUDIO', 'FTC C&P AUDIO BEV',
-                                                               'CHY C&P AUDIO JAN', 'CHY AUDIOLOGY',
-                                                               'WHT AUDIO VAR2', 'TOR C&P LORI',
-                                                               'WHT HEARING AID LORI']).at_least(:once)
+                                                              '{"CHY C&P AUDIO":{"id":"570",'\
+                                                              '"serviceName":"CHY C&P AUDIO"},'\
+                                                              '"FTC C&P AUDIO BEV":{"id":"945",'\
+                                                              '"serviceName":"FTC C&P AUDIO BEV"},'\
+                                                              '"CHY C&P AUDIO JAN":{"id":"947",'\
+                                                              '"serviceName":"CHY C&P AUDIO JAN"},'\
+                                                              '"CHY AUDIOLOGY":{"id":"1014",'\
+                                                              '"serviceName":"CHY AUDIOLOGY"},'\
+                                                              '"WHT AUDIO VAR2":{"id":"1020",'\
+                                                              '"serviceName":"WHT AUDIO VAR2"},'\
+                                                              '"TOR C&P LORI":{"id":"1022",'\
+                                                              '"serviceName":"TOR C&P LORI"},'\
+                                                              '"WHT HEARING AID LORI":{"id":"1072",'\
+                                                              '"serviceName":"WHT HEARING AID LORI"}}')
+                                                        .at_least(:once)
             expect(response).to have_http_status(:ok)
             expect(response.body).to match_camelized_schema('vaos/v2/clinics', { strict: false })
             x = JSON.parse(response.body)
