@@ -13,6 +13,43 @@ module V1::Webhooks
     # load './app/models/webhooks/utilities.rb'
     before_action :verify_settings, only: [:ping]
 
+    WEBHOOK_PING_PONG_EVENT = 'gov.va.developer.webhooks.ping-pong'
+    PING_PONG_API_NAME = 'webhooks-ping-pong'
+    REGISTRATION_NEXT_RUN_MINS = Settings.webhooks.ping_pong_next_run_in_minutes
+
+    register_events(WEBHOOK_PING_PONG_EVENT,
+                    api_name: PING_PONG_API_NAME,
+                    max_retries: Settings.webhooks.ping_pong_max_retries || 3) do |last|
+
+      next_run = last ? (REGISTRATION_NEXT_RUN_MINS || WEBHOOK_DEFAULT_RUN_MINS) : 0
+      next_run.minutes.from_now
+    rescue
+      WEBHOOK_DEFAULT_RUN_MINS.minutes.from_now
+    end
+
+
+    # todo place documentation outlining structure of failure data.  Something like:
+    #  {"404"=>6, "420"=>4, "503"=>7, "total"=>27, "Faraday::Error"=>6, "Faraday::ClientError"=>4}
+    register_failure_handler(api_name: PING_PONG_API_NAME) do |failure_data|
+      Rails.logger.info("Webhooks: failure handler got #{failure_data}")
+      # {"404"=>6, "420"=>4, "503"=>7, "total"=>27, "Faraday::Error"=>6, "Faraday::ClientError"=>4}
+      next_run =
+        case failure_data['total']
+        when 1..3
+          0.minutes.from_now
+        when 4..10
+          5.minutes.from_now
+          # when 11..20
+          #   20.minutes.from_now
+          # when 21..50
+          #   40.minutes.from_now
+        else
+          Webhooks::Subscription::BLOCKED_CALLBACK
+        end
+
+      next_run
+    end
+
     def list
       consumer_id = request.headers['X-Consumer-ID']
       wh = Webhooks::Subscription.list_subscriptions(consumer_id)
@@ -64,60 +101,35 @@ module V1::Webhooks
 
     # rubocop:enable Metrics/MethodLength
 
-    WEBHOOK_PING_PONG_EVENT = 'gov.va.developer.webhooks.ping-pong'
-    PING_PONG_API_NAME = 'webhooks-ping-pong'
-    REGISTRATION_NEXT_RUN_MINS = Settings.webhooks.ping_pong_next_run_in_minutes
 
-    register_events(WEBHOOK_PING_PONG_EVENT,
-                    api_name: PING_PONG_API_NAME,
-                    max_retries: Settings.webhooks.ping_pong_max_retries || 3) do |last|
-
-      next_run = last ? (REGISTRATION_NEXT_RUN_MINS || WEBHOOK_DEFAULT_RUN_MINS) : 0
-      next_run.minutes.from_now
-    rescue
-      WEBHOOK_DEFAULT_RUN_MINS.minutes.from_now
-    end
 
     def ping
       consumer_id = request.headers['X-Consumer-ID']
       consumer_name = request.headers['X-Consumer-Username']
-      wh = Webhooks::Utilities.fetch_subscriptions(consumer_id)
+      wh = Webhooks::Subscription.list_subscriptions(consumer_id)
       # TODO what else should be return?
       # # TODO get the real GUID
       remove_me_guid = '59ac8ab0-1f28-43bd-8099-23adb561815a'
       msg = format_msg(consumer_name, consumer_id, REGISTRATION_NEXT_RUN_MINS)
       params = { consumer_id: consumer_id, consumer_name: consumer_name,
                  event: WEBHOOK_PING_PONG_EVENT, api_guid: remove_me_guid, msg: msg }
-      Webhooks::Utilities.record_notifications(params)
-      render status: :ok,
-             json: wh,
-             serializer: ActiveModel::Serializer::CollectionSerializer,
-             each_serializer: Webhooks::PingPongSerializer
+      begin
+        Webhooks::Utilities.record_notifications(params)
+        wh.first.metadata["message"] = "The ping event will fire in #{Settings.webhooks.ping_pong_next_run_in_minutes} minute from now"
+        wh.first.save!
+        render status: :ok,
+               json: wh,
+               serializer: ActiveModel::Serializer::CollectionSerializer,
+               each_serializer: Webhooks::PingPongSerializer
+        rescue Common::Exceptions::RecordNotFound => e
+          error = { detail: 'You must first subscribe to a webhook using the /register endpoint.'}
+          render json: { errors: [error] }, status: :not_found
+      end
+
     rescue JSON::ParserError => e
       raise Common::Exceptions::SchemaValidationErrors, ["Invalid JSON. #{e.message}"] if e.is_a? JSON::ParserError
     end
 
-    # todo place documentation outlining structure of failure data.  Something like:
-    #  {"404"=>6, "420"=>4, "503"=>7, "total"=>27, "Faraday::Error"=>6, "Faraday::ClientError"=>4}
-    register_failure_handler(api_name: PING_PONG_API_NAME) do |failure_data|
-      Rails.logger.info("Webhooks: failure handler got #{failure_data}")
-      # {"404"=>6, "420"=>4, "503"=>7, "total"=>27, "Faraday::Error"=>6, "Faraday::ClientError"=>4}
-      next_run =
-        case failure_data['total']
-        when 1..3
-          0.minutes.from_now
-        when 4..10
-          5.minutes.from_now
-          # when 11..20
-          #   20.minutes.from_now
-          # when 21..50
-          #   40.minutes.from_now
-        else
-          Webhooks::Subscription::BLOCKED_CALLBACK
-        end
-
-      next_run
-    end
 
     def report
       # stats - counts of failures, etc.

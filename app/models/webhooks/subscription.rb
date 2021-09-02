@@ -19,6 +19,8 @@ module Webhooks
       raise ArgumentError, 'A block is required!' unless block_given?
 
       subscription = Subscription.where(api_name: api_name, consumer_id: consumer_id).first
+      raise Common::Exceptions::RecordNotFound, consumer_id unless subscription
+
       subscription.with_lock do
         subscription.reload
         block.call(subscription)

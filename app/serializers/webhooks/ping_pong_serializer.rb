@@ -3,13 +3,11 @@
 require './lib/webhooks/utilities'
 module Webhooks
   class PingPongSerializer < ActiveModel::Serializer
-    attributes  :api_name, :consumer_name, :consumer_id
-    # attribute :message
+    attributes  :api_name, :consumer_name, :consumer_id, :metadata
   end
   # TODO craft a clever message
-  # def message
-  #   @message = "The ping event will fire in #{Settings.webhooks.ping_pong_next_run_in_minutes} minutes from now"
-  # end
+  def metadata
+    object.metadata
+  end
 
-  # attr_reader :message
 end
