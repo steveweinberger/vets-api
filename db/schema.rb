@@ -153,6 +153,8 @@ ActiveRecord::Schema.define(version: 2021_09_02_124948) do
     t.string "board_review_option"
     t.string "pdf_version"
     t.string "api_version"
+    t.text "form_data_ciphertext"
+    t.text "auth_headers_ciphertext"
   end
 
   create_table "appeals_api_status_updates", force: :cascade do |t|
