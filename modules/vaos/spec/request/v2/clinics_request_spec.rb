@@ -23,19 +23,19 @@ RSpec.describe 'clinics', type: :request do
             allow(Rails.logger).to receive(:info).at_least(:once)
             get '/vaos/v2/locations/983/clinics?clinical_service=audiology', headers: inflection_header
             expect(Rails.logger).to have_received(:info).with('Clinic names returned',
-                                                              '{"CHY C&P AUDIO":{"id":"570",'\
+                                                              '{"CHY C&P AUDIO":{"stationId":"983",'\
                                                               '"serviceName":"CHY C&P AUDIO"},'\
-                                                              '"FTC C&P AUDIO BEV":{"id":"945",'\
+                                                              '"FTC C&P AUDIO BEV":{"stationId":"983GC",'\
                                                               '"serviceName":"FTC C&P AUDIO BEV"},'\
-                                                              '"CHY C&P AUDIO JAN":{"id":"947",'\
+                                                              '"CHY C&P AUDIO JAN":{"stationId":"983",'\
                                                               '"serviceName":"CHY C&P AUDIO JAN"},'\
-                                                              '"CHY AUDIOLOGY":{"id":"1014",'\
+                                                              '"CHY AUDIOLOGY":{"stationId":"983",'\
                                                               '"serviceName":"CHY AUDIOLOGY"},'\
-                                                              '"WHT AUDIO VAR2":{"id":"1020",'\
+                                                              '"WHT AUDIO VAR2":{"stationId":"983",'\
                                                               '"serviceName":"WHT AUDIO VAR2"},'\
-                                                              '"TOR C&P LORI":{"id":"1022",'\
+                                                              '"TOR C&P LORI":{"stationId":"983",'\
                                                               '"serviceName":"TOR C&P LORI"},'\
-                                                              '"WHT HEARING AID LORI":{"id":"1072",'\
+                                                              '"WHT HEARING AID LORI":{"stationId":"983",'\
                                                               '"serviceName":"WHT HEARING AID LORI"}}')
                                                         .at_least(:once)
             expect(response).to have_http_status(:ok)

@@ -27,7 +27,7 @@ module VAOS
         {
           clinicName: clinic.clinic_name,
           clinicFriendlyLocationName: clinic.clinic_friendly_location_name,
-          clinicId: clinic.clinic_id
+          institutionCode: clinic.institution_code
         }
       end
 

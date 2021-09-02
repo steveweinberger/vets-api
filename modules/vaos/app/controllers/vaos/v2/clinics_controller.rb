@@ -25,7 +25,7 @@ module VAOS
 
       def clinic_name_metrics(clinic)
         {
-          id: clinic.id,
+          stationId: clinic.station_id,
           serviceName: clinic.service_name
         }
       end
