@@ -754,6 +754,7 @@ flipper:
     - dror@matal.com
     - elder_joseph@bah.com
     - eric.buckley@adhocteam.us
+    - eric.boehs@oddball.io
     - erik@adhocteam.us
     - filip.fafara@gmail.com
     - fahmed@governmentcio.com
@@ -877,7 +878,7 @@ hqva_mobile:
     mock: false
     key_path: /srv/vets-api/secret/health-quest.lighthouse.key
     pgd_api_scopes:
-      - "launch/patient"
+      - "launch launch/patient"
       - "patient/Observation.read"
       - "patient/Observation.write"
       - "patient/Questionnaire.read"
@@ -885,7 +886,7 @@ hqva_mobile:
       - "patient/QuestionnaireResponse.read"
       - "patient/QuestionnaireResponse.write"
     health_api_scopes:
-      - "launch/patient"
+      - "launch launch/patient"
       - "patient/Appointment.read"
       - "patient/Location.read"
       - "patient/Organization.read"
