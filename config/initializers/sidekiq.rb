@@ -7,9 +7,11 @@ require 'sidekiq/error_tag'
 require 'sidekiq/semantic_logging'
 require 'sidekiq/set_request_id'
 require 'sidekiq/set_request_attributes'
+require 'sidekiq/middleware/server/statsd'
 
 Rails.application.reloader.to_prepare do
   Sidekiq::Enterprise.unique! if Rails.env.production?
+  Sidekiq::Pro.dogstatsd = ->{ StatsD::Instrument::Client.from_env }
 
   Sidekiq.configure_server do |config|
     config.redis = REDIS_CONFIG[:sidekiq]
@@ -30,6 +32,7 @@ Rails.application.reloader.to_prepare do
       chain.add SidekiqStatsInstrumentation::ServerMiddleware
       chain.add Sidekiq::RetryMonitoring
       chain.add Sidekiq::ErrorTag
+      chain.add Sidekiq::Middleware::Server::Statsd
     end
 
     config.client_middleware do |chain|
