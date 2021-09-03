@@ -72,10 +72,10 @@ module Webhooks
       def register_events(*event, **keyword_args, &block)
         raise ArgumentError, 'Block required to yield next execution time!' unless block_given?
         raise ArgumentError, 'api_name argument required' unless keyword_args.key? :api_name
-        raise ArgumentError, 'max_retries argument must be greater than zero' unless keyword_args.key? :max_retries
 
         api_name = keyword_args[:api_name]
         max_retries = keyword_args[:max_retries]
+        raise ArgumentError, 'max_retries argument must be greater than zero' unless max_retries.to_i.positive?
         if Webhooks::Utilities.api_registered?(api_name)
           raise ArgumentError, "api name: #{api_name} previously registered!"
         end

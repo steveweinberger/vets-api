@@ -32,21 +32,14 @@ describe Webhooks::Subscription, type: :model do
     expect(@subscription.consumer_id).to eq(consumer_id)
   end
 
-  it 'queries for subscriptions correctly' do
-    api_name = Webhooks::Utilities.event_to_api_name[observers['subscriptions'].first['event']]
-    query_results = Webhooks::Subscription.get_notification_urls(
-      api_name: api_name, consumer_id: consumer_id, event: observers['subscriptions'].first['event'])
+  it 'queries for urls correctly' do
+    query_results = @subscription.get_notification_urls(observers['subscriptions'].first['event'])
     observer_urls = []
     observers['subscriptions'].each do |subscription|
       observer_urls << subscription['urls']
     end
     observer_urls = observer_urls.flatten.uniq
-
-    query_results_nil = Webhooks::Subscription.get_notification_urls(
-      api_name: api_name, consumer_id: consumer_id, event: observers['subscriptions'].first['event'])
-
     expect(query_results).to eq(observer_urls)
-    expect(query_results_nil).to eq(observer_urls)
   end
 
   it 'finds urls that have had too many failures' do

@@ -41,14 +41,9 @@ module V1::Webhooks
       # get the subscription for this api_name and consumer_id
       Webhooks::Subscription.clean_subscription(api_name, @consumer_id) do |subscription|
         if subscription
-          maint_key = Webhooks::Subscription::MAINTENANCE_KEY
-          metadata = subscription.metadata
           urls.each do |url_hash|
-            metadata[url_hash['url']] ||= {}
-            metadata[url_hash['url']][maint_key] =
-                {Webhooks::Subscription::UNDER_MAINT_KEY => url_hash['maintenance']}
+            subscription.set_maintenance(url_hash['url'], url_hash['url']['maintenance'])
           end
-          subscription.metadata = metadata
           subscription.save!
           render status: :accepted,
                  json: subscription,

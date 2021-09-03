@@ -4,32 +4,30 @@
 require 'rails_helper'
 require './lib/webhooks/utilities'
 
-# TODO: add a test to ensure that max_retries is greater than zero
-
 RSpec.describe 'Webhooks::Utilities' do
   let(:websocket_settings) do
     {
-      require_https: false
+        require_https: false
     }
   end
 
   let(:dev_headers) do
     {
-      'X-Consumer-ID': '59ac8ab0-1f28-43bd-8099-23adb561815d',
-      'X-Consumer-Username': 'Development'
+        'X-Consumer-ID': '59ac8ab0-1f28-43bd-8099-23adb561815d',
+        'X-Consumer-Username': 'Development'
     }
   end
   let(:observers) do
     {
-      'subscriptions' => [
-        {
-          'event' => 'test_event',
-          'urls' => [
-            'https://i/am/listening',
-            'https://i/am/also/listening'
-          ]
-        }
-      ]
+        'subscriptions' => [
+            {
+                'event' => 'test_event',
+                'urls' => [
+                    'https://i/am/listening',
+                    'https://i/am/also/listening'
+                ]
+            }
+        ]
     }
   end
 
@@ -40,6 +38,7 @@ RSpec.describe 'Webhooks::Utilities' do
     class TestHelper
       include Webhooks::Utilities
     end
+
     Webhooks::Utilities.register_events('test_event',
                                         api_name: 'TEST_API', max_retries: 3) do
       'working!'
@@ -54,6 +53,17 @@ RSpec.describe 'Webhooks::Utilities' do
     Settings.websockets = Config::Options.new
     websocket_settings.each_pair do |k, v|
       Settings.websockets.send("#{k}=".to_sym, v)
+    end
+  end
+
+  it 'requires max_retries to be greater than zero' do
+    expect do
+      Webhooks::Utilities.register_events('test_event_max_retries',
+                                          api_name: 'TEST_API_max_retries', max_retries: -1) do
+        'working!'
+      end
+    end.to raise_error do |e|
+      expect(e.message).to match(/^max_retries argument must be greater than zero/i)
     end
   end
 
@@ -111,7 +121,7 @@ RSpec.describe 'Webhooks::Utilities' do
 
   it 'does not allow invalid subscriptions' do
     expect do
-      TestHelper.new.validate_subscription({ invalid: :stuff })
+      TestHelper.new.validate_subscription({invalid: :stuff})
     end.to raise_error(StandardError)
   end
 
@@ -171,8 +181,8 @@ RSpec.describe 'Webhooks::Utilities' do
   it 'allows valid maintenance objects' do
     subscription = JSON.parse(File.read(subscription_fixture_path + 'subscriptions.json'))
     webhook = Webhooks::Utilities.register_webhook(dev_headers[:'X-Consumer-ID'],
-                                                       dev_headers[:'X-Consumer-Username'],
-                                                       subscription)
+                                                   dev_headers[:'X-Consumer-Username'],
+                                                   subscription)
     maint_hash = JSON.parse(File.read(maint_fixture_path + 'maintenance.json'))
     maint = TestHelper.new.validate_maintenance(maint_hash, dev_headers[:'X-Consumer-ID'])
     expect(maint).to be maint_hash
@@ -180,7 +190,7 @@ RSpec.describe 'Webhooks::Utilities' do
 
   it 'does not allow invalid maintenance objects' do
     expect do
-      TestHelper.new.validate_maintenance({ invalid: :stuff }, dev_headers[:'X-Consumer-ID'])
+      TestHelper.new.validate_maintenance({invalid: :stuff}, dev_headers[:'X-Consumer-ID'])
     end.to raise_error(StandardError)
   end
 
@@ -221,5 +231,5 @@ RSpec.describe 'Webhooks::Utilities' do
       expect(e.errors.first.detail).to match(/^Subscription for the given api_name does not exist!/i)
     end
   end
-    # rubocop:enable Style/MultilineBlockChain
+  # rubocop:enable Style/MultilineBlockChain
 end
