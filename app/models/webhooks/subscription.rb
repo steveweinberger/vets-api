@@ -31,6 +31,11 @@ module Webhooks
       Subscription.where(consumer_id: consumer_id).all
     end
 
+    def set_maintenance(url, in_maintenance)
+      metadata[url] ||= {}
+      metadata[url][MAINTENANCE_KEY] = {Webhooks::Subscription::UNDER_MAINT_KEY => in_maintenance}
+    end
+
     # rubocop:disable Style/RescueModifier
     def blocked_callback_urls
       metadata = self.metadata

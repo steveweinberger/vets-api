@@ -5,11 +5,49 @@ require 'rails_helper'
 require './spec/workers/webhooks/job_tracking'
 
 RSpec.describe Webhooks::SchedulerJob, type: :job do
+
+  let(:observers) do
+    {
+        'subscriptions' => [
+            {
+                'event' => 'gov.va.developer.SchedulerJobMarkedProcessing',
+                'urls' => ['https://i/am/listening', 'https://i/am/also/listening']
+            }
+        ]
+    }
+  end
+
+
   before do
     Thread.current['job_ids'] = []
   end
 
+  it 'resets notifications marked as processing (in a state of delivery) upon initial start' do
+    future = 10.minutes.from_now
+    Webhooks::Utilities
+        .register_events('gov.va.developer.SchedulerJobMarkedProcessing',
+                         api_name: 'SchedulerJobMarkedProcessing', max_retries: 1) do
+      future
+    end
+    subscription = Webhooks::Utilities.register_webhook(SecureRandom.uuid, 'tester', observers)
+    notifications = Webhooks::Utilities.record_notifications(consumer_id: subscription.consumer_id,
+                                             consumer_name:subscription.consumer_name,
+                                             event:  observers['subscriptions'].first['event'],
+                                             api_guid: SecureRandom.uuid,
+                                             msg:{})
+    notifications.each do |n|
+      n.processing = Time.now.to_i
+    end
+    notifications.each(&:save!)
+    Webhooks::SchedulerJob.new.perform
+    notifications.each do |n|
+      n.reload
+      expect(n.processing).to be nil
+    end
+  end
+
   it 'schedules notification jobs' do
+    future = 10.minutes.from_now
     Webhooks::Utilities
       .register_events('gov.va.developer.SchedulerJobTEST1',
                        api_name: 'SchedulerJobTEST1', max_retries: 1) do
@@ -23,6 +61,7 @@ RSpec.describe Webhooks::SchedulerJob, type: :job do
   end
 
   it 'reschedules itself when something goes wrong' do
+    future = 10.minutes.from_now
     Webhooks::Utilities
       .register_events('gov.va.developer.SchedulerJobTEST2',
                        api_name: 'SchedulerJobTEST2', max_retries: 1) do

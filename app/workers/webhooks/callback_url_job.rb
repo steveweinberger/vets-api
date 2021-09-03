@@ -16,7 +16,6 @@ module Webhooks
       @notifications = Webhooks::Notification.where(id: ids).order(:event, :api_guid, :created_at).all
       @subscription = @notifications.first.webhooks_subscription
       subscribed_urls = @subscription.get_notification_urls
-
       if subscribed_urls.include? @url
         if run_later? || under_maintenance?
           # wait to run later based on the api failure schedule so update the processing column to nil
@@ -89,9 +88,5 @@ module Webhooks
       @subscription.metadata[@url][Subscription::MAINTENANCE_KEY][Subscription::UNDER_MAINT_KEY] rescue false
     end
     # rubocop:enable Style/RescueModifier
-
-    def seal_off_blocked?
-      @subscription.blocked_callback_urls.include? @url
-    end
   end
 end

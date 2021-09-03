@@ -124,7 +124,7 @@ describe Webhooks::Utilities, type: :model do
       pids = []
       2.times do
         pids << fork do
-          Webhooks::Utilities.clean_subscription(subscription.api_name, subscription.consumer_id) do |s|
+          Webhooks::Subscription.clean_subscription(subscription.api_name, subscription.consumer_id) do |s|
             l.call
             s.metadata = {'pid' => $$, "key_#{$$}" => "key_#{$$}"} # $$ is a special variable containing the current pid
             s.save!
