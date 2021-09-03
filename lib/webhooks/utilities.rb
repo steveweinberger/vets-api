@@ -109,7 +109,6 @@ module Webhooks
       schemer_formats = {
         'valid_urls' => ->(urls, _schema_info) { validate_urls(urls) },
         'valid_events' => ->(subscription, _schema_info) { validate_events(subscription) }
-
       }
       schemer = JSONSchemer.schema(schema_path, formats: schemer_formats)
       unless schemer.valid?(subscriptions)
@@ -139,6 +138,7 @@ module Webhooks
     end
 
     def validate_url(url)
+      raise SchemaValidationErrors, ["Invalid subscription! URL must be string: #{url}"] unless url.is_a?(String)
       begin
         uri = URI(url)
       rescue URI::InvalidURIError

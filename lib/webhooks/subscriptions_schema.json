@@ -19,10 +19,7 @@
           },
           "urls": {
             "type": "array",
-            "format": "valid_urls",
-            "contains": {
-              "type": "string"
-            }
+            "format": "valid_urls"
           }
         }
       }
