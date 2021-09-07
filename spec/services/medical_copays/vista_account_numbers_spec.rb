@@ -43,24 +43,24 @@ RSpec.describe MedicalCopays::VistaAccountNumbers do
     context 'when data' do
       it 'returns an array of Vista Account Numbers' do
         vista_num_list = [
-          5160000000012345,
-          5160000067891234,
-          5530000000000002,
-          5530000087234689,
-          2010000000012345,
-          2010000003624534,
-          2050000004123456,
-          2050000000006123,
-          2000000000001234,
-          2000000002345678,
-          9830000000003234,
-          9830000000335678,
-          9870000000004234,
-          9870000000435678,
-          9840000000005234,
-          9840000000535678,
-          9880000000006234,
-          9880000000635678
+          5_160_000_000_012_345,
+          5_160_000_067_891_234,
+          5_530_000_000_000_002,
+          5_530_000_087_234_689,
+          2_010_000_000_012_345,
+          2_010_000_003_624_534,
+          2_050_000_004_123_456,
+          2_050_000_000_006_123,
+          2_000_000_000_001_234,
+          2_000_000_002_345_678,
+          9_830_000_000_003_234,
+          9_830_000_000_335_678,
+          9_870_000_000_004_234,
+          9_870_000_000_435_678,
+          9_840_000_000_005_234,
+          9_840_000_000_535_678,
+          9_880_000_000_006_234,
+          9_880_000_000_635_678
         ]
 
         expect(subject.list).to eq(vista_num_list)
@@ -71,7 +71,7 @@ RSpec.describe MedicalCopays::VistaAccountNumbers do
   describe '#vista_account_id' do
     context 'when facility_id plus vista_id is not 16 characters in length' do
       it 'builds the vista_account_id' do
-        expect(subject.vista_account_id('4234', '2345678')).to eq(4234000002345678)
+        expect(subject.vista_account_id('4234', '2345678')).to eq(4_234_000_002_345_678)
       end
 
       it 'is 16 characters in length' do
@@ -85,7 +85,7 @@ RSpec.describe MedicalCopays::VistaAccountNumbers do
 
     context 'when facility_id plus vista_id is 16 characters' do
       it 'builds the vista_account_id' do
-        expect(subject.vista_account_id('423456', '5212345678')).to eq(4234565212345678)
+        expect(subject.vista_account_id('423456', '5212345678')).to eq(4_234_565_212_345_678)
       end
 
       it 'is 16 characters in length' do
