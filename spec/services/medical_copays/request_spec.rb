@@ -16,7 +16,7 @@ RSpec.describe MedicalCopays::Request do
       expect(subject.host).to eq('yf7yvyucfj.execute-api.us-gov-west-1.amazonaws.com')
     end
 
-    it 'has base_env' do 
+    it 'has base_env' do
       expect(subject.base_env).to eq('/Prod')
     end
 
@@ -43,7 +43,8 @@ RSpec.describe MedicalCopays::Request do
 
   describe '#headers' do
     it 'has request headers' do
-      expect(subject.headers).to eq({ 'Host' => 'yf7yvyucfj.execute-api.us-gov-west-1.amazonaws.com', 'Content-Type' => 'application/json' })
+      expect(subject.headers).to eq({ 'Host' => 'yf7yvyucfj.execute-api.us-gov-west-1.amazonaws.com',
+                                      'Content-Type' => 'application/json' })
     end
   end
 

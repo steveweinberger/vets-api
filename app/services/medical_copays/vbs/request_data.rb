@@ -41,9 +41,9 @@ module MedicalCopays
             'edipi' => {
               'type' => 'string'
             },
-            'vistaAccountNumbers' => { 
+            'vistaAccountNumbers' => {
               'type' => 'array'
-             }
+            }
           }
         }
       end

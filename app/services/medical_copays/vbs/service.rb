@@ -42,7 +42,7 @@ module MedicalCopays
         ResponseData.build(response: response).handle
       end
 
-      def settings 
+      def settings
         Settings.mcp.vbs
       end
     end
