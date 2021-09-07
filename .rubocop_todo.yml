@@ -402,13 +402,14 @@ Style/CaseLikeIf:
     - 'rakelib/redis.rake'
     - 'spec/models/form_profile_spec.rb'
 
-# Offense count: 9
+# Offense count: 10
 # Cop supports --auto-correct.
 # Configuration parameters: IgnoredMethods.
 # IgnoredMethods: ==, equal?, eql?
 Style/ClassEqualityComparison:
   Exclude:
     - 'app/controllers/appeals_base_controller.rb'
+    - 'app/controllers/appeals_base_controller_v1.rb'
     - 'app/serializers/dependents_serializer.rb'
     - 'app/serializers/dependents_verifications_serializer.rb'
     - 'app/serializers/vet_payment_history_serializer.rb'
@@ -443,7 +444,7 @@ Style/EmptyElse:
   Exclude:
     - 'Gemfile'
 
-# Offense count: 15
+# Offense count: 14
 # Cop supports --auto-correct.
 Style/ExplicitBlockArgument:
   Exclude:
@@ -451,6 +452,7 @@ Style/ExplicitBlockArgument:
     - 'lib/common/hash_helpers.rb'
     - 'lib/debt_management_center/base_service.rb'
     - 'lib/decision_review/service.rb'
+    - 'lib/decision_review_v1/service.rb'
     - 'lib/evss/intent_to_file/response_strategy.rb'
     - 'lib/evss/pciu_address/response_strategy.rb'
     - 'lib/evss/reference_data/response_strategy.rb'
@@ -547,7 +549,6 @@ Style/QuotedSymbols:
     - 'modules/appeals_api/spec/swagger/appeals_api/json_schema_to_swagger_converter_spec.rb'
     - 'modules/mobile/spec/request/push_send_request_spec.rb'
     - 'modules/openid_auth/app/controllers/openid_auth/v0/okta_controller.rb'
-    - 'rakelib/support/sessions_arg_serializer.rb'
     - 'spec/controllers/v0/profile/ch33_bank_accounts_controller_spec.rb'
     - 'spec/factories/in_progress_forms/hca_forms.rb'
     - 'spec/lib/vetext/service_spec.rb'
@@ -672,8 +673,3 @@ ThreadSafety/InstanceVariableInClassMethod:
     - 'lib/va_profile/contact_information/person_response.rb'
     - 'lib/va_profile/contact_information/transaction_response.rb'
     - 'lib/vic/url_helper.rb'
-
-# Offense count: 1
-ThreadSafety/NewThread:
-  Exclude:
-    - 'spec/lib/common/client/middleware/request/remove_cookies_spec.rb'

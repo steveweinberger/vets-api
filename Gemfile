@@ -133,7 +133,7 @@ gem 'sentry-raven'
 gem 'shrine'
 gem 'slack-notify'
 gem 'staccato'
-gem 'statsd-instrument', '~> 3.1.0'
+gem 'statsd-instrument', '~> 3.1.2'
 gem 'strong_migrations'
 gem 'swagger-blocks'
 gem 'typhoeus'
@@ -199,7 +199,7 @@ group :development, :test do
   gem 'rspec-its'
   gem 'rspec-rails'
   gem 'rswag-specs'
-  gem 'rubocop', '1.19.1', require: false
+  gem 'rubocop', require: false
   gem 'rubocop-rails'
   gem 'rubocop-rspec'
   gem 'rubocop-thread_safety'

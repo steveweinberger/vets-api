@@ -14,7 +14,7 @@ saml:
   cert_new_path: config/certs/vetsgov-localhost_new.crt
   key_path: config/certs/vetsgov-localhost.key
   issuer: saml-rp.vetsgov.localhost
-  callback_url: http://localhost:3000/auth/saml/callback
+  callback_url: http://localhost:3000/v1/sessions/callback
   metadata_url: https://api.idmelabs.com/saml/metadata/provider
   authn_requests_signed: false
 
@@ -27,6 +27,7 @@ saml_ssoe:
   issuer: https://ssoe-sp-localhost.va.gov
   callback_url: http://localhost:3000/v1/sessions/callback
   logout_url: https://int.eauth.va.gov/slo/globallogout?appKey=https%253A%252F%252Fssoe-sp-dev.va.gov
+  idme_authn_context: ~
   request_signing: false
   response_signing: false
   response_encryption: false
@@ -38,16 +39,6 @@ ssoe_eauth_cookie:
 
 session_cookie:
   secure: false
-
-# Generate key and iv with: openssl enc -nosalt -aes-256-cbc -k <passphrase> -P
-sso:
-  cookie_domain: localhost
-  cookie_enabled: true
-  cookie_iv: A3C0567C78BEC6DDE75E2FEB92DE11AA
-  cookie_key: 095B564B0F29EF88A96F1A7584E17516B14F85C2B3AD431E63349AC5272BC86B
-  cookie_name: vagov_session_dev
-  cookie_secure: false
-  cookie_signout_enabled: true
 
 binaries:
   # you can specify a full path in settings.local.yml if necessary
@@ -197,6 +188,9 @@ decision_review:
     aws_secret_access_key: ~
     region: region
     bucket: bucket
+  v1:
+    url: https://sandbox-api.va.gov/services/appeals/v2/decision_reviews
+
 
 # Settings for modules/appeals_api
 modules_appeals_api:
@@ -647,6 +641,7 @@ oidc:
   base_api_url: https://example.com
   base_api_token: ~
   smart_launch_url: ~
+  issued_url: ~
   issuers:
     - prefix: "https://example.com/"
       metadata: "/.well-known/openid-configuration"
@@ -750,6 +745,7 @@ flipper:
     - dror@matal.com
     - elder_joseph@bah.com
     - eric.buckley@adhocteam.us
+    - eric.boehs@oddball.io
     - erik@adhocteam.us
     - filip.fafara@gmail.com
     - fahmed@governmentcio.com
@@ -873,7 +869,7 @@ hqva_mobile:
     mock: false
     key_path: /srv/vets-api/secret/health-quest.lighthouse.key
     pgd_api_scopes:
-      - "launch/patient"
+      - "launch launch/patient"
       - "patient/Observation.read"
       - "patient/Observation.write"
       - "patient/Questionnaire.read"
@@ -881,7 +877,7 @@ hqva_mobile:
       - "patient/QuestionnaireResponse.read"
       - "patient/QuestionnaireResponse.write"
     health_api_scopes:
-      - "launch/patient"
+      - "launch launch/patient"
       - "patient/Appointment.read"
       - "patient/Location.read"
       - "patient/Organization.read"
@@ -1089,6 +1085,7 @@ check_in:
     tmp_api_user: TzY6DFrnjPE8dwxUMbFf9HjbFqRim2MgXpMpMciXJFVohyURUJAc7W99rpFzhfh2B3sVnn4
     tmp_api_id: 2dcdrrn5zc
     tmp_api_username: vetsapiTempUser
+    service_name: CHIP-API
     mock: false
     key_path: ~
     redis_session_prefix: check_in

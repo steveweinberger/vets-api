@@ -25,6 +25,8 @@ saml:
 saml_ssoe:
   cert_path: spec/support/certificates/ruby-saml.crt
   key_path: spec/support/certificates/ruby-saml.key
+  idme_authn_context: https://eauth.va.gov/csp?Select=idme3
+
 
 edu:
   prefill: true
@@ -138,7 +140,7 @@ hqva_mobile:
     mock: false
     key_path: modules/health_quest/config/rsa/sandbox_rsa
     pgd_api_scopes:
-      - "launch/patient"
+      - "launch launch/patient"
       - "patient/Observation.read"
       - "patient/Observation.write"
       - "patient/Questionnaire.read"
@@ -146,7 +148,7 @@ hqva_mobile:
       - "patient/QuestionnaireResponse.read"
       - "patient/QuestionnaireResponse.write"
     health_api_scopes:
-      - "launch/patient"
+      - "launch launch/patient"
       - "patient/Appointment.read"
       - "patient/Location.read"
       - "patient/Organization.read"
@@ -166,6 +168,7 @@ check_in:
     tmp_api_user: TzY6DFrnjPE8dwxUMbFf9HjbFqRim2MgXpMpMciXJFVohyURUJAc7W99rpFzhfh2B3sVnn4
     tmp_api_id: 2dcdrrn5zc
     tmp_api_username: vetsapiTempUser
+    service_name: CHIP-API
     mock: false
     key_path: ~
     redis_session_prefix: check_in

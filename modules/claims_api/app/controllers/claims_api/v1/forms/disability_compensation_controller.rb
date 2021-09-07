@@ -10,7 +10,7 @@ require 'jsonapi/parser'
 module ClaimsApi
   module V1
     module Forms
-      class DisabilityCompensationController < ClaimsApi::V1::Forms::Base
+      class DisabilityCompensationController < ClaimsApi::V1::Forms::Base # rubocop:disable Metrics/ClassLength
         include ClaimsApi::PoaVerification
         include ClaimsApi::DocumentValidations
 
@@ -156,21 +156,8 @@ module ClaimsApi
           validate_form_526_service_pay!
           validate_form_526_title10_activation_date!
           validate_form_526_change_of_address!
-          validate_form_526_disability_classification_code!
-        end
-
-        def validate_form_526_disability_classification_code!
-          return if (form_attributes['disabilities'].pluck('classificationCode') - [nil]).blank?
-
-          contention_classification_type_codes = bgs_service.data.get_contention_classification_type_code_list
-          classification_ids = contention_classification_type_codes.pluck(:clsfcn_id)
-          form_attributes['disabilities'].each do |disability|
-            next if disability['classificationCode'].blank?
-            next if classification_ids.include?(disability['classificationCode'])
-
-            raise ::Common::Exceptions::InvalidFieldValue.new('disabilities.classificationCode',
-                                                              disability['classificationCode'])
-          end
+          validate_form_526_disabilities!
+          validate_form_526_treatments!
         end
 
         def validate_form_526_change_of_address!
@@ -357,6 +344,204 @@ module ClaimsApi
 
           # EVSS does not allow passing a 'pointOfContact' if neither homelessness attribute is provided
           currently_homeless_attr.blank? && homelessness_risk_attr.blank? && homelessness_poc_attr.present?
+        end
+
+        def validate_form_526_disabilities!
+          validate_form_526_disability_classification_code!
+          validate_form_526_disability_approximate_begin_date!
+          validate_form_526_special_issues!
+          validate_form_526_disability_secondary_disabilities!
+        end
+
+        def validate_form_526_disability_secondary_disability_disability_action_type!(disability)
+          return unless disability['disabilityActionType'] == 'NONE' && disability['secondaryDisabilities'].blank?
+
+          raise ::Common::Exceptions::InvalidFieldValue.new('disabilities.secondaryDisabilities',
+                                                            disability['secondaryDisabilities'])
+        end
+
+        def validate_form_526_disability_secondary_disability_classification_code!(secondary_disability)
+          return unless bgs_classification_ids.exclude?(secondary_disability['classificationCode'])
+
+          raise ::Common::Exceptions::InvalidFieldValue.new(
+            'disabilities.secondaryDisabilities.classificationCode',
+            secondary_disability['classificationCode']
+          )
+        end
+
+        def validate_form_526_disability_secondary_disability_classification_code_matches_name!(secondary_disability)
+          return unless secondary_disability['classificationCode'] != secondary_disability['name']
+
+          raise ::Common::Exceptions::InvalidFieldValue.new(
+            'disabilities.secondaryDisabilities.name',
+            secondary_disability['name']
+          )
+        end
+
+        def validate_form_526_disability_secondary_disability_name!(secondary_disability)
+          return if %r{([a-zA-Z0-9\-'.,/\(\)]([a-zA-Z0-9\-',. ])?)+$}.match?(secondary_disability['name']) &&
+                    secondary_disability['name'].length <= 255
+
+          raise ::Common::Exceptions::InvalidFieldValue.new(
+            'disabilities.secondaryDisabilities.name',
+            secondary_disability['name']
+          )
+        end
+
+        def validate_form_526_disability_secondary_disability_approximate_begin_date!(secondary_disability)
+          return if Date.parse(secondary_disability['approximateBeginDate']) < Time.zone.today
+
+          raise ::Common::Exceptions::InvalidFieldValue.new(
+            'disabilities.secondaryDisabilities.approximateBeginDate',
+            secondary_disability['approximateBeginDate']
+          )
+        rescue ArgumentError
+          raise ::Common::Exceptions::InvalidFieldValue.new(
+            'disabilities.secondaryDisabilities.approximateBeginDate',
+            secondary_disability['approximateBeginDate']
+          )
+        end
+
+        def validate_form_526_disability_secondary_disabilities!
+          form_attributes['disabilities'].each do |disability|
+            validate_form_526_disability_secondary_disability_disability_action_type!(disability)
+            next if disability['secondaryDisabilities'].blank?
+
+            disability['secondaryDisabilities'].each do |secondary_disability|
+              if secondary_disability['classificationCode'].present?
+                validate_form_526_disability_secondary_disability_classification_code!(secondary_disability)
+                validate_form_526_disability_secondary_disability_classification_code_matches_name!(
+                  secondary_disability
+                )
+              else
+                validate_form_526_disability_secondary_disability_name!(secondary_disability)
+              end
+
+              if secondary_disability['approximateBeginDate'].present?
+                validate_form_526_disability_secondary_disability_approximate_begin_date!(secondary_disability)
+              end
+            end
+          end
+        end
+
+        def validate_form_526_disability_classification_code!
+          return if (form_attributes['disabilities'].pluck('classificationCode') - [nil]).blank?
+
+          form_attributes['disabilities'].each do |disability|
+            next if disability['classificationCode'].blank?
+            next if bgs_classification_ids.include?(disability['classificationCode'])
+
+            raise ::Common::Exceptions::InvalidFieldValue.new('disabilities.classificationCode',
+                                                              disability['classificationCode'])
+          end
+        end
+
+        def bgs_classification_ids
+          return @bgs_classification_ids if @bgs_classification_ids.present?
+
+          contention_classification_type_codes = bgs_service.data.get_contention_classification_type_code_list
+          @bgs_classification_ids = contention_classification_type_codes.pluck(:clsfcn_id)
+        end
+
+        def validate_form_526_disability_approximate_begin_date!
+          disabilities = form_attributes.dig('disabilities')
+          return if disabilities.blank?
+
+          disabilities.each do |disability|
+            approx_begin_date = disability['approximateBeginDate']
+            next if approx_begin_date.blank?
+
+            next if Date.parse(approx_begin_date) < Time.zone.today
+
+            raise ::Common::Exceptions::InvalidFieldValue.new('disability.approximateBeginDate', approx_begin_date)
+          end
+        end
+
+        def validate_form_526_special_issues!
+          disabilities = form_attributes.dig('disabilities')
+          return if disabilities.blank?
+
+          disabilities.each do |disability|
+            special_issues = disability['specialIssues']
+            next if special_issues.blank?
+
+            if invalid_hepatitis_c_special_issue?(special_issues: special_issues, disability: disability)
+              raise ::Common::Exceptions::InvalidFieldValue.new('disability.specialIssues', special_issues)
+            end
+
+            if invalid_pow_special_issue?(special_issues: special_issues)
+              raise ::Common::Exceptions::InvalidFieldValue.new('disability.specialIssues', special_issues)
+            end
+          end
+        end
+
+        def invalid_hepatitis_c_special_issue?(special_issues:, disability:)
+          # if 'specialIssues' includes 'HEPC', then EVSS requires the disability 'name' to equal 'hepatitis'
+          special_issues.include?('HEPC') && !disability['name'].casecmp?('hepatitis')
+        end
+
+        def invalid_pow_special_issue?(special_issues:)
+          return false unless special_issues.include?('POW')
+
+          # if 'specialIssues' includes 'POW', then EVSS requires there also be a 'serviceInformation.confinements'
+          confinements = form_attributes['serviceInformation']['confinements']
+          confinements.blank?
+        end
+
+        def validate_form_526_treatments!
+          treatments = form_attributes.dig('treatments')
+          return if treatments.blank?
+
+          validate_treatment_start_dates!
+          validate_treatment_end_dates!
+          validate_treated_disability_names!
+        end
+
+        def validate_treatment_start_dates!
+          treatments = form_attributes.dig('treatments')
+          return if treatments.blank?
+
+          earliest_begin_date = form_attributes['serviceInformation']['servicePeriods'].map do |service_period|
+            Date.parse(service_period['activeDutyBeginDate'])
+          end.min
+
+          treatments.each do |treatment|
+            next if Date.parse(treatment['startDate']) > earliest_begin_date
+
+            raise ::Common::Exceptions::InvalidFieldValue.new('treatments.startDate', treatment['startDate'])
+          end
+        end
+
+        def validate_treatment_end_dates!
+          treatments = form_attributes.dig('treatments')
+          return if treatments.blank?
+
+          treatments.each do |treatment|
+            next if treatment['endDate'].blank?
+
+            treatment_start_date = Date.parse(treatment['startDate'])
+            treatment_end_date   = Date.parse(treatment['endDate'])
+
+            next if treatment_end_date > treatment_start_date
+
+            raise ::Common::Exceptions::InvalidFieldValue.new('treatments.endDate', treatment['endDate'])
+          end
+        end
+
+        def validate_treated_disability_names!
+          treatments = form_attributes.dig('treatments')
+          return if treatments.blank?
+
+          declared_disability_names = form_attributes['disabilities'].pluck('name')
+
+          treatments.each do |treatment|
+            next if treatment['treatedDisabilityNames'].all? { |name| declared_disability_names.include?(name) }
+
+            raise ::Common::Exceptions::InvalidFieldValue.new(
+              'treatments.treatedDisabilityNames',
+              treatment['treatedDisabilityNames']
+            )
+          end
         end
 
         def flashes

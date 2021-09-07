@@ -14,6 +14,11 @@ RSpec.describe SAML::PostURLService do
 
     let(:user) { build(:user) }
     let(:session) { Session.create(uuid: user.uuid, token: 'abracadabra') }
+    let(:expected_authn_context) { 'some_authn_context' }
+
+    before do
+      allow(Settings.saml_ssoe).to receive(:idme_authn_context).and_return(expected_authn_context)
+    end
 
     around do |example|
       User.create(user)
@@ -26,7 +31,8 @@ RSpec.describe SAML::PostURLService do
     SAML::URLService::VIRTUAL_HOST_MAPPINGS.each do |vhost_url, values|
       context "virtual host: #{vhost_url}" do
         let(:saml_settings) do
-          build(:settings_no_context_v1, assertion_consumer_service_url: "#{vhost_url}/auth/saml/callback")
+          callback_path = URI.parse(Settings.saml_ssoe.callback_url).path
+          build(:settings_no_context_v1, assertion_consumer_service_url: "#{vhost_url}#{callback_path}")
         end
 
         let(:params) { { action: 'new' } }
@@ -63,7 +69,7 @@ RSpec.describe SAML::PostURLService do
           it 'has sign in url: with (default authn_context)' do
             expect(user.authn_context).to eq('http://idmanagement.gov/ns/assurance/loa/1/vets')
             expect_any_instance_of(OneLogin::RubySaml::Settings)
-              .to receive(:authn_context=).with('http://idmanagement.gov/ns/assurance/loa/3/vets')
+              .to receive(:authn_context=).with([LOA::IDME_LOA3_VETS, expected_authn_context])
             url, params = subject.verify_url
             expect(url).to eq('https://pint.eauth.va.gov/isam/sps/saml20idp/saml20/login')
             expect_saml_form_parameters(params,
@@ -73,7 +79,7 @@ RSpec.describe SAML::PostURLService do
           it 'has sign in url: with (multifactor authn_context)' do
             allow(user).to receive(:authn_context).and_return('multifactor')
             expect_any_instance_of(OneLogin::RubySaml::Settings)
-              .to receive(:authn_context=).with('http://idmanagement.gov/ns/assurance/loa/3/vets')
+              .to receive(:authn_context=).with([LOA::IDME_LOA3_VETS, expected_authn_context])
             url, params = subject.verify_url
             expect(url).to eq('https://pint.eauth.va.gov/isam/sps/saml20idp/saml20/login')
             expect_saml_form_parameters(params,
@@ -184,7 +190,7 @@ RSpec.describe SAML::PostURLService do
             it 'goes to verify URL before login redirect' do
               expect(user.authn_context).to eq('http://idmanagement.gov/ns/assurance/loa/1/vets')
               expect_any_instance_of(OneLogin::RubySaml::Settings)
-                .to receive(:authn_context=).with('http://idmanagement.gov/ns/assurance/loa/3/vets')
+                .to receive(:authn_context=).with([LOA::IDME_LOA3_VETS, expected_authn_context])
               expect(subject.should_uplevel?).to be(true)
               url, params = subject.verify_url
               expect(url).to eq('https://pint.eauth.va.gov/isam/sps/saml20idp/saml20/login')
@@ -255,6 +261,11 @@ RSpec.describe SAML::PostURLService do
 
     let(:user) { build(:user) }
     let(:session) { Session.create(uuid: user.uuid, token: 'abracadabra') }
+    let(:expected_authn_context) { 'some_authn_context' }
+
+    before do
+      allow(Settings.saml_ssoe).to receive(:idme_authn_context).and_return(expected_authn_context)
+    end
 
     around do |example|
       User.create(user)
@@ -267,7 +278,8 @@ RSpec.describe SAML::PostURLService do
     SAML::URLService::VIRTUAL_HOST_MAPPINGS.each do |vhost_url, values|
       context "virtual host: #{vhost_url}" do
         let(:saml_settings) do
-          build(:settings_no_context_v1, assertion_consumer_service_url: "#{vhost_url}/auth/saml/callback")
+          callback_path = URI.parse(Settings.saml_ssoe.callback_url).path
+          build(:settings_no_context_v1, assertion_consumer_service_url: "#{vhost_url}#{callback_path}")
         end
 
         let(:params) { { action: 'new' } }
@@ -314,7 +326,7 @@ RSpec.describe SAML::PostURLService do
           it 'has sign in url: with (default authn_context)' do
             expect(user.authn_context).to eq('http://idmanagement.gov/ns/assurance/loa/1/vets')
             expect_any_instance_of(OneLogin::RubySaml::Settings)
-              .to receive(:authn_context=).with('http://idmanagement.gov/ns/assurance/loa/3')
+              .to receive(:authn_context=).with([LOA::IDME_LOA3, expected_authn_context])
             url, params = subject.verify_url
             expect(url).to eq('https://pint.eauth.va.gov/isam/sps/saml20idp/saml20/login')
             expect_saml_form_parameters(params,
@@ -324,7 +336,7 @@ RSpec.describe SAML::PostURLService do
           it 'has sign in url: with (multifactor authn_context)' do
             allow(user).to receive(:authn_context).and_return('multifactor')
             expect_any_instance_of(OneLogin::RubySaml::Settings)
-              .to receive(:authn_context=).with('http://idmanagement.gov/ns/assurance/loa/3')
+              .to receive(:authn_context=).with([LOA::IDME_LOA3, expected_authn_context])
             url, params = subject.verify_url
             expect(url).to eq('https://pint.eauth.va.gov/isam/sps/saml20idp/saml20/login')
             expect_saml_form_parameters(params,
@@ -457,7 +469,7 @@ RSpec.describe SAML::PostURLService do
             it 'goes to verify URL before login redirect' do
               expect(user.authn_context).to eq('http://idmanagement.gov/ns/assurance/loa/1/vets')
               expect_any_instance_of(OneLogin::RubySaml::Settings)
-                .to receive(:authn_context=).with('http://idmanagement.gov/ns/assurance/loa/3')
+                .to receive(:authn_context=).with([LOA::IDME_LOA3, expected_authn_context])
               expect(subject.should_uplevel?).to be(true)
               url, params = subject.verify_url
               expect(url).to eq('https://pint.eauth.va.gov/isam/sps/saml20idp/saml20/login')
@@ -512,6 +524,11 @@ RSpec.describe SAML::PostURLService do
     let(:saml_settings) do
       build(:settings_no_context_v1, assertion_consumer_service_url: 'https://staging-api.vets.gov/review_instance/saml/callback')
     end
+    let(:expected_authn_context) { 'some_authn_context' }
+
+    before do
+      allow(Settings.saml_ssoe).to receive(:idme_authn_context).and_return(expected_authn_context)
+    end
 
     around do |example|
       User.create(user)
@@ -545,7 +562,7 @@ RSpec.describe SAML::PostURLService do
       it 'goes to verify URL before login redirect' do
         expect(user.authn_context).to eq('http://idmanagement.gov/ns/assurance/loa/1/vets')
         expect_any_instance_of(OneLogin::RubySaml::Settings)
-          .to receive(:authn_context=).with('http://idmanagement.gov/ns/assurance/loa/3/vets')
+          .to receive(:authn_context=).with([LOA::IDME_LOA3_VETS, expected_authn_context])
         expect(subject.should_uplevel?).to be(true)
         url, params = subject.verify_url
         expect(url).to eq('https://pint.eauth.va.gov/isam/sps/saml20idp/saml20/login')
