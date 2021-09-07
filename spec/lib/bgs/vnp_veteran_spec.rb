@@ -5,7 +5,7 @@ require 'bgs/vnp_veteran'
 
 RSpec.describe BGS::VnpVeteran do
   let(:user_object) { FactoryBot.create(:evss_user, :loa3) }
-  let(:all_flows_payload) { FactoryBot.build(:form_686c_674) }
+  let(:all_flows_payload) { FactoryBot.build(:form_686c_674_kitchen_sink) }
   let(:formatted_payload) do
     {
       'first' => 'WESLEY',
@@ -58,6 +58,10 @@ RSpec.describe BGS::VnpVeteran do
             address_state_code: 'CA',
             address_city: 'Pasadena',
             address_zip_code: '21122',
+            address_type: nil,
+            mlty_postal_type_cd: nil,
+            mlty_post_office_type_cd: nil,
+            foreign_mail_code: nil,
             type: 'veteran',
             benefit_claim_type_end_product: '139',
             regional_office_number: '313',
