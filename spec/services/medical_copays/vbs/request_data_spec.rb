@@ -72,17 +72,12 @@ RSpec.describe MedicalCopays::VBS::RequestData do
         'type' => 'object',
         'additionalProperties' => false,
         'required' => %w[edipi],
-        "anyOf" => [ 
-          { 
-            "not" => { "required" => ["vistaAccountNumbers"] }
-          },
-        ],
         'properties' => {
           'edipi' => {
             'type' => 'string'
           },
           'vistaAccountNumbers' => { 
-            'type' => 'number'
+            'type' => 'array'
            }
         }
       }
