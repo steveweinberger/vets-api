@@ -138,6 +138,9 @@ features:
     actor_type: user
     description: enables sending flashes to BGS for disability_compensation submissions.
     enable_in_development: true
+  disability_compensation_fast_track:
+    actor_type: user
+    description: Fast tracks 526 disability compensation claims by submitting additional health data
   education_reports_cleanup:
     actor_type: user
     description: Updates to the daily education reports to remove old data that isn't needed in the new fiscal year

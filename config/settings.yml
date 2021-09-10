@@ -896,6 +896,8 @@ hqva_mobile:
 # settings va.gov uses related to lighthouse api's
 lighthouse:
   api_key: fake_key
+  clinical_health:
+    url: https://sandbox-api.va.gov
   facilities:
     url: https://sandbox-api.va.gov
     api_key: fake_key
