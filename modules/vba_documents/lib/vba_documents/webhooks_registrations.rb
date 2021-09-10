@@ -64,8 +64,8 @@ module VBADocuments
         case failure_data['total']
         when 1..3
           0.minutes.from_now
-        when 4..10
-          5.minutes.from_now
+        # when 4..10
+        #   5.minutes.from_now
           # when 11..20
           #   20.minutes.from_now
           # when 21..50

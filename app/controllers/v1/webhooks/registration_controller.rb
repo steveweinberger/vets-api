@@ -43,7 +43,7 @@ module V1::Webhooks
       Webhooks::Subscription.clean_subscription(api_name, @consumer_id) do |subscription|
         if subscription
           urls.each do |url_hash|
-            subscription.set_maintenance(url_hash['url'], url_hash['url']['maintenance'])
+            subscription.set_maintenance(url_hash['url'], url_hash['maintenance'])
           end
           subscription.save!
           render status: :accepted,
