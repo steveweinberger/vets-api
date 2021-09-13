@@ -21,7 +21,7 @@ EVSSPolicy = Struct.new(:user, :evss) do
 
   def access_form526?
     if user.edipi.present? && user.ssn.present? && user.birls_id.present? && user.participant_id.present? &&
-       user.birth_date.present?
+       user.birth_date.present? && user.gender.present?
       log_success('form526')
     else
       log_failure('form526')
