@@ -842,15 +842,16 @@ GEM
     shrine (3.4.0)
       content_disposition (~> 1.0)
       down (~> 5.1)
-    sidekiq (6.2.2)
+    sidekiq (6.2.1)
       connection_pool (>= 2.2.2)
       rack (~> 2.0)
       redis (>= 4.2.0)
-    sidekiq-ent (2.2.3)
+    sidekiq-ent (2.2.2)
       einhorn (>= 0.7.4)
-      sidekiq (>= 6.2.0)
-      sidekiq-pro (>= 5.2.0)
-    sidekiq-pro (5.2.4)
+      sidekiq (>= 6.1.1)
+      sidekiq-pro (>= 5.1.1)
+    sidekiq-pro (5.2.2)
+      connection_pool (>= 2.2.3)
       sidekiq (>= 6.2.0)
     sidekiq-scheduler (3.1.0)
       e2mmap
@@ -1110,10 +1111,10 @@ DEPENDENCIES
   seedbank
   sentry-raven
   shrine
-  sidekiq
+  sidekiq (< 7)
   sidekiq-ent!
   sidekiq-pro!
-  sidekiq-scheduler
+  sidekiq-scheduler (~> 3.1)
   simplecov
   slack-notify
   spring

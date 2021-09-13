@@ -36,6 +36,7 @@ gem 'rails', '~> 6.1'
 
 # Gems with special version/repo needs
 gem 'active_model_serializers', git: 'https://github.com/department-of-veterans-affairs/active_model_serializers', branch: 'master'
+gem 'sidekiq-scheduler', '~> 3.1' # TODO: explanation
 
 gem 'aasm'
 gem 'activerecord-import'
@@ -126,7 +127,6 @@ gem 'rubyzip', '>= 1.3.0'
 gem 'savon'
 gem 'sentry-raven'
 gem 'shrine'
-gem 'sidekiq-scheduler'
 gem 'slack-notify'
 gem 'staccato'
 gem 'statsd-instrument', '~> 3.1.2'
@@ -199,12 +199,11 @@ group :development, :test do
   gem 'rubocop-rails'
   gem 'rubocop-rspec'
   gem 'rubocop-thread_safety'
-  gem 'sidekiq'
+  gem 'sidekiq', '< 7'
   gem 'timecop'
   gem 'webmock'
   gem 'yard'
 end
-
 # sidekiq enterprise requires a license key to download. In many cases, basic sidekiq is enough for local development
 if (Bundler::Settings.new(Bundler.app_config_path)['enterprise.contribsys.com'].nil? ||
     Bundler::Settings.new(Bundler.app_config_path)['enterprise.contribsys.com']&.empty?) &&
