@@ -129,6 +129,9 @@ development: &defaults
   mobile_vets360_account_link_lock:
     namespace: mobile-vets360-account-link
     each_ttl: 180
+  mobile_user_table_lock:
+    namespace: mobile-user-table
+    each_ttl: 180
   mobile_app_appointments_store:
     namespace: mobile-app-appointments-store
     each_ttl: 1800

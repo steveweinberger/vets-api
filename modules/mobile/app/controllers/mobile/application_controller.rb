@@ -45,6 +45,7 @@ module Mobile
       session_manager = IAMSSOeOAuth::SessionManager.new(access_token)
       @current_user = session_manager.find_or_create_user
       link_user_with_vets360 if @current_user.vet360_id.blank?
+      add_user_to_mobile_user_table if Mobile::V0::Users.find_by(user_id: @current_user.icn).nil?
       @current_user
     end
 
@@ -77,6 +78,29 @@ module Mobile
 
     def vet360_linking_locked?(account_uuid)
       !vets360_link_redis_lock.get(account_uuid).nil?
+    end
+
+    def add_user_to_mobile_user_table
+      uuid = @current_user.uuid
+
+      unless user_table_locked?(uuid)
+        lock_user_table(uuid)
+        jid = Mobile::V0::FillMobileUserTableJob.perform_async(uuid, @current_user.icn)
+        Rails.logger.info('Mobile user table add job id', { job_id: jid })
+      end
+    end
+
+    def user_table_redis_lock
+      @redis ||= Redis::Namespace.new(REDIS_CONFIG[:mobile_user_table_lock][:namespace], redis: Redis.current)
+    end
+
+    def lock_user_table(account_uuid)
+      vets360_link_redis_lock.set(account_uuid, 1)
+      vets360_link_redis_lock.expire(account_uuid, REDIS_CONFIG[:mobile_user_table_lock][:each_ttl])
+    end
+
+    def user_table_locked?(account_uuid)
+      !user_table_redis_lock.get(account_uuid).nil?
     end
 
     def append_info_to_payload(payload)
