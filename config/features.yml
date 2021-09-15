@@ -9,7 +9,7 @@
 # The actor_type should be either `user` for features you want to be "sticky" for a logged in user (default)
 #  or `cookie_id` of you wish to use the Google Analytics id as the unique identifier.
 
-# Sorted using http://yaml-sorter.herokuapp.com/
+# Sorted using https://marketplace.visualstudio.com/items?itemName=PascalReitermann93.vscode-yaml-sort
 
 features:
   can_upload_10_10cg_poa:
@@ -50,14 +50,14 @@ features:
     actor_type: user
     description: Enables the health care check-in experiences to use the lowest tier of authentication, i.e. last 4 and last name
     enable_in_development: true
-  check_in_experience_update_information_page_enabled:
-    actor_type: user
-    description: Enables the Update Information question in the health care check-in experience application
-    enable_in_development: false
   check_in_experience_multiple_appointment_support:
     actor_type: user
     description: Enables the health care check-in experiences to show multiple appointments
     enable_in_development: true
+  check_in_experience_update_information_page_enabled:
+    actor_type: user
+    description: Enables the Update Information question in the health care check-in experience application
+    enable_in_development: false
   coe_access:
     actor_type: user
     description: Feature gates the certificate of eligibility application
@@ -77,17 +77,15 @@ features:
     description: Toggles the availability of the frontend form on va.gov for the covid-19 vaccine sign-up
   covid_vaccine_registration_frontend_cta:
     actor_type: user
-    description: >
-      Toggles the availability of the call-to-action prompt (cta) on "va.gov/health-care/covid-19-vaccine/"
-      leading to the frontend form on va.gov for the covid-19 vaccine sign-up
+    description: |
+      Toggles the availability of the call-to-action prompt (cta) on "va.gov/health-care/covid-19-vaccine/" leading to the frontend form on va.gov for the covid-19 vaccine sign-up
   covid_vaccine_registration_frontend_enable_expanded_eligibility:
     actor_type: user
     description: Toggles the 'continue' button to launch the new expanded eligibility VAFS app
   covid_vaccine_registration_frontend_hide_auth:
     actor_type: user
-    description: >
-      Toggles the availability of the sign-in button on the covid-19 vaccine sign-up form on va.gov.
-      Note: When this is enabled, the 'Sign in' button will be hidden
+    description: |
+      Toggles the availability of the sign-in button on the covid-19 vaccine sign-up form on va.gov. Note: When this is enabled, the 'Sign in' button will be hidden
   covid_vaccine_scheduling_frontend:
     actor_type: user
     description: Toggles the availability of covid-19 vaccine scheduling links in the facility locator frontend
@@ -105,13 +103,13 @@ features:
     actor_type: user
     description: Feature gates the dependency verification modal for updating the diaries service.
     enable_in_development: true
-  dependents_pension_check:
-    actor_type: user
-    description: Manage whether or not Pension check is enabled for the 686/674
-    enable_in_development: true
   dependents_management:
     actor_type: user
     description: Manage dependent removal from view dependent page
+    enable_in_development: true
+  dependents_pension_check:
+    actor_type: user
+    description: Manage whether or not Pension check is enabled for the 686/674
     enable_in_development: true
   direct_deposit_cnp:
     actor_type: user
@@ -122,6 +120,10 @@ features:
   direct_deposit_vanotify:
     actor_type: user
     description: Send direct deposit emails using VaNotify service
+  discharge_wizard_features:
+    actor_type: user
+    description: Iteration of new features for discharge wizard
+    enable_in_development: true
   education_reports_cleanup:
     actor_type: user
     description: Updates to the daily education reports to remove old data that isn't needed in the new fiscal year
@@ -133,9 +135,9 @@ features:
   ezcg_use_facility_api:
     actor_type: user
     description: Enables 1010EZ & 1010CG to use the Facility API instead of JSON schema
-  discharge_wizard_features:
+  facilities_locator_mobile_covid_online_scheduling:
     actor_type: user
-    description: Iteration of new features for discharge wizard
+    description: get covid online scheduling availability from the mobile api
     enable_in_development: true
   facilities_ppms_suppress_all:
     actor_type: user
@@ -158,10 +160,6 @@ features:
     actor_type: user
     description: enable covid search/display
     enable_in_development: true
-  facilities_locator_mobile_covid_online_scheduling:
-    actor_type: user
-    enable_in_development: true
-    description: get covid online scheduling availability from the mobile api
   facility_locator_ppms_forced_unique_id:
     actor_type: user
     description: Use an hexdigest for the ID on PPMS Place of Service Calls
@@ -184,14 +182,16 @@ features:
     enable_in_development: true
   facility_locator_show_community_cares:
     actor_type: user
-    description: >
-      On https://www.va.gov/find-locations/ enable veterans to search for Community care by showing that option
-      in the "Search for" box.
+    description: |
+      On https://www.va.gov/find-locations/ enable veterans to search for Community care by showing that option in the "Search for" box.
     enable_in_development: true
   facility_locator_show_operational_hours_special_instructions:
     actor_type: user
     description: Display new field operationalHoursSpecialInstructions for VA facilities
     enable_in_development: true
+  file_upload_short_workflow_enabled:
+    actor_type: user
+    description: Enables shorter workflow enhancement for file upload component
   find_forms_first_flag:
     actor_type: user
     description: Enhances Find A Forms Flag 1.
@@ -204,9 +204,6 @@ features:
     actor_type: user
     description: Enhances Find A Forms Flag 3.
     enable_in_development: true
-  file_upload_short_workflow_enabled:
-    actor_type: user
-    description: Enables shorter workflow enhancement for file upload component
   form10182_nod:
     actor_type: user
     description: Form 10182 Notice of Disagreement - Request a board appeal
@@ -221,9 +218,8 @@ features:
     enable_in_development: true
   gibct_eyb_bottom_sheet:
     actor_type: user
-    description: >
-      Panel that displays while the user is modifying inputs to give context to their currently estimated benefits
-      until they reach the full your estimated benefits panel.
+    description: |
+      Panel that displays while the user is modifying inputs to give context to their currently estimated benefits until they reach the full your estimated benefits panel.
   gibct_school_ratings:
     actor_type: user
     description: Show/Hide the school ratings section of the Comparison Tool School Profile Page.
@@ -247,15 +243,12 @@ features:
     description: API endpoints consumed by the VA Mobile App (iOS/Android)
   multiple_address_10_10ez:
     actor_type: cookie_id
-    description: >
-      [Front-end only] When enabled, the 10-10EZ will collect a home and mailing address for the veteran
-      vs only collecting a single, "permanent" address.
+    description: |
+      [Front-end only] When enabled, the 10-10EZ will collect a home and mailing address for the veteran vs only collecting a single, "permanent" address.
   pre_entry_covid19_screener:
     actor_type: user
-    description: >
-      Toggle for the entire pre-entry covid 19 self-screener available at /covid19screener and to be used by visitors
-      to VHA facilities in lieu of manual screening with a VHA employee.
-      This toggle is owned by Patrick B. and the rest of the CTO Health Products team.
+    description: |
+      Toggle for the entire pre-entry covid 19 self-screener available at /covid19screener and to be used by visitors to VHA facilities in lieu of manual screening with a VHA employee. This toggle is owned by Patrick B. and the rest of the CTO Health Products team.
   profile_notification_settings:
     actor_type: user
     description: Turns on the Notification Settings section of the VA.gov Profile
@@ -317,13 +310,13 @@ features:
     actor_type: user
     description: Enables the Wizard for VA Form 5655 (Financial Status Report)
     enable_in_development: true
-  show_medical_copays:
-    actor_type: user
-    description: Enables the medical copays application on route /manage-va-debt/medical-copays/
-    enable_in_development: true
   show_healthcare_experience_questionnaire:
     actor_type: cookie_id
     description: Enables showing the pre-appointment questionnaire feature.
+    enable_in_development: true
+  show_medical_copays:
+    actor_type: user
+    description: Enables the medical copays application on route /manage-va-debt/medical-copays/
     enable_in_development: true
   show_new_get_medical_records_page:
     actor_type: user
@@ -376,6 +369,10 @@ features:
     actor_type: user
     description: Allows veterans to cancel VA appointments
     enable_in_development: true
+  va_online_scheduling_cc_iterations:
+    actor_type: user
+    description: Toggle for VAOS community care flow iterations.
+    enable_in_development: true
   va_online_scheduling_community_care:
     actor_type: user
     description: Allows veterans to submit requests for Community Care appointments
@@ -383,6 +380,10 @@ features:
   va_online_scheduling_direct:
     actor_type: user
     description: Allows veterans to directly schedule VA appointments
+    enable_in_development: true
+  va_online_scheduling_facilities_service_v2:
+    actor_type: user
+    description: Toggle for new mobile facility service v2 endpoints
     enable_in_development: true
   va_online_scheduling_facility_selection_v2_2:
     actor_type: user
@@ -412,18 +413,10 @@ features:
     actor_type: user
     description: Toggle for new vaos service va appointments.
     enable_in_development: true
-  va_online_scheduling_facilities_service_v2:
-    actor_type: user
-    description: Toggle for new mobile facility service v2 endpoints
-    enable_in_development: true
   va_online_scheduling_variant_testing:
     actor_type: user
-    enable_in_development: true
     description: Toggle for VAOS variant testing.
-  va_online_scheduling_cc_iterations:
-    actor_type: user
     enable_in_development: true
-    description: Toggle for VAOS community care flow iterations.
   va_view_dependents_access:
     actor_type: user
     description: Allows us to gate the View/ Modify dependents content in a progressive rollout
