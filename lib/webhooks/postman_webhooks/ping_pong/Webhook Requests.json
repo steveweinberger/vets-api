@@ -1,0 +1,339 @@
+{
+	"info": {
+		"_postman_id": "4cf59efd-b40f-4a08-9d12-62abd3b9c461",
+		"name": "Webhook Requests",
+		"description": "This collection has the following requests:\n\nPing: Sends a ping request to vets-api. Within a minute, a pong webhook response will be sent to the Monitors.\n\nRegister for Webhook: This request registers the 2 Postman Monitors to the Ping Pong event.\n\nSet Monitor 1 to maintenance mode: This request sets the first monitor to maintenance mode. Pong responses will not be sent to the first monitor until maintenance mode is turned off.\n\nSet Maintenance mode off for both: Removes maintenance mode for both monitors. After sending this request, all pong request will be sent to monitors.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Register  for Webhook",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "{{vets-api_API_KEY}}",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "apikey",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "webhook",
+							"value": "{\n  \"subscriptions\": [\n    {\n      \"event\": \"gov.va.developer.webhooks.ping-pong\",\n      \"urls\": [\n        \"{{webhookURL1}}\",\n        \"{{webhookURL2}}\"\n      ]\n    }\n  ]\n}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://sandbox-api.va.gov/v1/webhooks/register",
+					"protocol": "https",
+					"host": [
+						"sandbox-api",
+						"va",
+						"gov"
+					],
+					"path": [
+						"v1",
+						"webhooks",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set Monitor 1 to maintenance mode",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "{{vets-api_API_KEY}}",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "apikey",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "webhook_maintenance",
+							"value": "{\n  \"api_name\": \"webhooks-ping-pong\",\n  \"urls\": [\n    {\n      \"url\": \"{{webhookURL1}}\",\n      \"maintenance\": true\n    },\n    {\n      \"url\": \"{{webhookURL2}}\",\n      \"maintenance\": false\n    }\n  ]\n}\n\n",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://sandbox-api.va.gov/v1/webhooks/maintenance",
+					"protocol": "https",
+					"host": [
+						"sandbox-api",
+						"va",
+						"gov"
+					],
+					"path": [
+						"v1",
+						"webhooks",
+						"maintenance"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set Maintenance mode off for both",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "{{vets-api_API_KEY}}",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "apikey",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "webhook_maintenance",
+							"value": "{\n  \"api_name\": \"webhooks-ping-pong\",\n  \"urls\": [\n    {\n      \"url\": \"{{webhookURL1}}\",\n      \"maintenance\": false\n    },\n    {\n      \"url\": \"{{webhookURL2}}\",\n      \"maintenance\": false\n    }\n  ]\n}\n\n",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://sandbox-api.va.gov/v1/webhooks/maintenance",
+					"protocol": "https",
+					"host": [
+						"sandbox-api",
+						"va",
+						"gov"
+					],
+					"path": [
+						"v1",
+						"webhooks",
+						"maintenance"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "List webhook Subscription",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "{{vets-api_API_KEY}}",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "apikey",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"url": {
+					"raw": "https://sandbox-api.va.gov/v1/webhooks/list",
+					"protocol": "https",
+					"host": [
+						"sandbox-api",
+						"va",
+						"gov"
+					],
+					"path": [
+						"v1",
+						"webhooks",
+						"list"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Ping",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "{{vets-api_API_KEY}}",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "apikey",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"url": {
+					"raw": "https://sandbox-api.va.gov/v1/webhooks/ping",
+					"protocol": "https",
+					"host": [
+						"sandbox-api",
+						"va",
+						"gov"
+					],
+					"path": [
+						"v1",
+						"webhooks",
+						"ping"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

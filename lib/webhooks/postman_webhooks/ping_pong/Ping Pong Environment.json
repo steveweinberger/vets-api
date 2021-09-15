@@ -1,0 +1,24 @@
+{
+	"id": "97630806-2878-4342-a27d-d0458f23b835",
+	"name": "Ping Pong Environment",
+	"values": [
+		{
+			"key": "POSTMAN_API_KEY",
+			"value": "",
+			"enabled": true
+		},
+		{
+			"key": "vets-api_API_KEY",
+			"value": "",
+			"enabled": true
+		},
+		{
+			"key": "webhookWorkspaceId",
+			"value": "",
+			"enabled": true
+		}
+	],
+	"_postman_variable_scope": "environment",
+	"_postman_exported_at": "2021-09-09T16:37:44.494Z",
+	"_postman_exported_using": "Postman/8.12.1"
+}
