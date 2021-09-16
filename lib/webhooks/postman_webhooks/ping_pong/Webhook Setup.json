@@ -1,0 +1,367 @@
+{
+	"info": {
+		"_postman_id": "5f7a3d9f-e8b8-40db-b9cc-5c0ee45447fa",
+		"name": "Webhook Setup",
+		"description": "This collection will help create Postman Monitors that will serve as sample HTTP servers to help demonstrate the Webhook functionality.\n\nThere are a couple of steps to setting up the monitors.\n\n1. Create your own API key in your [settings page](https://postman.co/settings/me/api-keys). Place this key in the POSTMAN_API_KEY variable within the Ping Pong Environment.\n\n2. Run \"Get Your API credentials\"\n\n3. Run \"Retrieve all your Workspaces\". Grab the workspace ID from the response for the workspace you are currently in. Place this workspace ID in the webhookWorkspaceID variable within the Ping Pong Environment.\n\n4. Run \"Find Collections in current Workspace\".\n\n5. Run \"Create Webhook endpoint 1\" and \"Create Webhook endpoint 2\"\n\n\nThere should now be 2 Postman Monitors in the Monitors tab. You may need to re-open Postman to refresh.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Retrieve all your Workspaces",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var template = `",
+							"<div style=\"background-color: #FFFFFF; padding: 1em;height: 100%;\">",
+							"    <h2> All workspaces in your Postman account</h2>",
+							"    <h4> 1. Copy the workspace ID for the workspace you're using</h4>",
+							"    <h4> 2. Paste it in Collection variable called <i>webhookWorkspaceId</i></h4>",
+							"    <table bgcolor=\"#FFFFFF\">",
+							"        <tr>",
+							"            <th>Name</th>",
+							"            <th>Id</th>",
+							"            <th>Action</th>",
+							"        </tr>",
+							"",
+							"        {{#each response.workspaces}}",
+							"            <tr>",
+							"                <td>{{name}}</td>",
+							"                <td>{{id}}</td>",
+							"                <td>",
+							"                <button onClick=\"navigator.clipboard.writeText('{{id}}').then(function() {",
+							"                        alert('Copied to clipboard, you can now add it to your collection environnement.');",
+							"                    }, function(err) {",
+							"                        console.error('Async: Could not copy text: ', err);",
+							"                    });\">📋 Copy to clipboard</button>",
+							"                </td>",
+							"            </tr>",
+							"        {{/each}}",
+							"    </table>",
+							"    </div>",
+							"`;",
+							"",
+							"pm.visualizer.set(template, {",
+							"    // Pass the response body parsed as JSON as `data`",
+							"    response: pm.response.json()",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://api.getpostman.com/workspaces",
+					"protocol": "https",
+					"host": [
+						"api",
+						"getpostman",
+						"com"
+					],
+					"path": [
+						"workspaces"
+					]
+				},
+				"description": "Use the visualizer to visualize all your Postman workspaces.\n\nAnd find the one named `Webhook Debugger`."
+			},
+			"response": []
+		},
+		{
+			"name": "Find Collections in current Workspace",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var template = `",
+							"<div style=\"background-color: #FFFFFF; padding: 1em;height: 100%;\">",
+							"    {{#if error}}",
+							"        <h2> 🛑 {{error.title}}</h2>",
+							"        <h4> {{error.message}}</h4>",
+							"    {{else}}",
+							"        <h2> ✅ {{success.title}}</h2>",
+							"        <h4> {{success.message}}</h4>",
+							"        <hr />",
+							"        <h5> Or copy it manually</h5>",
+							"        <h3> All collections in the Workspace</h3>",
+							"        <table bgcolor=\"#FFFFFF\" which>",
+							"        <tr>",
+							"            <th>Name</th>",
+							"            <th>Id</th>",
+							"            <th>Action</th>",
+							"        </tr>",
+							"",
+							"        {{#each response.workspace.collections}}",
+							"            <tr>",
+							"                <td>{{name}}</td>",
+							"                <td>{{uid}}</td>",
+							"                <td>",
+							"                <button onClick=\"navigator.clipboard.writeText('{{uid}}').then(function() {",
+							"                        alert('Copied to clipboard, you can now add it to your collection environnement.');",
+							"                    }, function(err) {",
+							"                        console.error('Async: Could not copy text: ', err);",
+							"                    });\">📋 Copy to clipboard</button>",
+							"                </td>",
+							"            </tr>",
+							"        {{/each}}",
+							"    </table>",
+							"    {{/if}}",
+							"</div>",
+							"`;",
+							"",
+							"let data_ = pm.response.json()",
+							"let collections = data_.workspace && data_.workspace.collections.filter((c)=> /^Create Webhook Monitor.*/.test(c.name))",
+							"let error = \"\"",
+							"",
+							"pm.test(\"Workspace exists\", function () {",
+							"  pm.response.to.not.be.error;",
+							"});",
+							"",
+							"pm.test(\"Workspace has Monitor Creating collections\", function () {",
+							"  pm.response.to.have.jsonBody('workspace.collections');",
+							"  pm.expect(collections).to.not.be.undefined",
+							"});",
+							"",
+							"if(collections){",
+							"    console.log('collections', collections)",
+							"    collections.forEach((collection, i) => ",
+							"        pm.environment.set(\"collectionUID\" + (i+1), collection.uid)",
+							"    );",
+							"    success = {",
+							"        title: `Collections found`,",
+							"        message: `values stored in environment variables called: collectionUID#`",
+							"    }",
+							"}else{",
+							"    error = {",
+							"       title:  \"Can't find collections named 'Create Webhook Monitor' in Workspace.\",",
+							"       message: \"Check which workspace you have selected and that the collections exist in it.\"",
+							"    }",
+							"    console.log('collection Webhook Monitor not found')",
+							"}",
+							"",
+							"pm.visualizer.set(template, {",
+							"    error,",
+							"    success,",
+							"    response: pm.response.json()",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-API-Key",
+						"value": "{{POSTMAN_API_KEY}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://api.getpostman.com/workspaces/{{webhookWorkspaceId}}",
+					"protocol": "https",
+					"host": [
+						"api",
+						"getpostman",
+						"com"
+					],
+					"path": [
+						"workspaces",
+						"{{webhookWorkspaceId}}"
+					]
+				},
+				"description": "Automatically finds in the workspace selected at `Step 2` a collection named `Webhook Debug`.\n\nUse the `Visualize` tab to find the collection manually."
+			},
+			"response": []
+		},
+		{
+			"name": "Create Webhook endpoint 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var template = `",
+							"<div style=\"background-color: #FFFFFF; padding: 1em;height: 100%;\">",
+							"    <h2> ✅ Webhook has been created</h2>",
+							"    <p>URL is {{webhook.webhookUrl}}</p>",
+							"    <button onClick=\"navigator.clipboard.writeText('{{webhook.webhookUrl}}').then(function() {",
+							"        alert('Copied to clipboard, you can now past it whereever you need a webhook.');",
+							"    }, function(err) {",
+							"        console.error('Async: Could not copy text: ', err);",
+							"    });\">📋 Copy to clipboard</button>",
+							"    <br />",
+							"    <p> Once added, Open https://postman.co/monitor/{{webhook.id}} in your browser to 🔍 Inspect calls. </p>",
+							"`;",
+							"",
+							"let data_ = pm.response.json()",
+							"let webhook = data_.webhook",
+							"",
+							"if(webhook){",
+							"    pm.environment.set(\"webhookURL1\", webhook.webhookUrl)",
+							"}else{ ",
+							"    console.log('collection Webhook Debug not found')",
+							"}",
+							"",
+							"pm.visualizer.set(template, {",
+							"    // Pass the response body parsed as JSON as `data`",
+							"    webhook",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-workspace-id",
+						"value": "{{webhookWorkspaceId}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"webhook\":{\n        \"name\": \"Webhook Monitor 1\",\n        \"collection\": \"{{collectionUID1}}\"\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://api.getpostman.com/webhooks",
+					"protocol": "https",
+					"host": [
+						"api",
+						"getpostman",
+						"com"
+					],
+					"path": [
+						"webhooks"
+					]
+				},
+				"description": "Create a webhook endpoint to be called from the outside.\n\nUse `Visualize` tab to get the Webhook URL that could be used in 3rd party app.\n\nIt will also give you the link to inspect the monitor and the incoming requests."
+			},
+			"response": []
+		},
+		{
+			"name": "Create Webhook endpoint 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var template = `",
+							"<div style=\"background-color: #FFFFFF; padding: 1em;height: 100%;\">",
+							"    <h2> ✅ Webhook has been created</h2>",
+							"    <p>URL is {{webhook.webhookUrl}}</p>",
+							"    <button onClick=\"navigator.clipboard.writeText('{{webhook.webhookUrl}}').then(function() {",
+							"        alert('Copied to clipboard, you can now past it whereever you need a webhook.');",
+							"    }, function(err) {",
+							"        console.error('Async: Could not copy text: ', err);",
+							"    });\">📋 Copy to clipboard</button>",
+							"    <br />",
+							"    <p> Once added, Open https://postman.co/monitor/{{webhook.id}} in your browser to 🔍 Inspect calls. </p>",
+							"`;",
+							"",
+							"let data_ = pm.response.json()",
+							"let webhook = data_.webhook",
+							"",
+							"if(webhook){",
+							"    pm.environment.set(\"webhookURL2\", webhook.webhookUrl)",
+							"}else{ ",
+							"    console.log('collection Webhook Debug not found')",
+							"}",
+							"",
+							"pm.visualizer.set(template, {",
+							"    // Pass the response body parsed as JSON as `data`",
+							"    webhook",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-workspace-id",
+						"value": "{{webhookWorkspaceId}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"webhook\":{\n        \"name\": \"Webhook Monitor 2\",\n        \"collection\": \"{{collectionUID2}}\"\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://api.getpostman.com/webhooks",
+					"protocol": "https",
+					"host": [
+						"api",
+						"getpostman",
+						"com"
+					],
+					"path": [
+						"webhooks"
+					]
+				},
+				"description": "Create a webhook endpoint to be called from the outside.\n\nUse `Visualize` tab to get the Webhook URL that could be used in 3rd party app.\n\nIt will also give you the link to inspect the monitor and the incoming requests."
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "apikey",
+		"apikey": [
+			{
+				"key": "key",
+				"value": "X-Api-key",
+				"type": "string"
+			},
+			{
+				"key": "value",
+				"value": "{{POSTMAN_API_KEY}}",
+				"type": "string"
+			},
+			{
+				"key": "in",
+				"value": "header",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
