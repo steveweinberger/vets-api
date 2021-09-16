@@ -4,14 +4,14 @@ require 'flipper/admin_user_constraint'
 
 Rails.application.routes.draw do
   if Settings.webhooks.enabled
-    post '/v1/webhooks/register', to: 'v1/webhooks/registration#subscribe'
-    get '/v1/webhooks/list', to: 'v1/webhooks/registration#list'
-    get '/v1/webhooks/report', to: 'v1/webhooks/registration#report'
-    post '/v1/webhooks/maintenance', to: 'v1/webhooks/registration#maintenance'
+    post '/webhooks/v1/register', to: 'v1/webhooks/registration#subscribe'
+    get '/webhooks/v1/list', to: 'v1/webhooks/registration#list'
+    get '//webhooks/v1/report', to: 'v1/webhooks/registration#report'
+    post '/webhooks/v1/maintenance', to: 'v1/webhooks/registration#maintenance'
   end
 
   if Settings.webhooks.ping_pong_enabled
-    match '/v1/webhooks/ping', to: 'v1/webhooks/registration#ping', via: [:get, :put, :post]
+    match '/webhooks/v1/ping', to: 'v1/webhooks/registration#ping', via: [:get, :put, :post]
   end
 
   match '/v0/*path', to: 'application#cors_preflight', via: [:options]

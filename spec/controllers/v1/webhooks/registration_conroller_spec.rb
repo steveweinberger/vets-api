@@ -54,7 +54,7 @@ RSpec.describe 'Webhooks Registration Endpoint', type: :request, retry: 3 do
       #   end
 
       it 'returns a valid subscription json' do
-        post '/v1/webhooks/register', params: { webhook: VALID_SUBSCRIPTIONS }, headers: dev_headers
+        post '/webhooks/v1/register', params: { webhook: VALID_SUBSCRIPTIONS }, headers: dev_headers
         expect(response).to have_http_status(:created)
         body = JSON.parse(response.body)
         expect(body['data']['id']).to eq('')
@@ -144,8 +144,8 @@ RSpec.describe 'Webhooks Registration Endpoint', type: :request, retry: 3 do
         end
 
         it 'returns the subscription' do
-          post '/v1/webhooks/register', params: { webhook: VALID_SUBSCRIPTIONS }, headers: dev_headers
-          get '/v1/webhooks/list', headers: dev_headers
+          post '/webhooks/v1/register', params: { webhook: VALID_SUBSCRIPTIONS }, headers: dev_headers
+          get '/webhooks/v1/list', headers: dev_headers
           expect(response).to have_http_status(:ok)
           body = JSON.parse(response.body)
           expect(body['data'].size).to eq(1)
