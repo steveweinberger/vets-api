@@ -45,7 +45,6 @@ jobs:
 
       - name: Clear cache
         run: |
-          git pex statuss
           git rm --force /pex
 
       - uses: actions/checkout@v2
