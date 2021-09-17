@@ -43,9 +43,11 @@ jobs:
     runs-on: asg
     steps:
 
+      - name: Clear cache
+        run: |
+          rm -rf .git
+
       - uses: actions/checkout@v2
-        with:
-          persist_credentials: falses
 
       - uses: docker/login-action@v1
         with:
