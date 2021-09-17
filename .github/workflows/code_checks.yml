@@ -45,7 +45,7 @@ jobs:
 
       - name: Clear cache
         run: |
-          git submodule update --init --recursive
+          git rm --cached .
 
       - uses: actions/checkout@v2
 
