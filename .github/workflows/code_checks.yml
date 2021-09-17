@@ -45,7 +45,7 @@ jobs:
 
       - name: Clear cache
         run: |
-          cat .gitmodules
+          git submodule status
 
       - uses: actions/checkout@v2
 
