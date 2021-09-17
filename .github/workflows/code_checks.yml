@@ -45,7 +45,7 @@ jobs:
 
       - name: Clear cache
         run: |
-          git rm pex
+          git submodule update --init --recursive
 
       - uses: actions/checkout@v2
 
