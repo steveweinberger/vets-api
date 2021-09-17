@@ -13,29 +13,16 @@ module V0
           "middleName": 'string',
           "lastName": 'string',
           "dateOfBirth": '2021-09-17',
-          "cadency": 'string',
           "contactInfos": [
             {
               "addressLine1": 'string',
               "addressLine2": 'string',
-              "addressLine3": 'string',
               "city": 'string',
               "zipcode": 'string',
               "effectiveDate": '2021-09-17',
-              "zipCodeExtension": 'string',
-              "emailAddress": 'vets.gov.user+1@gmail.com',
-              "addressType": 'DOMESTIC'
+              "emailAddress": 'vets.gov.user+1@gmail.com'
             }
-          ],
-          "personComments": [
-            {
-              "personCommentKey": 0,
-              "commentDate": '2021-09-17',
-              "comments": 'string'
-            }
-          ],
-          "dobChanged": true,
-          "firstAndLastNameChanged": true
+          ]
         }
       }
     end
