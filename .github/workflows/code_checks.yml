@@ -45,7 +45,7 @@ jobs:
 
       - name: Clear cache
         run: |
-          git pex status
+          git submodule status
 
       - uses: actions/checkout@v2
 
