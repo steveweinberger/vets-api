@@ -455,6 +455,8 @@ vba_documents:
     path_enabled_flag: false
   report_enabled: false
   monthly_report: false
+  enable_download_endpoint_v2: false
+  enable_download_endpoint: false
   location:
     prefix: http://some.fakesite.com/path
     replacement: http://another.fakesite.com/rewrittenpath
