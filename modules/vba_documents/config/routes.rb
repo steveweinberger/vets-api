@@ -20,7 +20,7 @@ VBADocuments::Engine.routes.draw do
   if Settings.vba_documents.v2_enabled
     namespace :v2, defaults: { format: 'json' } do
       resources :uploads, only: %i[create show] do
-        get 'download', to: 'uploads#download'
+        get 'download', to: 'uploads#download' if Settings.vba_documents.enable_download_endpoint_v2
         collection do
           resource :report, only: %i[create]
         end

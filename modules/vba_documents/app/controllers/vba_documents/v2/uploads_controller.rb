@@ -86,7 +86,7 @@ module VBADocuments
       private
 
       def verify_settings
-        render plain: 'Not found', status: :not_found unless Settings.vba_documents.enable_download_endpoint
+        render plain: 'Not found', status: :not_found unless Settings.vba_documents.enable_download_endpoint_v2
       end
     end
   end
