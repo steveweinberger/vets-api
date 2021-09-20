@@ -101,17 +101,23 @@ jobs:
              run --rm --service-ports vets-api bash \
              -c "RAILS_ENV=test DISABLE_BOOTSNAP=true parallel_test -n 14 -e 'bundle exec rake db:reset'"
 
+      - name: Start Puma
+        run: |
+             docker-compose -f docker-compose.test.yml -f docker-compose.gha.yml -p ${{ env.DOCKER_IMAGE}} \
+             run --rm --service-ports vets-api bash \
+             -c "bundle exec puma -p 3000 -C ./config/puma.rb -d"
+
+      - name: Start Sidekiq
+        run: |
+             docker-compose -f docker-compose.test.yml -f docker-compose.gha.yml -p ${{ env.DOCKER_IMAGE}} \
+             run --rm --service-ports vets-api bash \
+             -c "bundle exec sidekiq -d"
+
       - name: Run Specs
         run: |
              docker-compose -f docker-compose.test.yml -f docker-compose.gha.yml -p ${{ env.DOCKER_IMAGE}} \
              run --rm --service-ports vets-api bash \
              -c "DISABLE_BOOTSNAP=true bundle exec parallel_rspec spec/ modules/ -n 14 -o '--color --tty'"
-
-      - name: Start Puma
-        run: |
-             docker-compose -f docker-compose.test.yml -f docker-compose.gha.yml -p ${{ env.DOCKER_IMAGE}} \
-             run --rm --service-ports vets-api bash \
-             -c "bundle exec puma -p 3000 -C ./config/puma.rb"
 
       - name: Upload Coverage Report
         uses: actions/upload-artifact@v2
