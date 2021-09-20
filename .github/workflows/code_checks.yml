@@ -107,6 +107,12 @@ jobs:
              run --rm --service-ports vets-api bash \
              -c "DISABLE_BOOTSNAP=true bundle exec parallel_rspec spec/ modules/ -n 14 -o '--color --tty'"
 
+      - name: Start Puma
+        run: |
+             docker-compose -f docker-compose.test.yml -f docker-compose.gha.yml -p ${{ env.DOCKER_IMAGE}} \
+             run --rm --service-ports vets-api bash \
+             -c "bundle exec puma -p 3000 -C ./config/puma.rb"
+
       - name: Upload Coverage Report
         uses: actions/upload-artifact@v2
         if: always()

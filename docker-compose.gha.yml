@@ -1,5 +1,9 @@
 version: '3.4'
 services:
+  redis:
+    image: redis:5.0-alpine
+    ports:
+      - "63790:6379"
   vets-api:
     tmpfs:
       - /tmp
