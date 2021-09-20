@@ -122,6 +122,8 @@ jobs:
           path: log/*.xml
           if-no-files-found: ignore
 
+      # rm -rf .git is a temporary fix for actions/checkout@v2 action
+      # see: https://github.com/actions/checkout/issues/582
       - name: Cleanup
         if: always()
         run: |
