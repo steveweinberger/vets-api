@@ -57,7 +57,7 @@
 					]
 				},
 				"url": {
-					"raw": "https://sandbox-api.va.gov/v1/webhooks/register",
+					"raw": "https://sandbox-api.va.gov/webhooks/v1/register",
 					"protocol": "https",
 					"host": [
 						"sandbox-api",
@@ -65,8 +65,8 @@
 						"gov"
 					],
 					"path": [
-						"v1",
 						"webhooks",
+						"v1",
 						"register"
 					]
 				}
@@ -124,7 +124,7 @@
 					]
 				},
 				"url": {
-					"raw": "https://sandbox-api.va.gov/v1/webhooks/maintenance",
+					"raw": "https://sandbox-api.va.gov/webhooks/v1/maintenance",
 					"protocol": "https",
 					"host": [
 						"sandbox-api",
@@ -132,8 +132,8 @@
 						"gov"
 					],
 					"path": [
-						"v1",
 						"webhooks",
+						"v1",
 						"maintenance"
 					]
 				}
@@ -191,7 +191,7 @@
 					]
 				},
 				"url": {
-					"raw": "https://sandbox-api.va.gov/v1/webhooks/maintenance",
+					"raw": "https://sandbox-api.va.gov/webhooks/v1/maintenance",
 					"protocol": "https",
 					"host": [
 						"sandbox-api",
@@ -199,8 +199,8 @@
 						"gov"
 					],
 					"path": [
-						"v1",
 						"webhooks",
+						"v1",
 						"maintenance"
 					]
 				}
@@ -255,7 +255,7 @@
 					"formdata": []
 				},
 				"url": {
-					"raw": "https://sandbox-api.va.gov/v1/webhooks/list",
+					"raw": "https://sandbox-api.va.gov/webhooks/v1/list",
 					"protocol": "https",
 					"host": [
 						"sandbox-api",
@@ -263,8 +263,8 @@
 						"gov"
 					],
 					"path": [
-						"v1",
 						"webhooks",
+						"v1",
 						"list"
 					]
 				}
@@ -319,7 +319,7 @@
 					"formdata": []
 				},
 				"url": {
-					"raw": "https://sandbox-api.va.gov/v1/webhooks/ping",
+					"raw": "https://sandbox-api.va.gov/webhooks/v1/ping",
 					"protocol": "https",
 					"host": [
 						"sandbox-api",
@@ -327,8 +327,8 @@
 						"gov"
 					],
 					"path": [
-						"v1",
 						"webhooks",
+						"v1",
 						"ping"
 					]
 				}
