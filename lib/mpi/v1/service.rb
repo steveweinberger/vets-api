@@ -1,8 +1,7 @@
 module MPI
   module V1
     class Service
-      def initialize(user)
-        @user = user
+      def initialize
         @service = MasterPersonIndex::Service.new
 
         instance = MasterPersonIndex::Configuration.instance
@@ -15,6 +14,33 @@ module MPI
         instance.processing_code = Settings.mvi.processing_code
         instance.vba_orchestration = Settings.mvi.vba_orchestration
         instance.edipi_search = Settings.mvi.edipi_search
+      end
+
+      def find_profile(user, search_type = MasterPersonIndex::Constants::CORRELATION_WITH_RELATIONSHIP_DATA)
+        @service.find_profile(convert_user(user), search_type)
+      end
+
+      private
+
+      def convert_user(user)
+        attributes = {}
+
+        %w[
+          first_name
+          middle_name
+          last_name
+          birth_date
+          ssn
+          gender
+          mhv_icn
+          edipi
+        ].each do |attr|
+          attributes[attr] = user.public_send(attr)
+        end
+
+        MasterPersonIndex::Models::User.new(
+          attributes
+        )
       end
     end
   end
