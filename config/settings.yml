@@ -40,6 +40,10 @@ ssoe_eauth_cookie:
 session_cookie:
   secure: false
 
+lockbox:
+  master_key: "a798f118b400a1a7552597cc94f44c577919c76b3d26c1eed8ae0703f4240216"
+  #old_master_key: we will need this in the near future when rotating
+
 binaries:
   # you can specify a full path in settings.local.yml if necessary
   pdfinfo: pdfinfo
@@ -121,6 +125,16 @@ edu:
       - PIERRE.BROWN@va.gov
       - VAVBAHIN/TIMS@vba.va.gov
       - EDUAPPMGMT.VBACO@VA.GOV
+      - abelardo.blanco@va.gov
+      - eugenia.gina.ronat@accenturefederal.com
+      - morgan.whaley@accenturefederal.com
+      - m.c.shah@accenturefederal.com
+      - patrick.arthur@accenturefederal.com
+      - adam.freemer@accenturefederal.com
+      - dan.brooking@accenturefederal.com
+      - sebastian.cooper@accenturefederal.com
+      - david.rowley@accenturefederal.com
+      - nick.barthelemy@accenturefederal.com
     staging_emails:
 dependents:
   prefill: true
@@ -193,6 +207,7 @@ modules_appeals_api:
     path_enabled_flag: false
   higher_level_review_pii_expunge_enabled: true
   higher_level_review_updater_enabled: true
+  legacy_appeals_enabled: false
   notice_of_disagreement_pii_expunge_enabled: true
   notice_of_disagreement_updater_enabled: true
   reports:
@@ -544,6 +559,13 @@ reports:
       - Lucas.Tickner@va.gov
       - Ricardo.DaSilva@va.gov
       - tammy.hurley1@va.gov
+      - abelardo.blanco@va.gov
+      - eugenia.gina.ronat@accenturefederal.com
+      - morgan.whaley@accenturefederal.com
+      - m.c.shah@accenturefederal.com
+      - d.a.barnes@accenturefederal.com
+      - jacob.finnern@accenturefederal.com
+      - hocine.halli@accenturefederal.com
   spool_submission:
     emails:
       - Brian.Grubb@va.gov
@@ -566,6 +588,13 @@ reports:
       - Lucas.Tickner@va.gov
       - Ricardo.DaSilva@va.gov
       - tammy.hurley1@va.gov
+      - abelardo.blanco@va.gov
+      - eugenia.gina.ronat@accenturefederal.com
+      - morgan.whaley@accenturefederal.com
+      - m.c.shah@accenturefederal.com
+      - d.a.barnes@accenturefederal.com
+      - jacob.finnern@accenturefederal.com
+      - hocine.halli@accenturefederal.com
   year_to_date_report:
     emails:
       - 222A.VBAVACO@va.gov
@@ -599,6 +628,13 @@ reports:
       - robyn.noles@va.gov
       - Ricardo.DaSilva@va.gov
       - tammy.hurley1@va.gov
+      - abelardo.blanco@va.gov
+      - eugenia.gina.ronat@accenturefederal.com
+      - morgan.whaley@accenturefederal.com
+      - m.c.shah@accenturefederal.com
+      - d.a.barnes@accenturefederal.com
+      - jacob.finnern@accenturefederal.com
+      - hocine.halli@accenturefederal.com
 
 oidc:
   auth_server_metadata_url: ~
@@ -782,6 +818,16 @@ flipper:
     - zmorel@governmentcio.com
     - kha.huynh@thoughtworks.com
     - zach.morel@gcio.com
+    - abelardo.blanco@va.gov
+    - eugenia.gina.ronat@accenturefederal.com
+    - morgan.whaley@accenturefederal.com
+    - m.c.shah@accenturefederal.com
+    - patrick.arthur@accenturefederal.com
+    - adam.freemer@accenturefederal.com
+    - dan.brooking@accenturefederal.com
+    - sebastian.cooper@accenturefederal.com
+    - david.rowley@accenturefederal.com
+    - nick.barthelemy@accenturefederal.com
 
 bgs:
   application: ~

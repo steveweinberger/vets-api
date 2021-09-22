@@ -193,7 +193,7 @@ GEM
     attr_extras (6.2.4)
     awesome_print (1.9.2)
     aws-eventstream (1.2.0)
-    aws-partitions (1.496.0)
+    aws-partitions (1.503.0)
     aws-sdk-core (3.121.0)
       aws-eventstream (~> 1, >= 1.0.2)
       aws-partitions (~> 1, >= 1.239.0)
@@ -202,7 +202,7 @@ GEM
     aws-sdk-kms (1.48.0)
       aws-sdk-core (~> 3, >= 3.120.0)
       aws-sigv4 (~> 1.1)
-    aws-sdk-s3 (1.102.0)
+    aws-sdk-s3 (1.103.0)
       aws-sdk-core (~> 3, >= 3.120.0)
       aws-sdk-kms (~> 1)
       aws-sigv4 (~> 1.4)
@@ -219,7 +219,7 @@ GEM
       i18n
     bindex (0.8.1)
     blueprinter (0.25.3)
-    bootsnap (1.8.1)
+    bootsnap (1.9.1)
       msgpack (~> 1.0)
     brakeman (5.1.1)
     breakers (0.5.0)
@@ -522,10 +522,11 @@ GEM
       kramdown (~> 2.0)
     levenshtein-ffi (1.1.0)
       ffi (~> 1.9)
-    liquid (5.0.1)
+    liquid (5.1.0)
     listen (3.7.0)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
+    lockbox (0.6.5)
     loofah (2.12.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
@@ -616,7 +617,7 @@ GEM
       activerecord (>= 5.2)
       request_store (~> 1.1)
     parallel (1.21.0)
-    parallel_tests (3.7.1)
+    parallel_tests (3.7.3)
       parallel
     parser (3.0.2.0)
       ast (~> 2.4.1)
@@ -654,7 +655,7 @@ GEM
       byebug (~> 11.0)
       pry (~> 0.13.0)
     public_suffix (4.0.6)
-    puma (5.4.0)
+    puma (5.5.0)
       nio4r (~> 2.0)
     puma-plugin-statsd (2.0.0)
       puma (>= 5.0, < 6)
@@ -794,9 +795,8 @@ GEM
       activesupport (>= 4.2.0)
       rack (>= 1.1)
       rubocop (>= 1.7.0, < 2.0)
-    rubocop-rspec (2.4.0)
-      rubocop (~> 1.0)
-      rubocop-ast (>= 1.1.0)
+    rubocop-rspec (2.5.0)
+      rubocop (~> 1.19)
     rubocop-thread_safety (0.4.4)
       rubocop (>= 0.53.0)
     ruby-progressbar (1.11.0)
@@ -917,7 +917,7 @@ GEM
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.7.7)
-    unicode-display_width (2.0.0)
+    unicode-display_width (2.1.0)
     uri_template (0.7.0)
     utf8-cleaner (1.0.0)
       activesupport
@@ -1042,6 +1042,7 @@ DEPENDENCIES
   jwt
   levenshtein-ffi
   liquid
+  lockbox
   mail (= 2.7.1)
   memoist
   mimemagic (~> 0.4.3)
@@ -1073,7 +1074,7 @@ DEPENDENCIES
   prawn
   prawn-table
   pry-byebug
-  puma (~> 5.4.0)
+  puma (~> 5.5.0)
   puma-plugin-statsd
   pundit
   rack

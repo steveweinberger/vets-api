@@ -30,9 +30,10 @@ describe AppealsApi::V2::DecisionReviews::LegacyAppealsController, type: :reques
         it 'returns a 422 error with details' do
           VCR.use_cassette('caseflow/legacy_appeals_get_by_ssn') do
             get_legacy_appeals(ssn: '24-2921hw', file_number: nil)
-            errors = JSON.parse(response.body)['errors'][0]
+            error = JSON.parse(response.body)['errors'][0]
             expect(response).to have_http_status :unprocessable_entity
-            expect(errors['detail']).to include 'X-VA-SSN has an invalid format'
+            expect(error['detail']).to include "'24-2921hw' did not match the defined pattern"
+            expect(error['source']['pointer']).to eq '/X-VA-SSN'
           end
         end
       end
@@ -110,6 +111,15 @@ describe AppealsApi::V2::DecisionReviews::LegacyAppealsController, type: :reques
         get_legacy_appeals(ssn: '123445223', file_number: '222222222')
         expect(response.status).to be status
         expect(JSON.parse(response.body)).to eq body
+      end
+    end
+
+    context 'when feature flag disabled' do
+      with_settings(Settings.modules_appeals_api, legacy_appeals_enabled: false) do
+        it 'returns a 500 error' do
+          get_legacy_appeals(ssn: '123445223', file_number: '222222222')
+          expect(response).to have_http_status :internal_server_error
+        end
       end
     end
   end
