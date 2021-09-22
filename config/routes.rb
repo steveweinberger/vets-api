@@ -128,7 +128,7 @@ Rails.application.routes.draw do
     get 'limited', to: 'example#limited', as: :limited
     get 'status', to: 'admin#status'
 
-    get 'eligibility', to: 'claimants#eligibility', as: :eligibility if Flipper.enabled?(:show_meb_mock_endpoints)
+    get 'eligibility', to: 'claimants#eligibility', as: :eligibility
 
     get 'ppiu/payment_information', to: 'ppiu#index'
     put 'ppiu/payment_information', to: 'ppiu#update'
