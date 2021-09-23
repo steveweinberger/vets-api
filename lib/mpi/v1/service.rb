@@ -17,6 +17,12 @@ module MPI
       end
 
       def find_profile(user, search_type = MasterPersonIndex::Constants::CORRELATION_WITH_RELATIONSHIP_DATA)
+        if user.mhv_icn.present?
+          Raven.tags_context(mvi_find_profile: 'icn')
+        elsif user.edipi.present?
+          Raven.tags_context(mvi_find_profile: 'edipi')
+        end
+
         @service.find_profile(convert_user(user), search_type)
       end
 
