@@ -1,5 +1,5 @@
 {
-  "subscriptions": [
+  "callbacks": [
     {
       "event": "this-event-does-not-exist",
       "urls": [

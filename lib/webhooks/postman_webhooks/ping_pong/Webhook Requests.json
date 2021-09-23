@@ -51,7 +51,7 @@
 					"formdata": [
 						{
 							"key": "webhook",
-							"value": "{\n  \"subscriptions\": [\n    {\n      \"event\": \"gov.va.developer.webhooks.ping-pong\",\n      \"urls\": [\n        \"{{webhookURL1}}\",\n        \"{{webhookURL2}}\"\n      ]\n    }\n  ]\n}",
+							"value": "{\n  \"callbacks\": [\n    {\n      \"event\": \"gov.va.developer.webhooks.ping-pong\",\n      \"urls\": [\n        \"{{webhookURL1}}\",\n        \"{{webhookURL2}}\"\n      ]\n    }\n  ]\n}",
 							"type": "text"
 						}
 					]

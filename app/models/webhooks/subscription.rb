@@ -49,7 +49,7 @@ module Webhooks
     # rubocop:enable Style/RescueModifier
 
     def get_notification_urls(event = nil)
-      subscription_array = self.events['subscriptions'] ||= []
+      subscription_array = self.events['callbacks'] ||= []
       ret = []
       if event
         subscription_array.each { |h| ret << h['urls'] if h['event']&.eql? event }

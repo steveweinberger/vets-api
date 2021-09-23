@@ -20,7 +20,7 @@ describe Webhooks::Subscription, type: :model do
   end
 
   it 'records the api name' do
-    api_name = Webhooks::Utilities.event_to_api_name[observers['subscriptions'].first['event']]
+    api_name = Webhooks::Utilities.event_to_api_name[observers['callbacks'].first['event']]
     expect(@subscription.api_name).to eq(api_name)
   end
 
@@ -33,9 +33,9 @@ describe Webhooks::Subscription, type: :model do
   end
 
   it 'queries for urls correctly' do
-    query_results = @subscription.get_notification_urls(observers['subscriptions'].first['event'])
+    query_results = @subscription.get_notification_urls(observers['callbacks'].first['event'])
     observer_urls = []
-    observers['subscriptions'].each do |subscription|
+    observers['callbacks'].each do |subscription|
       observer_urls << subscription['urls']
     end
     observer_urls = observer_urls.flatten.uniq

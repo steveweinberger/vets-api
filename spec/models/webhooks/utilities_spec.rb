@@ -19,7 +19,7 @@ describe Webhooks::Utilities, type: :model do
   let(:msg) { {'msg' => 'the message'} }
   let(:observers) do
     {
-        'subscriptions' => [
+        'callbacks' => [
             {
                 'event' => 'model_event',
                 'urls' => ['https://i/am/listening', 'https://i/am/also/listening']
@@ -72,11 +72,11 @@ describe Webhooks::Utilities, type: :model do
         expect(notifications.count).to be 2
         expect(notifications.first.event.eql?('model_event')).to be true
         expect(notifications.first.msg.eql?(msg)).to be true
-        observing_urls = observers['subscriptions'].first['urls']
+        observing_urls = observers['callbacks'].first['urls']
       else
         expect(notifications.count).to be 1
         expect(notifications.last.event.eql?('model_event2')).to be true
-        observing_urls = observers['subscriptions'].last['urls']
+        observing_urls = observers['callbacks'].last['urls']
       end
       expect((observing_urls - urls).length).to be 0
     end

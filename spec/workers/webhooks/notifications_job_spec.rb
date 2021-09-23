@@ -15,7 +15,7 @@ RSpec.describe Webhooks::NotificationsJob, type: :job do
   end
   let(:observers_json) do
     {
-      'subscriptions' => [
+      'callbacks' => [
         {
           'event' => Registrations::TEST_EVENT,
           'urls' => [

@@ -96,7 +96,7 @@ module Webhooks
 
       # TODO: move this method out of ClassMethods, it should invoke as an instance method.
       def fetch_events(subscription)
-        subscription['subscriptions'].map do |e|
+        subscription['callbacks'].map do |e|
           e['event']
         end.uniq
       end
@@ -185,7 +185,7 @@ module Webhooks
         raise SchemaValidationErrors, ["Subscription for the given api_name does not exist! api_name: #{api_name}"]
       end
 
-      subscribed_urls = subscription.events['subscriptions'].map { |sub| sub['urls'] }.flatten
+      subscribed_urls = subscription.events['callbacks'].map { |sub| sub['urls'] }.flatten
       if subscribed_urls.include?(url)
         true
       else

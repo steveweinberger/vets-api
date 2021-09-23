@@ -26,7 +26,7 @@ describe Webhooks::Notification, type: :model do
   end
 
   it 'returns a notification per url' do
-    urls = observers['subscriptions'].select { |s| s['event'].eql? event }.first['urls']
+    urls = observers['callbacks'].select { |s| s['event'].eql? event }.first['urls']
     expect(@notifications.length).to eq(urls.length)
     expect(@notifications.map(&:callback_url) - urls).to eq([])
   end

@@ -1,6 +1,6 @@
 {
   "observers": {
-    "subscriptions": [
+    "callbacks": [
       {
         "event": "gov.va.developer.benefits-intake.status_change",
         "urls": [

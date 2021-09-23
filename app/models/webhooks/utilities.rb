@@ -15,7 +15,7 @@ module Webhooks
       # TODO: All of these methods should be moved out of ClassMethods Cris?
       # We assume the subscription parameter has already been through validate_subscription()
       def register_webhook(consumer_id, consumer_name, subscription, &block)
-        event = subscription['subscriptions'].first['event']
+        event = subscription['callbacks'].first['event']
         api_name = Webhooks::Utilities.event_to_api_name[event]
         old_subscription = fetch_subscription(consumer_id, subscription)
         wh = old_subscription || Webhooks::Subscription.new
@@ -34,7 +34,13 @@ module Webhooks
       end
 
       def fetch_subscription(consumer_id, subscription)
-        event = subscription['subscriptions'].first['event']
+        event = subscription['callbacks'].first['event']
+        api_name = Webhooks::Utilities.event_to_api_name[event]
+        Webhooks::Subscription.where(api_name: api_name, consumer_id: consumer_id)&.first
+      end
+
+      def fetch_subscriptions(consumer_id)
+        event = subscription['callbacks'].first['event']
         api_name = Webhooks::Utilities.event_to_api_name[event]
         Webhooks::Subscription.where(api_name: api_name, consumer_id: consumer_id)&.first
       end

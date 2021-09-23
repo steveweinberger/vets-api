@@ -86,7 +86,7 @@
 					"formdata": [
 						{
 							"key": "webhook",
-							"value": "{\n  \"subscriptions\": [\n    {\n      \"event\": \"gov.va.developer.benefits-intake.status_change\",\n      \"urls\": {{urls}}\n    }\n  ]\n}\n",
+							"value": "{\n  \"callbacks\": [\n    {\n      \"event\": \"gov.va.developer.benefits-intake.status_change\",\n      \"urls\": {{urls}}\n    }\n  ]\n}\n",
 							"type": "text"
 						}
 					]

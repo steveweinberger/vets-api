@@ -14,7 +14,7 @@ RSpec.describe Webhooks::CallbackUrlJob, type: :job do
   let(:msg) { {'msg' => 'the message'} }
   let(:observers_json) do
     {
-        'subscriptions' => [
+        'callbacks' => [
             {
                 'event' => Registrations::TEST_EVENT,
                 'urls' => [
@@ -30,7 +30,7 @@ RSpec.describe Webhooks::CallbackUrlJob, type: :job do
      event: Registrations::TEST_EVENT, api_guid: api_guid, msg: msg}
   end
 
-  let(:urls) { observers_json['subscriptions'].first['urls'] }
+  let(:urls) { observers_json['callbacks'].first['urls'] }
 
   before do
     @subscription = Webhooks::Utilities.register_webhook(consumer_id, consumer_name, observers_json)
@@ -67,7 +67,7 @@ RSpec.describe Webhooks::CallbackUrlJob, type: :job do
 
   it 'does not notify on urls that have been removed from subscription' do
     urls.inspect # instantiate urls in rspec
-    observers_json['subscriptions'].first['urls'] = [observers_json['subscriptions'].first['urls'].first]
+    observers_json['callbacks'].first['urls'] = [observers_json['callbacks'].first['urls'].first]
     @subscription = Webhooks::Utilities.register_webhook(consumer_id, consumer_name, observers_json)
     mock_faraday(200, '', true)
     urls.each do |url|

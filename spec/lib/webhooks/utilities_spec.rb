@@ -19,7 +19,7 @@ RSpec.describe 'Webhooks::Utilities' do
   end
   let(:webhook) do
     {
-        'subscriptions' => [
+        'callbacks' => [
             {
                 'event' => 'test_event',
                 'urls' => [
@@ -142,29 +142,29 @@ RSpec.describe 'Webhooks::Utilities' do
 
   # rubocop:disable Style/MultilineBlockChain
   it 'detects invalid events' do
-    webhook['subscriptions'].first['event'] = 'bad_event'
+    webhook['callbacks'].first['event'] = 'bad_event'
     expect do
-      TestHelper.new.validate_events(webhook['subscriptions'])
+      TestHelper.new.validate_events(webhook['callbacks'])
     end.to raise_error do |e|
       expect(e.errors.first.detail).to match(/^invalid/i)
     end
   end
 
   it 'detects events spanning multiple APIs' do
-    webhook['subscriptions'] << webhook['subscriptions'].first.deep_dup
-    webhook['subscriptions'].last['event'] = 'test_event_multiple_APIs'
+    webhook['calllks'] << webhook['caallbacks'].first.deep_dup
+    webhook['callbacks'].last['event'] = 'test_event_multiple_APIs'
     expect do
-      TestHelper.new.validate_events(webhook['subscriptions'])
+      TestHelper.new.validate_events(webhook['callbacks'])
     end.to raise_error do |e|
       expect(e.errors.first.detail).to match(/^Subscription cannot span multiple APIs/i)
     end
   end
 
   it 'detects duplicate events' do
-    duplicate = webhook['subscriptions'].first.deep_dup
-    webhook['subscriptions'] << duplicate
+    duplicate = webhook['callbacks'].first.deep_dup
+    webhook['callbacks'] << duplicate
     expect do
-      TestHelper.new.validate_events(webhook['subscriptions'])
+      TestHelper.new.validate_events(webhook['callbacks'])
     end.to raise_error do |e|
       expect(e.errors.first.detail).to match(/^duplicate/i)
     end
@@ -239,7 +239,7 @@ RSpec.describe 'Webhooks::Utilities' do
     expect do
       TestHelper.new.url_subscribed?(url,
                                      dev_headers[:'X-Consumer-ID'],
-                                     Webhooks::Utilities.event_to_api_name[webhook['subscriptions'].first['event']])
+                                     Webhooks::Utilities.event_to_api_name[webhook['callbacks'].first['event']])
     end.to raise_error do |e|
       expect(e.errors.first.detail).to match(/URL is not subscribed to the given api_name/i)
     end

@@ -8,7 +8,7 @@ RSpec.describe Webhooks::SchedulerJob, type: :job do
 
   let(:observers) do
     {
-        'subscriptions' => [
+        'callbacks' => [
             {
                 'event' => 'gov.va.developer.SchedulerJobMarkedProcessing',
                 'urls' => ['https://i/am/listening', 'https://i/am/also/listening']
@@ -32,7 +32,7 @@ RSpec.describe Webhooks::SchedulerJob, type: :job do
     subscription = Webhooks::Utilities.register_webhook(SecureRandom.uuid, 'tester', observers)
     notifications = Webhooks::Utilities.record_notifications(consumer_id: subscription.consumer_id,
                                              consumer_name:subscription.consumer_name,
-                                             event:  observers['subscriptions'].first['event'],
+                                             event:  observers['callbacks'].first['event'],
                                              api_guid: SecureRandom.uuid,
                                              msg:{})
     notifications.each do |n|

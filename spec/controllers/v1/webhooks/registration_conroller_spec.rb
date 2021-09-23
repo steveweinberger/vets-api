@@ -93,7 +93,7 @@ RSpec.describe 'Webhooks Registration Endpoint', type: :request, retry: 3 do
             expect(json['data']['attributes']).to have_key('guid')
             expect(json['data']['attributes']['status']).to eq('pending')
             expect(json['data']['attributes']['location']).to eq('https://api.vets.gov/proxy/guid')
-            expect(json['data']['attributes']['observers']).to eq(JSON.parse(observers_json)['subscriptions'])
+            expect(json['data']['attributes']['observers']).to eq(JSON.parse(observers_json)['callbacks'])
           end
         end
       end
