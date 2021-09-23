@@ -15,6 +15,12 @@ module EVSS
     class Service < EVSS::Service
       configuration EVSS::PPIU::Configuration
 
+      def initialize(*args)
+        super
+
+        raise Common::Exceptions::Unauthorized unless PPIUPolicy.new(@user).access?
+      end
+
       # GETs a user's payment information
       #
       # @return [EVSS::PPIU::PaymentInformationResponse] Response with a users payment information

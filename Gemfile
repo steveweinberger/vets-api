@@ -4,10 +4,6 @@ source 'https://rubygems.org'
 
 ruby '~> 2.6.6'
 
-# temp fix for security vulnerability, hopefulle we can remove this line with the next rails patch
-# https://blog.jcoglan.com/2020/06/02/redos-vulnerability-in-websocket-extensions/
-gem 'websocket-extensions', '>= 0.1.5'
-
 # Modules
 path 'modules' do
   gem 'appeals_api'
@@ -35,13 +31,11 @@ end
 gem 'sass-rails', '>= 6'
 
 # Anchored versions, do not change
-gem 'puma', '~> 5.3.2'
-gem 'puma-plugin-statsd', '~> 1.2.1'
-gem 'rails', '~> 6.1.3'
+gem 'puma', '~> 5.5.0'
+gem 'rails', '~> 6.1'
 
 # Gems with special version/repo needs
 gem 'active_model_serializers', git: 'https://github.com/department-of-veterans-affairs/active_model_serializers', branch: 'master'
-gem 'sidekiq-scheduler', '~> 3.1' # TODO: explanation
 
 gem 'aasm'
 gem 'activerecord-import'
@@ -68,11 +62,11 @@ gem 'faraday'
 gem 'faraday_middleware'
 gem 'fast_jsonapi'
 gem 'fastimage'
-gem 'fhir_client', '~> 4.0.6'
-gem 'flipper', '~> 0.21.0'
-gem 'flipper-active_record', '~> 0.21.0'
-gem 'flipper-active_support_cache_store', '~> 0.21.0'
-gem 'flipper-ui', '~> 0.21.0'
+gem 'fhir_client', '~> 5.0.1'
+gem 'flipper'
+gem 'flipper-active_record'
+gem 'flipper-active_support_cache_store'
+gem 'flipper-ui', '0.22.0' # Flipper#552 (CSP) in 0.22.1 is causing our styles not to load
 gem 'foreman'
 gem 'google-api-client'
 gem 'google-apis-core'
@@ -91,12 +85,13 @@ gem 'jsonapi-parser'
 gem 'jwt'
 gem 'levenshtein-ffi'
 gem 'liquid'
+gem 'lockbox'
 gem 'mail', '2.7.1'
 gem 'memoist'
 gem 'mimemagic', '~> 0.4.3'
 gem 'mini_magick', '~> 4.11.0'
 gem 'net-sftp'
-gem 'nokogiri', '~> 1.11'
+gem 'nokogiri', '~> 1.12'
 gem 'notifications-ruby-client', '~> 5.3'
 gem 'octokit'
 gem 'oj' # Amazon Linux `json` gem causes conflicts, but `multi_json` will prefer `oj` if installed
@@ -114,6 +109,7 @@ gem 'pg_search'
 gem 'pghero'
 gem 'prawn'
 gem 'prawn-table'
+gem 'puma-plugin-statsd'
 gem 'pundit'
 gem 'rack'
 gem 'rack-attack'
@@ -132,9 +128,10 @@ gem 'rubyzip', '>= 1.3.0'
 gem 'savon'
 gem 'sentry-raven'
 gem 'shrine'
+gem 'sidekiq-scheduler'
 gem 'slack-notify'
 gem 'staccato'
-gem 'statsd-instrument', '~> 3.1.0'
+gem 'statsd-instrument', '~> 3.1.2'
 gem 'strong_migrations'
 gem 'swagger-blocks'
 gem 'typhoeus'
@@ -204,11 +201,12 @@ group :development, :test do
   gem 'rubocop-rails'
   gem 'rubocop-rspec'
   gem 'rubocop-thread_safety'
-  gem 'sidekiq', '< 7'
+  gem 'sidekiq'
   gem 'timecop'
   gem 'webmock'
   gem 'yard'
 end
+
 # sidekiq enterprise requires a license key to download. In many cases, basic sidekiq is enough for local development
 if (Bundler::Settings.new(Bundler.app_config_path)['enterprise.contribsys.com'].nil? ||
     Bundler::Settings.new(Bundler.app_config_path)['enterprise.contribsys.com']&.empty?) &&

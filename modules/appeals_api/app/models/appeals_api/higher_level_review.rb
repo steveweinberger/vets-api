@@ -7,6 +7,10 @@ module AppealsApi
   class HigherLevelReview < ApplicationRecord
     include HlrStatus
 
+    scope :pii_expunge_policy, lambda {
+      where('updated_at < ? AND status IN (?)', 7.days.ago, COMPLETE_STATUSES)
+    }
+
     def self.past?(date)
       date < Time.zone.today
     end
@@ -19,6 +23,10 @@ module AppealsApi
 
     attr_encrypted(:form_data, key: Settings.db_encryption_key, marshal: true, marshaler: JsonMarshal::Marshaller)
     attr_encrypted(:auth_headers, key: Settings.db_encryption_key, marshal: true, marshaler: JsonMarshal::Marshaller)
+
+    serialize :auth_headers, JsonMarshal::Marshaller
+    serialize :form_data, JsonMarshal::Marshaller
+    encrypts :auth_headers, :form_data, migrating: true
 
     NO_ADDRESS_PROVIDED_SENTENCE = 'USE ADDRESS ON FILE'
     NO_EMAIL_PROVIDED_SENTENCE = 'USE EMAIL ON FILE'
@@ -112,6 +120,14 @@ module AppealsApi
       return '' unless address_combined
 
       veteran.dig('address', 'countryCodeISO2') || 'US'
+    end
+
+    def zip_code
+      if zip_code_5 == '00000'
+        veteran.dig('address', 'internationalPostalCode') || '00000'
+      else
+        zip_code_5
+      end
     end
 
     def zip_code_5
@@ -210,22 +226,21 @@ module AppealsApi
       update_handler = Events::Handler.new(event_type: :hlr_status_updated, opts: {
                                              from: self.status,
                                              to: status,
-                                             status_update_time: Time.zone.now,
+                                             status_update_time: Time.zone.now.iso8601,
                                              statusable_id: id
                                            })
 
       email_handler = Events::Handler.new(event_type: :hlr_received, opts: {
-                                            email: email_v2,
-                                            veteran_first_name: first_name,
-                                            veteran_last_name: last_name,
-                                            date_submitted: date_signed,
+                                            email_identifier: email_identifier,
+                                            first_name: first_name,
+                                            date_submitted: veterans_local_time.iso8601,
                                             guid: id
                                           })
 
       update!(status: status, code: code, detail: detail)
 
       update_handler.handle!
-      email_handler.handle! if able_to_send_email? && status == 'submitted'
+      email_handler.handle! if status == 'submitted' && email_identifier.present?
     end
 
     def informal_conference_rep
@@ -238,8 +253,22 @@ module AppealsApi
 
     private
 
-    def able_to_send_email?
-      api_version&.upcase == 'V2' && email_v2.present?
+    def mpi_veteran
+      AppealsApi::Veteran.new(
+        ssn: ssn,
+        first_name: first_name,
+        last_name: last_name,
+        birth_date: birth_date.iso8601
+      )
+    end
+
+    def email_identifier
+      return { id_type: 'email', id_value: email } if email.present?
+      return { id_type: 'email', id_value: email_v2 } if email_v2.present?
+
+      icn = mpi_veteran.mpi_icn
+
+      return { id_type: 'ICN', id_value: icn } if icn.present?
     end
 
     def data_attributes

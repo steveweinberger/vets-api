@@ -6,10 +6,19 @@ module AppealsApi::V1
       class EvidenceSubmissionsController < AppealsApi::ApplicationController
         include AppealsApi::StatusSimulation
         include SentryLogging
+        include AppealsApi::CharacterUtilities
+        include AppealsApi::CharacterValidation
 
         class EvidenceSubmissionRequestValidatorError < StandardError; end
 
+        HEADERS = JSON.parse(
+          File.read(
+            AppealsApi::Engine.root.join('config/schemas/v1/10182_headers.json')
+          )
+        )['definitions']['nodCreateHeadersRoot']['properties'].keys
+
         skip_before_action :authenticate
+        before_action :validate_characters, only: :create
         before_action :nod_uuid_present?, only: :create
 
         def create
@@ -21,7 +30,8 @@ module AppealsApi::V1
             upload = VBADocuments::UploadSubmission.create! consumer_name: 'appeals_api_nod_evidence_submission'
             submission = AppealsApi::EvidenceSubmission.create! submission_attributes.merge(upload_submission: upload)
 
-            render json: submission,
+            render status: :accepted,
+                   json: submission,
                    serializer: AppealsApi::EvidenceSubmissionSerializer,
                    key_transform: :camel_lower,
                    render_location: true
@@ -62,6 +72,10 @@ module AppealsApi::V1
             supportable_id: params[:nod_uuid],
             supportable_type: 'AppealsApi::NoticeOfDisagreement'
           }
+        end
+
+        def request_headers
+          HEADERS.index_with { |key| request.headers[key] }.compact
         end
 
         def log_error(error_detail)

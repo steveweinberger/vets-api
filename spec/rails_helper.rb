@@ -32,6 +32,7 @@ require 'support/uploader_helpers'
 require 'super_diff/rspec-rails'
 require 'super_diff/active_support'
 require './spec/support/default_configuration_helper'
+require 'sidekiq/downtime_checker_middleware'
 
 WebMock.disable_net_connect!(allow_localhost: true)
 
@@ -82,6 +83,7 @@ ActiveRecord::Migration.maintain_test_schema!
 require 'sidekiq/testing'
 Sidekiq::Testing.fake!
 Sidekiq::Testing.server_middleware do |chain|
+  chain.add Sidekiq::DowntimeCheckerMiddleware
   chain.add Sidekiq::SemanticLogging
   chain.add Sidekiq::ErrorTag
 end
@@ -142,6 +144,11 @@ RSpec.configure do |config|
   # The different available types are documented in the features, such as in
   # https://relishapp.com/rspec/rspec-rails/docs
   config.infer_spec_type_from_file_location!
+
+  # set `:type` for serializers directory
+  config.define_derived_metadata(file_path: Regexp.new('/spec/serializers/')) do |metadata|
+    metadata[:type] = :serializer
+  end
 
   # Filter lines from Rails gems in backtraces.
   config.filter_rails_from_backtrace!

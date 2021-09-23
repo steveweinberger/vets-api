@@ -10,6 +10,8 @@ describe AppealsApi::V1::DecisionReviews::NoticeOfDisagreements::EvidenceSubmiss
   let(:evidence_submissions) { create_list(:evidence_submission, 3, supportable: notice_of_disagreement) }
   let(:path) { '/services/appeals/v1/decision_reviews/notice_of_disagreements/evidence_submissions/' }
 
+  let(:parsed) { JSON.parse(response.body) }
+
   def with_s3_settings
     with_settings(Settings.modules_appeals_api.evidence_submissions.location,
                   prefix: 'http://some.fakesite.com/path',
@@ -48,6 +50,16 @@ describe AppealsApi::V1::DecisionReviews::NoticeOfDisagreements::EvidenceSubmiss
       end
 
       context "when nod record 'auth_headers' are present" do
+        it 'returns success with 202' do
+          with_s3_settings do
+            notice_of_disagreement.update(board_review_option: 'evidence_submission')
+            post path, params: { nod_uuid: notice_of_disagreement.id }, headers: headers
+
+            expect(response.status).to eq 202
+            expect(response.body).to include notice_of_disagreement.id
+          end
+        end
+
         it "returns an error if request 'headers['X-VA-SSN'] and NOD record SSNs do not match" do
           with_s3_settings do
             notice_of_disagreement.update(board_review_option: 'evidence_submission')

@@ -103,6 +103,135 @@ RSpec.describe ClaimsApi::AutoEstablishedClaim, type: :model do
       actual = payload['form526']['veteran']['homelessness']['currentlyHomeless']['homelessSituationType']
       expect(actual).to eq('FLEEING_CURRENT_RESIDENCE')
     end
+
+    describe 'when days until release is between 90 and 180 days' do
+      it 'sets bddQualified to true' do
+        temp_form_data = pending_record.form_data
+        temp_form_data['serviceInformation'] = {
+          'servicePeriods' => [
+            {
+              'serviceBranch' => 'Air Force',
+              'activeDutyBeginDate' => '1991-05-02',
+              'activeDutyEndDate' => (Time.zone.now.to_date + 100.days).to_s
+            }
+          ]
+        }
+        pending_record.form_data = temp_form_data
+
+        payload = JSON.parse(pending_record.to_internal)
+        expect(payload['form526']['bddQualified']).to eq(true)
+      end
+    end
+
+    describe 'when days until release is less than 90 days' do
+      it 'sets bddQualified to false' do
+        temp_form_data = pending_record.form_data
+        temp_form_data['serviceInformation'] = {
+          'servicePeriods' => [
+            {
+              'serviceBranch' => 'Air Force',
+              'activeDutyBeginDate' => '1991-05-02',
+              'activeDutyEndDate' => (Time.zone.now.to_date + 80.days).to_s
+            }
+          ]
+        }
+        pending_record.form_data = temp_form_data
+
+        payload = JSON.parse(pending_record.to_internal)
+        expect(payload['form526']['bddQualified']).to eq(false)
+      end
+    end
+
+    describe 'when days until release is greater than 180 days' do
+      describe 'when Veteran has previous service period' do
+        it 'sets bddQualified to false' do
+          temp_form_data = pending_record.form_data
+          temp_form_data['serviceInformation'] = {
+            'servicePeriods' => [
+              {
+                'serviceBranch' => 'Air Force',
+                'activeDutyBeginDate' => '1991-05-02',
+                'activeDutyEndDate' => (Time.zone.now.to_date + 190.days).to_s
+              },
+              {
+                'serviceBranch' => 'Army',
+                'activeDutyBeginDate' => '1991-05-02',
+                'activeDutyEndDate' => (Time.zone.now.to_date - 1.day).to_s
+              }
+            ]
+          }
+          pending_record.form_data = temp_form_data
+
+          payload = JSON.parse(pending_record.to_internal)
+          expect(payload['form526']['bddQualified']).to eq(false)
+        end
+      end
+
+      describe 'when Veteran does not have previous service period' do
+        it 'raises an exception' do
+          temp_form_data = pending_record.form_data
+          temp_form_data['serviceInformation'] = {
+            'servicePeriods' => [
+              {
+                'serviceBranch' => 'Air Force',
+                'activeDutyBeginDate' => '1991-05-02',
+                'activeDutyEndDate' => (Time.zone.now.to_date + 190.days).to_s
+              }
+            ]
+          }
+          pending_record.form_data = temp_form_data
+
+          expect { pending_record.to_internal }.to raise_error(::Common::Exceptions::UnprocessableEntity)
+        end
+      end
+    end
+
+    describe "breaking out 'separationPay.receivedDate'" do
+      it 'breaks it out by year, month, day' do
+        temp_form_data = pending_record.form_data
+        temp_form_data.merge!(
+          {
+            'servicePay' => {
+              'separationPay' => {
+                'received' => true,
+                'receivedDate' => '2018-03-02',
+                'payment' => {
+                  'serviceBranch' => 'Air Force',
+                  'amount' => 100
+                }
+              }
+            }
+          }
+        )
+        pending_record.form_data = temp_form_data
+
+        payload = JSON.parse(pending_record.to_internal)
+        expect(payload['form526']['servicePay']['separationPay']['receivedDate']).to include(
+          'year' => '2018',
+          'month' => '3',
+          'day' => '2'
+        )
+      end
+    end
+
+    describe "breaking out 'disabilities.approximateBeginDate'" do
+      it 'breaks it out by year, month, day' do
+        disability = pending_record.form_data['disabilities'].first
+        disability.merge!(
+          {
+            'approximateBeginDate' => '1989-12-01'
+          }
+        )
+        pending_record.form_data['disabilities'][0] = disability
+
+        payload = JSON.parse(pending_record.to_internal)
+        expect(payload['form526']['disabilities'].first['approximateBeginDate']).to include(
+          'year' => '1989',
+          'month' => '12',
+          'day' => '1'
+        )
+      end
+    end
   end
 
   describe 'evss_id_by_token' do
@@ -158,6 +287,80 @@ RSpec.describe ClaimsApi::AutoEstablishedClaim, type: :model do
 
       expect(auto_form.file_name).to eq(auto_form.file_data['filename'])
       expect(auto_form.document_type).to eq(auto_form.file_data['doc_type'])
+    end
+  end
+
+  describe "breaking out 'treatments.startDate'" do
+    it 'breaks it out by year, month, day' do
+      treatments = [
+        {
+          'center' => {
+            'name' => 'Some Treatment Center',
+            'country' => 'United States of America'
+          },
+          'treatedDisabilityNames' => [
+            'PTSD (post traumatic stress disorder)'
+          ],
+          'startDate' => '1985-01-01'
+        }
+      ]
+
+      pending_record.form_data['treatments'] = treatments
+
+      payload = JSON.parse(pending_record.to_internal)
+      expect(payload['form526']['treatments'].first['startDate']).to include(
+        'year' => '1985',
+        'month' => '1',
+        'day' => '1'
+      )
+    end
+  end
+
+  describe "breaking out 'treatments.endDate'" do
+    it 'breaks it out by year, month, day' do
+      treatments = [
+        {
+          'center' => {
+            'name' => 'Some Treatment Center',
+            'country' => 'United States of America'
+          },
+          'treatedDisabilityNames' => [
+            'PTSD (post traumatic stress disorder)'
+          ],
+          'startDate' => '1985-01-01',
+          'endDate' => '1986-01-01'
+        }
+      ]
+
+      pending_record.form_data['treatments'] = treatments
+
+      payload = JSON.parse(pending_record.to_internal)
+      expect(payload['form526']['treatments'].first['endDate']).to include(
+        'year' => '1986',
+        'month' => '1',
+        'day' => '1'
+      )
+    end
+  end
+
+  describe "assigning 'applicationExpirationDate'" do
+    context "when 'applicationExpirationDate' is not provided" do
+      it 'assigns a value 1 year from today' do
+        pending_record.form_data.delete('applicationExpirationDate')
+
+        payload = JSON.parse(pending_record.to_internal)
+        application_expiration_date = Date.parse(payload['form526']['applicationExpirationDate'])
+        expect(application_expiration_date).to eq(Time.zone.now.to_date + 1.year)
+      end
+    end
+
+    context "when 'applicationExpirationDate' is provided" do
+      it 'leaves the original provided value' do
+        original_value = Date.parse(pending_record.form_data['applicationExpirationDate'])
+        payload = JSON.parse(pending_record.to_internal)
+        application_expiration_date = Date.parse(payload['form526']['applicationExpirationDate'])
+        expect(original_value).to eq(application_expiration_date)
+      end
     end
   end
 end

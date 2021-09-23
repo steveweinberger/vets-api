@@ -127,7 +127,7 @@ module BGS
 
       increment_params.merge!(user_ssn) if Settings.bgs.mock_response == true
       with_multiple_attempts_enabled do
-        service.data.find_benefit_claim_type_increment(increment_params)
+        service.share_data.find_benefit_claim_type_increment(increment_params)
       end
     end
 
@@ -233,9 +233,24 @@ module BGS
     end
 
     def find_regional_offices
-      service.data.find_regional_offices[:return]
+      service.share_data.find_regional_offices[:return]
     rescue => e
       notify_of_service_exception(e, __method__, 1, :warn)
+    end
+
+    def create_note(claim_id, note_text)
+      option_hash = {
+        jrn_stt_tc: 'I',
+        name: 'Claim rejected by VA.gov',
+        bnft_clm_note_tc: 'CLMDVLNOTE',
+        clm_id: claim_id,
+        ptcpnt_id: @user.participant_id,
+        txt: note_text
+      }.merge!(bgs_auth).except!(:jrn_status_type_cd)
+
+      service.notes.create_note(option_hash)
+    rescue => e
+      notify_of_service_exception("#{claim_id} - #{e}", __method__, 1, :warn)
     end
 
     private

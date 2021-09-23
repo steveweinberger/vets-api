@@ -7,11 +7,6 @@ Rails.application.routes.draw do
   match '/services/*path', to: 'application#cors_preflight', via: [:options]
 
   get '/saml/metadata', to: 'saml#metadata'
-  get '/auth/saml/logout', to: 'v0/sessions#saml_logout_callback', as: 'saml_logout'
-  post '/auth/saml/callback', to: 'v0/sessions#saml_callback', module: 'v0'
-  get '/sessions/:type/new',
-      to: 'v0/sessions#new',
-      constraints: ->(request) { V0::SessionsController::REDIRECT_URLS.include?(request.path_parameters[:type]) }
 
   get '/v1/sessions/metadata', to: 'v1/sessions#metadata'
   post '/v1/sessions/callback', to: 'v1/sessions#saml_callback', module: 'v1'
@@ -31,6 +26,7 @@ Rails.application.routes.draw do
     resources :debts, only: :index
     resources :debt_letters, only: %i[index show]
     resources :education_career_counseling_claims, only: :create
+    resources :medical_copays, only: :index
     resources :veteran_readiness_employment_claims, only: :create
     resource :virtual_agent_token, only: [:create], controller: :virtual_agent_token
 
@@ -68,11 +64,6 @@ Rails.application.routes.draw do
 
     resource :decision_review_evidence, only: :create
     resource :upload_supporting_evidence, only: :create
-
-    resource :sessions, only: [] do
-      post :saml_callback, to: 'sessions#saml_callback'
-      post :saml_slo_callback, to: 'sessions#saml_slo_callback'
-    end
 
     resource :user, only: [:show]
     resource :post911_gi_bill_status, only: [:show]
@@ -122,6 +113,12 @@ Rails.application.routes.draw do
     end
 
     resources :evss_claims_async, only: %i[index show]
+
+    namespace :virtual_agent do
+      get 'claim', to: 'virtual_agent_claim#index'
+    end
+
+    resources :virtual_agent_claim, only: %i[index]
 
     get 'intent_to_file', to: 'intent_to_files#index'
     get 'intent_to_file/:type/active', to: 'intent_to_files#active'
@@ -248,10 +245,26 @@ Rails.application.routes.draw do
       resources :payment_history, only: %i[index]
 
       # Vet360 Routes
-      resource :addresses, only: %i[create update destroy]
-      resource :email_addresses, only: %i[create update destroy]
-      resource :telephones, only: %i[create update destroy]
-      resource :permissions, only: %i[create update destroy]
+      resource :addresses, only: %i[create update destroy] do
+        collection do
+          post :create_or_update
+        end
+      end
+      resource :email_addresses, only: %i[create update destroy] do
+        collection do
+          post :create_or_update
+        end
+      end
+      resource :telephones, only: %i[create update destroy] do
+        collection do
+          post :create_or_update
+        end
+      end
+      resource :permissions, only: %i[create update destroy] do
+        collection do
+          post :create_or_update
+        end
+      end
       resources :address_validation, only: :create
       post 'initialize_vet360_id', to: 'persons#initialize_vet360_id'
       get 'person/status/:transaction_id', to: 'persons#status', as: 'person/status'
@@ -353,6 +366,11 @@ Rails.application.routes.draw do
 
       resources :zipcode_rates, only: :show, defaults: { format: :json }
     end
+
+    namespace :higher_level_reviews do
+      get 'contestable_issues(/:benefit_type)', to: 'contestable_issues#index'
+    end
+    resources :higher_level_reviews, only: %i[create show]
   end
 
   root 'v0/example#index', module: 'v0'

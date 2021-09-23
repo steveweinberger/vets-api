@@ -7,6 +7,7 @@ data:
       comment: Please arrive 20 minutes before the start of your appointment
       clinicId: "308"
       facilityId: "442"
+      healthcareProvider: null
       healthcareService: Blind Rehabilitation Center
       location:
         name: VA Long Beach Healthcare System
@@ -24,9 +25,11 @@ data:
         url: null
         code: null
       minutesDuration: 60
+      phoneOnly: false
       startDateLocal: 2019-04-20T14:15:00.000-04:00
       startDateUtc: 2019-04-20T18:15:00.000Z
-      status: BOOKED
+      status: CANCELLED
+      statusDetail: CANCELLED BY PATIENT
       timeZone: America/Los_Angeles
       vetextId: 308;20210106.140000
 meta:

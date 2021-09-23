@@ -50,6 +50,12 @@ AppealsApi::Engine.routes.draw do
         end
       end
 
+      namespace :notice_of_disagreements do
+        resources :evidence_submissions,
+                  only: %i[create show],
+                  controller: '/appeals_api/v1/decision_reviews/notice_of_disagreements/evidence_submissions'
+      end
+
       resources :notice_of_disagreements, only: %i[create show],
                                           controller: '/appeals_api/v1/decision_reviews/notice_of_disagreements' do
         collection do
@@ -57,6 +63,8 @@ AppealsApi::Engine.routes.draw do
           post 'validate'
         end
       end
+
+      get 'legacy_appeals', to: 'legacy_appeals#index'
     end
   end
 
@@ -68,6 +76,7 @@ AppealsApi::Engine.routes.draw do
 
     namespace :v2, defaults: { format: 'json' } do
       get 'decision_reviews', to: 'docs#decision_reviews'
+      get 'decision_reviews_beta', to: 'docs#decision_reviews_beta'
     end
   end
 end

@@ -15,11 +15,15 @@ class Account < ApplicationRecord
 
   has_many :notifications, dependent: :destroy
   has_many :preferred_facilities, dependent: :destroy, inverse_of: :account
+  has_one  :login_stats,
+           class_name: 'AccountLoginStat',
+           dependent: :destroy,
+           inverse_of: :account
 
   validates :uuid, presence: true, uniqueness: true
-  validates :idme_uuid, uniqueness: true
+  validates :idme_uuid, uniqueness: true, allow_nil: true
   validates :idme_uuid, presence: true, unless: -> { sec_id.present? }
-  validates :sec_id, presence: true, unless: -> { idme_uuid.present? }
+  validates :sec_id, presence: true, uniqueness: true, unless: -> { idme_uuid.present? }
 
   before_validation :initialize_uuid, on: :create
 

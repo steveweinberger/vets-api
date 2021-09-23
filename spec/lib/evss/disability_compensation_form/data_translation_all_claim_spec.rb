@@ -205,6 +205,13 @@ describe EVSS::DisabilityCompensationForm::DataTranslationAllClaim do
             }
           end
         end
+        context 'and the user is not authorized to access ppiu' do
+          it 'gathers the banking info from the PPIU service' do
+            Flipper.disable :direct_deposit_cnp
+            expect(subject.send(:translate_banking_info)).to eq({})
+            Flipper.enable :direct_deposit_cnp
+          end
+        end
       end
 
       context 'and the PPIU service does not have the account info' do
@@ -557,6 +564,11 @@ describe EVSS::DisabilityCompensationForm::DataTranslationAllClaim do
                 'first' => 'Steve',
                 'middle' => 'Steverson',
                 'last' => 'Stevington'
+              },
+              {
+                'first' => 'Steve',
+                'middle' => 'Steverson',
+                'last' => 'Stevington'
               }
             ]
           }
@@ -669,7 +681,7 @@ describe EVSS::DisabilityCompensationForm::DataTranslationAllClaim do
           'form526' => {
             'mailingAddress' => {
               'country' => 'Germany',
-              'city' => 'Hamburg',
+              'city' => ' apo ',
               'state' => 'AA',
               'addressLine1' => '1234 Couch Strasse',
               'zipCode' => '12345-6789'
@@ -682,7 +694,7 @@ describe EVSS::DisabilityCompensationForm::DataTranslationAllClaim do
         expect(subject.send(:translate_veteran)).to eq 'veteran' => {
           'currentMailingAddress' => {
             'addressLine1' => '1234 Couch Strasse',
-            'militaryPostOfficeTypeCode' => 'Hamburg',
+            'militaryPostOfficeTypeCode' => 'APO',
             'country' => 'Germany',
             'militaryStateCode' => 'AA',
             'type' => 'MILITARY',
@@ -973,10 +985,6 @@ describe EVSS::DisabilityCompensationForm::DataTranslationAllClaim do
               'month' => '01',
               'day' => '01'
             },
-            'endDate' => {
-              'year' => '2018',
-              'month' => '02'
-            },
             'treatedDisabilityNames' => %w[PTSD PTSD2 PTSD3],
             'center' => {
               'name' => 'Super Hospital \'&\' "More" (#2.0)',
@@ -1020,6 +1028,78 @@ describe EVSS::DisabilityCompensationForm::DataTranslationAllClaim do
               'month' => '01',
               'day' => '01'
             },
+            'treatedDisabilityNames' => %w[PTSD PTSD2 PTSD3],
+            'center' => {
+              'name' => 'Super Hospital',
+              'country' => 'USA',
+              'city' => 'Portland',
+              'state' => 'OR'
+            }
+          }
+        ]
+      end
+    end
+
+    context 'when given a treatment center an incomplete "from" date' do
+      let(:form_content) do
+        {
+          'form526' => {
+            'vaTreatmentFacilities' => [
+              {
+                'treatmentDateRange' => {
+                  'from' => 'XXXX-07-XX',
+                  'to' => ''
+                },
+                'treatmentCenterName' => 'Super Hospital',
+                'treatmentCenterAddress' => {
+                  'country' => 'USA',
+                  'city' => 'Portland',
+                  'state' => 'OR'
+                },
+                'treatedDisabilityNames' => %w[PTSD PTSD2 PTSD3]
+              }
+            ]
+          }
+        }
+      end
+
+      it 'translates the data correctly' do
+        expect(subject.send(:translate_treatments)).to eq 'treatments' => [
+          {
+            'treatedDisabilityNames' => %w[PTSD PTSD2 PTSD3],
+            'center' => {
+              'name' => 'Super Hospital',
+              'country' => 'USA',
+              'city' => 'Portland',
+              'state' => 'OR'
+            }
+          }
+        ]
+      end
+    end
+
+    context 'when given a treatment center with no date' do
+      let(:form_content) do
+        {
+          'form526' => {
+            'vaTreatmentFacilities' => [
+              {
+                'treatmentCenterName' => 'Super Hospital',
+                'treatmentCenterAddress' => {
+                  'country' => 'USA',
+                  'city' => 'Portland',
+                  'state' => 'OR'
+                },
+                'treatedDisabilityNames' => %w[PTSD PTSD2 PTSD3]
+              }
+            ]
+          }
+        }
+      end
+
+      it 'translates the data correctly' do
+        expect(subject.send(:translate_treatments)).to eq 'treatments' => [
+          {
             'treatedDisabilityNames' => %w[PTSD PTSD2 PTSD3],
             'center' => {
               'name' => 'Super Hospital',

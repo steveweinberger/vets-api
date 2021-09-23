@@ -5,6 +5,7 @@ class FormAttachment < ApplicationRecord
   include SentryLogging
 
   attr_encrypted(:file_data, key: Settings.db_encryption_key)
+  encrypts :file_data, migrating: true
 
   validates(:file_data, :guid, presence: true)
 
@@ -54,6 +55,6 @@ class FormAttachment < ApplicationRecord
   end
 
   def get_attachment_uploader
-    self.class::ATTACHMENT_UPLOADER_CLASS.new(guid)
+    @au ||= self.class::ATTACHMENT_UPLOADER_CLASS.new(guid)
   end
 end

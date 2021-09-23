@@ -1,10 +1,14 @@
 # Vets API
+This project provides common APIs for applications that live on VA.gov (formerly vets.gov APIs).
 
-[![Build Status](http://jenkins.vfs.va.gov/buildStatus/icon?job=testing/vets-api/master)](http://jenkins.vfs.va.gov/job/builds/job/vets-api/)
 [![Yard Docs](http://img.shields.io/badge/yard-docs-blue.svg)](https://www.rubydoc.info/github/department-of-veterans-affairs/vets-api)
 [![License: CC0-1.0](https://img.shields.io/badge/License-CC0%201.0-lightgrey.svg)](LICENSE.md)
 
-This project provides common APIs for applications that live on VA.gov (formerly vets.gov APIs).
+[Build Status](http://jenkins.vfs.va.gov/job/builds/job/vets-api/)
+
+[API Docs](https://department-of-veterans-affairs.github.io/va-digital-services-platform-docs/api-reference/#/)
+
+
 
 For frontend, see [vets-website](https://github.com/department-of-veterans-affairs/vets-website) and [vets-content](https://github.com/department-of-veterans-affairs/vagov-content) repos.
 
@@ -97,7 +101,7 @@ The following features require additional configuration, click for details.
 - [Facilities Locator](/docs/setup/facilities_locator.md)
 - [Local Network Access](/docs/setup/local_network_access.md)
 - [Mailers](/docs/setup/mailer.md)
-- [Master Veteran Index (MVI)](/docs/setup/mvi.md)
+- [Master Person Index (MPI)](/docs/setup/mpi.md)
 - [My HealtheVet (MHV)](/docs/setup/mhv.md)
 - [Virtual Machine Access](/docs/setup/virtual_machine_access.md)
 - [Test User Dashboard](https://github.com/department-of-veterans-affairs/vsp-test-user-dashboard/blob/main/README.md#back-end)

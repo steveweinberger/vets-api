@@ -78,17 +78,17 @@ module SAML
     # SIGN ON URLS
     def mhv_url
       @type = 'mhv'
-      build_sso_url('myhealthevet')
+      build_sso_url(build_authn_context('myhealthevet'))
     end
 
     def dslogon_url
       @type = 'dslogon'
-      build_sso_url('dslogon')
+      build_sso_url(build_authn_context('dslogon'))
     end
 
     def idme_url
       @type = 'idme'
-      build_sso_url(LOA::IDME_LOA1_VETS)
+      build_sso_url(build_authn_context(LOA::IDME_LOA1_VETS))
     end
 
     def custom_url(authn)
@@ -99,7 +99,7 @@ module SAML
     def signup_url
       @type = 'signup'
       @query_params[:op] = 'signup'
-      build_sso_url(LOA::IDME_LOA1_VETS)
+      build_sso_url(build_authn_context(LOA::IDME_LOA1_VETS))
     end
 
     def verify_url
@@ -110,11 +110,11 @@ module SAML
       link_authn_context =
         case authn_context
         when LOA::IDME_LOA1_VETS, 'multifactor'
-          @loa3_context
+          build_authn_context(@loa3_context)
         when 'myhealthevet', 'myhealthevet_multifactor'
-          'myhealthevet_loa3'
+          build_authn_context('myhealthevet_loa3')
         when 'dslogon', 'dslogon_multifactor'
-          'dslogon_loa3'
+          build_authn_context('dslogon_loa3')
         when SAML::UserAttributes::SSOe::INBOUND_AUTHN_CONTEXT
           "#{@user.identity.sign_in[:service_name]}_loa3"
         end
@@ -127,11 +127,11 @@ module SAML
       link_authn_context =
         case authn_context
         when LOA::IDME_LOA1_VETS, LOA::IDME_LOA3_VETS, LOA::IDME_LOA3
-          'multifactor'
+          build_authn_context('multifactor')
         when 'myhealthevet', 'myhealthevet_loa3'
-          'myhealthevet_multifactor'
+          build_authn_context('myhealthevet_multifactor')
         when 'dslogon', 'dslogon_loa3'
-          'dslogon_multifactor'
+          build_authn_context('dslogon_multifactor')
         when SAML::UserAttributes::SSOe::INBOUND_AUTHN_CONTEXT
           "#{@user.identity.sign_in[:service_name]}_multifactor"
         end
@@ -164,6 +164,14 @@ module SAML
       saml_auth_request = OneLogin::RubySaml::Authrequest.new
       save_saml_request_tracker(saml_auth_request.uuid, link_authn_context)
       saml_auth_request.create(new_url_settings, query_params)
+    end
+
+    def build_authn_context(assurance_level_url, identity_provider = Settings.saml_ssoe.idme_authn_context)
+      if identity_provider
+        [assurance_level_url, identity_provider]
+      else
+        assurance_level_url
+      end
     end
 
     def relay_state_params

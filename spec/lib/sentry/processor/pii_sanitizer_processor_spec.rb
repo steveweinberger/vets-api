@@ -11,6 +11,21 @@ RSpec.describe Sentry::Processor::PIISanitizer do
   let(:processor) { Sentry::Processor::PIISanitizer.new(client) }
   let(:result) { processor.process(data) }
 
+  describe '#process' do
+    let(:data) do
+      {
+        foo: {
+          state: 'state'
+        }
+      }
+    end
+
+    it 'doesnt mutate the original data' do
+      result
+      expect(data[:foo][:state]).to eq('state')
+    end
+  end
+
   # These are needed for communicating issues to downstream parties and should not be sanitized
   context 'sanitization exceptions' do
     let(:data) do
@@ -68,6 +83,7 @@ RSpec.describe Sentry::Processor::PIISanitizer do
         gender: 'M',
         phone: '5035551234',
         va_eauth_birthdate: '1945-02-13T00:00:00+00:00',
+        va_eauth_gcIds: ['1234567890^NI^200M^USVHA^P|1234567890^NI^200DOD^USDOD^A|1234567890^PI^200BRLS^USVBA^'],
         va_eauth_pnid: '796375555'
       }
     end
@@ -108,6 +124,10 @@ RSpec.describe Sentry::Processor::PIISanitizer do
       expect(result[:va_eauth_birthdate]).to eq('FILTERED-CLIENTSIDE')
     end
 
+    it 'filters EVSS va_eauth_gcIds data' do
+      expect(result[:va_eauth_gcIds]).to eq(['FILTERED-CLIENTSIDE'])
+    end
+
     it 'filters EVSS va_eauth_pnid data' do
       expect(result[:va_eauth_pnid]).to eq('FILTERED-CLIENTSIDE')
     end
@@ -128,6 +148,7 @@ RSpec.describe Sentry::Processor::PIISanitizer do
         'gender' => 'F',
         'phone' => '5415551234',
         'va_eauth_birthdate' => '1945-02-13T00:00:00+00:00',
+        'va_eauth_gcIds' => ['1234567890^NI^200M^USVHA^P|1234567890^NI^200DOD^USDOD^A|1234567890^PI^200BRLS^USVBA^'],
         'va_eauth_pnid' => '796375555'
       }
     end
@@ -154,6 +175,10 @@ RSpec.describe Sentry::Processor::PIISanitizer do
 
     it 'filters EVSS va_eauth_birthdate data' do
       expect(result['va_eauth_birthdate']).to eq('FILTERED-CLIENTSIDE')
+    end
+
+    it 'filters EVSS va_eauth_gcIds data' do
+      expect(result['va_eauth_gcIds']).to eq(['FILTERED-CLIENTSIDE'])
     end
 
     it 'filters EVSS va_eauth_pnid data' do

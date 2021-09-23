@@ -181,6 +181,10 @@ MHV::AccountStatisticsJob:
   cron: "0 */4 * * * America/New_York"
   description: "Log MHV Account Statistics"
 
+AccountLoginStatisticsJob:
+  cron: "0 6 * * * America/New_York"
+  description: "Gather account login statistics for statsd"
+
 ExternalServicesStatusJob:
   every: '1m'
   description: "Checks the current status of all external services through PagerDuty's API"
@@ -249,3 +253,8 @@ PgHeroCleanQueryStatsJob:
 Webhooks::SchedulerJob:
   at: "<%=Settings.vba_documents.v2_enabled ? 0.seconds.from_now : 100.years.from_now%>"
   description: Starts off webhook based notifications
+
+Form1010cg::DeleteOldUploadsJob:
+  cron: "0 0 * * * America/New_York"
+  description: Delete uploaded caregiver assistance claim forms 30 days old or older.
+

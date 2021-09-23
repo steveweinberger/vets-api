@@ -17,6 +17,14 @@ module ClaimsApi
                                                  marshal: true,
                                                  marshaler: JsonMarshal::Marshaller)
 
+    serialize :auth_headers, JsonMarshal::Marshaller
+    serialize :bgs_flash_responses, JsonMarshal::Marshaller
+    serialize :bgs_special_issue_responses, JsonMarshal::Marshaller
+    serialize :form_data, JsonMarshal::Marshaller
+    serialize :evss_response, JsonMarshal::Marshaller
+    encrypts :auth_headers, :bgs_flash_responses, :bgs_special_issue_responses, :evss_response, :form_data,
+             migrating: true
+
     validate :validate_service_dates
     after_create :log_special_issues
     after_create :log_flashes
@@ -53,8 +61,15 @@ module ClaimsApi
     alias token id
 
     def to_internal
+      form_data['applicationExpirationDate'] ||= build_application_expiration
       form_data['claimDate'] ||= (persisted? ? created_at.to_date.to_s : Time.zone.today.to_s)
       form_data['claimSubmissionSource'] = 'Lighthouse'
+      form_data['bddQualified'] = bdd_qualified?
+      if separation_pay_received_date?
+        form_data['servicePay']['separationPay']['receivedDate'] = transform_separation_pay_received_date
+      end
+      form_data['disabilites'] = transform_disability_approximate_begin_dates
+      form_data['treatments'] = transform_treatment_dates if treatments?
 
       resolve_special_issue_mappings!
       resolve_homelessness_situation_type_mappings!
@@ -98,6 +113,88 @@ module ClaimsApi
     end
 
     private
+
+    EVSS_TZ = 'Central Time (US & Canada)'
+
+    def recent_service_periods_end_dates
+      end_dates = form_data.dig('serviceInformation', 'servicePeriods').map do |service_period|
+        unless service_period['serviceBranch'].include?('Reserve') ||
+               service_period['serviceBranch'].include?('National Guard')
+          service_period['activeDutyEndDate']
+        end
+      end
+
+      end_dates.compact
+    end
+
+    def user_supplied_rad_date
+      end_dates = recent_service_periods_end_dates
+      end_dates << form_data.dig('serviceInformation',
+                                 'reservesNationalGuardService',
+                                 'title10Activation',
+                                 'anticipatedSeparationDate')
+      end_dates.compact!
+      return nil if end_dates.blank?
+
+      end_dates.max.in_time_zone(EVSS_TZ).to_date
+    end
+
+    def days_until_release
+      return 0 if user_supplied_rad_date.blank?
+
+      form_submission_date = created_at.presence || Time.now.in_time_zone(EVSS_TZ)
+      @days_until_release ||= user_supplied_rad_date - form_submission_date.to_date
+    end
+
+    def bdd_qualified?
+      if days_until_release > 180
+        return false if (recent_service_periods_end_dates - [user_supplied_rad_date.to_s]).any?
+
+        raise ::Common::Exceptions::UnprocessableEntity.new(
+          detail: 'User may not submit BDD more than 180 days prior to RAD date'
+        )
+      end
+
+      days_until_release >= 90
+    end
+
+    def separation_pay_received_date?
+      form_data.dig('servicePay', 'separationPay', 'receivedDate').present?
+    end
+
+    # EVSS requires the 'receivedDate' to be the components of an approximated date
+    # We (ClaimsApi) require a date string that is then validated to be a valid date
+    # Convert our validated date into the components required by EVSS
+    def transform_separation_pay_received_date
+      received_date = form_data.dig('servicePay', 'separationPay', 'receivedDate')
+      breakout_date_components(date: received_date)
+    end
+
+    # EVSS requires the disability 'approximateBeginDate' to be the components of an approximated date
+    # We (ClaimsApi) require a date string that is then validated to be a valid date
+    # Convert our validated date into the components required by EVSS
+    def transform_disability_approximate_begin_dates
+      disabilities = form_data.dig('disabilities')
+
+      disabilities.map do |disability|
+        next if disability['approximateBeginDate'].blank?
+
+        disability['approximateBeginDate'] = breakout_date_components(date: disability['approximateBeginDate'])
+
+        disability['secondaryDisabilities'] ||= []
+        disability['secondaryDisabilities'].map do |secondary_disability|
+          next if secondary_disability['approximateBeginDate'].blank?
+
+          secondary_disability['approximateBeginDate'] = breakout_date_components(
+            date: secondary_disability['approximateBeginDate']
+          )
+
+          secondary_disability
+        end
+
+        disability
+      end
+    end
 
     def resolve_special_issue_mappings!
       mapper = ClaimsApi::SpecialIssueMappers::Evss.new
@@ -156,6 +253,49 @@ module ClaimsApi
         self.auth_headers = {}
         self.file_data = nil
       end
+    end
+
+    def treatments?
+      form_data['treatments'].present?
+    end
+
+    def transform_treatment_dates
+      treatments = form_data['treatments']
+
+      treatments.map do |treatment|
+        treatment = transform_treatment_start_date(treatment: treatment)
+        treatment = transform_treatment_end_date(treatment: treatment)
+        treatment
+      end
+    end
+
+    def transform_treatment_start_date(treatment:)
+      start_date = treatment['startDate']
+      treatment['startDate'] = breakout_date_components(date: start_date)
+      treatment
+    end
+
+    def transform_treatment_end_date(treatment:)
+      # 'endDate' is not a required field in EVSS
+      return treatment if treatment['endDate'].blank?
+
+      end_date = treatment['endDate']
+      treatment['endDate'] = breakout_date_components(date: end_date)
+      treatment
+    end
+
+    def breakout_date_components(date:)
+      temp = Date.parse(date)
+
+      {
+        'year': temp.year.to_s,
+        'month': temp.month.to_s,
+        'day': temp.day.to_s
+      }
+    end
+
+    def build_application_expiration
+      (Time.zone.now.to_date + 1.year).to_s
     end
   end
 end

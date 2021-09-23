@@ -35,8 +35,14 @@ class OpenidApplicationController < ApplicationController
   def authenticate_token
     return false if token.blank?
 
+    # Static tokens do not have a session built up at this time.
+    return true if token.static?
+
+    # For now only opaque tokens are static, all others are opaque tokens are invalid.
+    return false if token.opaque?
+
     # Only want to fetch the Okta profile if the session isn't already established and not a CC token
-    @session = Session.find(token) unless token.client_credentials_token?
+    @session = Session.find(hash_token(token)) unless token.client_credentials_token?
     profile = @session.profile unless @session.nil? || @session.profile.nil?
     profile = fetch_profile(token.identifiers.okta_uid) unless token.client_credentials_token? || !profile.nil?
     populate_ssoi_token_payload(profile) if !profile.nil? && profile.attrs['last_login_type'] == 'ssoi'
@@ -72,7 +78,7 @@ class OpenidApplicationController < ApplicationController
   end
 
   def analyze_redis_launch_context
-    @session = Session.find(token)
+    @session = Session.find(hash_token(token))
     # Sessions are not originally created for client credentials tokens, one will be created here.
     if @session.nil?
       ttl = token.payload['exp'] - Time.current.utc.to_i
@@ -84,6 +90,15 @@ class OpenidApplicationController < ApplicationController
       @session.launch = fetch_smart_launch_context
       @session.save
     end
+  end
+
+  def handle_opaque_token(token_string, aud)
+    opaque_token = OpaqueToken.new(token_string, aud)
+    opaque_token.set_payload(fetch_issued(token_string))
+
+    return opaque_token if TokenUtil.validate_token(opaque_token)
+
+    raise error_klass('Invalid token.')
   end
 
   def populate_ssoi_token_payload(profile)
@@ -103,7 +118,9 @@ class OpenidApplicationController < ApplicationController
     if jwt?(token_string)
       Token.new(token_string, fetch_aud)
     else
-      # Future block for opaque tokens
+      # Handle opaque token
+      return handle_opaque_token(token_string, fetch_aud) if Settings.oidc.issued_url
+
       raise error_klass('Invalid token.')
     end
   end
@@ -169,13 +186,13 @@ class OpenidApplicationController < ApplicationController
   end
 
   def build_session(ttl, profile)
-    session = Session.new(token: token.to_s, uuid: token.identifiers.uuid, profile: profile)
+    session = Session.new(token: hash_token(token), uuid: token.identifiers.uuid, profile: profile)
     session.expire(ttl)
     session
   end
 
   def build_launch_session(ttl, launch)
-    session = Session.new(token: token.to_s, launch: launch)
+    session = Session.new(token: hash_token(token), launch: launch)
     session.expire(ttl)
     session
   end
@@ -198,5 +215,29 @@ class OpenidApplicationController < ApplicationController
     raise error_klass('Invalid launch context')
   end
 
+  def fetch_issued(token_string)
+    return nil unless Settings.oidc.issued_url
+
+    response = RestClient.get(Settings.oidc.issued_url,
+                              { Authorization: 'Bearer ' + token_string })
+    raise error_klass('Invalid token') if response.nil?
+
+    if response.code == 200
+      json_response = JSON.parse(response.body)
+      if json_response['scopes']
+        json_response['scp'] = json_response['scopes']
+        json_response['scopes'] = nil
+      end
+      json_response
+    end
+  rescue => e
+    raise error_klass('Invalid token') if e.to_s.include?('Unauthorized')
+
+    raise Common::Exceptions::ServiceError('Issued service error')
+  end
+
+  def hash_token(token)
+    Digest::SHA256.hexdigest(token.to_s)
+  end
   attr_reader :current_user, :session, :scopes
 end

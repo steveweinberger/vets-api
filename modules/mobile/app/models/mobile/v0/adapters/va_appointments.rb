@@ -95,7 +95,7 @@ module Mobile
           start_date_utc = start_date_utc(appointment_hash)
           time_zone = time_zone(facility_id)
           start_date_local = start_date_utc.in_time_zone(time_zone)
-          status = status(details, type, start_date_utc)
+          status, status_detail = status(details, type, start_date_utc)
 
           cancel_id = if booked_va_appointment?(status, type)
                         Mobile::V0::Appointment.encode_cancel_id(
@@ -113,14 +113,18 @@ module Mobile
             comment: comment(details, type),
             facility_id: facility_id,
             sta6aid: sta6aid,
+            healthcare_provider: nil, # healthcare_provider is currently only used by CC appointments
             healthcare_service: healthcare_service(appointment_hash, details, type),
             location: location(details, type, facility_id),
             minutes_duration: minutes_duration(details, type),
+            phone_only: appointment_hash[:phone_only] == true,
             start_date_local: start_date_local,
             start_date_utc: start_date_utc,
             status: status,
+            status_detail: status_detail,
             time_zone: time_zone,
-            vetext_id: vetext_id(appointment_hash, start_date_local)
+            vetext_id: vetext_id(appointment_hash, start_date_local),
+            reason: details[:booking_note]
           }
 
           Rails.logger.info('metric.mobile.appointment.type', type: type)
@@ -142,10 +146,10 @@ module Mobile
 
         def status(details, type, start_date)
           status = va?(type) ? details[:current_status] : details.dig(:status, :code)
-          return STATUSES[:hidden] if should_hide_status?(start_date.past?, status)
-          return STATUSES[:cancelled] if CANCELLED_STATUS.include?(status)
+          return [STATUSES[:hidden], nil] if should_hide_status?(start_date.past?, status)
+          return [STATUSES[:cancelled], status] if CANCELLED_STATUS.include?(status)
 
-          STATUSES[:booked]
+          [STATUSES[:booked], nil]
         end
 
         def start_date_utc(appointment_hash)

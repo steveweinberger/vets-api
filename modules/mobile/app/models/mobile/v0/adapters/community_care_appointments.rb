@@ -37,6 +37,7 @@ module Mobile
 
         private
 
+        # rubocop:disable Metrics/MethodLength
         def generate_hash(appointment_hash, location)
           start_date_utc = start_date(appointment_hash[:appointment_time], appointment_hash[:time_zone]).utc
           time_zone = time_zone(appointment_hash[:time_zone], location.dig(:address, :state))
@@ -49,15 +50,26 @@ module Mobile
             comment: appointment_hash[:instructions_to_veteran],
             facility_id: nil,
             sta6aid: nil,
+            healthcare_provider: healthcare_provider(appointment_hash[:name]),
             healthcare_service: appointment_hash[:provider_practice],
             location: location,
             minutes_duration: 60, # not in raw data, matches va.gov default for cc appointments
+            phone_only: false,
             start_date_local: start_date_local,
             start_date_utc: start_date_utc,
             status: BOOKED_STATUS,
+            status_detail: nil, # not currently used by community care appointments
             time_zone: time_zone,
-            vetext_id: nil
+            vetext_id: nil,
+            reason: nil
           }
+        end
+        # rubocop:enable Metrics/MethodLength
+
+        def healthcare_provider(name_hash)
+          return nil if name_hash.nil? || name_hash.values.all?(&:blank?)
+
+          name_hash.values.join(' ').strip
         end
 
         def location(name, address, phone)

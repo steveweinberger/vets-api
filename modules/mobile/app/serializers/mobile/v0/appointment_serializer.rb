@@ -8,14 +8,18 @@ module Mobile
       attributes :appointment_type,
                  :cancel_id,
                  :comment,
+                 :healthcare_provider,
                  :healthcare_service,
                  :location,
                  :minutes_duration,
+                 :phone_only,
                  :start_date_local,
                  :start_date_utc,
                  :status,
+                 :status_detail,
                  :time_zone,
-                 :vetext_id
+                 :vetext_id,
+                 :reason
     end
   end
 end

@@ -15,13 +15,7 @@
           "type": "object",
           "properties": {
             "combinedDisabilityRating": {
-              "type": "integer"
-            },
-            "combinedEffectiveDate": {
-              "type": "string"
-            },
-            "legalEffectiveDate": {
-              "type": "string"
+              "type": ["integer", "null"]
             },
             "individualRatings": {
               "type": "array",
@@ -32,10 +26,13 @@
                     "type": "string"
                   },
                   "ratingPercentage": {
-                    "type": "integer"
+                    "type": ["integer", "null"]
                   },
                   "effectiveDate": {
-                    "type": "string"
+                    "type": ["string", "null"]
+                  },
+                  "diagnosticText": {
+                    "type": ["string", "null"]
                   }
                 }
               }

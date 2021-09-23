@@ -133,4 +133,10 @@ describe ChipApi::Service do
       end
     end
   end
+
+  describe '#base_path' do
+    it 'returns base_path' do
+      expect(subject.build(valid_check_in).base_path).to eq('dev')
+    end
+  end
 end

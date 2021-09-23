@@ -114,6 +114,8 @@ module EVSS
       end
 
       def get_banking_info
+        return {} unless @user.authorize :ppiu, :access?
+
         service = EVSS::PPIU::Service.new(@user)
         response = service.get_payment_information
         account = response.responses.first.payment_account
@@ -267,7 +269,7 @@ module EVSS
             'middleName' => an['middle'],
             'lastName' => an['last']
           }.compact
-        end
+        end.uniq
       end
 
       def service_branch(service_branch)
@@ -353,7 +355,7 @@ module EVSS
 
       def set_military_address(address, zip_code)
         {
-          'militaryPostOfficeTypeCode' => address['city'],
+          'militaryPostOfficeTypeCode' => address['city']&.strip&.upcase,
           'militaryStateCode' => address['state'],
           'zipFirstFive' => zip_code.first,
           'zipLastFour' => zip_code.last
@@ -431,8 +433,7 @@ module EVSS
         # validation ([a-zA-Z0-9"\/&\(\)\-'.#]([a-zA-Z0-9(\)\-'.# ])?)+$
         treatments = input_form['vaTreatmentFacilities'].map do |treatment|
           {
-            'startDate' => approximate_date(treatment['treatmentDateRange']['from']),
-            'endDate' => approximate_date(treatment['treatmentDateRange']['to']),
+            'startDate' => approximate_date(treatment.dig('treatmentDateRange', 'from')),
             'treatedDisabilityNames' => treatment['treatedDisabilityNames'],
             'center' => {
               'name' => treatment['treatmentCenterName'].gsub(/[^a-zA-Z0-9 .()#&'"-]+/, '').gsub(/\s\s+/, ' ').strip
@@ -447,6 +448,7 @@ module EVSS
         return nil if date.blank?
 
         year, month, day = date.split('-')
+        return nil if year == 'XXXX'
 
         # month/day are optional and can be XXed out
         month = nil if month == 'XX'

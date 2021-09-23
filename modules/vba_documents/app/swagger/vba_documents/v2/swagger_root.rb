@@ -4,6 +4,7 @@ module VBADocuments
   module V2
     class SwaggerRoot
       include Swagger::Blocks
+      VBA_TAG = ['VBA Documents'].freeze
       swagger_root do
         key :openapi, '3.0.0'
         info do
@@ -16,12 +17,12 @@ module VBADocuments
         end
 
         tag do
-          key :name, 'document_uploads'
+          key :name, VBA_TAG
           key :description, 'VA Benefits document upload functionality'
         end
 
         server do
-          key :url, 'https://dev-api.va.gov/services/vba_documents/{version}'
+          key :url, 'https://dev-api.va.gov/'
           key :description, 'VA.gov API dev environment'
           variable :version do
             key :default, 'v2'

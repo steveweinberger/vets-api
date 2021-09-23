@@ -80,7 +80,7 @@ class User < Common::RedisStore
   end
 
   def first_name
-    identity.first_name || first_name_mpi
+    identity.first_name.presence || first_name_mpi
   end
 
   def full_name_normalized
@@ -93,7 +93,7 @@ class User < Common::RedisStore
   end
 
   def gender
-    identity.gender || gender_mpi
+    identity.gender.presence || gender_mpi
   end
 
   def icn
@@ -113,11 +113,11 @@ class User < Common::RedisStore
   end
 
   def middle_name
-    identity.middle_name || mpi&.profile&.given_names.to_a[1..-1]&.join(' ').presence
+    identity.middle_name.presence || middle_name_mpi
   end
 
   def last_name
-    identity.last_name || last_name_mpi
+    identity.last_name.presence || last_name_mpi
   end
 
   def participant_id
@@ -174,6 +174,10 @@ class User < Common::RedisStore
 
   def first_name_mpi
     given_names&.first
+  end
+
+  def middle_name_mpi
+    mpi&.profile&.given_names.to_a[1..-1]&.join(' ').presence
   end
 
   def gender_mpi
@@ -310,6 +314,10 @@ class User < Common::RedisStore
 
   def vha_facility_ids
     mpi_profile&.vha_facility_ids || []
+  end
+
+  def vha_facility_hash
+    mpi_profile&.vha_facility_hash || {}
   end
 
   def can_access_id_card?
@@ -449,9 +457,9 @@ class User < Common::RedisStore
 
   def bgs_relationships
     bgs_dependents = BGS::DependentService.new(self).get_dependents
-    return unless bgs_dependents.presence
+    return unless bgs_dependents.presence && bgs_dependents[:persons]
 
-    bgs_dependents['persons'].map { |dependent| UserRelationship.from_bgs_dependent(dependent) }
+    bgs_dependents[:persons].map { |dependent| UserRelationship.from_bgs_dependent(dependent) }
   end
 
   def pciu

@@ -44,6 +44,7 @@ RSpec.describe Mobile::V0::PreCacheAppointmentsJob, type: :job do
                         comment: '',
                         facility_id: nil,
                         sta6aid: nil,
+                        healthcare_provider: 'Tes',
                         healthcare_service: 'RR',
                         location: { name: 'RR',
                                     address: { street: 'clarksburg', city: 'md', state: 'MD',
@@ -54,11 +55,14 @@ RSpec.describe Mobile::V0::PreCacheAppointmentsJob, type: :job do
                                     url: nil,
                                     code: nil },
                         minutes_duration: 60,
+                        phone_only: false,
                         start_date_local: '2020-06-26T22:19:00.000-04:00',
                         start_date_utc: '2020-06-27T02:19:00.000Z',
                         status: 'BOOKED',
+                        status_detail: nil,
                         time_zone: 'America/New_York',
-                        vetext_id: nil })
+                        vetext_id: nil,
+                        reason: nil })
             end
           end
         end
@@ -70,7 +74,7 @@ RSpec.describe Mobile::V0::PreCacheAppointmentsJob, type: :job do
             VCR.use_cassette('appointments/get_cc_appointments_500', match_requests_on: %i[method uri]) do
               VCR.use_cassette('appointments/get_appointments_default', match_requests_on: %i[method uri]) do
                 expect(Mobile::V0::Appointment.get_cached(user)).to be_nil
-                subject.perform(user.uuid)
+                expect { subject.perform(user.uuid) }.to raise_error(Common::Exceptions::BackendServiceException)
                 expect(Mobile::V0::Appointment.get_cached(user)).to be_nil
               end
             end

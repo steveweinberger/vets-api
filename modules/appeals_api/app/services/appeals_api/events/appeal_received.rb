@@ -11,20 +11,15 @@ module AppealsApi
       def hlr_received
         return unless Flipper.enabled?(:decision_review_hlr_email)
 
-        log_error(guid, 'HLR') unless email
+        unless valid_email_identifier?
+          log_error(guid, 'HLR')
+          raise InvalidKeys
+        end
 
         template_type = 'higher_level_review_received'
-        template_id = template_id(template_type)
+        template = { template_id: template_id(template_type) }
 
-        vanotify_service.send_email(
-          email_address: email,
-          template_id: template_id,
-          personalisation: {
-            'veteran_first_name' => opts['veteran_first_name'],
-            'veteran_last_name' => opts['veteran_last_name'],
-            'date_submitted' => opts['date_submitted']
-          }
-        )
+        vanotify_service.send_email(params(template))
       end
 
       private
@@ -35,20 +30,55 @@ module AppealsApi
         @vanotify_service ||= VaNotify::Service.new(Settings.vanotify.services.lighthouse.api_key)
       end
 
+      def params(template_opts)
+        [
+          lookup,
+          template_opts,
+          personalisation
+        ].reduce(&:merge)
+      end
+
+      def lookup
+        if opts['email_identifier']['id_type'] == 'email'
+          { email_address: opts['email_identifier']['id_value'] }
+        else
+          { recipient_identifier: { id_value: opts['email_identifier']['id_value'],
+                                    id_type: opts['email_identifier']['id_type'] } }
+        end
+      end
+
       def template_id(template)
-        Settings.vanotify.services.va_gov.template_id.public_send(template)
+        Settings.vanotify.services.lighthouse.template_id.public_send(template)
+      end
+
+      def personalisation
+        { personalisation: { 'first_name' => opts['first_name'],
+                             'date_submitted' => date_submitted } }
       end
 
       def log_error(guid, type)
-        Rails.logger.error "No email present for AppealsApi::AppealReceived notification #{type} - GUID: #{guid}"
+        Rails.logger.error "No lookup value present for AppealsApi::AppealReceived notification #{type} - GUID: #{guid}"
       end
 
       def guid
         opts['guid']
       end
 
-      def email
-        opts['email']
+      def date_submitted
+        # TODO: Remove "%m/%d/%Y" format parsing after all old jobs using that format have cleared the queue
+        @date_submitted ||= if opts['date_submitted'] =~ %r{^\d{2}/\d{2}/\d{4}}
+                              DateTime.strptime(opts['date_submitted'], '%m/%d/%Y').strftime('%B %d, %Y')
+                            else
+                              DateTime.iso8601(opts['date_submitted']).strftime('%B %d, %Y')
+                            end
+      end
+
+      def valid_email_identifier?
+        required_email_identifier_keys.all? { |k| opts['email_identifier'].key?(k) }
+      end
+
+      def required_email_identifier_keys
+        %w[id_type id_value]
       end
 
       def required_keys?
@@ -56,7 +86,7 @@ module AppealsApi
       end
 
       def required_keys
-        %w[guid email date_submitted veteran_first_name veteran_last_name]
+        %w[guid email_identifier date_submitted first_name]
       end
     end
 

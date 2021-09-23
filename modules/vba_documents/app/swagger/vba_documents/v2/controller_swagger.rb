@@ -4,10 +4,10 @@ module VBADocuments
   module V2
     class ControllerSwagger
       include Swagger::Blocks
-      EXAMPLE_PATH = VBADocuments::Engine.root.join('app', 'swagger', 'vba_documents', 'document_upload', 'v2', 'observer_example.json')
-
-      swagger_path '/uploads' do
-        operation :post do
+      VBA_TAG = ['VBA Documents'].freeze
+      WEBHOOK_EXAMPLE_PATH = VBADocuments::Engine.root.join('app', 'swagger', 'vba_documents', 'document_upload', 'v2', 'webhook_example.json')
+      swagger_path '/services/vba_documents/v2/uploads' do
+        operation :post, tags: VBA_TAG do
           extend VBADocuments::Responses::ForbiddenError
           extend VBADocuments::Responses::TooManyRequestsError
           extend VBADocuments::Responses::InternalServerError
@@ -15,23 +15,11 @@ module VBADocuments
           extend VBADocuments::Responses::UnauthorizedError
           key :summary, 'Get a location for subsequent document upload PUT request'
           key :operationId, 'postBenefitsDocumentUpload'
-          key :description, File.read(VBADocuments::Engine.root.join('app', 'swagger', 'vba_documents', 'document_upload', 'v2', 'upload_description.md'))
           security do
             key :apikey, []
           end
-          request_body do
-            key :description, 'Pass an optional observers object for notifications'
-            key :in, :formData
-            key :example, JSON.parse(File.read(EXAMPLE_PATH))
-            content 'application/json' do
-              schema do
-                key :$ref, :Observers
-              end
-            end
-          end
-
           key :tags, [
-            'document_uploads'
+            VBA_TAG
           ]
 
           response 202 do
@@ -46,15 +34,45 @@ module VBADocuments
               end
             end
           end
+        end
+      end
+
+      swagger_path '/webhooks/v1/register' do
+        operation :post, tags: VBA_TAG do
+          extend VBADocuments::Responses::ForbiddenError
+          extend VBADocuments::Responses::TooManyRequestsError
+          extend VBADocuments::Responses::InternalServerError
+          extend VBADocuments::Responses::UnexpectedError
+          extend VBADocuments::Responses::UnauthorizedError
+          key :summary, 'Register callback url(s) for notifications'
+          key :operationId, 'postBenefitsWebhooksRegister'
+          key :description, File.read(VBADocuments::Engine.root.join('app', 'swagger', 'vba_documents', 'document_upload', 'v2', 'webhook_description.md'))
+          security do
+            key :apikey, []
+          end
+          request_body do
+            key :description, 'Pass a webhook object for notifications'
+            key :in, :formData
+            key :example, JSON.parse(File.read(WEBHOOK_EXAMPLE_PATH))
+            content 'application/json' do
+              schema do
+                key :$ref, :Webhook
+              end
+            end
+          end
+
+          key :tags, [
+            VBA_TAG
+          ]
 
           response 202 do
-            key :description, 'Webhooks: Accepted. Location generated'
+            key :description, 'Accepted'
             content 'application/json' do
               schema do
                 key :type, :object
                 key :required, %i[data]
                 property :data do
-                  key :$ref, :DocumentUploadPath
+                  key :$ref, :WebhookResponse
                 end
               end
             end
@@ -62,16 +80,50 @@ module VBADocuments
         end
       end
 
-      swagger_path '/path' do
-        operation :put do
+      swagger_path '/webhooks/v1/list' do
+        operation :get, tags: VBA_TAG do
+          extend VBADocuments::Responses::ForbiddenError
+          extend VBADocuments::Responses::TooManyRequestsError
+          extend VBADocuments::Responses::InternalServerError
+          extend VBADocuments::Responses::UnexpectedError
+          extend VBADocuments::Responses::UnauthorizedError
+          key :summary, 'Get a list of all current subscriptions'
+          key :operationId, 'postBenefitsWebhooksList'
+          # key :description, File.read(VBADocuments::Engine.root.join('app', 'swagger', 'vba_documents', 'document_upload', 'v2', 'webhook_description.md'))
+          security do
+            key :apikey, []
+          end
+
+          key :tags, [
+            VBA_TAG
+          ]
+
+          response 200 do
+            key :description, 'Ok'
+            content 'application/json' do
+              schema do
+                key :type, :object
+                property :data do
+                  key :$ref, :WebhookResponse
+                end
+              end
+            end
+          end
+        end
+      end
+
+      swagger_path '/{location from step 3 response}' do
+        operation :put, tags: VBA_TAG do
           extend VBADocuments::Responses::InternalServerError
           extend VBADocuments::Responses::UnauthorizedError
+          extend VBADocuments::Responses::TooManyRequestsError
+          extend VBADocuments::Responses::UnexpectedError
           key :summary, 'Accepts document upload.'
           key :description, File.read(VBADocuments::Engine.root.join('app', 'swagger', 'vba_documents', 'document_upload', 'put_description.md'))
           key :operationId, 'putBenefitsDocumentUpload'
 
           key :tags, [
-            'document_uploads'
+            VBA_TAG
           ]
 
           parameter do
@@ -89,8 +141,8 @@ module VBADocuments
             key :description, 'Document upload staged'
           end
 
-          response 400 do
-            key :description, 'Document upload failed'
+          response 403 do
+            key :description, 'Forbidden'
             content 'application/xml' do
               schema do
                 key :$ref, :DocumentUploadFailure
@@ -100,11 +152,10 @@ module VBADocuments
         end
       end
 
-      swagger_path '/uploads/{id}' do
-        operation :get do
+      swagger_path '/services/vba_documents/v2/uploads/{id}' do
+        operation :get, tags: VBA_TAG do
           extend VBADocuments::Responses::NotFoundError
           extend VBADocuments::Responses::TooManyRequestsError
-          extend VBADocuments::Responses::UnexpectedError
           extend VBADocuments::Responses::InternalServerError
           extend VBADocuments::Responses::UnauthorizedError
           extend VBADocuments::Responses::ForbiddenError
@@ -112,7 +163,7 @@ module VBADocuments
           key :operationId, 'getBenefitsDocumentUploadStatus'
 
           key :tags, [
-            'document_uploads'
+            VBA_TAG
           ]
 
           security do
@@ -145,56 +196,14 @@ module VBADocuments
         end
       end
 
-      swagger_path '/uploads/{id}/download' do
-        operation :get do
-          extend VBADocuments::Responses::UnauthorizedError
-          extend VBADocuments::Responses::TooManyRequestsError
-          extend VBADocuments::Responses::ForbiddenError
-          extend VBADocuments::Responses::NotFoundError
-          extend VBADocuments::Responses::InternalServerError
-          key :summary, 'Download zip of "what the server sees"'
-          key :description, 'An endpoint that will allow you to see exactly what the server sees. We split apart all submitted docs and metadata and zip the file to make it available to you to help with debugging purposes. Files are deleted after 10 days. Only available in testing environments, not production.'
-          key :operationId, 'getBenefitsDocumentUploadDownload'
-
-          key :tags, ['document_uploads']
-
-          security do
-            key :apikey, []
-          end
-
-          parameter do
-            key :name, 'id'
-            key :in, :path
-            key :description, 'ID as returned by a previous create upload request'
-            key :required, true
-            key :example, '6d8433c1-cd55-4c24-affd-f592287a7572'
-            schema do
-              key :type, :string
-              key :format, :uuid
-            end
-          end
-
-          response 200 do
-            key :description, 'Zip file with the contents of your payload as parsed by our server'
-            content 'application/zip' do
-              schema do
-                key :type, :string
-                key :format, :binary
-                key :example, 'Binary File'
-              end
-            end
-          end
-        end
-      end
-
-      swagger_path '/uploads/report' do
-        operation :post do
+      swagger_path '/services/vba_documents/v2/uploads/report' do
+        operation :post, tags: VBA_TAG do
           extend VBADocuments::Responses::UnauthorizedError
           extend VBADocuments::Responses::TooManyRequestsError
           extend VBADocuments::Responses::ForbiddenError
           extend VBADocuments::Responses::UnexpectedError
           extend VBADocuments::Responses::InternalServerError
-          key :tags, %i[document_uploads]
+          key :tags, [VBA_TAG]
 
           key :summary, 'Get a bulk status report for a list of previous uploads'
           key :operationId, 'getBenefitsDocumentUploadStatusReport'

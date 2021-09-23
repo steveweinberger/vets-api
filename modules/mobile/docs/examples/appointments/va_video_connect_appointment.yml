@@ -7,6 +7,7 @@ data:
       comment: Please log on 5 minutes before the start of your appointment
       clinicId: ~
       facilityId: ~
+      healthcareProvider: null
       healthcareService: null
       location:
         name: null
@@ -17,9 +18,11 @@ data:
         url: https://care2.evn.va.gov/vvc-app/?join=1&media=1&escalate=1&conference=VVC8275247@care2.evn.va.gov&pin=3242949390#
         code: null
       minutesDuration: 60
+      phoneOnly: false
       startDateLocal: 2019-04-20T14:15:00.000-04:00
       startDateUtc: 2019-04-20T18:15:00.000Z
       status: CANCELLED
+      statusDetail: CANCELLED BY PATIENT
       timeZone: America/Los_Angeles
       vetextId: 308;20210106.140000
 meta:

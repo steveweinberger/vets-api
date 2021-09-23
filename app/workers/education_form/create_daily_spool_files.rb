@@ -159,9 +159,7 @@ module EducationForm
     # Useful for debugging which records were or were not sent over successfully,
     # in case of network failures.
     def log_submissions(records, filename)
-      ids = records.map { |r| r.record.id }
       log_info("Writing #{records.count} application(s) to #{filename}")
-      log_info("IDs: #{ids}")
     end
 
     # Useful for alerting and monitoring the numbers of successfully send submissions
@@ -201,7 +199,7 @@ module EducationForm
     end
 
     def log_to_email(region)
-      return unless Flipper.enabled?(:spool_testing_error_3)
+      return unless Flipper.enabled?(:spool_testing_error_3) && !FeatureFlipper.staging_email?
 
       CreateDailySpoolFilesMailer.build(region).deliver_now
     end
