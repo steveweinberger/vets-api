@@ -100,6 +100,27 @@ describe MPI::V1::Service do
             )
           end
         end
+
+        it 'fetches no historical icns if none exist', run_at: 'Wed, 21 Feb 2018 20:19:01 GMT' do
+          allow(user).to receive(:mhv_icn).and_return('1008710003V120120^NI^200M^USVHA^P')
+          allow(SecureRandom).to receive(:uuid).and_return('5e819d17-ce9b-4860-929e-f9062836ebd0')
+
+          VCR.use_cassette('mpi/find_candidate/historical_icns_empty', VCR::MATCH_EVERYTHING) do
+            response = subject.find_profile(user, MPI::Constants::CORRELATION_WITH_ICN_HISTORY)
+            expect(response.status).to eq('OK')
+            expect(response.profile['historical_icns']).to eq([])
+          end
+        end
+
+        it 'fetches id_theft flag' do
+          allow(user).to receive(:mhv_icn).and_return('1012870264V741864')
+
+          VCR.use_cassette('mpi/find_candidate/valid_id_theft_flag') do
+            response = subject.find_profile(user)
+            expect(response.status).to eq('OK')
+            expect(response.profile['id_theft_flag']).to eq(true)
+          end
+        end
       end
     end
 
