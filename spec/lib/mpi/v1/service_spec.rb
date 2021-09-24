@@ -85,6 +85,21 @@ describe MPI::V1::Service do
             expect(response.profile['vet360_id']).to eq('80')
           end
         end
+
+        it 'fetches historical icns if they exist', run_at: 'Wed, 21 Feb 2018 20:19:01 GMT' do
+          allow(user).to receive(:mhv_icn).and_return('1008787551V609092^NI^200M^USVHA^P')
+          allow(SecureRandom).to receive(:uuid).and_return('5e819d17-ce9b-4860-929e-f9062836ebd0')
+
+          match = { match_requests_on: %i[method uri headers body] }
+          VCR.use_cassette('mpi/find_candidate/historical_icns_with_icn', match) do
+            response = subject.find_profile(user, MPI::Constants::CORRELATION_WITH_ICN_HISTORY)
+            expect(response.status).to eq('OK')
+            expect(response.profile['historical_icns']).to eq(
+              %w[1008692852V724999 1008787550V443247 1008787485V229771 1008795715V162680
+                 1008795714V030791 1008795629V076564 1008795718V643356]
+            )
+          end
+        end
       end
     end
 
