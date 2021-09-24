@@ -63,6 +63,18 @@ describe MPI::V1::Service do
             expect(response.profile).to have_deep_attributes(profile)
           end
         end
+
+        it 'fetches profile when icn is just basic icn' do
+          allow(user).to receive(:mhv_icn).and_return('1008714701V416111')
+
+          VCR.use_cassette('mpi/find_candidate/valid_icn_without_ni') do
+            profile = mvi_profile
+            profile['search_token'] = 'WSDOC1908201553094460697640189'
+            response = subject.find_profile(user)
+            expect(response.status).to eq('OK')
+            expect(response.profile).to have_deep_attributes(profile)
+          end
+        end
       end
     end
 
