@@ -21,8 +21,9 @@ VBADocuments::Engine.routes.draw do
     namespace :v2, defaults: { format: 'json' } do
       resources :uploads, only: %i[create show] do
         get 'download', to: 'uploads#download'
+
         collection do
-          resource :report, only: %i[create]
+          resource :reports, only: %i[create]
         end
       end
     end
@@ -31,10 +32,12 @@ VBADocuments::Engine.routes.draw do
   namespace :v1, defaults: { format: 'json' } do
     resources :uploads, only: %i[create show] do
       get 'download', to: 'uploads#download'
-      collection do
-        resource :report, only: %i[create]
-      end
+
+      # collection do
+      #   resource :report, only: %i[create]
+      # end
     end
+    post 'reports', to: 'reports#create'
   end
 
   namespace :docs do

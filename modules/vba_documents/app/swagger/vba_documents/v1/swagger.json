@@ -1,0 +1,54 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Benefits Intake",
+    "version": "v1",
+    "termsOfService": "https://developer.va.gov/terms-of-service",
+    "description": "example description"
+  },
+  "tags": [
+    {
+      "name": "Benefits Intake",
+      "description": "VA Benefits document upload functionality"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "apikey": {
+        "type": "apiKey",
+        "name": "apikey",
+        "in": "header"
+      }
+    },
+    "schemas": {
+      "nonBlankString": {
+        "type": "string",
+        "pattern": "[^ \\f\\n\\r\\t\\v\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
+      }
+    }
+  },
+  "paths": {
+    "/metadata": {
+      "get": {
+        "summary": "metadata",
+        "responses": {
+          "200": {
+            "description": "returns metadata"
+          }
+        }
+      }
+    }
+  },
+  "basePath": "/services/vba_documents/v1",
+  "servers": [
+    {
+      "url": "https://dev-api.va.gov/services/vba_documents/{version}/",
+      "description": "VA.gov API sandbox environment",
+      "variables": {
+        "version": {
+          "default": "v1"
+        }
+      }
+    }
+  ]
+}
