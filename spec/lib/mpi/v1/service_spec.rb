@@ -5,6 +5,7 @@ describe MPI::V1::Service do
   let(:user) { create(:user, :loa3) }
   let(:service) { described_class.new }
   let(:icn_with_aaid) { '1008714701V416111^NI^200M^USVHA' }
+  let(:server_error) { MasterPersonIndex::Responses::FindProfileResponse::RESPONSE_STATUS[:server_error] }
   let(:mvi_profile) do
     build(
       :mpi_profile_response,
@@ -132,6 +133,19 @@ describe MPI::V1::Service do
           end
         end
       end
+
+      context 'invalid requests' do
+        it 'responds with a SERVER_ERROR if ICN is invalid', :aggregate_failures do
+          allow(user).to receive(:mhv_icn).and_return('invalid-icn-is-here^NI')
+          expect(subject).to receive(:log_exception_to_sentry)
+
+          VCR.use_cassette('mpi/find_candidate/invalid_icn') do
+            response = subject.find_profile(user)
+
+            server_error_502_expectations_for(response)
+          end
+        end
+      end
     end
 
     describe '.find_profile with edipi', run_at: 'Wed, 21 Feb 2018 20:19:01 GMT' do
@@ -159,4 +173,16 @@ describe MPI::V1::Service do
       end
     end
   end
+end
+
+def server_error_502_expectations_for(response)
+  exception = response.error.errors.first
+
+  expect(response.class).to eq MasterPersonIndex::Responses::FindProfileResponse
+  expect(response.status).to eq server_error
+  expect(response.profile).to be_nil
+  expect(exception.title).to eq 'Bad Gateway'
+  expect(exception.code).to eq 'MVI_502'
+  expect(exception.status).to eq '502'
+  expect(exception.source).to eq MPI::V1::Service
 end
