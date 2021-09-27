@@ -28,8 +28,8 @@ module HealthQuest
                    marshal: true,
                    marshaler: JsonMarshaller
 
-    serialize :questionnaire_response_data, JSON
-    serialize :user_demographics_data, JSON
+    serialize :questionnaire_response_data, JsonMarshaller
+    serialize :user_demographics_data, JsonMarshaller
     encrypts :questionnaire_response_data, :user_demographics_data, migrating: true, **lockbox_options
 
     validates :questionnaire_response_data, presence: true
