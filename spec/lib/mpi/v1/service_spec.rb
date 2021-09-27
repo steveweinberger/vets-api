@@ -145,6 +145,17 @@ describe MPI::V1::Service do
             server_error_502_expectations_for(response)
           end
         end
+
+        it 'responds with a SERVER_ERROR if ICN has no matches', :aggregate_failures do
+          allow(user).to receive(:mhv_icn).and_return('1008714781V416999')
+          expect(subject).to receive(:log_exception_to_sentry)
+
+          VCR.use_cassette('mpi/find_candidate/icn_not_found') do
+            response = subject.find_profile(user)
+
+            server_error_502_expectations_for(response)
+          end
+        end
       end
     end
 
