@@ -682,7 +682,13 @@ RSpec.describe FormProfile, type: :model do
           'name' => 'Diabetes mellitus0',
           'ratedDisabilityId' => '0',
           'ratingDecisionId' => '63655',
-          'ratingPercentage' => 100
+          'ratingPercentage' => 100,
+          'specialIssues' => [
+            {
+              'code' => 'TRM',
+              'name' => 'Personal Trauma PTSD'
+            }
+          ]
         },
         {
           'diagnosticCode' => 5238,
@@ -691,7 +697,13 @@ RSpec.describe FormProfile, type: :model do
           'name' => 'Diabetes mellitus1',
           'ratedDisabilityId' => '1',
           'ratingDecisionId' => '63655',
-          'ratingPercentage' => 100
+          'ratingPercentage' => 100,
+          'specialIssues' => [
+            {
+              'code' => 'TRM',
+              'name' => 'Personal Trauma PTSD'
+            }
+          ]
         }
       ],
       'servicePeriods' => [

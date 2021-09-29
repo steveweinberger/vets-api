@@ -16,6 +16,7 @@ module VA526ez
     include Virtus.model
 
     attribute :name, String
+    attribute :special_issues, Array[FormSpecialIssue]
     attribute :rated_disability_id, String
     attribute :rating_decision_id, String
     attribute :diagnostic_code, Integer
