@@ -16,7 +16,10 @@ module MPI
         instance.processing_code = Settings.mvi.processing_code
         instance.vba_orchestration = Settings.mvi.vba_orchestration
         instance.edipi_search = Settings.mvi.edipi_search
-        # TODO add middlewares
+
+        handlers = instance.connection.builder.handlers
+        handlers.insert(-2, Faraday::RackBuilder::Handler.new(Common::Client::Middleware::Logging, 'MVIRequest')) if Settings.mvi.pii_logging
+        handlers.insert(-2, Faraday::RackBuilder::Handler.new(Betamocks::Middleware)) if Settings.mvi.mock
       end
 
       def find_profile(user, search_type = MasterPersonIndex::Constants::CORRELATION_WITH_RELATIONSHIP_DATA)

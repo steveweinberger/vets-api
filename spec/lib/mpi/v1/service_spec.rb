@@ -31,10 +31,28 @@ describe MPI::V1::Service do
       id_theft_flag: false
     )
   end
+  let(:instance) { MasterPersonIndex::Configuration.instance }
 
   before do
-    instance = MasterPersonIndex::Configuration.instance
     allow(instance).to receive(:allow_missing_certs?).and_return(true)
+  end
+
+  describe 'middlewares' do
+    it 'adds middlewares in the right positions' do
+      allow(Settings.mvi).to receive(:pii_logging).and_return(true)
+      allow(Settings.mvi).to receive(:mock).and_return(true)
+      service
+
+      expect(instance.connection.builder.handlers).to eq(
+        [
+          MasterPersonIndex::Common::Client::Middleware::SOAPHeaders,
+          MasterPersonIndex::Common::Client::Middleware::SOAPParser,
+          Common::Client::Middleware::Logging,
+          Betamocks::Middleware,
+          Faraday::Adapter::NetHttp
+        ]
+      )
+    end
   end
 
   describe '#find_profile' do
