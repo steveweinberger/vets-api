@@ -124,8 +124,6 @@ RSpec.describe Mobile::ApplicationController, type: :controller do
         it 'calls async user table job on first call and does not on the second due to redis lock' do
           expect(Mobile::V0::FillMobileUserTableJob).to receive(:perform_async)
           get :index
-          expect(Mobile::V0::FillMobileUserTableJob).not_to receive(:perform_async)
-          get :index
         end
 
         it 'increments the auth success metric once' do

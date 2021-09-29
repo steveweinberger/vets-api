@@ -3,7 +3,7 @@
 module Mobile
   module V0
     class Users < ApplicationRecord
-      validates :user_id, presence: true
+      validates :icn, presence: true
     end
   end
 end
