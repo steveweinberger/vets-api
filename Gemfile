@@ -15,6 +15,7 @@ path 'modules' do
   gem 'facilities_api'
   gem 'health_quest'
   gem 'identity'
+  gem 'meb_api'
   gem 'mobile'
   gem 'openid_auth'
   gem 'test_user_dashboard'
@@ -31,7 +32,7 @@ end
 gem 'sass-rails', '>= 6'
 
 # Anchored versions, do not change
-gem 'puma', '~> 5.4.0'
+gem 'puma', '~> 5.5.0'
 gem 'rails', '~> 6.1'
 
 # Gems with special version/repo needs
@@ -62,7 +63,7 @@ gem 'faraday'
 gem 'faraday_middleware'
 gem 'fast_jsonapi'
 gem 'fastimage'
-gem 'fhir_client', '~> 5.0.1'
+gem 'fhir_client', '~> 5.0.2'
 gem 'flipper'
 gem 'flipper-active_record'
 gem 'flipper-active_support_cache_store'
@@ -85,6 +86,7 @@ gem 'jsonapi-parser'
 gem 'jwt'
 gem 'levenshtein-ffi'
 gem 'liquid'
+gem 'lockbox'
 gem 'mail', '2.7.1'
 gem 'memoist'
 gem 'mimemagic', '~> 0.4.3'

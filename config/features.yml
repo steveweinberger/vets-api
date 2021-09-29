@@ -42,6 +42,22 @@ features:
   cerner_override_757:
     actor_type: user
     description: This will show the Cerner facility 757 as `isCerner`.
+  check_in_experience_enabled:
+    actor_type: user
+    description: Enables the health care check-in experiences
+    enable_in_development: true
+  check_in_experience_low_authentication_enabled:
+    actor_type: user
+    description: Enables the health care check-in experiences to use the lowest tier of authentication, i.e. last 4 and last name
+    enable_in_development: true
+  check_in_experience_update_information_page_enabled:
+    actor_type: user
+    description: Enables the Update Information question in the health care check-in experience application
+    enable_in_development: false
+  check_in_experience_multiple_appointment_support:
+    actor_type: user
+    description: Enables the health care check-in experiences to show multiple appointments
+    enable_in_development: true
   coe_access:
     actor_type: user
     description: Feature gates the certificate of eligibility application
@@ -106,6 +122,10 @@ features:
   direct_deposit_vanotify:
     actor_type: user
     description: Send direct deposit emails using VaNotify service
+  disability_compensation_flashes:
+    actor_type: user
+    description: enables sending flashes to BGS for disability_compensation submissions.
+    enable_in_development: true
   education_reports_cleanup:
     actor_type: user
     description: Updates to the daily education reports to remove old data that isn't needed in the new fiscal year
@@ -114,6 +134,9 @@ features:
     actor_type: user
     description: Allow user to upload files up to 150 MB in size (EVSS endpoint for 526 & CST)
     enable_in_development: true
+  ezcg_use_facility_api:
+    actor_type: user
+    description: Enables 1010EZ & 1010CG to use the Facility API instead of JSON schema
   discharge_wizard_features:
     actor_type: user
     description: Iteration of new features for discharge wizard
@@ -127,6 +150,10 @@ features:
   facilities_ppms_suppress_pharmacies:
     actor_type: user
     description: Front End Flag to suppress the ability to search for pharmacies
+  facilities_vet_center_automate_nearby:
+    actor_type: user
+    description: Automatically fetch nearby Vet Centers on Vet Center locations pages
+    enable_in_development: true
   facility_locator_covid_vaccine_walk_in_availability_text_frontend:
     actor_type: user
     description: Enable covid vaccine walk-in availability text within covid vaccine related search results
@@ -148,6 +175,9 @@ features:
   facility_locator_ppms_use_secure_api:
     actor_type: user
     description: Use the new secure ppms api with new auth headers
+  facility_locator_ppms_use_paginated_endpoint:
+    actor_type: user
+    description: Use the new paginated endpoint for providers
   facility_locator_predictive_location_search:
     actor_type: user
     description: Use predictive location search in the Facility Locator UI
@@ -294,6 +324,10 @@ features:
     actor_type: user
     description: Enables the Wizard for VA Form 5655 (Financial Status Report)
     enable_in_development: true
+  show_meb_mock_endpoints:
+    actor_type: user
+    description: Allows for frontend to have progressivley enhanced backend endpoints to consume in staging.
+    enable_in_development: true
   show_medical_copays:
     actor_type: user
     description: Enables the medical copays application on route /manage-va-debt/medical-copays/
@@ -416,22 +450,3 @@ features:
     actor_type: user
     description: Enhances Yellow Ribbon MVP.
     enable_in_development: true
-  check_in_experience_enabled:
-    actor_type: user
-    description: Enables the health care check-in experiences
-    enable_in_development: true
-  check_in_experience_low_authentication_enabled:
-    actor_type: user
-    description: Enables the health care check-in experiences to use the lowest tier of authentication, i.e. last 4 and last name
-    enable_in_development: true
-  check_in_experience_update_information_page_enabled:
-    actor_type: user
-    description: Enables the Update Information question in the health care check-in experience application
-    enable_in_development: false
-  check_in_experience_multiple_appointment_support:
-    actor_type: user
-    description: Enables the health care check-in experiences to show multiple appointments
-    enable_in_development: true
-  ezcg_use_facility_api:
-    actor_type: user
-    description: Enables 1010EZ & 1010CG to use the Facility API instead of JSON schema

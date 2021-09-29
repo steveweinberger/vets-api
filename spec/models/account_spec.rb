@@ -13,6 +13,25 @@ RSpec.describe Account, type: :model do
     expect(account.reload.uuid).to eq uuid
   end
 
+  it 'enforces sec_id uniqueness when idme_uuid is blank' do
+    expect(Account.count).to eq 0
+    sec_id = 'some-sec-id'
+
+    expect do
+      first_account = Account.new(sec_id: sec_id)
+      second_account = Account.new(sec_id: sec_id)
+
+      first_account.save
+      second_account.save
+      expect(first_account.sec_id).to eq sec_id
+      expect(second_account.sec_id).to eq sec_id
+      expect(first_account.idme_uuid).to eq nil
+      expect(second_account.idme_uuid).to eq nil
+      expect(first_account.valid?).to eq true
+      expect(second_account.valid?).to eq false
+    end.to change(Account, :count).by(1)
+  end
+
   describe '.idme_uuid_match' do
     it 'returns only accounts with matching idme_uuid' do
       find_me = create :account
@@ -46,6 +65,25 @@ RSpec.describe Account, type: :model do
     end
   end
 
+  describe '.logingov_uuid_match' do
+    it 'returns only accounts with matching logingov_uuid' do
+      find_me = create :account
+      find_me.logingov_uuid = SecureRandom.uuid
+      find_me.save!
+      dont_find_me = create :account
+      dont_find_me.logingov_uuid = SecureRandom.uuid
+      dont_find_me.save!
+      accounts = Account.logingov_uuid_match(find_me.logingov_uuid)
+      expect(accounts).to include(find_me)
+      expect(accounts).not_to include(dont_find_me)
+    end
+
+    it 'returns no records with a nil logingov_uuid' do
+      create :account # account to not find
+      expect(Account.logingov_uuid_match(nil)).to be_empty
+    end
+  end
+
   describe '.create_if_needed!' do
     it 'creates an Account if one does not exist' do
       expect(Account.count).to eq 0
@@ -75,6 +113,15 @@ RSpec.describe Account, type: :model do
       end.not_to change(Account, :count)
     end
 
+    it 'does not create a second Account, matched on logingov_uuid' do
+      user = create(:user, :accountable_with_logingov_uuid)
+      expect(Account.count).to eq 1
+
+      expect do
+        Account.create_if_needed!(user)
+      end.not_to change(Account, :count)
+    end
+
     it 'creates an Account on sec id if one does not exist' do
       expect(Account.count).to eq 0
 
@@ -87,6 +134,24 @@ RSpec.describe Account, type: :model do
       end.to change(Account, :count).by(1)
     end
 
+    it 'allows multiple records to have nil idme_uuid if sec_id is defined' do
+      expect(Account.count).to eq 0
+      first_sec_id = 'some-sec-id'
+      another_sec_id = 'some-other-sec-id'
+
+      first_user = create(:user, :user_with_no_idme_uuid, sec_id: first_sec_id)
+      second_user = create(:user, :user_with_no_idme_uuid, sec_id: another_sec_id)
+
+      expect do
+        first_account = Account.create_if_needed!(first_user)
+        second_account = Account.create_if_needed!(second_user)
+        expect(first_account.sec_id).to eq first_sec_id
+        expect(second_account.sec_id).to eq another_sec_id
+        expect(first_account.idme_uuid).to eq nil
+        expect(second_account.idme_uuid).to eq nil
+      end.to change(Account, :count).by(2)
+    end
+
     it 'matches on sec id with missing idme uuid' do
       user = create(:user, :user_with_no_idme_uuid)
       create(:account, idme_uuid: nil, sec_id: user.sec_id)
@@ -95,6 +160,29 @@ RSpec.describe Account, type: :model do
       expect do
         Account.create_if_needed!(user)
       end.not_to change(Account, :count)
+    end
+
+    it 'matches on logingov uuid with missing idme uuid and sec id' do
+      user = create(:user, :user_with_no_idme_uuid_or_sec_id)
+      create(:account, idme_uuid: nil, sec_id: nil, logingov_uuid: user.logingov_uuid)
+      expect(Account.count).to eq 1
+
+      expect do
+        Account.create_if_needed!(user)
+      end.not_to change(Account, :count)
+    end
+
+    it 'creates an Account on logingov uuid if one does not exist' do
+      expect(Account.count).to eq 0
+
+      user = create(:user, :user_with_no_idme_uuid_or_sec_id)
+
+      expect do
+        acct = Account.create_if_needed!(user)
+        expect(acct.sec_id).to eq nil
+        expect(acct.idme_uuid).to eq nil
+        expect(acct.logingov_uuid).to eq user.logingov_uuid
+      end.to change(Account, :count).by(1)
     end
 
     it 'issues a warning with multiple matching Accounts' do

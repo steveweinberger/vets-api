@@ -7,6 +7,10 @@ module AppealsApi
   class HigherLevelReview < ApplicationRecord
     include HlrStatus
 
+    scope :pii_expunge_policy, lambda {
+      where('updated_at < ? AND status IN (?)', 7.days.ago, COMPLETE_STATUSES)
+    }
+
     def self.past?(date)
       date < Time.zone.today
     end
@@ -19,6 +23,10 @@ module AppealsApi
 
     attr_encrypted(:form_data, key: Settings.db_encryption_key, marshal: true, marshaler: JsonMarshal::Marshaller)
     attr_encrypted(:auth_headers, key: Settings.db_encryption_key, marshal: true, marshaler: JsonMarshal::Marshaller)
+
+    serialize :auth_headers, JsonMarshal::Marshaller
+    serialize :form_data, JsonMarshal::Marshaller
+    encrypts :auth_headers, :form_data, migrating: true, **lockbox_options
 
     NO_ADDRESS_PROVIDED_SENTENCE = 'USE ADDRESS ON FILE'
     NO_EMAIL_PROVIDED_SENTENCE = 'USE EMAIL ON FILE'

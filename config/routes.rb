@@ -6,8 +6,6 @@ Rails.application.routes.draw do
   match '/v0/*path', to: 'application#cors_preflight', via: [:options]
   match '/services/*path', to: 'application#cors_preflight', via: [:options]
 
-  get '/saml/metadata', to: 'saml#metadata'
-
   get '/v1/sessions/metadata', to: 'v1/sessions#metadata'
   post '/v1/sessions/callback', to: 'v1/sessions#saml_callback', module: 'v1'
   get '/v1/sessions/:type/new',
@@ -113,6 +111,18 @@ Rails.application.routes.draw do
     end
 
     resources :evss_claims_async, only: %i[index show]
+
+    namespace :virtual_agent do
+      get 'claim', to: 'virtual_agent_claim#index'
+    end
+
+    resources :virtual_agent_claim, only: %i[index]
+
+    namespace :virtual_agent do
+      get 'appeal', to: 'virtual_agent_appeal#index'
+    end
+
+    resources :virtual_agent_appeal, only: %i[index]
 
     get 'intent_to_file', to: 'intent_to_files#index'
     get 'intent_to_file/:type/active', to: 'intent_to_files#active'
@@ -391,6 +401,7 @@ Rails.application.routes.draw do
   mount CovidVaccine::Engine, at: '/covid_vaccine'
   mount FacilitiesApi::Engine, at: '/facilities_api'
   mount HealthQuest::Engine, at: '/health_quest'
+  mount MebApi::Engine, at: '/meb_api'
   mount Mobile::Engine, at: '/mobile'
   mount VAOS::Engine, at: '/vaos'
   # End Modules

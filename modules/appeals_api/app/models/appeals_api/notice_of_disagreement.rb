@@ -7,6 +7,15 @@ module AppealsApi
   class NoticeOfDisagreement < ApplicationRecord
     include NodStatus
 
+    scope :pii_expunge_policy, lambda {
+      where(
+        status: COMPLETE_STATUSES
+      ).and(
+        where('updated_at < ? AND board_review_option IN (?)', 1.week.ago, %w[hearing direct_review])
+        .or(where('updated_at < ? AND board_review_option IN (?)', 91.days.ago, 'evidence_submission'))
+      )
+    }
+
     def self.load_json_schema(filename)
       MultiJson.load File.read Rails.root.join('modules', 'appeals_api', 'config', 'schemas', "#{filename}.json")
     end
@@ -19,6 +28,10 @@ module AppealsApi
 
     attr_encrypted(:form_data, key: Settings.db_encryption_key, marshal: true, marshaler: JsonMarshal::Marshaller)
     attr_encrypted(:auth_headers, key: Settings.db_encryption_key, marshal: true, marshaler: JsonMarshal::Marshaller)
+
+    serialize :auth_headers, JsonMarshal::Marshaller
+    serialize :form_data, JsonMarshal::Marshaller
+    encrypts :auth_headers, :form_data, migrating: true, **lockbox_options
 
     validate :validate_hearing_type_selection, if: :pii_present?
 

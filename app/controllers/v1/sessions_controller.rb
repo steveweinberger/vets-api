@@ -28,7 +28,7 @@ module V1
 
     # Collection Action: auth is required for certain types of requests
     # @type is set automatically by the routes in config/routes.rb
-    # For more details see SAML::SettingsService and SAML::URLService
+    # For more details see SAML::SSOeSettingsService and SAML::URLService
     def new
       type = params[:type]
 
@@ -342,7 +342,7 @@ module V1
     end
 
     def after_login_actions
-      AfterLoginJob.perform_async('user_uuid' => @current_user&.uuid)
+      AfterLoginJob.perform_async(user_uuid: @current_user&.uuid)
       log_persisted_session_and_warnings
     end
 

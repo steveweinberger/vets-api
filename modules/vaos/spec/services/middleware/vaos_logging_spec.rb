@@ -33,7 +33,7 @@ describe VAOS::Middleware::VAOSLogging do
   context 'with status successful' do
     let(:status) { 200 }
 
-    it 'user service call logs a success' do
+    it 'user service call logs a success and increments total' do
       expect(Rails.logger).to receive(:info).with('VAOS service call succeeded!',
                                                   jti: 'ebfc95ef5f3a41a7b15e432fe47e9864',
                                                   status: 200,

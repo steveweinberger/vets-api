@@ -117,12 +117,14 @@ module Mobile
             healthcare_service: healthcare_service(appointment_hash, details, type),
             location: location(details, type, facility_id),
             minutes_duration: minutes_duration(details, type),
+            phone_only: appointment_hash[:phone_only] == true,
             start_date_local: start_date_local,
             start_date_utc: start_date_utc,
             status: status,
             status_detail: status_detail,
             time_zone: time_zone,
-            vetext_id: vetext_id(appointment_hash, start_date_local)
+            vetext_id: vetext_id(appointment_hash, start_date_local),
+            reason: details[:booking_note]
           }
 
           Rails.logger.info('metric.mobile.appointment.type', type: type)

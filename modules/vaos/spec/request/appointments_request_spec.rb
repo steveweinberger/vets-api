@@ -158,6 +158,16 @@ RSpec.describe 'vaos appointments', type: :request, skip_mvi: true do
           end
         end
 
+        it 'increments statsD on a partial' do
+          VCR.use_cassette('vaos/appointments/get_appointments_200_partial_error', match_requests_on: %i[method uri]) do
+            expect { get('/vaos/v0/appointments', params: params) }
+              .to trigger_statsd_increment(
+                'api.vaos.va_mobile.response.partial',
+                tags: ['errors:[{:code=>1 :source=>"test result" :summary=>"test summary"}]']
+              )
+          end
+        end
+
         it 'has access and returns va appointments when camel-inflected' do
           VCR.use_cassette('vaos/appointments/get_appointments', match_requests_on: %i[method uri]) do
             get '/vaos/v0/appointments', params: params, headers: inflection_header
@@ -189,6 +199,24 @@ RSpec.describe 'vaos appointments', type: :request, skip_mvi: true do
             expect(response.body).to be_a(String)
             expect(JSON.parse(response.body)['data']['id']).to eq('202006031600983000030800000000000000.aaaaaa')
             expect(response).to match_camelized_response_schema('vaos/va_appointment')
+          end
+        end
+      end
+
+      context 'when the upstream service returns an http status of 204, no content' do
+        it 'returns an http status of 404 to the vets website' do
+          VCR.use_cassette('vaos/appointments/show_appointment', match_requests_on: %i[method uri]) do
+            get '/vaos/v0/appointments/va/123456789101112'
+            expect(response).to have_http_status(:not_found)
+          end
+        end
+      end
+
+      context 'when the upstream service returns an http status of 204, no content and X-Key-Inflection set' do
+        it 'returns an http status of 404 to the vets website' do
+          VCR.use_cassette('vaos/appointments/show_appointment', match_requests_on: %i[method uri]) do
+            get '/vaos/v0/appointments/va/123456789101112', params: params, headers: inflection_header
+            expect(response).to have_http_status(:not_found)
           end
         end
       end

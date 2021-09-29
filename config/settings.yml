@@ -8,16 +8,6 @@ virtual_hosts: ["127.0.0.1", "localhost"] # Safe host names
 web_origin: http://localhost:3000,http://localhost:3001,http://127.0.0.1:3000,http://127.0.0.1:3001,null
 web_origin_regex: \Ahttps?:\/\/www\.va\.gov\z
 
-# Settings for SAML authentication
-saml:
-  cert_path: config/certs/vetsgov-localhost.crt
-  cert_new_path: config/certs/vetsgov-localhost_new.crt
-  key_path: config/certs/vetsgov-localhost.key
-  issuer: saml-rp.vetsgov.localhost
-  callback_url: http://localhost:3000/v1/sessions/callback
-  metadata_url: https://api.idmelabs.com/saml/metadata/provider
-  authn_requests_signed: false
-
 # Settings for new SAML authentication with SSOe
 saml_ssoe:
   idp_metadata_file: config/ssoe_idp_int_metadata_isam.xml
@@ -29,6 +19,7 @@ saml_ssoe:
   logout_url: https://int.eauth.va.gov/slo/globallogout?appKey=https%253A%252F%252Fssoe-sp-dev.va.gov
   idme_authn_context: ~
   request_signing: false
+  relay: ~
   response_signing: false
   response_encryption: false
 
@@ -39,6 +30,10 @@ ssoe_eauth_cookie:
 
 session_cookie:
   secure: false
+
+lockbox:
+  master_key: "0d78eaf0e90d4e7b8910c9112e16e66d8b00ec4054a89aa426e32712a13371e9"
+  previous_master_key: "a798f118b400a1a7552597cc94f44c577919c76b3d26c1eed8ae0703f4240216"
 
 binaries:
   # you can specify a full path in settings.local.yml if necessary
@@ -121,14 +116,17 @@ edu:
       - PIERRE.BROWN@va.gov
       - VAVBAHIN/TIMS@vba.va.gov
       - EDUAPPMGMT.VBACO@VA.GOV
+      - abelardo.blanco@va.gov
+      - eugenia.gina.ronat@accenturefederal.com
+      - morgan.whaley@accenturefederal.com
+      - m.c.shah@accenturefederal.com
+      - patrick.arthur@accenturefederal.com
+      - adam.freemer@accenturefederal.com
+      - dan.brooking@accenturefederal.com
+      - sebastian.cooper@accenturefederal.com
+      - david.rowley@accenturefederal.com
+      - nick.barthelemy@accenturefederal.com
     staging_emails:
-      - sonntag_adam@bah.com
-      - shawkey_daniel@bah.com
-      - neel_darrell@bah.com
-      - turner_desiree@bah.com
-      - mccurdy_devin@bah.com
-      - roth_matthew@bah.com
-      - delli-gatti_michael@bah.com
 dependents:
   prefill: true
 
@@ -200,6 +198,7 @@ modules_appeals_api:
     path_enabled_flag: false
   higher_level_review_pii_expunge_enabled: true
   higher_level_review_updater_enabled: true
+  legacy_appeals_enabled: false
   notice_of_disagreement_pii_expunge_enabled: true
   notice_of_disagreement_updater_enabled: true
   reports:
@@ -545,18 +544,19 @@ reports:
       - tammy.hurley1@va.gov
     staging_emails:
       - Brian.Grubb@va.gov
-      - Darrell.Neel@va.gov
-      - Delli-Gatti_Michael@bah.com
       - Joseph.Preisser@va.gov
       - kyle.pietrosanto@va.gov
       - lihan@adhocteam.us
       - Lucas.Tickner@va.gov
-      - Neel_Darrell@bah.com
       - Ricardo.DaSilva@va.gov
-      - shawkey_daniel@bah.com
-      - sonntag_adam@bah.com
       - tammy.hurley1@va.gov
-      - Turner_Desiree@bah.com
+      - abelardo.blanco@va.gov
+      - eugenia.gina.ronat@accenturefederal.com
+      - morgan.whaley@accenturefederal.com
+      - m.c.shah@accenturefederal.com
+      - d.a.barnes@accenturefederal.com
+      - jacob.finnern@accenturefederal.com
+      - hocine.halli@accenturefederal.com
   spool_submission:
     emails:
       - Brian.Grubb@va.gov
@@ -573,18 +573,19 @@ reports:
       - tammy.hurley1@va.gov
     staging_emails:
       - Brian.Grubb@va.gov
-      - Darrell.Neel@va.gov
-      - Delli-Gatti_Michael@bah.com
       - Joseph.Preisser@va.gov
       - kyle.pietrosanto@va.gov
       - lihan@adhocteam.us
       - Lucas.Tickner@va.gov
-      - Neel_Darrell@bah.com
       - Ricardo.DaSilva@va.gov
-      - shawkey_daniel@bah.com
-      - sonntag_adam@bah.com
       - tammy.hurley1@va.gov
-      - Turner_Desiree@bah.com
+      - abelardo.blanco@va.gov
+      - eugenia.gina.ronat@accenturefederal.com
+      - morgan.whaley@accenturefederal.com
+      - m.c.shah@accenturefederal.com
+      - d.a.barnes@accenturefederal.com
+      - jacob.finnern@accenturefederal.com
+      - hocine.halli@accenturefederal.com
   year_to_date_report:
     emails:
       - 222A.VBAVACO@va.gov
@@ -593,7 +594,6 @@ reports:
       - Brandon.Scott2@va.gov
       - Brian.Grubb@va.gov
       - Christina.DiTucci@va.gov
-      - Darla.vanNieukerk@va.gov
       - EDU.VBAMUS@va.gov
       - John.McNeal@va.gov
       - Joseph.Preisser@va.gov
@@ -607,7 +607,6 @@ reports:
       - tammy.hurley1@va.gov
     staging_emails:
       - Brian.Grubb@va.gov
-      - Delli-Gatti_Michael@bah.com
       - Joseph.Preisser@va.gov
       - kyle.pietrosanto@va.gov
       - lee.munson@va.gov
@@ -615,15 +614,18 @@ reports:
       - Lucas.Tickner@va.gov
       - matthew.ziolkowski@va.gov
       - Michael.Johnson19@va.gov
-      - neel_darrell@bah.com
       - patrick.burk@va.gov
       - preston.sanders@va.gov
       - robyn.noles@va.gov
       - Ricardo.DaSilva@va.gov
-      - shawkey_daniel@bah.com
-      - sonntag_adam@bah.com
       - tammy.hurley1@va.gov
-      - turner_desiree@bah.com
+      - abelardo.blanco@va.gov
+      - eugenia.gina.ronat@accenturefederal.com
+      - morgan.whaley@accenturefederal.com
+      - m.c.shah@accenturefederal.com
+      - d.a.barnes@accenturefederal.com
+      - jacob.finnern@accenturefederal.com
+      - hocine.halli@accenturefederal.com
 
 oidc:
   auth_server_metadata_url: ~
@@ -646,6 +648,9 @@ oidc:
     - prefix: "https://example.com/"
       metadata: "/.well-known/openid-configuration"
       proxy: "https://example.com/"
+  opaque_clients:
+    - route: ~
+      client_id: ~
 
 sentry:
   dsn: ~
@@ -738,12 +743,10 @@ flipper:
     - craig.wheeler@gcio.com
     - dan.hinze@adhocteam.us
     - dat.tran@gcio.com
-    - delli-gatti_michael@bah.com
     - devinmccurdy@gmail.com
     - dnalbach@governmentcio.com
     - draju@governmentcio.com
     - dror@matal.com
-    - elder_joseph@bah.com
     - eric.buckley@adhocteam.us
     - eric.boehs@oddball.io
     - erik@adhocteam.us
@@ -778,7 +781,6 @@ flipper:
     - ltran@thoughtworks.com
     - marisa.hoenig@thoughtworks.com
     - mark.greenburg@adhocteam.us
-    - mccurdy_devin@bah.com
     - mdewey@governmentcio.com
     - micah@adhocteam.us
     - michel.mcdonald@adhocteam.us
@@ -795,26 +797,32 @@ flipper:
     - pherbert@thoughtworks.com
     - regarr@gmail.com # Robin Garrison - AdHoc
     - riley.anderson@oddball.io
-    - roth_matthew@bah.com
     - ryan.leahy@adhocteam.us # Ryan Leahy - Adhoc
     - ryan.thurlwell@va.gov
     - saman.moshafi@thoughtworks.com
     - samara.strauss@va.gov
     - scy0846@gmail.com # Taylor Mitchell - GCIO
-    - shawkey_daniel@bah.com
     - shefai.nayak@thoughtworks.com
-    - sonntag_adam@bah.com
     - ssuddath@governmentcio.com
     - stephen.barrs@va.gov
     - tony.williams@va.gov
     - travis.hilton@oddball.io
     - trevor.bosaw@oddball.io
-    - turner_desiree@bah.com
     - tze@adhocteam.us
-    - zurbergram@gmail.com
     - zmorel@governmentcio.com
     - kha.huynh@thoughtworks.com
     - zach.morel@gcio.com
+    - abelardo.blanco@va.gov
+    - eugenia.gina.ronat@accenturefederal.com
+    - morgan.whaley@accenturefederal.com
+    - m.c.shah@accenturefederal.com
+    - patrick.arthur@accenturefederal.com
+    - adam.freemer@accenturefederal.com
+    - dan.brooking@accenturefederal.com
+    - sebastian.cooper@accenturefederal.com
+    - david.rowley@accenturefederal.com
+    - nick.barthelemy@accenturefederal.com
+    - bradley.bergeron@accenturefederal.com
 
 bgs:
   application: ~
@@ -1087,7 +1095,7 @@ check_in:
     tmp_api_username: vetsapiTempUser
     service_name: CHIP-API
     mock: false
-    key_path: ~
+    key_path: fake_api_path
     redis_session_prefix: check_in
     timeout: 30
   chip_api_v1:
@@ -1099,14 +1107,41 @@ check_in:
     tmp_api_username: vetsapiTempUser
     service_name: CHIP-API
     mock: false
-    key_path: ~
+    key_path: fake_api_path
     redis_session_prefix: check_in_chip_v1
     timeout: 30
   lorota_v1:
-    url: https://fake_url.com:9000
-    host: fake_url.com
+    url: https://vpce-06399548ef94bdb41-lk4qp2nd.execute-api.us-gov-west-1.vpce.amazonaws.com
+    host: vpce-06399548ef94bdb41-lk4qp2nd.execute-api.us-gov-west-1.vpce.amazonaws.com
+    base_path: dev
+    api_id: 22t00c6f97
+    api_key: Xc7k35oE2H9aDeUEpeGa38PzAHyLT9jb5HiKeBfs
     service_name: LoROTA-API
     mock: false
+    key_path: fake_api_path
+    redis_session_prefix: check_in_lorota_v1
+  chip_api_v2:
+    url: https://vpce-06399548ef94bdb41-lk4qp2nd.execute-api.us-gov-west-1.vpce.amazonaws.com
+    base_path: dev
+    host: vpce-06399548ef94bdb41-lk4qp2nd.execute-api.us-gov-west-1.vpce.amazonaws.com
+    tmp_api_user: TzY6DFrnjPE8dwxUMbFf9HjbFqRim2MgXpMpMciXJFVohyURUJAc7W99rpFzhfh2B3sVnn4
+    tmp_api_id: 2dcdrrn5zc
+    tmp_api_username: vetsapiTempUser
+    service_name: CHIP-API
+    mock: false
+    key_path: fake_api_path
+    redis_session_prefix: check_in_chip_v2
+    timeout: 30
+  lorota_v2:
+    url: https://vpce-06399548ef94bdb41-lk4qp2nd.execute-api.us-gov-west-1.vpce.amazonaws.com
+    host: vpce-06399548ef94bdb41-lk4qp2nd.execute-api.us-gov-west-1.vpce.amazonaws.com
+    base_path: dev
+    api_id: 22t00c6f97
+    api_key: Xc7k35oE2H9aDeUEpeGa38PzAHyLT9jb5HiKeBfs
+    service_name: LoROTA-API
+    mock: false
+    key_path: fake_api_path
+    redis_session_prefix: check_in_lorota_v2
 
 rack:
   cookie_secret: ~

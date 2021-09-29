@@ -644,9 +644,10 @@ ActiveRecord::Schema.define(version: 2021_09_13_194827) do
   end
 
   create_table "mobile_users", force: :cascade do |t|
-    t.string "user_id", null: false
-    t.datetime "created_at", null: false
-    t.index ["user_id"], name: "mobile_user_index", unique: true
+    t.string "icn", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["icn"], name: "index_mobile_users_on_icn", unique: true
   end
 
   create_table "notifications", id: :serial, force: :cascade do |t|

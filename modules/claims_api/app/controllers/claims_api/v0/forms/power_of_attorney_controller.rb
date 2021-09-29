@@ -15,7 +15,7 @@ module ClaimsApi
         # POST to change power of attorney for a Veteran.
         #
         # @return [JSON] Record in pending state
-        def submit_form_2122
+        def submit_form_2122 # rubocop:disable Metrics/MethodLength
           validate_json_schema
 
           poa_code = form_attributes.dig('serviceOrganization', 'poaCode')
@@ -29,6 +29,7 @@ module ClaimsApi
               auth_headers: auth_headers,
               form_data: form_attributes,
               source_data: source_data,
+              current_poa: current_poa_code,
               header_md5: header_md5
             )
 
@@ -40,6 +41,11 @@ module ClaimsApi
           end
 
           ClaimsApi::PoaUpdater.perform_async(power_of_attorney.id)
+          if enable_vbms_access?
+            ClaimsApi::VBMSUpdater.perform_async(
+              power_of_attorney.id, target_veteran.participant_id
+            )
+          end
 
           render json: power_of_attorney, serializer: ClaimsApi::PowerOfAttorneySerializer
         end
@@ -130,6 +136,10 @@ module ClaimsApi
             icn: Settings.bgs.external_uid,
             email: Settings.bgs.external_key
           }
+        end
+
+        def enable_vbms_access?
+          form_attributes['recordConsent'] && form_attributes['consentLimits'].blank?
         end
 
         def validation_success

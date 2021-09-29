@@ -55,12 +55,14 @@ RSpec.describe Mobile::V0::PreCacheAppointmentsJob, type: :job do
                                     url: nil,
                                     code: nil },
                         minutes_duration: 60,
+                        phone_only: false,
                         start_date_local: '2020-06-26T22:19:00.000-04:00',
                         start_date_utc: '2020-06-27T02:19:00.000Z',
                         status: 'BOOKED',
                         status_detail: nil,
                         time_zone: 'America/New_York',
-                        vetext_id: nil })
+                        vetext_id: nil,
+                        reason: nil })
             end
           end
         end
