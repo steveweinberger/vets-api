@@ -65,13 +65,12 @@ GIT
 
 GIT
   remote: https://github.com/department-of-veterans-affairs/vets-json-schema
-  revision: 3ee78fbe44079c16e10649395d5076fbbf90e535
+  revision: 3a0946727d9013ff2771af37bfca0c4c0ff0a1d5
   branch: master
   specs:
-    vets_json_schema (20.13.0)
+    vets_json_schema (20.14.0)
       multi_json (~> 1.0)
       script_utils (= 0.0.4)
-
 PATH
   remote: /home/lihan/projects/ruby-mpi
   specs:
@@ -105,6 +104,7 @@ PATH
     facilities_api (0.1.0)
     health_quest (0.1.0)
     identity (0.1.0)
+    meb_api (0.1.0)
     mobile (0.1.0)
       dry-validation
     openid_auth (0.0.1)
@@ -391,28 +391,28 @@ GEM
       activesupport (>= 4.2)
     fastimage (2.2.5)
     ffi (1.15.3)
-    fhir_client (5.0.1)
+    fhir_client (5.0.2)
       activesupport (>= 3)
       addressable (>= 2.3)
-      fhir_dstu2_models (>= 1.1.0)
-      fhir_models (>= 4.2.0)
-      fhir_stu3_models (>= 3.1.0)
+      fhir_dstu2_models (>= 1.1.1)
+      fhir_models (>= 4.2.1)
+      fhir_stu3_models (>= 3.1.1)
       nokogiri (>= 1.10.4)
       oauth2 (~> 1.1)
       rack (>= 1.5)
       rest-client (~> 2.0)
       tilt (>= 1.1)
-    fhir_dstu2_models (1.1.0)
+    fhir_dstu2_models (1.1.1)
       bcp47 (>= 0.3)
       date_time_precision (>= 0.8)
       mime-types (>= 3.0)
       nokogiri (>= 1.11.4)
-    fhir_models (4.2.0)
+    fhir_models (4.2.1)
       bcp47 (>= 0.3)
       date_time_precision (>= 0.8)
       mime-types (>= 3.0)
       nokogiri (>= 1.11.4)
-    fhir_stu3_models (3.1.0)
+    fhir_stu3_models (3.1.1)
       bcp47 (>= 0.3)
       date_time_precision (>= 0.8)
       mime-types (>= 3.0)
@@ -465,13 +465,13 @@ GEM
       google-apis-discovery_v1 (~> 0.5)
       thor (>= 0.20, < 2.a)
     google-protobuf (3.17.3)
-    googleauth (0.17.1)
+    googleauth (1.0.0)
       faraday (>= 0.17.3, < 2.0)
       jwt (>= 1.4, < 3.0)
       memoist (~> 0.16)
       multi_json (~> 1.11)
       os (>= 0.9, < 2.0)
-      signet (~> 0.15)
+      signet (>= 0.16, < 2.a)
     govdelivery-tms (2.8.4)
       activesupport
       faraday
@@ -541,7 +541,7 @@ GEM
     listen (3.7.0)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
-    lockbox (0.6.5)
+    lockbox (0.6.6)
     loofah (2.12.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
@@ -553,7 +553,7 @@ GEM
     method_source (1.0.0)
     mime-types (3.3.1)
       mime-types-data (~> 3.2015)
-    mime-types-data (3.2021.0704)
+    mime-types-data (3.2021.0901)
     mimemagic (0.4.3)
       nokogiri (~> 1)
       rake
@@ -573,7 +573,7 @@ GEM
     netrc (0.11.0)
     nio4r (2.5.8)
     no_proxy_fix (0.1.2)
-    nokogiri (1.12.4)
+    nokogiri (1.12.5)
       mini_portile2 (~> 2.6.1)
       racc (~> 1.4)
     nori (2.6.0)
@@ -591,7 +591,7 @@ GEM
     octokit (4.21.0)
       faraday (>= 0.9)
       sawyer (~> 0.8.0, >= 0.5.3)
-    oj (3.13.7)
+    oj (3.13.8)
     okcomputer (1.18.4)
     olive_branch (4.0.0)
       multi_json
@@ -874,8 +874,8 @@ GEM
       sidekiq (>= 3)
       thwait
       tilt (>= 1.4.0)
-    signet (0.15.0)
-      addressable (~> 2.3)
+    signet (0.16.0)
+      addressable (~> 2.8)
       faraday (>= 0.17.3, < 2.0)
       jwt (>= 1.5, < 3.0)
       multi_json (~> 1.10)
@@ -931,7 +931,7 @@ GEM
     uber (0.1.0)
     unf (0.1.4)
       unf_ext
-    unf_ext (0.0.7.7)
+    unf_ext (0.0.8)
     unicode-display_width (2.1.0)
     uri_template (0.7.0)
     utf8-cleaner (1.0.0)
@@ -1029,7 +1029,7 @@ DEPENDENCIES
   faraday_middleware
   fast_jsonapi
   fastimage
-  fhir_client (~> 5.0.1)
+  fhir_client (~> 5.0.2)
   flipper
   flipper-active_record
   flipper-active_support_cache_store
@@ -1059,6 +1059,7 @@ DEPENDENCIES
   liquid
   lockbox
   mail (= 2.7.1)
+  meb_api!
   memoist
   mimemagic (~> 0.4.3)
   mini_magick (~> 4.11.0)
