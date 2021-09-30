@@ -288,6 +288,45 @@ describe MPIData, skip_mvi: true do
     end
   end
 
+  describe '#response_from_redis_or_service' do
+    subject do
+      mvi.send(:response_from_redis_or_service)
+    end
+
+    def self.calls_original
+      it 'calls the original mpi service' do
+        expect_any_instance_of(MPI::Service).to receive(:find_profile).and_return(OpenStruct.new(cache?: true))
+        subject
+      end
+    end
+
+    context 'with mpi_gem flipper disabled' do
+      before do
+        expect(Flipper).to receive(:enabled?).with(:mpi_gem).and_return(false)
+      end
+
+      calls_original
+    end
+
+    context 'with a user with no edipi or icn' do
+      calls_original
+    end
+
+    context 'with a user with an icn or edipi' do
+      before do
+        expect(user.identity).to receive(:edipi).and_return('1007697216')
+      end
+
+      context 'with mpi_gem flipper enabled' do
+        it 'calls the new mpi service' do
+          allow(MasterPersonIndex::Configuration.instance).to receive(:allow_missing_certs?).and_return(true)
+          expect_any_instance_of(MPI::V1::Service).to receive(:find_profile).and_return(OpenStruct.new(cache?: true))
+          subject
+        end
+      end
+    end
+  end
+
   describe '#add_ids' do
     let(:mvi) { MPIData.for_user(user.identity) }
     let(:response) do

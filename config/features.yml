@@ -252,6 +252,9 @@ features:
   mobile_api:
     actor_type: user
     description: API endpoints consumed by the VA Mobile App (iOS/Android)
+  mpi_gem:
+    actor_type: user
+    description: Use MPI gem to make MPI requests
   multiple_address_10_10ez:
     actor_type: cookie_id
     description: >

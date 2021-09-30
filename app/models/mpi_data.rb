@@ -2,6 +2,7 @@
 
 require 'mpi/responses/find_profile_response'
 require 'mpi/service'
+require 'mpi/v1/service'
 require 'mpi/orch_search_service'
 require 'common/models/redis_store'
 require 'common/models/concerns/cache_aside'
@@ -192,11 +193,23 @@ class MPIData < Common::RedisStore
 
   def response_from_redis_or_service
     do_cached_with(key: user_identity.uuid) do
-      mpi_service.find_profile(user_identity)
+      if Flipper.enabled?(:mpi_gem)
+        if user_identity.edipi.present? || user_identity.mhv_icn.present?
+          mpi_v1_service.find_profile(user_identity)
+        else
+          mpi_service.find_profile(user_identity)
+        end
+      else
+        mpi_service.find_profile(user_identity)
+      end
     rescue ArgumentError => e
       log_message_to_sentry("[MPI Data] Request error: #{e.message}", :warn)
       return nil
     end
+  end
+
+  def mpi_v1_service
+    @service ||= MPI::V1::Service.new
   end
 
   def mpi_service
