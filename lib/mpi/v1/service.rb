@@ -18,23 +18,25 @@ module MPI
         instance.edipi_search = Settings.mvi.edipi_search
 
         handlers = instance.connection.builder.handlers
-        handlers.insert(-2, Faraday::RackBuilder::Handler.new(Common::Client::Middleware::Logging, 'MVIRequest')) if Settings.mvi.pii_logging
-        handlers.insert(-2, Faraday::RackBuilder::Handler.new(Betamocks::Middleware)) if Settings.mvi.mock
+        unless handlers.frozen?
+          handlers.insert(-2, Faraday::RackBuilder::Handler.new(Common::Client::Middleware::Logging, 'MVIRequest')) if Settings.mvi.pii_logging
+          handlers.insert(-2, Faraday::RackBuilder::Handler.new(Betamocks::Middleware)) if Settings.mvi.mock
+        end
       end
 
-      def find_profile(user, search_type = MasterPersonIndex::Constants::CORRELATION_WITH_RELATIONSHIP_DATA)
-        if user.mhv_icn.present?
+      def find_profile(user_identity, search_type = MasterPersonIndex::Constants::CORRELATION_WITH_RELATIONSHIP_DATA)
+        if user_identity.mhv_icn.present?
           Raven.tags_context(mvi_find_profile: 'icn')
-        elsif user.edipi.present?
+        elsif user_identity.edipi.present?
           Raven.tags_context(mvi_find_profile: 'edipi')
         end
 
-        return_val = @service.find_profile(convert_user(user), search_type)
+        return_val = @service.find_profile(convert_user(user_identity), search_type)
 
         if return_val.error.present?
           original_error = return_val.error
           log_message_to_sentry("MVI find_profile error: #{original_error.message}", :warn)
-          mvi_error_handler(user, original_error)
+          mvi_error_handler(user_identity, original_error)
 
           return_val.error = build_exception(return_val.error_code, original_error)
         end
@@ -71,7 +73,7 @@ module MPI
         )
       end
 
-      def convert_user(user)
+      def convert_user(user_identity)
         attributes = {}
 
         %w[
@@ -84,7 +86,7 @@ module MPI
           mhv_icn
           edipi
         ].each do |attr|
-          attributes[attr] = user.public_send(attr)
+          attributes[attr] = user_identity.public_send(attr)
         end
 
         MasterPersonIndex::Models::User.new(

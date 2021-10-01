@@ -2,7 +2,7 @@ require 'rails_helper'
 require 'mpi/v1/service'
 
 describe MPI::V1::Service do
-  let(:user) { create(:user, :loa3) }
+  let(:user) { create(:user, :loa3).identity }
   let(:service) { described_class.new }
   let(:icn_with_aaid) { '1008714701V416111^NI^200M^USVHA' }
   let(:server_error) { MasterPersonIndex::Responses::FindProfileResponse::RESPONSE_STATUS[:server_error] }
@@ -34,15 +34,13 @@ describe MPI::V1::Service do
   let(:instance) { MasterPersonIndex::Configuration.instance }
 
   before do
+    allow(Settings.mvi).to receive(:pii_logging).and_return(true)
+    allow(Settings.mvi).to receive(:mock).and_return(true)
     allow(instance).to receive(:allow_missing_certs?).and_return(true)
   end
 
   describe 'middlewares' do
     it 'adds middlewares in the right positions' do
-      allow(Settings.mvi).to receive(:pii_logging).and_return(true)
-      allow(Settings.mvi).to receive(:mock).and_return(true)
-      service
-
       expect(instance.connection.builder.handlers).to eq(
         [
           MasterPersonIndex::Common::Client::Middleware::SOAPHeaders,
