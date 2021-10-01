@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module MPI
   module V1
     class Service
@@ -19,7 +21,11 @@ module MPI
 
         handlers = instance.connection.builder.handlers
         unless handlers.frozen?
-          handlers.insert(-2, Faraday::RackBuilder::Handler.new(Common::Client::Middleware::Logging, 'MVIRequest')) if Settings.mvi.pii_logging
+          if Settings.mvi.pii_logging
+            handlers.insert(-2,
+                            Faraday::RackBuilder::Handler.new(Common::Client::Middleware::Logging,
+                                                              'MVIRequest'))
+          end
           handlers.insert(-2, Faraday::RackBuilder::Handler.new(Betamocks::Middleware)) if Settings.mvi.mock
         end
       end

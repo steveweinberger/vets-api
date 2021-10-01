@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require 'mpi/v1/service'
 
@@ -153,10 +155,10 @@ describe MPI::V1::Service do
       context 'invalid requests' do
         it 'responds with a SERVER_ERROR if ICN is invalid', :aggregate_failures do
           allow(user).to receive(:mhv_icn).and_return('invalid-icn-is-here^NI')
-          expect(subject).to receive(:log_exception_to_sentry)
+          expect(service).to receive(:log_exception_to_sentry)
 
           VCR.use_cassette('mpi/find_candidate/invalid_icn') do
-            response = subject.find_profile(user)
+            response = service.find_profile(user)
 
             server_error_502_expectations_for(response)
           end
@@ -164,10 +166,10 @@ describe MPI::V1::Service do
 
         it 'responds with a SERVER_ERROR if ICN has no matches', :aggregate_failures do
           allow(user).to receive(:mhv_icn).and_return('1008714781V416999')
-          expect(subject).to receive(:log_exception_to_sentry)
+          expect(service).to receive(:log_exception_to_sentry)
 
           VCR.use_cassette('mpi/find_candidate/icn_not_found') do
-            response = subject.find_profile(user)
+            response = service.find_profile(user)
 
             server_error_502_expectations_for(response)
           end
