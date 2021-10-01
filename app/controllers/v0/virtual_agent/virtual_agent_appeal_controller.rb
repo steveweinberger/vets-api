@@ -41,7 +41,7 @@ module V0
 
       def first_five_open_comp_appeals(appeals)
         appeals
-          .sort_by { |appeal| get_submission_date appeal }
+          .sort_by { |appeal| get_last_updated_date appeal }
           .reverse
           .select { |appeal| open_compensation? appeal }
           .take(5)

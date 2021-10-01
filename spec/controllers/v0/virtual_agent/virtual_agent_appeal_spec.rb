@@ -222,6 +222,13 @@ RSpec.describe 'VirtualAgentAppeals', type: :request do
               expect(res_body).to be_kind_of(Array)
               expect(res_body.length).to equal(5)
               expect(res_body).to eq([{
+                                      "appeal_type" => "Compensation",
+                                      "filing_date" => "02/06/2003",
+                                      "appeal_status" => "Your appeal was closed",
+                                      "updated_date" => "10/01/2021",
+                                      "description" => " ",
+                                      "appeal_or_review" => "appeal"
+                                    },{
                                         "appeal_type" => "Compensation",
                                         "filing_date" => "09/30/2021",
                                         "appeal_status" => "Your appeal is waiting to be sent to a judge",
@@ -236,24 +243,17 @@ RSpec.describe 'VirtualAgentAppeals', type: :request do
                                         "description" => " ",
                                         "appeal_or_review" => "appeal"
                                       }, {
+                                       "appeal_type" => "Compensation",
+                                       "filing_date" => "01/06/2003",
+                                       "appeal_status" => "The Board made a decision on your appeal",
+                                       "updated_date" => "09/16/2021",
+                                       "description" => " ",
+                                       "appeal_or_review" => "appeal"
+                                     }, {
                                         "appeal_type" => "Compensation",
                                         "filing_date" => "03/06/2021",
                                         "appeal_status" => "The Board made a decision on your appeal",
                                         "updated_date" => "09/15/2021",
-                                        "description" => " ",
-                                        "appeal_or_review" => "appeal"
-                                      }, {
-                                        "appeal_type" => "Compensation",
-                                        "filing_date" => "02/06/2003",
-                                        "appeal_status" => "Your appeal was closed",
-                                        "updated_date" => "10/01/2021",
-                                        "description" => " ",
-                                        "appeal_or_review" => "appeal"
-                                      }, {
-                                        "appeal_type" => "Compensation",
-                                        "filing_date" => "01/06/2003",
-                                        "appeal_status" => "The Board made a decision on your appeal",
-                                        "updated_date" => "09/16/2021",
                                         "description" => " ",
                                         "appeal_or_review" => "appeal"
                                       }])
