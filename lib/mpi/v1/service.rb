@@ -35,6 +35,8 @@ module MPI
           Raven.tags_context(mvi_find_profile: 'icn')
         elsif user_identity.edipi.present?
           Raven.tags_context(mvi_find_profile: 'edipi')
+        else
+          Raven.tags_context(mvi_find_profile: 'user_attributes')
         end
 
         return_val = @service.find_profile(convert_user(user_identity), search_type)
