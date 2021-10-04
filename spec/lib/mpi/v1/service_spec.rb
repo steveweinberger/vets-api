@@ -3,6 +3,8 @@
 require 'rails_helper'
 require 'mpi/v1/service'
 
+# TODO: remove references to old MPI code
+
 describe MPI::V1::Service do
   let(:user_hash) do
     {
