@@ -1,5 +1,9 @@
 version: '3.4'
 services:
+  clamav:
+    image: clamav/clamav
+    ports:
+      - "3310:3310"
   redis:
     image: redis:5.0-alpine
     ports:
@@ -13,4 +17,3 @@ services:
       - ./data:/var/lib/postgresql/data:cached
     ports:
       - "54320:5432"
-

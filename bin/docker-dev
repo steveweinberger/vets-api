@@ -1,0 +1,37 @@
+#! /usr/bin/env zsh
+
+ensure_git_root() {
+  root_dir=$(git rev-parse --show-toplevel)
+
+  if [ "$root_dir" != "$(pwd)" ]; then
+    echo 'Please run from project root.'
+    exit 1
+  fi
+}
+
+web_run() {
+  DATABASE_URL="${DATABASE_URL:=postgis://postgres:password@gateway.docker.internal:54320/vets_api_test}"
+  REDIS_HOST="${REDIS_HOST:=gateway.docker.internal}"
+  REDIS_URL="${REDIS_URL:=redis://$REDIS_HOST:63790}"
+  PORT="${PORT:=3000}"
+  tag_name="$(basename $(pwd))"
+
+  docker run \
+    --env DATABASE_URL=$DATABASE_URL \
+    --env Settings.test_database_url=$DATABASE_URL \
+    --env Settings.redis.host=$REDIS_HOST \
+    --env Settings.redis.app_data.url=$REDIS_URL \
+    --env Settings.redis.sidekiq.url=$REDIS_URL \
+    --env Settings.redis.rails_cache.url=$REDIS_URL \
+    --env Settings.saml.cert_path=/app/config/certs/vetsgov-localhost.crt \
+    --env Settings.saml.key_path=/app/config/certs/vetsgov-localhost.key \
+    --env RAILS_ENV=test \
+    --publish $PORT:3000 \
+    --rm \
+    --interactive \
+    --tty \
+    $tag_name rspec
+    # $tag_name bin/rails db:drop db:setup db:migrate
+}
+
+ensure_git_root && web_run

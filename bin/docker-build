@@ -1,0 +1,18 @@
+#! /usr/bin/env zsh
+
+ensure_git_root() {
+  root_dir=$(git rev-parse --show-toplevel)
+
+  if [ "$root_dir" != "$(pwd)" ]; then
+    echo 'Please run from project root.'
+    exit 1
+  fi
+}
+
+docker_build() {
+  tag_name="$(basename $(pwd))"
+
+  docker build -t $tag_name .
+}
+
+ensure_git_root && docker_build
