@@ -4,7 +4,16 @@ require 'rails_helper'
 require 'mpi/v1/service'
 
 describe MPI::V1::Service do
-  let(:user) { create(:user, :loa3).identity }
+  let(:user_hash) do
+    {
+      first_name: 'Mitchell',
+      last_name: 'Jenkins',
+      middle_name: 'G',
+      birth_date: '1949-03-04',
+      ssn: '796122306'
+    }
+  end
+  let(:user) { build(:user, :loa3, user_hash).identity }
   let(:service) { described_class.new }
   let(:icn_with_aaid) { '1008714701V416111^NI^200M^USVHA' }
   let(:server_error) { MasterPersonIndex::Responses::FindProfileResponse::RESPONSE_STATUS[:server_error] }
