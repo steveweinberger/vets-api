@@ -71,6 +71,7 @@ GIT
     vets_json_schema (20.14.0)
       multi_json (~> 1.0)
       script_utils (= 0.0.4)
+
 PATH
   remote: /home/lihan/projects/ruby-mpi
   specs:
@@ -283,7 +284,7 @@ GEM
     crack (0.4.5)
       rexml
     crass (1.0.6)
-    danger (8.3.1)
+    danger (8.4.0)
       claide (~> 1.0)
       claide-plugins (>= 0.9.2)
       colored2 (~> 3.1)
@@ -440,7 +441,7 @@ GEM
       rspec-core (~> 3.0)
       ruby-progressbar (~> 1.4)
     gems (1.2.0)
-    git (1.8.1)
+    git (1.9.1)
       rchardet (~> 1.8)
     globalid (0.5.2)
       activesupport (>= 5.0)
@@ -794,16 +795,16 @@ GEM
     rswag-ui (2.4.0)
       actionpack (>= 3.1, < 7.0)
       railties (>= 3.1, < 7.0)
-    rubocop (1.21.0)
+    rubocop (1.22.0)
       parallel (~> 1.10)
       parser (>= 3.0.0.0)
       rainbow (>= 2.2.2, < 4.0)
       regexp_parser (>= 1.8, < 3.0)
       rexml
-      rubocop-ast (>= 1.9.1, < 2.0)
+      rubocop-ast (>= 1.12.0, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 1.4.0, < 3.0)
-    rubocop-ast (1.11.0)
+    rubocop-ast (1.12.0)
       parser (>= 3.0.1.1)
     rubocop-junit-formatter (0.1.4)
     rubocop-rails (2.12.2)
@@ -912,7 +913,7 @@ GEM
     sync (0.5.0)
     term-ansicolor (1.7.1)
       tins (~> 1.0)
-    terminal-table (3.0.1)
+    terminal-table (3.0.2)
       unicode-display_width (>= 1.1.1, < 3)
     thor (1.1.0)
     thread_safe (0.3.6)
