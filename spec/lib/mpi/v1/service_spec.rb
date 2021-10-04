@@ -201,6 +201,257 @@ describe MPI::V1::Service do
         end
       end
     end
+
+    describe '.find_profile without icn' do
+      context 'valid request' do
+        before do
+          expect(MasterPersonIndex::Messages::FindProfileMessage).to receive(:new).once.and_call_original
+        end
+
+        it 'calls the find_profile endpoint with a find candidate message' do
+          VCR.use_cassette('mpi/find_candidate/valid') do
+            profile = mvi_profile
+            profile['search_token'] = 'WSDOC1908281447208280163390431'
+            expect(Raven).to receive(:tags_context).once.with(mvi_find_profile: 'user_attributes')
+            response = subject.find_profile(user)
+            expect(response.status).to eq('OK')
+            expect(response.profile).to have_deep_attributes(profile)
+          end
+        end
+
+        context 'with historical icns' do
+          let(:user_hash) do
+            {
+              first_name: 'RFIRST',
+              last_name: 'RLAST',
+              birth_date: '19790812',
+              gender: 'M',
+              ssn: '768598574'
+            }
+          end
+
+          it 'fetches historical icns when available', run_at: 'Thu, 29 Aug 2019 13:56:24 GMT' do
+            allow(SecureRandom).to receive(:uuid).and_return('5e819d17-ce9b-4860-929e-f9062836ebd0')
+
+            VCR.use_cassette('mpi/find_candidate/historical_icns_with_traits', VCR::MATCH_EVERYTHING) do
+              response = subject.find_profile(user, MPI::Constants::CORRELATION_WITH_ICN_HISTORY)
+              expect(response.status).to eq('OK')
+              expect(response.profile['historical_icns']).to eq(
+                %w[1008692852V724999 1008787550V443247 1008787485V229771 1008795715V162680
+                   1008795714V030791 1008795629V076564 1008795718V643356]
+              )
+            end
+          end
+        end
+
+        context 'without gender' do
+          let(:user_hash) do
+            {
+              first_name: 'Mitchell',
+              last_name: 'Jenkins',
+              middle_name: 'G',
+              birth_date: '1949-03-04',
+              ssn: '796122306',
+              gender: nil
+            }
+          end
+
+          it 'calls the find_profile endpoint with a find candidate message' do
+            VCR.use_cassette('mpi/find_candidate/valid_no_gender') do
+              profile = mvi_profile
+              profile['search_token'] = 'WSDOC1908281514193450364096012'
+              response = subject.find_profile(user)
+              expect(response.profile).to have_deep_attributes(profile)
+            end
+          end
+        end
+      end
+
+      context 'when a MVI invalid request response is returned' do
+        it 'raises a invalid request error', :aggregate_failures do
+          invalid_xml = File.read('spec/support/mpi/find_candidate_invalid_request.xml')
+          allow_any_instance_of(MPI::Service).to receive(:create_profile_message).and_return(invalid_xml)
+          expect(subject).to receive(:log_exception_to_sentry)
+
+          VCR.use_cassette('mpi/find_candidate/invalid') do
+            response = subject.find_profile(user)
+            server_error_502_expectations_for(response)
+          end
+        end
+      end
+
+      context 'when a MVI internal system problem response is returned' do
+        let(:body) { File.read('spec/support/mpi/find_candidate_ar_code_database_error_response.xml') }
+
+        it 'raises a invalid request error', :aggregate_failures do
+          expect(subject).to receive(:log_exception_to_sentry)
+
+          stub_request(:post, Settings.mvi.url).to_return(status: 200, body: body)
+          response = subject.find_profile(user)
+          server_error_502_expectations_for(response)
+        end
+      end
+
+      context 'with an MVI timeout' do
+        let(:base_path) { MPI::Configuration.instance.base_path }
+
+        it 'raises a service error', :aggregate_failures do
+          allow_any_instance_of(Faraday::Connection).to receive(:post).and_raise(Faraday::TimeoutError)
+          expect(subject).to receive(:log_message_to_sentry).with(
+            'MVI find_profile error: Gateway timeout',
+            :warn
+          )
+          response = subject.find_profile(user)
+
+          server_error_504_expectations_for(response)
+        end
+      end
+
+      context 'when a status of 500 is returned' do
+        it 'raises a request failure error', :aggregate_failures do
+          allow_any_instance_of(MPI::Service).to receive(:create_profile_message).and_return('<nobeuno></nobeuno>')
+          expect(subject).to receive(:log_message_to_sentry).with(
+            'MVI find_profile error: SOAP HTTP call failed',
+            :warn
+          )
+          VCR.use_cassette('mpi/find_candidate/five_hundred') do
+            response = subject.find_profile(user)
+            server_error_504_expectations_for(response)
+          end
+        end
+      end
+
+      context 'when no subject is returned in the response body' do
+        before do
+          expect(MPI::Messages::FindProfileMessage).to receive(:new).once.and_call_original
+        end
+
+        let(:user_hash) do
+          {
+            first_name: 'Earl',
+            last_name: 'Stephens',
+            middle_name: 'M',
+            birth_date: '1978-06-11',
+            ssn: '796188587'
+          }
+        end
+
+        it 'returns not found, does not log sentry', :aggregate_failures do
+          VCR.use_cassette('mpi/find_candidate/no_subject') do
+            expect(subject).not_to receive(:log_exception_to_sentry)
+            response = subject.find_profile(user)
+
+            record_not_found_404_expectations_for(response)
+          end
+        end
+
+        context 'with an invalid historical icn user' do
+          let(:user_hash) do
+            {
+              first_name: 'sdf',
+              last_name: 'sdgsdf',
+              birth_date: '19800812',
+              gender: 'M',
+              ssn: '111222333'
+            }
+          end
+
+          it 'returns not found for COMP2 requests, does not log sentry', run_at: 'Wed, 21 Feb 2018 20:19:01 GMT' do
+            allow(SecureRandom).to receive(:uuid).and_return('5e819d17-ce9b-4860-929e-f9062836ebd0')
+
+            VCR.use_cassette('mpi/find_candidate/historical_icns_user_not_found', VCR::MATCH_EVERYTHING) do
+              expect(subject).not_to receive(:log_exception_to_sentry)
+              response = subject.find_profile(user, MPI::Constants::CORRELATION_WITH_ICN_HISTORY)
+
+              record_not_found_404_expectations_for(response)
+            end
+          end
+        end
+
+        context 'with an ongoing breakers outage' do
+          it 'returns the correct thing', :aggregate_failures do
+            MPI::Configuration.instance.breakers_service.begin_forced_outage!
+            expect(Raven).to receive(:extra_context).once
+            response = subject.find_profile(user)
+
+            server_error_503_expectations_for(response)
+          end
+        end
+      end
+
+      context 'when MVI returns 500 but VAAFI sends 200' do
+        before do
+          expect(MPI::Messages::FindProfileMessage).to receive(:new).once.and_call_original
+        end
+
+        %w[internal_server_error internal_server_error_2].each do |cassette|
+          it 'raises an Common::Client::Errors::HTTPError', :aggregate_failures do
+            expect(subject).to receive(:log_message_to_sentry).with(
+              'MVI find_profile error: SOAP service returned internal server error',
+              :warn
+            )
+            VCR.use_cassette("mpi/find_candidate/#{cassette}") do
+              response = subject.find_profile(user)
+
+              server_error_504_expectations_for(response)
+            end
+          end
+        end
+      end
+
+      context 'when MVI multiple match failure response' do
+        before do
+          expect(MPI::Messages::FindProfileMessage).to receive(:new).once.and_call_original
+        end
+
+        it 'raises MPI::Errors::RecordNotFound', :aggregate_failures do
+          expect(subject).to receive(:log_exception_to_sentry)
+
+          VCR.use_cassette('mpi/find_candidate/failure_multiple_matches') do
+            response = subject.find_profile(user)
+
+            record_not_found_404_expectations_for(response)
+          end
+        end
+      end
+    end
+
+    describe '.find_profile monitoring' do
+      context 'with a successful request' do
+        it 'increments find_profile total' do
+          allow(user).to receive(:mhv_icn)
+
+          allow(StatsD).to receive(:increment)
+          VCR.use_cassette('mpi/find_candidate/valid') do
+            subject.find_profile(user)
+          end
+          expect(StatsD).to have_received(:increment).with('api.mvi.find_profile.total')
+        end
+
+        it 'logs the request and response data' do
+          expect do
+            VCR.use_cassette('mpi/find_candidate/valid') do
+              Settings.mvi.pii_logging = true
+              subject.find_profile(user)
+              Settings.mvi.pii_logging = false
+            end
+          end.to change(PersonalInformationLog, :count).by(1)
+        end
+      end
+
+      context 'with an unsuccessful request' do
+        it 'increments find_profile fail and total', :aggregate_failures do
+          allow_any_instance_of(Faraday::Connection).to receive(:post).and_raise(Faraday::TimeoutError)
+          expect(StatsD).to receive(:increment).once.with(
+            'api.mvi.find_profile.fail', tags: ['error:CommonExceptionsGatewayTimeout']
+          )
+          expect(StatsD).to receive(:increment).once.with('api.mvi.find_profile.total')
+          response = subject.find_profile(user)
+
+          server_error_504_expectations_for(response)
+        end
+      end
+    end
   end
 end
 
