@@ -14,6 +14,7 @@ RSpec.describe Mobile::V0::FillMobileUserTableJob, type: :job do
         'Mobile user table add succeeded for user with icn ',
         { icn: '1234567' }
       )
+      expect(Mobile::V0::Users.find_by(icn: '1234567').icn).to eq('1234567')
     end
   end
 
