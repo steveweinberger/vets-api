@@ -2,8 +2,8 @@
 
 module Sidekiq::MeasureRunTime
   def measure_run_time
-    starting = Time.now
+    starting = Time.current
     yield
-    StatsD.measure "shared.sidekiq.#{self.class}.runtime", Time.now - starting
+    StatsD.measure "shared.sidekiq.#{self.class}.runtime", Time.current - starting
   end
 end
