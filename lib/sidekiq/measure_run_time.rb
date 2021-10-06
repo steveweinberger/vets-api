@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module MeasureRunTime
+module Sidekiq::MeasureRunTime
   def measure_run_time
     starting = Time.now
     yield
