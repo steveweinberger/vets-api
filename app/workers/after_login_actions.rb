@@ -2,7 +2,7 @@
 
 class AfterLoginActions
   include Accountable
-  include MeasureRunTime
+  include Sidekiq::MeasureRunTime
 
   def initialize(user)
     @current_user = user
