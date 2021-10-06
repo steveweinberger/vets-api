@@ -304,8 +304,6 @@ describe MPI::V1::Service do
       end
 
       context 'with an MVI timeout' do
-        let(:base_path) { MPI::Configuration.instance.base_path }
-
         it 'raises a service error', :aggregate_failures do
           allow_any_instance_of(Faraday::Connection).to receive(:post).and_raise(Faraday::TimeoutError)
           expect(subject).to receive(:log_message_to_sentry).with(
@@ -476,4 +474,16 @@ def server_error_502_expectations_for(response)
   expect(exception.code).to eq 'MVI_502'
   expect(exception.status).to eq '502'
   expect(exception.source).to eq MPI::V1::Service
+end
+
+def server_error_504_expectations_for(response)
+  exception = response.error.errors.first
+
+  expect(response.class).to eq MPI::Responses::FindProfileResponse
+  expect(response.status).to eq server_error
+  expect(response.profile).to be_nil
+  expect(exception.title).to eq 'Gateway timeout'
+  expect(exception.code).to eq 'MVI_504'
+  expect(exception.status).to eq '504'
+  expect(exception.source).to eq MPI::Service
 end
