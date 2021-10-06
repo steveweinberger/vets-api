@@ -281,7 +281,7 @@ describe MPI::V1::Service do
       context 'when a MVI invalid request response is returned' do
         it 'raises a invalid request error', :aggregate_failures do
           invalid_xml = File.read('spec/support/mpi/find_candidate_invalid_request.xml')
-          allow_any_instance_of(MPI::Service).to receive(:create_profile_message).and_return(invalid_xml)
+          allow_any_instance_of(MasterPersonIndex::Service).to receive(:create_profile_message).and_return(invalid_xml)
           expect(subject).to receive(:log_exception_to_sentry)
 
           VCR.use_cassette('mpi/find_candidate/invalid') do
