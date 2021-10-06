@@ -2,18 +2,21 @@
 
 class AfterLoginActions
   include Accountable
+  include MeasureRunTime
 
   def initialize(user)
     @current_user = user
   end
 
   def perform
-    return unless @current_user
+    measure_run_time do
+      return unless @current_user
 
-    evss_create_account
-    create_user_account
-    update_account_login_stats
-    TestUserDashboard::UpdateUser.new(@current_user).call(Time.current) if Settings.test_user_dashboard.env == 'staging'
+      evss_create_account
+      create_user_account
+      update_account_login_stats
+      TestUserDashboard::UpdateUser.new(@current_user).call(Time.current) if Settings.test_user_dashboard.env == 'staging'
+    end
   end
 
   private
