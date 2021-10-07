@@ -5,29 +5,46 @@ require 'sentry_logging'
 module TestUserDashboard
   class ApplicationController < ActionController::API
     include SentryLogging
-    before_action :require_jwt
 
-    def require_jwt
-      token = request.headers['JWT']
-      pub_key = request.headers['PK']
+    before_action :authenticate!
 
-      head :forbidden unless valid_token(token, pub_key)
-    end
+    attr_reader :current_user
 
     private
 
-    def valid_token(token, pub_key)
-      return false unless token && pub_key
-
-      rsa_public = OpenSSL::PKey::RSA.new(Base64.decode64(pub_key))
-      token.gsub!('Bearer ', '')
-      begin
-        JWT.decode token, rsa_public, true, { algorithm: 'RS256' }
-        return true
-      rescue JWT::DecodeError => e
-        log_message_to_sentry('Error decoding TUD JWT: ', :error, body: e.message)
-      end
-      false
+    def authenticate!
+      return if authenticated?
+  
+      warden.authenticate!(:github)
+      head :forbidden unless authenticated?
+    end
+  
+    def authenticated?
+      return true if Rails.env.test?
+  
+      set_current_user if warden&.authenticated?
+      # implicit: return warden&.authenticated?
+    end
+  
+    def authorize!
+      head :unauthorized unless authorized?
+    end
+  
+    def authorized?
+      authenticated? && warden.user.organization_member?('department-of-veterans-affairs')
+    end
+  
+    # set current_user for now
+    def set_current_user
+      @current_user = {
+        login: warden.user['attribs']['login'],
+        name: warden.user['attribs']['name'],
+        avatar_url: warden.user['attribs']['avatar_url']
+      }
+    end
+  
+    def warden
+      request.env['warden']
     end
   end
 end
