@@ -25,3 +25,19 @@ Warden::GitHub::Strategy.module_eval do
     throw(:warden)
   end
 end
+
+Rails.configuration.middleware.use Warden::Manager do |config|
+  config.failure_app = ->(env){ TestUserDashboard::UnauthorizedController.action(:index).call(env) }
+
+  config.default_strategies :github
+  config.scope_defaults :default, config: {
+    client_id: Settings.tud.github_oauth_key,
+    client_secret: Settings.tud.github_oauth_secret,
+    scope: 'read:user,read:org',
+    redirect_uri: 'test_user_dashboard/tud_accounts'
+  }
+  config.intercept_401 = false
+
+  config.serialize_from_session { |key| Warden::GitHub::Verifier.load(key) }
+  config.serialize_into_session { |user| Warden::GitHub::Verifier.dump(user) }
+end
