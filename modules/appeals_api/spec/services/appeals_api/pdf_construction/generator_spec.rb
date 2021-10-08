@@ -108,7 +108,7 @@ describe AppealsApi::PdfConstruction::Generator do
 
     context 'Supplemental Claim' do
       context 'pdf verification' do
-        let(:supplemental_claim) { create(:supplemental_claim, created_at: Time.zone.today) }
+        let(:supplemental_claim) { create(:supplemental_claim, created_at: '2021-02-03T14:15:16Z') }
 
         it 'generates the expected pdf' do
           generated_pdf = described_class.new(supplemental_claim, version: 'V2').generate
@@ -119,7 +119,7 @@ describe AppealsApi::PdfConstruction::Generator do
       end
 
       context 'pdf extra content verification' do
-        let(:extra_supplemental_claim) { create(:extra_supplemental_claim, created_at: Time.zone.today) }
+        let(:extra_supplemental_claim) { create(:extra_supplemental_claim, created_at: '2021-02-03T14:15:16Z') }
 
         it 'generates the expected pdf' do
           generated_pdf = described_class.new(extra_supplemental_claim, version: 'V2').generate
