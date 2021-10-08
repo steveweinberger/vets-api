@@ -30,6 +30,16 @@
       :uid_location: body
       :uid_locator: 'fileNumber":"(\w+)"'
 
+- :name: 'VBMS'
+  :base_uri: <%= "#{URI(Settings.vbms.url).host}:#{URI(Settings.vbms.url).port}" %>
+  :endpoints:
+  - :method: :post
+    :path: ""
+    :file_path: "debt_letters/index"
+    :cache_multiple_responses:
+      :uid_location: body
+      :uid_locator: 'documentId":"(\w+)"'
+
 - :name: 'VBS'
   :base_uri: <%= "#{URI(Settings.mcp.vbs.url).host}:#{URI(Settings.mcp.vbs.url).port}" %>
   :endpoints:

@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "",
+  "type": "array",
+  "properties": {
+    "items": {
+      "type": "object",
+      "properties": {
+        "documentId": {
+          "type": "string"
+        },
+        "docType": {
+          "type": "string"
+        },
+        "typeDescription": {
+          "type": "string"
+        },
+        "receivedAt": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

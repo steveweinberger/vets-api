@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'debt_management_center/debts_service'
+require 'debt_management_center/debt_letter_service'
 
 module DebtManagementCenter
   class DebtLetterDownloader
@@ -19,7 +19,7 @@ module DebtManagementCenter
     def initialize(user)
       @user = user
       @client = VBMS::Client.from_env_vars(env_name: Settings.vbms.env)
-      @service = debts_service
+      @service = debt_letter_service
       verify_no_dependent_debts
     end
 
@@ -58,8 +58,8 @@ module DebtManagementCenter
       )
     end
 
-    def debts_service
-      DebtManagementCenter::DebtsService.new(@user)
+    def debt_letter_service
+      DebtManagementCenter::DebtLetterService.new(@user)
     end
 
     def verify_no_dependent_debts
