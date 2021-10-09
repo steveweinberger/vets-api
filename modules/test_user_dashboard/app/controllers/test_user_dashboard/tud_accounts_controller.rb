@@ -10,8 +10,12 @@ module TestUserDashboard
     before_action :authorize!
 
     def index
-      tud_accounts = TudAccount.all
-      render json: tud_accounts
+      payload = {
+        tud_accounts: TudAccount.all,
+        user: @current_user
+      }
+
+      render json: payload
     end
 
     def update
