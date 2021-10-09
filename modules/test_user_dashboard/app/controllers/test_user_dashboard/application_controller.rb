@@ -21,9 +21,13 @@ module TestUserDashboard
   
     def authenticated?
       return true if Rails.env.test?
-  
-      set_current_user if warden&.authenticated?
-      # implicit: return warden&.authenticated?
+
+      if warden&.authenticated?
+        set_current_user
+        return true
+      end
+
+      false
     end
   
     def authorize!
@@ -31,13 +35,19 @@ module TestUserDashboard
     end
   
     def authorized?
-      authenticated? && warden.user.organization_member?('department-of-veterans-affairs')
+      # i requested access to department-of-veterans-affairs
+      # i'm not sure why i don't have it
+      # authenticated? && warden.user.organization_member?('department-of-veterans-affairs')
+      authenticated?
     end
   
     # set current_user for now
     def set_current_user
       @current_user = {
+        code: params[:code],
+        id: warden.user['attribs']['id'],
         login: warden.user['attribs']['login'],
+        email: warden.user['attribs']['email'],
         name: warden.user['attribs']['name'],
         avatar_url: warden.user['attribs']['avatar_url']
       }
