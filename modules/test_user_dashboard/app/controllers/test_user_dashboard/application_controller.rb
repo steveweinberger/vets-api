@@ -44,7 +44,6 @@ module TestUserDashboard
     # set current_user for now
     def set_current_user
       @current_user = {
-        code: params[:code],
         id: warden.user['attribs']['id'],
         login: warden.user['attribs']['login'],
         email: warden.user['attribs']['email'],
