@@ -6,10 +6,15 @@ module TestUserDashboard
   class OAuthController < ApplicationController
     include Warden::GitHub::SSO
 
-    before_action :authorize!
+    before_action :authenticate!, only: [:index]
+    before_action :authorize!, only: [:index]
 
     def index
-      redirect_to "http://localhost:8000/signin?code=#{@current_user[:code]}"
+      redirect_to "http://localhost:8000/signin"
+    end
+
+    def is_authorized
+      render json: @current_user if authorized?
     end
   end
 end
