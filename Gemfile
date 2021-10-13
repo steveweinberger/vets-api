@@ -166,6 +166,7 @@ group :test do
   gem 'rspec_junit_formatter'
   gem 'rspec-retry'
   gem 'rubocop-junit-formatter'
+  gem 'selenium-webdriver'
   gem 'simplecov', require: false
   gem 'super_diff'
   gem 'vcr'
