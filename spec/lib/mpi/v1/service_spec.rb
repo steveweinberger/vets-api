@@ -54,6 +54,7 @@ describe MPI::V1::Service do
 
   describe 'middlewares' do
     it 'adds middlewares in the right positions' do
+      described_class.new
       expect(instance.connection.builder.handlers).to eq(
         [
           MasterPersonIndex::Common::Client::Middleware::SOAPHeaders,
