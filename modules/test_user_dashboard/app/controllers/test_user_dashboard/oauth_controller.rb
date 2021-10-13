@@ -16,5 +16,10 @@ module TestUserDashboard
     def is_authorized
       render json: @current_user if authorized?
     end
+
+    def logout
+      warden.logout
+      redirect_to "http://localhost:8000/"
+    end
   end
 end
