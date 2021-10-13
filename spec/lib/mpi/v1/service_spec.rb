@@ -453,7 +453,7 @@ describe MPI::V1::Service do
         it 'increments find_profile fail and total', :aggregate_failures do
           allow_any_instance_of(Faraday::Connection).to receive(:post).and_raise(Faraday::TimeoutError)
           expect(StatsD).to receive(:increment).once.with(
-            'api.mvi.find_profile.fail', tags: ['error:CommonExceptionsGatewayTimeout']
+            'api.mvi.find_profile.fail', tags: ['error:MasterPersonIndexCommonClientErrorsClientError']
           )
           expect(StatsD).to receive(:increment).once.with('api.mvi.find_profile.total')
           response = subject.find_profile(user)
@@ -480,11 +480,11 @@ end
 def server_error_504_expectations_for(response)
   exception = response.error.errors.first
 
-  expect(response.class).to eq MPI::Responses::FindProfileResponse
+  expect(response.class).to eq MasterPersonIndex::Responses::FindProfileResponse
   expect(response.status).to eq server_error
   expect(response.profile).to be_nil
   expect(exception.title).to eq 'Gateway timeout'
   expect(exception.code).to eq 'MVI_504'
   expect(exception.status).to eq '504'
-  expect(exception.source).to eq MPI::Service
+  expect(exception.source).to eq MPI::V1::Service
 end

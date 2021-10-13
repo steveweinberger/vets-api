@@ -48,6 +48,7 @@ module MPI
 
         if return_val.error.present?
           original_error = return_val.error
+          increment_failure('find_profile', original_error)
           log_message_to_sentry("MVI find_profile error: #{original_error.message}", :warn)
           mvi_error_handler(user_identity, original_error)
 
