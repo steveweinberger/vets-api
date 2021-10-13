@@ -20,23 +20,41 @@ RSpec.describe AppealsApi::HigherLevelReviewPdfSubmitJob, type: :job do
   it_behaves_like 'a monitored worker'
 
   it 'uploads a valid payload' do
-    allow(CentralMail::Service).to receive(:new) { client_stub }
-    allow(faraday_response).to receive(:status).and_return(200)
-    allow(faraday_response).to receive(:body).and_return('')
-    allow(faraday_response).to receive(:success?).and_return(true)
-    capture_body = nil
-    expect(client_stub).to receive(:upload) { |arg|
-      capture_body = arg
-      faraday_response
-    }
-    described_class.new.perform(higher_level_review.id)
-    expect(capture_body).to be_a(Hash)
-    expect(capture_body).to have_key('metadata')
-    expect(capture_body).to have_key('document')
-    metadata = JSON.parse(capture_body['metadata'])
-    expect(metadata['uuid']).to eq(higher_level_review.id)
-    updated = AppealsApi::HigherLevelReview.find(higher_level_review.id)
-    expect(updated.status).to eq('submitted')
+    Timecop.freeze(DateTime.new(2020, 1, 1).utc) do
+      allow(CentralMail::Service).to receive(:new) { client_stub }
+      allow(faraday_response).to receive(:status).and_return(200)
+      allow(faraday_response).to receive(:body).and_return('')
+      allow(faraday_response).to receive(:success?).and_return(true)
+      capture_body = nil
+      expect(client_stub).to receive(:upload) { |arg|
+        capture_body = arg
+        faraday_response
+      }
+      described_class.new.perform(higher_level_review.id)
+      metadata = JSON.parse(capture_body['metadata'])
+
+      expect(capture_body).to be_a(Hash)
+      expect(capture_body).to have_key('metadata')
+      expect(metadata).to eq({
+                               'veteranFirstName' => 'Jane',
+                               'veteranLastName' => 'Doe',
+                               'fileNumber' => '987654321',
+                               'zipCode' => '66002',
+                               'source' => 'Appeals-HLR-va.gov',
+                               'uuid' => higher_level_review.id,
+                               'hashV' => '3a4dd356b7d6a97f3e954456790fcc259484e7f246ded887b9cf3e5335dc2b1b',
+                               'numberAttachments' => 0,
+                               'receiveDt' => '2019-12-31 18:00:00',
+                               'numberPages' => 2,
+                               'docType' => '20-0996'
+                             })
+      expect(capture_body).to have_key('document')
+      expect(capture_body['document'].original_filename).to eq('200996-document.pdf')
+      expect(capture_body['document'].content_type).to eq('application/pdf')
+
+      updated = AppealsApi::HigherLevelReview.find(higher_level_review.id)
+      expect(updated.status).to eq('submitted')
+    end
   end
 
   it 'sets error status for upstream server error' do
