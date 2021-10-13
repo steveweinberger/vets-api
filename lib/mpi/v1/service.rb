@@ -4,6 +4,9 @@ module MPI
   module V1
     class Service
       include SentryLogging
+      include Common::Client::Concerns::Monitoring
+
+      STATSD_KEY_PREFIX = 'api.mvi'
 
       def initialize
         @service = MasterPersonIndex::Service.new
@@ -39,7 +42,9 @@ module MPI
           Raven.tags_context(mvi_find_profile: 'user_attributes')
         end
 
-        return_val = @service.find_profile(convert_user(user_identity), search_type)
+        return_val = with_monitoring do
+          @service.find_profile(convert_user(user_identity), search_type)
+        end
 
         if return_val.error.present?
           original_error = return_val.error
