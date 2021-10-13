@@ -4,10 +4,11 @@ if ENV['LOGIN_SYSTEM_TESTS']
   RSpec.describe 'ID.me login', type: :system do
     before do
       driven_by :selenium_chrome
-      VCR.turn_off!
+      Capybara.server = :puma
       Capybara.app_host = 'https://staging.va.gov'
       Capybara.run_server = false # don't start Rack
       Capybara.default_max_wait_time = 8
+      VCR.turn_off!
     end
 
     it 'can log in an LOA1 user' do

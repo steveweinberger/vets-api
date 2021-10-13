@@ -102,9 +102,6 @@ FactoryBot::SyntaxRunner.class_eval do
   include RSpec::Mocks::ExampleMethods
 end
 
-require 'capybara/rails'
-Capybara.server = :puma
-
 RSpec.configure do |config|
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_path = Rails.root.join('spec', 'fixtures')
