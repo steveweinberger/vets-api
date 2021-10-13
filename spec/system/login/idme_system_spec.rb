@@ -7,13 +7,13 @@ if ENV['LOGIN_SYSTEM_TESTS']
       VCR.turn_off!
       Capybara.app_host = 'https://staging.va.gov'
       Capybara.run_server = false # don't start Rack
+      Capybara.default_max_wait_time = 8
     end
 
     it 'can log in an LOA1 user' do
       visit '/'
       click_button 'Sign in'
       click_button 'Sign in with ID.me'
-      sleep(5)
       fill_in 'Email', with: ENV['EMAIL']
       fill_in 'Password', with: ENV['PASSWORD']
       click_button 'Sign in to ID.me'
