@@ -391,7 +391,7 @@ describe MPI::V1::Service do
 
       context 'when MVI returns 500 but VAAFI sends 200' do
         before do
-          expect(MPI::Messages::FindProfileMessage).to receive(:new).once.and_call_original
+          expect(MasterPersonIndex::Messages::FindProfileMessage).to receive(:new).once.and_call_original
         end
 
         %w[internal_server_error internal_server_error_2].each do |cassette|
