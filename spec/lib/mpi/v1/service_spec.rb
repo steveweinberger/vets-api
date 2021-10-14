@@ -19,6 +19,7 @@ describe MPI::V1::Service do
   let(:service) { described_class.new }
   let(:icn_with_aaid) { '1008714701V416111^NI^200M^USVHA' }
   let(:server_error) { MasterPersonIndex::Responses::FindProfileResponse::RESPONSE_STATUS[:server_error] }
+  let(:not_found) { MasterPersonIndex::Responses::FindProfileResponse::RESPONSE_STATUS[:not_found] }
   let(:mvi_profile) do
     build(
       :mpi_profile_response,
@@ -333,7 +334,7 @@ describe MPI::V1::Service do
 
       context 'when no subject is returned in the response body' do
         before do
-          expect(MPI::Messages::FindProfileMessage).to receive(:new).once.and_call_original
+          expect(MasterPersonIndex::Messages::FindProfileMessage).to receive(:new).once.and_call_original
         end
 
         let(:user_hash) do
@@ -484,5 +485,17 @@ def server_error_504_expectations_for(response)
   expect(exception.title).to eq 'Gateway timeout'
   expect(exception.code).to eq 'MVI_504'
   expect(exception.status).to eq '504'
+  expect(exception.source).to eq MPI::V1::Service
+end
+
+def record_not_found_404_expectations_for(response)
+  exception = response.error.errors.first
+
+  expect(response.class).to eq MasterPersonIndex::Responses::FindProfileResponse
+  expect(response.status).to eq not_found
+  expect(response.profile).to be_nil
+  expect(exception.title).to eq 'Record not found'
+  expect(exception.code).to eq 'MVI_404'
+  expect(exception.status).to eq '404'
   expect(exception.source).to eq MPI::V1::Service
 end
