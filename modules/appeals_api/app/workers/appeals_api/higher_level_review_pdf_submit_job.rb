@@ -2,6 +2,7 @@
 
 require 'sidekiq'
 require 'appeals_api/upload_error'
+require 'appeals_api/hlr_pdf_submit_handler'
 require 'central_mail/utilities'
 require 'central_mail/service'
 require 'pdf_info'
@@ -17,8 +18,8 @@ module AppealsApi
     # Retry for ~7 days
     sidekiq_options retry: 20
 
-    def perform(higher_level_review_id, version = 'V1')
-      higher_level_review = AppealsApi::HigherLevelReview.find(higher_level_review_id)
+    def perform(higher_level_review_id, version = 'V1', handler:, appeal_klass:)
+      higher_level_review = handler.new(appeal_klass.find(higher_level_review_id))
 
       begin
         stamped_pdf = AppealsApi::PdfConstruction::Generator.new(higher_level_review, version: version).generate
@@ -46,20 +47,9 @@ module AppealsApi
     private
 
     def upload_to_central_mail(higher_level_review, pdf_path)
-      metadata = {
-        'veteranFirstName' => transliterate_for_centralmail(higher_level_review.first_name),
-        'veteranLastName' => transliterate_for_centralmail(higher_level_review.last_name),
-        'fileNumber' => higher_level_review.file_number.presence || higher_level_review.ssn,
-        'zipCode' => higher_level_review.zip_code_5,
-        'source' => "Appeals-HLR-#{higher_level_review.consumer_name}",
-        'uuid' => higher_level_review.id,
-        'hashV' => Digest::SHA256.file(pdf_path).hexdigest,
-        'numberAttachments' => 0,
-        'receiveDt' => receive_date(higher_level_review),
-        'numberPages' => PdfInfo::Metadata.read(pdf_path).pages,
-        'docType' => '20-0996'
-      }
-      body = { 'metadata' => metadata.to_json, 'document' => to_faraday_upload(pdf_path, '200996-document.pdf') }
+      metadata = higher_level_review.metadata(pdf_path)
+      body = { 'metadata' => metadata.to_json,
+               'document' => to_faraday_upload(pdf_path, higher_level_review.pdf_file_name) }
       process_response(CentralMail::Service.new.upload(body), higher_level_review, metadata)
     end
 
@@ -70,13 +60,6 @@ module AppealsApi
       else
         map_error(response.status, response.body, AppealsApi::UploadError)
       end
-    end
-
-    def receive_date(higher_level_review)
-      higher_level_review
-        .created_at
-        .in_time_zone('Central Time (US & Canada)')
-        .strftime('%Y-%m-%d %H:%M:%S')
     end
 
     def log_upload_error(higher_level_review, e)

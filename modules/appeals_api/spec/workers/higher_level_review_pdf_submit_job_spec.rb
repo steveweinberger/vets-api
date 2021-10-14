@@ -4,6 +4,8 @@ require 'rails_helper'
 require AppealsApi::Engine.root.join('spec', 'spec_helper.rb')
 require AppealsApi::Engine.root.join('spec', 'support', 'shared_examples_for_monitored_worker.rb')
 
+require 'appeals_api/hlr_pdf_submit_handler'
+
 RSpec.describe AppealsApi::HigherLevelReviewPdfSubmitJob, type: :job do
   include FixtureHelpers
 
@@ -30,7 +32,8 @@ RSpec.describe AppealsApi::HigherLevelReviewPdfSubmitJob, type: :job do
         capture_body = arg
         faraday_response
       }
-      described_class.new.perform(higher_level_review.id)
+      described_class.new.perform(higher_level_review.id, handler: AppealsApi::HlrPdfSubmitHandler,
+                                                          appeal_klass: AppealsApi::HigherLevelReview)
       metadata = JSON.parse(capture_body['metadata'])
 
       expect(capture_body).to be_a(Hash)
@@ -68,7 +71,10 @@ RSpec.describe AppealsApi::HigherLevelReviewPdfSubmitJob, type: :job do
       faraday_response
     }
 
-    expect { described_class.new.perform(higher_level_review.id) }.to raise_error(AppealsApi::UploadError)
+    expect do
+      described_class.new.perform(higher_level_review.id, handler: AppealsApi::HlrPdfSubmitHandler,
+                                                          appeal_klass: AppealsApi::HigherLevelReview)
+    end.to raise_error(AppealsApi::UploadError)
     expect(capture_body).to be_a(Hash)
     expect(capture_body).to have_key('metadata')
     expect(capture_body).to have_key('document')
@@ -92,7 +98,8 @@ RSpec.describe AppealsApi::HigherLevelReviewPdfSubmitJob, type: :job do
       messager_instance = instance_double(AppealsApi::Slack::Messager)
       allow(AppealsApi::Slack::Messager).to receive(:new).and_return(messager_instance)
       allow(messager_instance).to receive(:notify!).and_return(true)
-      described_class.new.perform(higher_level_review.id)
+      described_class.new.perform(higher_level_review.id, handler: AppealsApi::HlrPdfSubmitHandler,
+                                                          appeal_klass: AppealsApi::HigherLevelReview)
       expect(higher_level_review.reload.status).to eq('error')
       expect(higher_level_review.code).to eq('DOC201')
     end
@@ -102,7 +109,8 @@ RSpec.describe AppealsApi::HigherLevelReviewPdfSubmitJob, type: :job do
       messager_instance = instance_double(AppealsApi::Slack::Messager)
       allow(AppealsApi::Slack::Messager).to receive(:new).and_return(messager_instance)
       allow(messager_instance).to receive(:notify!).and_return(true)
-      described_class.new.perform(higher_level_review.id)
+      described_class.new.perform(higher_level_review.id, handler: AppealsApi::HlrPdfSubmitHandler,
+                                                          appeal_klass: AppealsApi::HigherLevelReview)
 
       expect(messager_instance).to have_received(:notify!)
     end
@@ -114,7 +122,8 @@ RSpec.describe AppealsApi::HigherLevelReviewPdfSubmitJob, type: :job do
       allow(submit_job_worker).to receive(:upload_to_central_mail).and_raise(RuntimeError, 'runtime error!')
 
       expect do
-        submit_job_worker.perform(higher_level_review.id)
+        submit_job_worker.perform(higher_level_review.id, handler: AppealsApi::HlrPdfSubmitHandler,
+                                                          appeal_klass: AppealsApi::HigherLevelReview)
       end.to raise_error(RuntimeError, 'runtime error!')
 
       higher_level_review.reload
