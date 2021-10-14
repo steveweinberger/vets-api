@@ -2,6 +2,7 @@
 
 require 'sidekiq'
 require 'appeals_api/upload_error'
+require 'appeals_api/nod_pdf_submit_handler'
 require 'central_mail/utilities'
 require 'central_mail/service'
 require 'pdf_info'
@@ -14,8 +15,8 @@ module AppealsApi
     include CentralMail::Utilities
     include AppealsApi::CharacterUtilities
 
-    def perform(id, version = 'V1')
-      notice_of_disagreement = NoticeOfDisagreement.find(id)
+    def perform(appeal_id, version = 'V1', handler:, appeal_klass:)
+      notice_of_disagreement = handler.new(appeal_klass.find(appeal_id))
 
       begin
         stamped_pdf = PdfConstruction::Generator.new(notice_of_disagreement, version: version).generate
@@ -42,21 +43,9 @@ module AppealsApi
     private
 
     def upload_to_central_mail(notice_of_disagreement, pdf_path)
-      metadata = {
-        'veteranFirstName' => transliterate_for_centralmail(notice_of_disagreement.veteran_first_name),
-        'veteranLastName' => transliterate_for_centralmail(notice_of_disagreement.veteran_last_name),
-        'fileNumber' => notice_of_disagreement.file_number.presence || notice_of_disagreement.ssn,
-        'zipCode' => notice_of_disagreement.zip_code_5,
-        'source' => "Appeals-NOD-#{notice_of_disagreement.consumer_name}",
-        'uuid' => notice_of_disagreement.id,
-        'hashV' => Digest::SHA256.file(pdf_path).hexdigest,
-        'numberAttachments' => 0,
-        'receiveDt' => receive_date(notice_of_disagreement),
-        'numberPages' => PdfInfo::Metadata.read(pdf_path).pages,
-        'docType' => '10182',
-        'lob' => notice_of_disagreement.lob
-      }
-      body = { 'metadata' => metadata.to_json, 'document' => to_faraday_upload(pdf_path, '10182-document.pdf') }
+      metadata = notice_of_disagreement.metadata(pdf_path)
+      body = { 'metadata' => metadata.to_json,
+               'document' => to_faraday_upload(pdf_path, notice_of_disagreement.pdf_file_name) }
       process_response(CentralMail::Service.new.upload(body), notice_of_disagreement, metadata)
     end
 
@@ -67,13 +56,6 @@ module AppealsApi
       else
         map_error(response.status, response.body, AppealsApi::UploadError)
       end
-    end
-
-    def receive_date(notice_of_disagreement)
-      notice_of_disagreement
-        .created_at
-        .in_time_zone('Central Time (US & Canada)')
-        .strftime('%Y-%m-%d %H:%M:%S')
     end
 
     def handle_upload_error(notice_of_disagreement, e)

@@ -2,6 +2,7 @@
 
 require 'json_schema/json_api_missing_attribute'
 require 'appeals_api/form_schemas'
+require 'appeals_api/nod_pdf_submit_handler'
 
 class AppealsApi::V1::DecisionReviews::NoticeOfDisagreementsController < AppealsApi::ApplicationController
   include AppealsApi::JsonFormatValidation
@@ -27,7 +28,9 @@ class AppealsApi::V1::DecisionReviews::NoticeOfDisagreementsController < Appeals
 
   def create
     @notice_of_disagreement.save
-    AppealsApi::NoticeOfDisagreementPdfSubmitJob.perform_async(@notice_of_disagreement.id)
+    AppealsApi::NoticeOfDisagreementPdfSubmitJob.perform_async(@notice_of_disagreement.id, api_version,
+                                                               handler: AppealsApi::NodPdfSubmitHandler,
+                                                               appeal_klass: AppealsApi::NoticeOfDisagreement)
     render_notice_of_disagreement
   end
 

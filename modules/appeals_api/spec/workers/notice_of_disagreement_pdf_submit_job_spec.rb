@@ -4,6 +4,8 @@ require 'rails_helper'
 require AppealsApi::Engine.root.join('spec', 'spec_helper.rb')
 require AppealsApi::Engine.root.join('spec', 'support', 'shared_examples_for_monitored_worker.rb')
 
+require 'appeals_api/nod_pdf_submit_handler'
+
 RSpec.describe AppealsApi::NoticeOfDisagreementPdfSubmitJob, type: :job do
   include FixtureHelpers
 
@@ -34,7 +36,8 @@ RSpec.describe AppealsApi::NoticeOfDisagreementPdfSubmitJob, type: :job do
         capture_body = arg
         faraday_response
       }
-      described_class.new.perform(notice_of_disagreement.id)
+      described_class.new.perform(notice_of_disagreement.id, handler: AppealsApi::NodPdfSubmitHandler,
+                                                             appeal_klass: AppealsApi::NoticeOfDisagreement)
       expect(capture_body).to be_a(Hash)
       expect(capture_body).to have_key('metadata')
       expect(capture_body).to have_key('document')
@@ -55,6 +58,10 @@ RSpec.describe AppealsApi::NoticeOfDisagreementPdfSubmitJob, type: :job do
                              })
       expect(metadata['uuid']).to eq(notice_of_disagreement.id)
       expect(metadata['lob']).to eq(notice_of_disagreement.lob)
+
+      expect(capture_body['document'].original_filename).to eq('10182-document.pdf')
+      expect(capture_body['document'].content_type).to eq('application/pdf')
+
       updated = AppealsApi::NoticeOfDisagreement.find(notice_of_disagreement.id)
       expect(updated.status).to eq('submitted')
     end
@@ -71,7 +78,10 @@ RSpec.describe AppealsApi::NoticeOfDisagreementPdfSubmitJob, type: :job do
       faraday_response
     }
 
-    expect { described_class.new.perform(notice_of_disagreement.id) }.to raise_error(AppealsApi::UploadError)
+    expect do
+      described_class.new.perform(notice_of_disagreement.id, handler: AppealsApi::NodPdfSubmitHandler,
+                                                             appeal_klass: AppealsApi::NoticeOfDisagreement)
+    end.to raise_error(AppealsApi::UploadError)
     expect(capture_body).to be_a(Hash)
     expect(capture_body).to have_key('metadata')
     expect(capture_body).to have_key('document')
@@ -96,7 +106,8 @@ RSpec.describe AppealsApi::NoticeOfDisagreementPdfSubmitJob, type: :job do
       messager_instance = instance_double(AppealsApi::Slack::Messager)
       allow(AppealsApi::Slack::Messager).to receive(:new).and_return(messager_instance)
       allow(messager_instance).to receive(:notify!).and_return(true)
-      described_class.new.perform(notice_of_disagreement.id)
+      described_class.new.perform(notice_of_disagreement.id, handler: AppealsApi::NodPdfSubmitHandler,
+                                                             appeal_klass: AppealsApi::NoticeOfDisagreement)
       expect(notice_of_disagreement.reload.status).to eq('error')
       expect(notice_of_disagreement.code).to eq('DOC201')
     end
@@ -106,7 +117,8 @@ RSpec.describe AppealsApi::NoticeOfDisagreementPdfSubmitJob, type: :job do
       messager_instance = instance_double(AppealsApi::Slack::Messager)
       allow(AppealsApi::Slack::Messager).to receive(:new).and_return(messager_instance)
       allow(messager_instance).to receive(:notify!).and_return(true)
-      described_class.new.perform(notice_of_disagreement.id)
+      described_class.new.perform(notice_of_disagreement.id, handler: AppealsApi::NodPdfSubmitHandler,
+                                                             appeal_klass: AppealsApi::NoticeOfDisagreement)
 
       expect(messager_instance).to have_received(:notify!)
     end
@@ -118,7 +130,8 @@ RSpec.describe AppealsApi::NoticeOfDisagreementPdfSubmitJob, type: :job do
       allow(submit_job_worker).to receive(:upload_to_central_mail).and_raise(RuntimeError, 'runtime error!')
 
       expect do
-        submit_job_worker.perform(notice_of_disagreement.id)
+        submit_job_worker.perform(notice_of_disagreement.id, handler: AppealsApi::NodPdfSubmitHandler,
+                                                             appeal_klass: AppealsApi::NoticeOfDisagreement)
       end.to raise_error(RuntimeError, 'runtime error!')
 
       notice_of_disagreement.reload
