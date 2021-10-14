@@ -23,6 +23,10 @@ RSpec.describe AppealsApi::HigherLevelReviewPdfSubmitJob, type: :job do
 
   it 'uploads a valid payload' do
     Timecop.freeze(DateTime.new(2020, 1, 1).utc) do
+      file_digest_stub = instance_double('Digest::SHA256')
+      allow(Digest::SHA256).to receive(:file) { file_digest_stub }
+      allow(file_digest_stub).to receive(:hexdigest).and_return('file_digest_12345')
+
       allow(CentralMail::Service).to receive(:new) { client_stub }
       allow(faraday_response).to receive(:status).and_return(200)
       allow(faraday_response).to receive(:body).and_return('')
@@ -45,7 +49,7 @@ RSpec.describe AppealsApi::HigherLevelReviewPdfSubmitJob, type: :job do
                                'zipCode' => '66002',
                                'source' => 'Appeals-HLR-va.gov',
                                'uuid' => higher_level_review.id,
-                               'hashV' => '3a4dd356b7d6a97f3e954456790fcc259484e7f246ded887b9cf3e5335dc2b1b',
+                               'hashV' => 'file_digest_12345',
                                'numberAttachments' => 0,
                                'receiveDt' => '2019-12-31 18:00:00',
                                'numberPages' => 2,
