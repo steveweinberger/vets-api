@@ -6,8 +6,6 @@ module TestUserDashboard
   class ApplicationController < ActionController::API
     include SentryLogging
 
-    before_action :authenticate!
-
     attr_reader :current_user
 
     private
