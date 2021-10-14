@@ -18,7 +18,7 @@ module TestUserDashboard
     end
 
     def logout
-      warden.logout
+      warden.logout(:tud)
       redirect_to "http://localhost:8000/"
     end
   end

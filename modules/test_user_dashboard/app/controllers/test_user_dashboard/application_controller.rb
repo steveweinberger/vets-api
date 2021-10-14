@@ -13,14 +13,14 @@ module TestUserDashboard
     def authenticate!
       return if authenticated?
   
-      warden.authenticate!(:github)
+      warden.authenticate!(:scope => :tud)
       head :forbidden unless authenticated?
     end
   
     def authenticated?
       return true if Rails.env.test?
 
-      if warden&.authenticated?
+      if warden.authenticated?(:tud)
         set_current_user
         return true
       end
@@ -42,11 +42,11 @@ module TestUserDashboard
     # set current_user for now
     def set_current_user
       @current_user = {
-        id: warden.user['attribs']['id'],
-        login: warden.user['attribs']['login'],
-        email: warden.user['attribs']['email'],
-        name: warden.user['attribs']['name'],
-        avatar_url: warden.user['attribs']['avatar_url']
+        id: warden.user(:tud)['attribs']['id'],
+        login: warden.user(:tud)['attribs']['login'],
+        email: warden.user(:tud)['attribs']['email'],
+        name: warden.user(:tud)['attribs']['name'],
+        avatar_url: warden.user(:tud)['attribs']['avatar_url']
       }
     end
   
