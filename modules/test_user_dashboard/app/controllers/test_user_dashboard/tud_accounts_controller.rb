@@ -7,15 +7,11 @@ module TestUserDashboard
     include ActionView::Helpers::SanitizeHelper
     include Warden::GitHub::SSO
 
+    before_action :authenticate!
     before_action :authorize!
 
     def index
-      payload = {
-        tud_accounts: TudAccount.all,
-        user: @current_user
-      }
-
-      render json: payload
+      render json: TudAccount.all
     end
 
     def update
