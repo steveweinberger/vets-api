@@ -10,7 +10,7 @@ module TestUserDashboard
     before_action :authorize!, only: [:index]
 
     def index
-      redirect_to "http://localhost:8000/signin"
+      redirect_to "#{url}/signin"
     end
 
     def unauthorized
@@ -23,7 +23,14 @@ module TestUserDashboard
 
     def logout
       warden.logout(:tud)
-      redirect_to "http://localhost:8000/"
+      redirect_to url
+    end
+
+    private
+
+    def url
+      return 'https://tud.vfs.va.gov' if Settings.vsp_environment == 'staging'
+      'http://localhost:8000'
     end
   end
 end
