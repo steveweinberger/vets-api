@@ -25,11 +25,27 @@ module MPI
         handlers = instance.connection.builder.handlers
         unless handlers.frozen?
           if Settings.mvi.pii_logging
-            handlers.insert(-2,
-                            Faraday::RackBuilder::Handler.new(Common::Client::Middleware::Logging,
-                                                              'MVIRequest'))
+            middleware = Common::Client::Middleware::Logging
+
+            handlers.insert(
+              -2,
+              Faraday::RackBuilder::Handler.new(
+                middleware,
+                'MVIRequest'
+              )
+            ) unless handlers.include?(middleware)
           end
-          handlers.insert(-2, Faraday::RackBuilder::Handler.new(Betamocks::Middleware)) if Settings.mvi.mock
+
+          if Settings.mvi.mock
+            middleware = Betamocks::Middleware
+
+            handlers.insert(
+              -2,
+              Faraday::RackBuilder::Handler.new(
+                middleware
+              )
+            ) unless handlers.include?(middleware)
+          end
         end
       end
 

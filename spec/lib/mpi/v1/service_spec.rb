@@ -441,11 +441,9 @@ describe MPI::V1::Service do
         it 'logs the request and response data' do
           expect do
             VCR.use_cassette('mpi/find_candidate/valid') do
-              Settings.mvi.pii_logging = true
               subject.find_profile(user)
-              Settings.mvi.pii_logging = false
             end
-          end.to change(PersonalInformationLog, :count).by(1)
+          end.to change { PersonalInformationLog.count }.by(1)
         end
       end
 
