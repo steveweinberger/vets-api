@@ -20,24 +20,44 @@ RSpec.describe AppealsApi::NoticeOfDisagreementPdfSubmitJob, type: :job do
   it_behaves_like 'a monitored worker'
 
   it 'uploads a valid payload' do
-    allow(CentralMail::Service).to receive(:new) { client_stub }
-    allow(faraday_response).to receive(:status).and_return(200)
-    allow(faraday_response).to receive(:body).and_return('')
-    allow(faraday_response).to receive(:success?).and_return(true)
-    capture_body = nil
-    expect(client_stub).to receive(:upload) { |arg|
-      capture_body = arg
-      faraday_response
-    }
-    described_class.new.perform(notice_of_disagreement.id)
-    expect(capture_body).to be_a(Hash)
-    expect(capture_body).to have_key('metadata')
-    expect(capture_body).to have_key('document')
-    metadata = JSON.parse(capture_body['metadata'])
-    expect(metadata['uuid']).to eq(notice_of_disagreement.id)
-    expect(metadata['lob']).to eq(notice_of_disagreement.lob)
-    updated = AppealsApi::NoticeOfDisagreement.find(notice_of_disagreement.id)
-    expect(updated.status).to eq('submitted')
+    Timecop.freeze(DateTime.new(2020, 1, 1).utc) do
+      allow(CentralMail::Service).to receive(:new) { client_stub }
+      file_digest_stub = instance_double('Digest::SHA256')
+      allow(Digest::SHA256).to receive(:file) { file_digest_stub }
+      allow(file_digest_stub).to receive(:hexdigest).and_return('file_digest_12345')
+
+      allow(faraday_response).to receive(:status).and_return(200)
+      allow(faraday_response).to receive(:body).and_return('')
+      allow(faraday_response).to receive(:success?).and_return(true)
+      capture_body = nil
+      expect(client_stub).to receive(:upload) { |arg|
+        capture_body = arg
+        faraday_response
+      }
+      described_class.new.perform(notice_of_disagreement.id)
+      expect(capture_body).to be_a(Hash)
+      expect(capture_body).to have_key('metadata')
+      expect(capture_body).to have_key('document')
+      metadata = JSON.parse(capture_body['metadata'])
+      expect(metadata).to eq({
+                               'veteranFirstName' => 'Jane',
+                               'veteranLastName' => 'Doe',
+                               'fileNumber' => '987654321',
+                               'zipCode' => '00000',
+                               'source' => 'Appeals-NOD-va.gov',
+                               'uuid' => notice_of_disagreement.id,
+                               'hashV' => 'file_digest_12345',
+                               'numberAttachments' => 0,
+                               'receiveDt' => '2019-12-31 18:00:00',
+                               'numberPages' => 4,
+                               'docType' => '10182',
+                               'lob' => 'BVA'
+                             })
+      expect(metadata['uuid']).to eq(notice_of_disagreement.id)
+      expect(metadata['lob']).to eq(notice_of_disagreement.lob)
+      updated = AppealsApi::NoticeOfDisagreement.find(notice_of_disagreement.id)
+      expect(updated.status).to eq('submitted')
+    end
   end
 
   it 'sets error status for upstream server error' do
