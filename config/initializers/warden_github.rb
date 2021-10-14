@@ -7,22 +7,21 @@ Warden::GitHub::User.module_eval do
 end
 
 Warden::GitHub::Strategy.module_eval do
-  # def authenticate!
-  #   if session[:user].present?
-  #     success!(session[:user])
-  #     redirect!(request.url)
-  #   elsif in_flow?
-  #     continue_flow!
-  #   else
-  #     begin_flow!
-  #   end
-  # end
+  extend ActiveSupport::Concern
+  included do
+    def authenticate!
+      if session[:sidekiq_user].present?
+        success!(session[:sidekiq_user])
+        redirect!(request.url)
+      else
+        super
+      end
+    end
 
-  def finalize_flow!
-    session[:user] = load_user
-    redirect!(custom_session['return_to'])
-    teardown_flow
-    throw(:warden)
+    def finalize_flow!
+      session[:sidekiq_user] = load_user if session[:sidekiq_user].present?
+      super
+    end
   end
 end
 
