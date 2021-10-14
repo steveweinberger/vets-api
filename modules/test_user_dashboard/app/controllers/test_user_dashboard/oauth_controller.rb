@@ -13,6 +13,10 @@ module TestUserDashboard
       redirect_to "http://localhost:8000/signin"
     end
 
+    def unauthorized
+      head :unauthorized
+    end
+
     def is_authorized
       render json: @current_user if authorized?
     end
