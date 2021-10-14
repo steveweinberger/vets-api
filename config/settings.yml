@@ -797,6 +797,7 @@ flipper:
     - nick.sullivan@adhocteam.us
     - patrick.bateman@va.gov
     - patrick@adhocteam.us
+    - patrickryll@yahoo.com
     - paul.phillips@thoughtworks.com
     - pherbert@thoughtworks.com
     - regarr@gmail.com # Robin Garrison - AdHoc
@@ -1160,3 +1161,12 @@ bid:
 # Settings for Test User Dashboard modules
 test_user_dashboard:
   env: dev
+
+lighthouse_health_immunization:
+  key_path: ~
+  access_token_url: 'https://sandbox-api.va.gov/oauth2/health/system/v1/token'
+  api_url: 'https://sandbox-api.va.gov/services/fhir/v0/r4'
+  scopes:
+    - "launch launch/patient"
+    - "patient/Immunization.read"
+    - "patient/Location.read"
