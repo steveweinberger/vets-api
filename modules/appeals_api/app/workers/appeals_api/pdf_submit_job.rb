@@ -9,7 +9,7 @@ require 'pdf_info'
 require 'sidekiq/monitored_worker'
 
 module AppealsApi
-  class AppealPdfSubmitJob
+  class PdfSubmitJob
     include Sidekiq::Worker
     include Sidekiq::MonitoredWorker
     include CentralMail::Utilities
