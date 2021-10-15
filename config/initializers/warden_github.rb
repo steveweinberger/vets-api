@@ -1,28 +1,38 @@
 # frozen_string_literal: true
 
-Warden::GitHub::User.module_eval do
-  def api
-    Octokit::Client.new(access_token: Settings.sidekiq.github_api_key)
+module WardenGitHubUserExtensions
+  # def api
+  #   Octokit::Client.new(access_token: Settings.sidekiq.github_api_key)
+  #   # if scope == :sidekiq && session[:sidekiq_user].present?
+  #   #   Octokit::Client.new(access_token: Settings.sidekiq.github_api_key)
+  #   # else
+  #   #   super
+  #   # end
+  # end
+end
+
+module WardenGithubStrategyExtensions
+  def authenticate!
+    if scope == :sidekiq && session[:sidekiq_user].present?
+      success!(session[:sidekiq_user])
+      redirect!(request.url)
+    else
+      super
+    end
+  end
+
+  def finalize_flow!
+    session[:sidekiq_user] = load_user if scope == :sidekiq
+    super
   end
 end
 
 Warden::GitHub::Strategy.module_eval do
-  extend ActiveSupport::Concern
-  included do
-    def authenticate!
-      if session[:sidekiq_user].present?
-        success!(session[:sidekiq_user])
-        redirect!(request.url)
-      else
-        super
-      end
-    end
+  prepend WardenGithubStrategyExtensions
+end
 
-    def finalize_flow!
-      session[:sidekiq_user] = load_user if session[:sidekiq_user].present?
-      super
-    end
-  end
+Warden::GitHub::User.module_eval do
+  prepend WardenGitHubUserExtensions
 end
 
 Rails.configuration.middleware.use Warden::Manager do |config|
@@ -30,8 +40,8 @@ Rails.configuration.middleware.use Warden::Manager do |config|
   config.default_strategies :github
 
   config.scope_defaults :tud, config: {
-    client_id: Settings.tud.github_oauth_key,
-    client_secret: Settings.tud.github_oauth_secret,
+    client_id: Settings.test_user_dashboard.github_oauth.client_id,
+    client_secret: Settings.test_user_dashboard.github_oauth.client_secret,
     scope: 'read:user,read:org',
     redirect_uri: 'test_user_dashboard/oauth'
   }
