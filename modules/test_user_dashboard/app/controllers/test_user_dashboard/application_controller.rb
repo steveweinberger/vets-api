@@ -14,39 +14,56 @@ module TestUserDashboard
       return if authenticated?
   
       warden.authenticate!(:scope => :tud)
+      # returning head :forbidden doesn't work with the warden-github gem
       head :forbidden unless authenticated?
     end
-  
+
     def authenticated?
       return true if Rails.env.test?
 
       if warden.authenticated?(:tud)
         set_current_user
+        Rails.logger.info("TUD authentication successful: #{github_user_details}")
         return true
       end
 
+      Rails.logger.info("TUD authentication unsuccessful")
       false
     end
   
     def authorize!
-      head :unauthorized unless authorized?
+      authorized?
     end
-  
+
     def authorized?
-      # i requested access to department-of-veterans-affairs
-      # i'm not sure why i don't have it
-      # authenticated? && warden.user.organization_member?('department-of-veterans-affairs')
-      authenticated?
+      if authenticated?
+      # if authenticated? && github_user.organization_member?('department-of-veterans-affairs')
+        Rails.logger.info("TUD authorization successful: #{github_user_details}")
+        true
+      else
+        if authenticated?
+          Rails.logger.info("TUD authorization unsuccessful: #{github_user_details}")
+        end
+        
+        false
+      end
     end
-  
-    # set current_user for now
+
+    def github_user
+      warden.user(:tud)
+    end
+
+    def github_user_details
+      "ID: #{github_user.id}, Login: #{github_user.login}, Name: #{github_user.name}, Email: #{github_user.email}"
+    end
+
     def set_current_user
       @current_user = {
-        id: warden.user(:tud)['attribs']['id'],
-        login: warden.user(:tud)['attribs']['login'],
-        email: warden.user(:tud)['attribs']['email'],
-        name: warden.user(:tud)['attribs']['name'],
-        avatar_url: warden.user(:tud)['attribs']['avatar_url']
+        id: github_user.id,
+        login: github_user.login,
+        email: github_user.email,
+        name: github_user.name,
+        avatar_url: github_user.avatar_url
       }
     end
   
