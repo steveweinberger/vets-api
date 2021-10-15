@@ -29,6 +29,8 @@ module CentralMail
       response = CentralMail::Service.new.upload(create_request_body)
       if @claim.is_a?(SavedClaim::VeteranReadinessEmploymentClaim)
         log_message_to_sentry("vre-central-mail-response: #{response}", :info, {}, { team: 'vfs-ebenefits' })
+        puts "XXXXXXXXXXXXXXXXXXX" #remove
+        puts "vre-central-mail-response: #{response}" #remove
       end
       File.delete(@pdf_path)
       @attachment_paths.each { |p| File.delete(p) }
