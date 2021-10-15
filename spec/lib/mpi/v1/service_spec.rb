@@ -412,7 +412,7 @@ describe MPI::V1::Service do
 
       context 'when MVI multiple match failure response' do
         before do
-          expect(MPI::Messages::FindProfileMessage).to receive(:new).once.and_call_original
+          expect(MasterPersonIndex::Messages::FindProfileMessage).to receive(:new).once.and_call_original
         end
 
         it 'raises MPI::Errors::RecordNotFound', :aggregate_failures do
