@@ -1162,5 +1162,3 @@ test_user_dashboard:
   github_oauth:
     client_id:
     client_secret:
-    scope: read:user,read:org
-    redirect_uri: test_user_dashboard/oauth
