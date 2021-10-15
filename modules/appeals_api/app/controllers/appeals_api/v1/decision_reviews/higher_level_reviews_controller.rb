@@ -26,9 +26,9 @@ class AppealsApi::V1::DecisionReviews::HigherLevelReviewsController < AppealsApi
     deprecate_headers
 
     @higher_level_review.save
-    AppealsApi::HigherLevelReviewPdfSubmitJob.perform_async(@higher_level_review.id,
-                                                            handler: AppealsApi::HlrPdfSubmitHandler,
-                                                            appeal_klass: AppealsApi::HigherLevelReview)
+    AppealsApi::AppealPdfSubmitJob.perform_async(@higher_level_review.id,
+                                                 handler: AppealsApi::HlrPdfSubmitHandler,
+                                                 appeal_klass: AppealsApi::HigherLevelReview)
     render_higher_level_review
   end
 

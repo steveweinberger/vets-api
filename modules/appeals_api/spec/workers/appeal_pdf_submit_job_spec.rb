@@ -6,7 +6,7 @@ require AppealsApi::Engine.root.join('spec', 'support', 'shared_examples_for_mon
 
 require 'appeals_api/hlr_pdf_submit_handler'
 
-RSpec.describe AppealsApi::HigherLevelReviewPdfSubmitJob, type: :job do
+RSpec.describe AppealsApi::AppealPdfSubmitJob, type: :job do
   include FixtureHelpers
 
   subject { described_class }
