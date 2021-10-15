@@ -3,27 +3,18 @@
 require 'json_marshal/marshaller'
 require 'claims_api/special_issue_mappers/evss'
 require 'claims_api/homelessness_situation_type_mapper'
+require 'claims_api/service_branch_mapper'
 
 module ClaimsApi
   class AutoEstablishedClaim < ApplicationRecord
     include FileData
-    attr_encrypted(:form_data, key: Settings.db_encryption_key, marshal: true, marshaler: JsonMarshal::Marshaller)
-    attr_encrypted(:auth_headers, key: Settings.db_encryption_key, marshal: true, marshaler: JsonMarshal::Marshaller)
-    attr_encrypted(:evss_response, key: Settings.db_encryption_key, marshal: true, marshaler: JsonMarshal::Marshaller)
-    attr_encrypted(:bgs_flash_responses, key: Settings.db_encryption_key,
-                                         marshal: true,
-                                         marshaler: JsonMarshal::Marshaller)
-    attr_encrypted(:bgs_special_issue_responses, key: Settings.db_encryption_key,
-                                                 marshal: true,
-                                                 marshaler: JsonMarshal::Marshaller)
-
     serialize :auth_headers, JsonMarshal::Marshaller
     serialize :bgs_flash_responses, JsonMarshal::Marshaller
     serialize :bgs_special_issue_responses, JsonMarshal::Marshaller
     serialize :form_data, JsonMarshal::Marshaller
     serialize :evss_response, JsonMarshal::Marshaller
     encrypts :auth_headers, :bgs_flash_responses, :bgs_special_issue_responses, :evss_response, :form_data,
-             migrating: true, **lockbox_options
+             **lockbox_options
 
     validate :validate_service_dates
     after_create :log_special_issues
@@ -65,12 +56,12 @@ module ClaimsApi
       form_data['claimDate'] ||= (persisted? ? created_at.to_date.to_s : Time.zone.today.to_s)
       form_data['claimSubmissionSource'] = 'Lighthouse'
       form_data['bddQualified'] = bdd_qualified?
-      if separation_pay_received_date?
-        form_data['servicePay']['separationPay']['receivedDate'] = transform_separation_pay_received_date
-      end
+      form_data['servicePay']['separationPay']['receivedDate'] = transform_separation_pay_received_date if separation_pay_received_date? # rubocop:disable Layout/LineLength
+      form_data['veteran']['changeOfAddress'] = transform_change_of_address_ending_date if invalid_change_of_address_ending_date? # rubocop:disable Layout/LineLength
       form_data['disabilites'] = transform_disability_approximate_begin_dates
       form_data['disabilites'] = massage_invalid_disability_names
       form_data['treatments'] = transform_treatment_dates if treatments?
+      form_data['serviceInformation'] = transform_service_branch
 
       resolve_special_issue_mappings!
       resolve_homelessness_situation_type_mappings!
@@ -321,6 +312,72 @@ module ClaimsApi
 
     def sanitize_disablity_name(name:, regex:)
       name.gsub(regex, '')
+    end
+
+    def invalid_change_of_address_ending_date?
+      change_of_address = form_data['veteran']['changeOfAddress']
+
+      return false if change_of_address.blank?
+      return true if temporary_change_of_address_missing_ending_date?
+      return true if permanent_change_of_address_includes_ending_date?
+
+      false
+    end
+
+    def temporary_change_of_address_missing_ending_date?
+      change_of_address = form_data['veteran']['changeOfAddress']
+
+      return false if change_of_address.blank?
+
+      change_of_address['addressChangeType'].casecmp?('TEMPORARY') && change_of_address['endingDate'].blank?
+    end
+
+    def permanent_change_of_address_includes_ending_date?
+      change_of_address = form_data['veteran']['changeOfAddress']
+
+      return false if change_of_address.blank?
+
+      change_of_address['addressChangeType'].casecmp?('PERMANENT') && change_of_address['endingDate'].present?
+    end
+
+    # EVSS requires a 'TEMPORARY' 'changeOfAddress' to include an 'endingDate'
+    # EVSS requires a 'PERMANENT' 'changeOfAddress' to NOT include an 'endingDate'
+    # If the submission is in an invalid state, let's try to gracefully fix it for them
+    def transform_change_of_address_ending_date
+      change_of_address = form_data['veteran']['changeOfAddress']
+      change_of_address = add_change_of_address_ending_date if temporary_change_of_address_missing_ending_date?
+      change_of_address = remove_change_of_address_ending_date if permanent_change_of_address_includes_ending_date?
+
+      change_of_address
+    end
+
+    def add_change_of_address_ending_date
+      change_of_address = form_data['veteran']['changeOfAddress']
+      change_of_address['endingDate'] = (Time.zone.now.to_date + 1.year).to_s
+      change_of_address
+    end
+
+    def remove_change_of_address_ending_date
+      change_of_address = form_data['veteran']['changeOfAddress']
+      change_of_address.delete('endingDate')
+      change_of_address
+    end
+
+    # For whatever reason, legacy ClaimsApi code previously allowed
+    # 'serviceInformation.servicePeriod.serviceBranch' values that are not accepted by EVSS.
+    # Rather than refuse those invalid values, this maps them to an equivalent value that EVSS will accept.
+    def transform_service_branch
+      received_service_periods = form_data['serviceInformation']['servicePeriods']
+
+      transformed_service_periods = received_service_periods.map do |period|
+        name = period['serviceBranch']
+        period['serviceBranch'] = ClaimsApi::ServiceBranchMapper.new(name).value
+
+        period
+      end
+
+      form_data['serviceInformation']['servicePeriods'] = transformed_service_periods
+      form_data['serviceInformation']
     end
   end
 end

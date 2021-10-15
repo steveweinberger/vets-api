@@ -46,6 +46,10 @@ features:
     actor_type: user
     description: Enables the health care check-in experiences
     enable_in_development: true
+  check_in_experience_demographics_page_enabled:
+    actor_type: user
+    description: Enables the health care check-in experiences to show demographics page.
+    enable_in_development: true
   check_in_experience_low_authentication_enabled:
     actor_type: user
     description: Enables the health care check-in experiences to use the lowest tier of authentication, i.e. last 4 and last name
@@ -241,10 +245,6 @@ features:
     actor_type: user
     description: Enable/disable custom expiration dates for forms
     enable_in_development: true
-  language_support:
-    actor_type: user
-    description: Toggles the availability of language support links (spanish et al) in the footer
-    enable_in_development: true
   login_gov:
     actor_type: cookie
     description: Enables/disables the usage of the new service provider Login.gov (VSP Identity)
@@ -286,6 +286,10 @@ features:
   search_representative:
     actor_type: user
     description: Enable frontend application and cta for Search Representative application
+    enable_in_development: true
+  search_dropdown_component_enabled:
+    actor_type: user
+    description: Enables typeahead 2.0 functionality
     enable_in_development: true
   search_typeahead_enabled:
     actor_type: user

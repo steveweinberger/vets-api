@@ -3,11 +3,6 @@
 module WardenGitHubUserExtensions
   # def api
   #   Octokit::Client.new(access_token: Settings.sidekiq.github_api_key)
-  #   # if scope == :sidekiq && session[:sidekiq_user].present?
-  #   #   Octokit::Client.new(access_token: Settings.sidekiq.github_api_key)
-  #   # else
-  #   #   super
-  #   # end
   # end
 end
 

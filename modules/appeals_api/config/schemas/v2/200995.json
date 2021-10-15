@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "description": "JSON Schema for VA Form 20-0996",
+  "description": "JSON Schema for VA Form 20-0995",
   "$ref": "#/definitions/scCreate",
   "definitions": {
     "nonBlankString": {
@@ -25,7 +25,17 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
-                "benefitType": { "type": "string", "enum": [ "compensation" ] },
+                "benefitType": { "type": "string", "enum": [
+                  "compensation",
+                  "pensionSurvivorsBenefits",
+                  "fiduciary",
+                  "lifeInsurance",
+                  "veteransHealthAdministration",
+                  "veteranReadinessAndEmployment",
+                  "loanGuaranty",
+                  "education",
+                  "nationalCemeteryAdministration"
+                ] },
                 "veteran": {
                   "type": "object",
                   "properties": {
@@ -52,7 +62,8 @@
                           "pattern": "^[0-9]{5}$"
                         }
                       },
-                      "additionalProperties": false
+                      "additionalProperties": false,
+                      "required": [ "addressLine1", "city", "countryCodeISO2", "zipCode5" ]
                     },
                     "phone":{
                       "type": "object",
@@ -97,7 +108,8 @@
                               "evidenceDates": {
                                 "type": "array",
                                 "items": { "$ref": "#/definitions/date" },
-                                "minItems": 1
+                                "minItems": 1,
+                                "maxItems":8
                               }
                             },
                             "additionalProperties": false,
@@ -122,9 +134,15 @@
                     },
                     { "required": ["retrieveFrom"] }
                   ]
-                }
+                },
+                "noticeAcknowledgement": {
+                  "enum": [true, false]
+                },
+                "socOptIn": { "type": "boolean" }
               },
-              "required": ["veteran", "evidenceSubmission"]
+              "required": ["veteran", "evidenceSubmission", "socOptIn", "noticeAcknowledgement"],
+              "if": { "properties": { "benefitType": { "const": "compensation" } } },
+              "then": { "properties": { "noticeAcknowledgement": { "const": true } } }
             }
           },
           "additionalProperties": false,

@@ -64,9 +64,15 @@ AppealsApi::Engine.routes.draw do
         end
       end
 
-      get 'legacy_appeals', to: 'legacy_appeals#index'
+      get 'legacy_appeals', to: 'legacy_appeals#index' if Settings.modules_appeals_api.legacy_appeals_enabled
 
       resources :supplemental_claims, only: %i[create show] if Settings.modules_appeals_api.supplemental_claims_enabled
+
+      if Settings.modules_appeals_api.supplemental_claims_enabled
+        namespace :supplemental_claims do
+          resources :evidence_submissions, only: %i[create show]
+        end
+      end
     end
   end
 
@@ -78,7 +84,6 @@ AppealsApi::Engine.routes.draw do
 
     namespace :v2, defaults: { format: 'json' } do
       get 'decision_reviews', to: 'docs#decision_reviews'
-      get 'decision_reviews_beta', to: 'docs#decision_reviews_beta'
     end
   end
 end

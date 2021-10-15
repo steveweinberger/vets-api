@@ -225,6 +225,60 @@ RSpec.describe 'Disability Claims ', type: :request do
               end
             end
           end
+
+          context 'but has leading whitespace' do
+            let(:treated_disability_names) { ['   PTSD (post traumatic stress disorder)'] }
+
+            it 'returns a 200' do
+              with_okta_user(scopes) do |auth_header|
+                VCR.use_cassette('evss/claims/claims') do
+                  VCR.use_cassette('evss/reference_data/get_intake_sites') do
+                    json_data = JSON.parse data
+                    params = json_data
+                    params['data']['attributes']['treatments'] = treatments
+                    post path, params: params.to_json, headers: headers.merge(auth_header)
+                    expect(response.status).to eq(200)
+                  end
+                end
+              end
+            end
+          end
+
+          context 'but has trailing whitespace' do
+            let(:treated_disability_names) { ['PTSD (post traumatic stress disorder)   '] }
+
+            it 'returns a 200' do
+              with_okta_user(scopes) do |auth_header|
+                VCR.use_cassette('evss/claims/claims') do
+                  VCR.use_cassette('evss/reference_data/get_intake_sites') do
+                    json_data = JSON.parse data
+                    params = json_data
+                    params['data']['attributes']['treatments'] = treatments
+                    post path, params: params.to_json, headers: headers.merge(auth_header)
+                    expect(response.status).to eq(200)
+                  end
+                end
+              end
+            end
+          end
+
+          context 'but has different casing' do
+            let(:treated_disability_names) { ['PtSd (PoSt TrAuMaTiC StReSs DiSoRdEr)'] }
+
+            it 'returns a 200' do
+              with_okta_user(scopes) do |auth_header|
+                VCR.use_cassette('evss/claims/claims') do
+                  VCR.use_cassette('evss/reference_data/get_intake_sites') do
+                    json_data = JSON.parse data
+                    params = json_data
+                    params['data']['attributes']['treatments'] = treatments
+                    post path, params: params.to_json, headers: headers.merge(auth_header)
+                    expect(response.status).to eq(200)
+                  end
+                end
+              end
+            end
+          end
         end
       end
     end
@@ -351,22 +405,6 @@ RSpec.describe 'Disability Claims ', type: :request do
             }
           end
 
-          it 'raises an exception that endingDate is not provided' do
-            with_okta_user(scopes) do |auth_header|
-              VCR.use_cassette('evss/claims/claims') do
-                VCR.use_cassette('evss/reference_data/get_intake_sites') do
-                  VCR.use_cassette('evss/reference_data/countries') do
-                    par = json_data
-                    par['data']['attributes']['veteran']['changeOfAddress'] = change_of_address
-
-                    post path, params: par.to_json, headers: headers.merge(auth_header)
-                    expect(response.status).to eq(422)
-                  end
-                end
-              end
-            end
-          end
-
           context 'when beginningDate is in the past' do
             let(:json_data) { JSON.parse data }
 
@@ -397,38 +435,6 @@ RSpec.describe 'Disability Claims ', type: :request do
                         expect(response.status).to eq(400)
                       end
                     end
-                  end
-                end
-              end
-            end
-          end
-        end
-
-        context 'when addressChangeType is PERMANENT' do
-          let(:change_of_address) do
-            {
-              beginningDate: (Time.zone.now + 1.month).to_date.to_s,
-              endingDate: (Time.zone.now + 2.months).to_date.to_s,
-              addressChangeType: 'PERMANENT',
-              addressLine1: '1234 Couch Street',
-              city: 'New York City',
-              state: 'NY',
-              type: 'DOMESTIC',
-              zipFirstFive: '12345',
-              country: 'USA'
-            }
-          end
-
-          it 'raises an exception that endingDate is provided but should not be' do
-            with_okta_user(scopes) do |auth_header|
-              VCR.use_cassette('evss/claims/claims') do
-                VCR.use_cassette('evss/reference_data/get_intake_sites') do
-                  VCR.use_cassette('evss/reference_data/countries') do
-                    par = json_data
-                    par['data']['attributes']['veteran']['changeOfAddress'] = change_of_address
-
-                    post path, params: par.to_json, headers: headers.merge(auth_header)
-                    expect(response.status).to eq(400)
                   end
                 end
               end
@@ -2038,6 +2044,22 @@ RSpec.describe 'Disability Claims ', type: :request do
                 end
               end
             end
+
+            it 'responds with a useful error message  ' do
+              with_okta_user(scopes) do |auth_header|
+                VCR.use_cassette('evss/claims/claims') do
+                  VCR.use_cassette('evss/reference_data/get_intake_sites') do
+                    json_data = JSON.parse data
+                    params = json_data
+                    params['data']['attributes']['disabilities'] = disabilities
+                    post path, params: params.to_json, headers: headers.merge(auth_header)
+                    errors = JSON.parse(response.body)['errors']
+                    expected_verbiage = "Claim must include a disability with the name 'hepatitis'"
+                    expect(errors.any? { |error| error['detail'].include?(expected_verbiage) }).to be true
+                  end
+                end
+              end
+            end
           end
 
           context "when 'disability.name' is 'Hepatitis'" do
@@ -2082,6 +2104,23 @@ RSpec.describe 'Disability Claims ', type: :request do
                     params['data']['attributes']['serviceInformation'].delete('confinements')
                     post path, params: params.to_json, headers: headers.merge(auth_header)
                     expect(response.status).to eq(400)
+                  end
+                end
+              end
+            end
+
+            it 'responds with a useful error message  ' do
+              with_okta_user(scopes) do |auth_header|
+                VCR.use_cassette('evss/claims/claims') do
+                  VCR.use_cassette('evss/reference_data/get_intake_sites') do
+                    json_data = JSON.parse data
+                    params = json_data
+                    params['data']['attributes']['disabilities'] = disabilities
+                    params['data']['attributes']['serviceInformation'].delete('confinements')
+                    post path, params: params.to_json, headers: headers.merge(auth_header)
+                    errors = JSON.parse(response.body)['errors']
+                    expected_verbiage = "Claim must include valid 'serviceInformation.confinements' value"
+                    expect(errors.any? { |error| error['detail'].include?(expected_verbiage) }).to be true
                   end
                 end
               end

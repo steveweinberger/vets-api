@@ -65,10 +65,10 @@ GIT
 
 GIT
   remote: https://github.com/department-of-veterans-affairs/vets-json-schema
-  revision: 3a0946727d9013ff2771af37bfca0c4c0ff0a1d5
+  revision: 8f22da4a728ec2a33e59d3ad3e19bd1e1516d9b2
   branch: master
   specs:
-    vets_json_schema (20.14.0)
+    vets_json_schema (20.14.1)
       multi_json (~> 1.0)
       script_utils (= 0.0.4)
 
@@ -189,8 +189,6 @@ GEM
       gyoku (>= 0.4.0)
       nokogiri
     ast (2.4.2)
-    attr_encrypted (3.1.0)
-      encryptor (~> 3.0.0)
     attr_extras (6.2.4)
     awesome_print (1.9.2)
     aws-eventstream (1.2.0)
@@ -347,7 +345,6 @@ GEM
     ecma-re-validator (0.3.0)
       regexp_parser (~> 2.0)
     einhorn (0.8.2)
-    encryptor (3.0.0)
     erubi (1.10.0)
     et-orbi (1.2.4)
       tzinfo
@@ -656,7 +653,7 @@ GEM
       byebug (~> 11.0)
       pry (~> 0.13.0)
     public_suffix (4.0.6)
-    puma (5.5.0)
+    puma (5.5.1)
       nio4r (~> 2.0)
     puma-plugin-statsd (2.0.0)
       puma (>= 5.0, < 6)
@@ -977,7 +974,6 @@ DEPENDENCIES
   apivore!
   appeals_api!
   apps_api!
-  attr_encrypted (= 3.1.0)
   awesome_print (~> 1.9)
   aws-sdk-s3 (~> 1)
   aws-sdk-sns (~> 1)
@@ -1076,7 +1072,7 @@ DEPENDENCIES
   prawn
   prawn-table
   pry-byebug
-  puma (~> 5.5.0)
+  puma (~> 5.5)
   puma-plugin-statsd
   pundit
   rack
@@ -1149,7 +1145,7 @@ DEPENDENCIES
   yard
 
 RUBY VERSION
-   ruby 2.6.6p146
+   ruby 2.7.4p191
 
 BUNDLED WITH
-   1.17.3
+   2.1.4
