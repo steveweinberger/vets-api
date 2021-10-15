@@ -30,7 +30,7 @@ module AppealsApi
         handle_upload_error(appeal, e)
       rescue => e
         appeal.update_status!(status: 'error', code: e.class.to_s, detail: e.message)
-        Rails.logger.error("#{self.class} error: #{e}")
+        Rails.logger.error("#{self.class} - #{appeal_klass} error: #{e}")
         raise
       end
     end
