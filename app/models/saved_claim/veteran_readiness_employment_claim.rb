@@ -112,18 +112,9 @@ class SavedClaim::VeteranReadinessEmploymentClaim < SavedClaim
     updated_form['veteranInformation']&.merge!({ 'regionalOffice' => "#{@office_location} - #{office_name}" })
   end
 
-  # rubocop:disable Metrics/MethodLength
   def send_to_vre(user)
     prepare_form_data
-    if user&.participant_id.blank?
-      send_to_central_mail!
-    else
-      begin
-        upload_to_vbms
-      rescue VBMS::DownForMaintenance
-        send_to_central_mail!
-      end
-    end
+    send_to_central_mail! # remove
     @office_location = check_office_location[0] if @office_location.nil?
 
     email_addr = REGIONAL_OFFICE_EMAILS[@office_location] || 'VRE.VBACO@va.gov'
@@ -149,7 +140,6 @@ class SavedClaim::VeteranReadinessEmploymentClaim < SavedClaim
     service = VRE::Ch31Form.new(user: user, claim: self)
     service.submit
   end
-  # rubocop:enable Metrics/MethodLength
 
   def upload_to_vbms(doc_type: '1167')
     form_path = PdfFill::Filler.fill_form(self)
