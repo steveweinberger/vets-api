@@ -22,7 +22,11 @@ module TestUserDashboard
     end
 
     def logout
-      warden.logout(:tud)
+      if authenticated?
+        Rails.logger.info("TUD user logged out: #{github_user_details}")
+        warden.logout(:tud)
+      end
+
       redirect_to url
     end
 
