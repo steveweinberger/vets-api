@@ -309,7 +309,7 @@ describe MPI::V1::Service do
         it 'raises a service error', :aggregate_failures do
           allow_any_instance_of(Faraday::Connection).to receive(:post).and_raise(Faraday::TimeoutError)
           expect(subject).to receive(:log_message_to_sentry).with(
-            'MVI find_profile error: Gateway timeout',
+            'MVI find_profile error: timeout',
             :warn
           )
           response = subject.find_profile(user)
