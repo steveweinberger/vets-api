@@ -17,7 +17,7 @@ describe VAOS::V2::AppointmentForm, type: :model do
       expect(params[:kind]).to be('cc')
       expect(params[:status]).to be('proposed')
       expect(params[:location_id]).to be('983')
-      expect(params[:reason]).to be('Testing')
+      expect(params[:reason]).to be('deprecated')
       expect(params[:contact]).to be_a(Hash)
       expect(params[:service_type]).to be('CCPOD')
       expect(params[:requested_periods]).to be_a(Array)
