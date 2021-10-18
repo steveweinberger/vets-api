@@ -3,7 +3,7 @@
 require 'sentry_logging'
 require 'vre/ch31_form'
 
-class SavedClaim::VeteranReadinessEmploymentClaim < SavedClaim
+class SavedClaim::VeteranReadinessEmploymentClaim < CentralMailClaim
   include SentryLogging
 
   FORM = '28-1900'

@@ -22,6 +22,10 @@ RSpec.describe SavedClaim::VeteranReadinessEmploymentClaim do
     }
   end
 
+  it 'responds to #central_mail_submission' do
+    expect(claim.respond_to? :central_mail_submission).to eq(true)
+  end
+
   describe '#add_claimant_info' do
     it 'adds veteran information' do
       VCR.use_cassette 'veteran_readiness_employment/add_claimant_info' do
