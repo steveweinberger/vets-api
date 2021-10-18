@@ -381,7 +381,7 @@ describe MPI::V1::Service do
 
         context 'with an ongoing breakers outage' do
           it 'returns the correct thing', :aggregate_failures do
-            MPI::Configuration.instance.breakers_service.begin_forced_outage!
+            MasterPersonIndex::Configuration.instance.breakers_service.begin_forced_outage!
             expect(Raven).to receive(:extra_context).once
             response = subject.find_profile(user)
 
