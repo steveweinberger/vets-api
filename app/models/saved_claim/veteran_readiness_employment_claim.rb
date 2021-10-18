@@ -115,7 +115,6 @@ class SavedClaim::VeteranReadinessEmploymentClaim < SavedClaim
   # rubocop:disable Metrics/MethodLength
   def send_to_vre(user)
     prepare_form_data
-
     if user&.participant_id.blank?
       send_to_central_mail!
     else
@@ -125,7 +124,6 @@ class SavedClaim::VeteranReadinessEmploymentClaim < SavedClaim
         send_to_central_mail!
       end
     end
-
 
     @office_location = check_office_location[0] if @office_location.nil?
 
