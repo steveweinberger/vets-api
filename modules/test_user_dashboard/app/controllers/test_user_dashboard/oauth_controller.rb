@@ -14,11 +14,6 @@ module TestUserDashboard
       redirect_to "#{url}/signin"
     end
 
-    # Action for warden-github config, failure_app
-    def unauthorized
-      head :unauthorized
-    end
-
     # Action to authorize TUD requests
     def authenticated_and_authorized?
       render json: @current_user if authorized?
