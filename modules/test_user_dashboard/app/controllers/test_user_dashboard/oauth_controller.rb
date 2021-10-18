@@ -9,14 +9,17 @@ module TestUserDashboard
     before_action :authenticate!, only: [:index]
     before_action :authorize!, only: [:index]
 
+    # Action for the redirect_uri for GitHub OAuth
     def index
       redirect_to "#{url}/signin"
     end
 
+    # Action for warden-github config, failure_app
     def unauthorized
       head :unauthorized
     end
 
+    # Action to authorize TUD requests
     def authenticated_and_authorized?
       render json: @current_user if authorized?
     end
