@@ -22,4 +22,19 @@ RSpec.describe TestUserDashboard::OAuthController, type: :request do
       expect(response.headers['Location']).to eq(url)
     end
   end
+
+  describe '#authenticated_and_authorized?' do
+    context 'authorized user' do
+      before do
+        # use RSpec mocks to avoid pinging live APIs during tests
+        allow_any_instance_of(described_class).to receive(:authorized?).and_return(true)
+      end
+
+      it 'renders a successful response' do
+        get('/test_user_dashboard/oauth/is_authorized')
+
+        expect(response).to have_http_status(:ok)
+      end
+    end
+  end
 end
