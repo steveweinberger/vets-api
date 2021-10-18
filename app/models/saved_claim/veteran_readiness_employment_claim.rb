@@ -140,7 +140,6 @@ class SavedClaim::VeteranReadinessEmploymentClaim < SavedClaim
         { team: 'vfs-ebenefits' }
       )
     end
-    # rubocop:enable Metrics/MethodLength
 
     VeteranReadinessEmploymentMailer.build(user, email_addr, @sent_to_cmp).deliver_now if user.present?
 
@@ -151,6 +150,7 @@ class SavedClaim::VeteranReadinessEmploymentClaim < SavedClaim
     service = VRE::Ch31Form.new(user: user, claim: self)
     service.submit
   end
+  # rubocop:enable Metrics/MethodLength
 
   def upload_to_vbms(doc_type: '1167')
     form_path = PdfFill::Filler.fill_form(self)
