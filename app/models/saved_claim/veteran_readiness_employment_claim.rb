@@ -3,7 +3,7 @@
 require 'sentry_logging'
 require 'vre/ch31_form'
 
-class SavedClaim::VeteranReadinessEmploymentClaim < CentralMailClaim
+class SavedClaim::VeteranReadinessEmploymentClaim < SavedClaim
   include SentryLogging
 
   FORM = '28-1900'
@@ -112,9 +112,21 @@ class SavedClaim::VeteranReadinessEmploymentClaim < CentralMailClaim
     updated_form['veteranInformation']&.merge!({ 'regionalOffice' => "#{@office_location} - #{office_name}" })
   end
 
+  # rubocop:disable Metrics/MethodLength
   def send_to_vre(user)
     prepare_form_data
-    send_to_central_mail! # remove
+
+    if user&.participant_id.blank?
+      send_to_central_mail!
+    else
+      begin
+        upload_to_vbms
+      rescue
+        send_to_central_mail!
+      end
+    end
+
+
     @office_location = check_office_location[0] if @office_location.nil?
 
     email_addr = REGIONAL_OFFICE_EMAILS[@office_location] || 'VRE.VBACO@va.gov'
@@ -130,6 +142,7 @@ class SavedClaim::VeteranReadinessEmploymentClaim < CentralMailClaim
         { team: 'vfs-ebenefits' }
       )
     end
+    # rubocop:enable Metrics/MethodLength
 
     VeteranReadinessEmploymentMailer.build(user, email_addr, @sent_to_cmp).deliver_now if user.present?
 
