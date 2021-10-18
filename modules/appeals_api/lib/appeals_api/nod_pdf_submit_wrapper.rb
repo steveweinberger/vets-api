@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module AppealsApi
-  class NodPdfSubmitHandler < SimpleDelegator
+  class NodPdfSubmitWrapper < SimpleDelegator
     include AppealsApi::CharacterUtilities
 
     def metadata(pdf_path)

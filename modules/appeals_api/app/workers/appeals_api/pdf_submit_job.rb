@@ -2,7 +2,7 @@
 
 require 'sidekiq'
 require 'appeals_api/upload_error'
-require 'appeals_api/nod_pdf_submit_handler'
+require 'appeals_api/nod_pdf_submit_wrapper'
 require 'central_mail/utilities'
 require 'central_mail/service'
 require 'pdf_info'
@@ -18,8 +18,8 @@ module AppealsApi
     # Retry for ~7 days
     sidekiq_options retry: 20
 
-    def perform(appeal_id, version = 'V1', handler:, appeal_class:)
-      appeal = handler.new(appeal_class.find(appeal_id))
+    def perform(appeal_id, version = 'V1', appeal_wrapper:, appeal_class:)
+      appeal = appeal_wrapper.new(appeal_class.find(appeal_id))
 
       begin
         stamped_pdf = AppealsApi::PdfConstruction::Generator.new(appeal, version: version).generate
