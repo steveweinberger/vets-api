@@ -1,9 +1,14 @@
 # frozen_string_literal: true
 
 module WardenGitHubUserExtensions
-  # def api
-  #   Octokit::Client.new(access_token: Settings.sidekiq.github_api_key)
-  # end
+  def api
+    # Confirm this works with Sidekiq
+    if self.token
+      super
+    else
+      Octokit::Client.new(access_token: Settings.sidekiq.github_api_key)
+    end
+  end
 end
 
 module WardenGithubStrategyExtensions
