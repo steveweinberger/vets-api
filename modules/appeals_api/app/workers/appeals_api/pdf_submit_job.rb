@@ -15,11 +15,15 @@ module AppealsApi
     include CentralMail::Utilities
     include AppealsApi::CharacterUtilities
 
+    APPEAL_WRAPPERS = {
+      AppealsApi::NoticeOfDisagreement => AppealsApi::NodPdfSubmitWrapper
+    }.freeze
+
     # Retry for ~7 days
     sidekiq_options retry: 20
 
-    def perform(appeal_id, version = 'V1', appeal_wrapper:, appeal_class:)
-      appeal = appeal_wrapper.new(appeal_class.find(appeal_id))
+    def perform(appeal_id, version = 'V1', appeal_class:)
+      appeal = appeal_wrapper(appeal_class).new(appeal_class.find(appeal_id))
 
       begin
         stamped_pdf = AppealsApi::PdfConstruction::Generator.new(appeal, version: version).generate
@@ -45,6 +49,10 @@ module AppealsApi
     end
 
     private
+
+    def appeal_wrapper(appeal_class)
+      APPEAL_WRAPPERS.fetch(appeal_class)
+    end
 
     def upload_to_central_mail(appeal, pdf_path)
       metadata = appeal.metadata(pdf_path)
