@@ -18,8 +18,8 @@ module AppealsApi
     # Retry for ~7 days
     sidekiq_options retry: 20
 
-    def perform(appeal_id, version = 'V1', handler:, appeal_klass:)
-      appeal = handler.new(appeal_klass.find(appeal_id))
+    def perform(appeal_id, version = 'V1', handler:, appeal_class:)
+      appeal = handler.new(appeal_class.find(appeal_id))
 
       begin
         stamped_pdf = AppealsApi::PdfConstruction::Generator.new(appeal, version: version).generate
@@ -30,7 +30,7 @@ module AppealsApi
         handle_upload_error(appeal, e)
       rescue => e
         appeal.update_status!(status: 'error', code: e.class.to_s, detail: e.message)
-        Rails.logger.error("#{self.class} - #{appeal_klass} error: #{e}")
+        Rails.logger.error("#{self.class} - #{appeal_class} error: #{e}")
         raise
       end
     end

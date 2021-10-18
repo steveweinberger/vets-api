@@ -29,7 +29,7 @@ class AppealsApi::V1::DecisionReviews::NoticeOfDisagreementsController < Appeals
     @notice_of_disagreement.save
     AppealsApi::PdfSubmitJob.perform_async(@notice_of_disagreement.id, api_version,
                                            handler: AppealsApi::NodPdfSubmitHandler,
-                                           appeal_klass: AppealsApi::NoticeOfDisagreement)
+                                           appeal_class: AppealsApi::NoticeOfDisagreement)
     render_notice_of_disagreement
   end
 
