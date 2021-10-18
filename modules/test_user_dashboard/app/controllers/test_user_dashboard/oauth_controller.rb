@@ -17,7 +17,7 @@ module TestUserDashboard
       head :unauthorized
     end
 
-    def is_authorized
+    def authenticated_and_authorized?
       render json: @current_user if authorized?
     end
 
@@ -34,6 +34,7 @@ module TestUserDashboard
 
     def url
       return 'https://tud.vfs.va.gov' if Settings.vsp_environment == 'staging'
+
       'http://localhost:8000'
     end
   end

@@ -12,8 +12,8 @@ module TestUserDashboard
 
     def authenticate!
       return if authenticated?
-  
-      warden.authenticate!(:scope => :tud)
+
+      warden.authenticate!(scope: :tud)
       # does returning head :forbidden work with the warden-github gem?
       head :forbidden unless authenticated?
     end
@@ -27,24 +27,21 @@ module TestUserDashboard
         return true
       end
 
-      Rails.logger.info("TUD authentication unsuccessful")
+      Rails.logger.info('TUD authentication unsuccessful')
       false
     end
-  
+
     def authorize!
       authorized?
     end
 
     def authorized?
       if authenticated?
-      # if authenticated? && github_user.organization_member?('department-of-veterans-affairs')
+        # if authenticated? && github_user.organization_member?('department-of-veterans-affairs')
         Rails.logger.info("TUD authorization successful: #{github_user_details}")
         true
       else
-        if authenticated?
-          Rails.logger.info("TUD authorization unsuccessful: #{github_user_details}")
-        end
-
+        Rails.logger.info("TUD authorization unsuccessful: #{github_user_details}") if authenticated?
         false
       end
     end
@@ -66,7 +63,7 @@ module TestUserDashboard
         avatar_url: github_user.avatar_url
       }
     end
-  
+
     def warden
       request.env['warden']
     end

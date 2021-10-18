@@ -31,7 +31,7 @@ Warden::GitHub::User.module_eval do
 end
 
 Rails.configuration.middleware.use Warden::Manager do |config|
-  config.failure_app = ->(env){ TestUserDashboard::OAuthController.action(:unauthorized).call(env) }
+  config.failure_app = ->(env) { TestUserDashboard::OAuthController.action(:unauthorized).call(env) }
   config.default_strategies :github
 
   config.scope_defaults :tud, config: {
