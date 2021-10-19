@@ -13,6 +13,20 @@ RSpec.describe TestUserDashboard::ApplicationController, type: :controller do
   # authorized?
   # github_user_details - done
 
+  describe '#authorize!' do
+    before do
+      allow_any_instance_of(described_class).to receive(:authorized?) { true }
+    end
+
+    subject do
+      controller.authorize!
+    end
+
+    it "returns true" do
+      expect(subject).to be_truthy
+    end
+  end
+
   describe '#github_user_details' do
     before do
       allow_any_instance_of(described_class).to receive_message_chain(:github_user, :id) { 1 }
