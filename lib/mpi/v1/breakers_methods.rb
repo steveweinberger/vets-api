@@ -45,6 +45,10 @@ module MPI
       def breakers_error_threshold
         50
       end
+
+      def allow_missing_certs?
+        !Rails.env.production?
+      end
     end
   end
 end

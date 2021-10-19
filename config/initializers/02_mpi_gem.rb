@@ -1,3 +1,5 @@
+require 'mpi/v1/breakers_methods'
+
 instance = MasterPersonIndex::Configuration.instance
 
 instance.base_path = Settings.mvi.url
@@ -10,6 +12,12 @@ instance.vba_orchestration = Settings.mvi.vba_orchestration
 instance.edipi_search = Settings.mvi.edipi_search
 
 handlers = instance.connection.builder.handlers
+
+handlers.unshift(
+  Faraday::RackBuilder::Handler.new(
+    Breakers::UptimeMiddleware
+  )
+)
 
 handlers.insert(
   -2,

@@ -50,7 +50,7 @@ describe MPI::V1::Service do
   before do
     allow(Settings.mvi).to receive(:pii_logging).and_return(true)
     allow(Settings.mvi).to receive(:mock).and_return(true)
-    allow(instance).to receive(:allow_missing_certs?).and_return(true)
+    load "#{Rails.root}/config/initializers/02_mpi_gem.rb" rescue FrozenError
   end
 
   describe 'middlewares' do
@@ -473,6 +473,18 @@ def server_error_502_expectations_for(response)
   expect(exception.title).to eq 'Bad Gateway'
   expect(exception.code).to eq 'MVI_502'
   expect(exception.status).to eq '502'
+  expect(exception.source).to eq MPI::V1::Service
+end
+
+def server_error_503_expectations_for(response)
+  exception = response.error.errors.first
+
+  expect(response.class).to eq MasterPersonIndex::Responses::FindProfileResponse
+  expect(response.status).to eq server_error
+  expect(response.profile).to be_nil
+  expect(exception.title).to eq 'Service unavailable'
+  expect(exception.code).to eq 'MVI_503'
+  expect(exception.status).to eq '503'
   expect(exception.source).to eq MPI::V1::Service
 end
 

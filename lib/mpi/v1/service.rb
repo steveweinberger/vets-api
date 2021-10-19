@@ -22,9 +22,16 @@ module MPI
           Raven.tags_context(mvi_find_profile: 'user_attributes')
         end
 
-        return_val = with_monitoring do
-          @service.find_profile(convert_user(user_identity), search_type)
-        end
+        return_val =
+          begin
+            with_monitoring do
+              @service.find_profile(convert_user(user_identity), search_type)
+            end
+          rescue Breakers::OutageException => e
+            Raven.extra_context(breakers_error_message: e.message)
+            log_message_to_sentry('MVI find_profile connection failed.', :warn)
+            @service.mvi_profile_exception_response_for(MasterPersonIndex::Constants::OUTAGE_EXCEPTION, e)
+          end
 
         if return_val.error.present?
           original_error = return_val.error
