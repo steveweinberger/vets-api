@@ -9,7 +9,7 @@ RSpec.describe TestUserDashboard::ApplicationController, type: :controller do
 
   # methods to test:
   # authenticate!
-  # authorize!
+  # authorize! - done
   # authorized?
   # github_user_details - done
 
@@ -24,6 +24,45 @@ RSpec.describe TestUserDashboard::ApplicationController, type: :controller do
 
     it "returns true" do
       expect(subject).to be_truthy
+    end
+  end
+
+  describe '#authorized?' do
+    let!(:user_details) { 'test user details'}
+
+    context 'authenticated user' do
+      before do
+        allow_any_instance_of(described_class).to receive(:authenticated?) { true }
+        allow_any_instance_of(described_class).to receive_message_chain(:github_user, :organization_member?) { true }
+        allow_any_instance_of(described_class).to receive(:github_user_details) { user_details }
+      end
+  
+      subject do
+        controller.authorized?
+      end
+  
+      it 'logs the GitHub user details' do
+        expect(Rails.logger).to receive(:info).with("TUD authorization successful: #{user_details}")
+        subject
+      end
+  
+      it 'returns true' do
+        expect(subject).to be_truthy
+      end
+    end
+
+    context 'unauthenticated user' do
+      before do
+        allow_any_instance_of(described_class).to receive(:authenticated?) { false }
+      end
+
+      subject do
+        controller.authorized?
+      end
+  
+      it 'returns false' do
+        expect(subject).to be_falsey
+      end
     end
   end
 
