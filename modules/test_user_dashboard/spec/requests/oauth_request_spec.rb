@@ -42,10 +42,11 @@ RSpec.describe TestUserDashboard::OAuthController, type: :request do
     before do
       # use RSpec mocks to avoid pinging live APIs during tests
       allow_any_instance_of(described_class).to receive(:authenticated?).and_return(true)
+      allow_any_instance_of(described_class).to receive(:github_user_details).and_return(true)
     end
 
     let(:url) do
-      Settings.vsp_environment == 'staging' ? 'https://tud.vfs.va.gov/' : 'http://localhost:8000/'
+      Settings.vsp_environment == 'staging' ? 'https://tud.vfs.va.gov' : 'http://localhost:8000'
     end
 
     it 'redirects home' do
