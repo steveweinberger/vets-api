@@ -7,11 +7,19 @@ RSpec.describe TestUserDashboard::ApplicationController, type: :controller do
     def index; end
   end
 
-  # methods to test:
-  # authenticate!
-  # authorize! - done
-  # authorized?
-  # github_user_details - done
+  describe 'authenticate!' do
+    before do
+      allow_any_instance_of(described_class).to receive(:authenticated?) { true }
+    end
+
+    subject do
+      controller.authenticate!
+    end
+
+    it 'returns true for an authenticated user' do
+      expect(subject).to be_nil
+    end
+  end
 
   describe '#authorize!' do
     before do
