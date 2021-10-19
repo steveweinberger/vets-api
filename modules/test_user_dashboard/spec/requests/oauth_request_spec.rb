@@ -37,4 +37,22 @@ RSpec.describe TestUserDashboard::OAuthController, type: :request do
       end
     end
   end
+
+  describe '#logout' do
+    before do
+      # use RSpec mocks to avoid pinging live APIs during tests
+      allow_any_instance_of(described_class).to receive(:authenticated?).and_return(true)
+    end
+
+    let(:url) do
+      Settings.vsp_environment == 'staging' ? 'https://tud.vfs.va.gov/' : 'http://localhost:8000/'
+    end
+
+    it 'redirects home' do
+      get('/test_user_dashboard/oauth/logout')
+
+      expect(response).to have_http_status(:redirect)
+      expect(response.headers['Location']).to eq(url)
+    end
+  end
 end
