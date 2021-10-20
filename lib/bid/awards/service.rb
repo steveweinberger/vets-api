@@ -24,8 +24,12 @@ module BID
       private
 
       def request_headers
+        external_key = @user.common_name || @user.email
+
         {
-          Authorization: "Bearer #{Settings.bid.awards.credentials}"
+          Authorization: "Bearer #{Settings.bid.awards.credentials}",
+          ExternalUid: @user.icn,
+          ExternalKey: external_key
         }
       end
 
