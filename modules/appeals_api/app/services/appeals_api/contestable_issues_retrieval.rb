@@ -24,6 +24,18 @@ module AppealsApi
 
     def filter_response(caseflow_response)
       return caseflow_response unless caseflow_response[:status] == 200
+      return caseflow_response unless decision_review_type == 'notice_of_disagreements'
+      return caseflow_response if caseflow_response.body['data'].nil?
+
+      caseflow_response.body['data'].reject! do |issue|
+        issue['attributes']['ratingIssueSubjectText'].nil?
+      end
+
+      caseflow_response.body['data'].sort_by! do |issue|
+        Date.strptime(issue['attributes']['approxDecisionDate'], '%Y-%m-%d')
+      end
+
+      caseflow_response.body['data'].reverse!
     end
 
     def call_caseflow
@@ -33,7 +45,8 @@ module AppealsApi
         decision_review_type: caseflow_decision_review_type
       )
     rescue Common::Exceptions::BackendServiceException => backend_service_exception
-      errored_caseflow_response(backend_service_exception)
+      errors = map_error_class_to_hash(backend_service_exception.errors)
+      error_response(errors)
     end
 
     private
@@ -57,7 +70,7 @@ module AppealsApi
           schema_version: 'v2'
         ).validate!('CONTESTABLE_ISSUES_HEADERS', request_headers)
       rescue => e
-        errors = e.errors.map(&:to_h).map(&:compact)
+        errors = map_error_class_to_hash(e.errors)
         @header_errors = error_response(errors)
         false
       end
@@ -89,25 +102,11 @@ module AppealsApi
     end
 
     def errored_caseflow_response(backend_service_exception)
-      return error_response(unusable_response_errors) unless response_is_usable?(backend_service_exception)
-
-      error_response(backend_service_exception)
+      error_response(map_error_class_to_hash(backend_service_exception.errors))
     end
 
-    def response_is_usable?(response)
-      binding.pry
-      response.try(:status) && response.try(:body).is_a?(Hash)
-    end
-
-    def unusable_response_errors
-      [
-        {
-          title: 'Bad Gateway',
-          code: 'bad_gateway',
-          detail: 'Received an unusable response from Caseflow.',
-          status: 502
-        }
-      ]
+    def map_error_class_to_hash(errors)
+      errors.map(&:to_h).map(&:compact)
     end
 
     def error_response(errors)
