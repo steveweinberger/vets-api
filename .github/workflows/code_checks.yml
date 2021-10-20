@@ -78,9 +78,7 @@ jobs:
         with:
           build-args: |
             sidekiq_license=${{ env.BUNDLE_ENTERPRISE__CONTRIBSYS__COM }}
-            userid=${{ env.VETS_API_USER_ID }}
           context: .
-          target: development
           push: false
           load: true
           tags: vets-api:${{ env.DOCKER_IMAGE }}
