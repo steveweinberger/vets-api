@@ -2,7 +2,6 @@
 
 module WardenGitHubUserExtensions
   def api
-    binding.pry
     # Confirm this works with Sidekiq
     if token
       super
