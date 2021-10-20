@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'pry'
 
 module SpecProfiling
@@ -9,7 +11,7 @@ module SpecProfiling
 
     def ruby_prof
       require 'ruby-prof'
-      $stdout.puts "RubyProf enabled"
+      $stdout.puts 'RubyProf enabled'
 
       profiler = RubyProf::Profile.new(
         merge_fibers: true,
@@ -21,22 +23,27 @@ module SpecProfiling
       at_exit do
         result = profiler.stop
 
-        # Common RSpec methods
-        result.exclude_methods!(
-          [
-            /instance_exec/,
-            /Example(Group)?>?#run(_examples)?/,
-            /Procsy/,
-            /AroundHook#execute_with/,
-            /HookCollections/,
-            /Array#(map|each)/
-          ]
-        )
+        exclude_rspec_methods(result)
+
         printer_type = ENV['RPRINTER'] || 'call_stack'
         printer = "RubyProf::#{printer_type.camelize}Printer".constantize
-        path = Rails.root.join("tmp", "ruby-prof-report-#{printer_type}-#{RubyProf.measure_mode}-total.html")
+        path = Rails.root.join('tmp', "ruby-prof-report-#{printer_type}-#{RubyProf.measure_mode}-total.html")
         File.open(path.to_s, 'w') { |f| printer.new(result).print(f, min_percent: 1) }
       end
+    end
+
+    def exclude_rspec_methods(result)
+      # Common RSpec methods
+      result.exclude_methods!(
+        [
+          /instance_exec/,
+          /Example(Group)?>?#run(_examples)?/,
+          /Procsy/,
+          /AroundHook#execute_with/,
+          /HookCollections/,
+          /Array#(map|each)/
+        ]
+      )
     end
 
     def stack_prof
@@ -47,7 +54,7 @@ module SpecProfiling
       StackProf.start(mode: mode.to_sym, raw: true)
 
       at_exit do
-        path = Rails.root.join("tmp", "stackprof-#{mode}-test-total.dump")
+        path = Rails.root.join('tmp', "stackprof-#{mode}-test-total.dump")
         StackProf.stop
         StackProf.results path.to_s
       end
@@ -59,7 +66,7 @@ RSpec.configure do |config|
   config.around(:each, :sprof) do |ex|
     require 'stackprof'
     mode = ENV['RMODE'] || 'wall'
-    path = Rails.root.join("tmp", "stackprof-#{mode}-test-#{ex.full_description.parameterize}.dump")
+    path = Rails.root.join('tmp', "stackprof-#{mode}-test-#{ex.full_description.parameterize}.dump")
     StackProf.run(mode: mode.to_sym, out: path.to_s, raw: true) do
       ex.run
     end
@@ -67,13 +74,15 @@ RSpec.configure do |config|
 
   config.around(:each, :rprof) do |ex|
     require 'ruby-prof'
-    
+
     result = RubyProf.profile { ex.run }
-    
+
     printer_type = ENV['RPRINTER'] || 'call_stack'
     printer = "RubyProf::#{printer_type.camelize}Printer".constantize
-    
-    path = Rails.root.join("tmp", "ruby-prof-report-#{printer_type}-#{RubyProf.measure_mode}-#{ex.full_description.parameterize}.html")
+
+    path = Rails.root.join('tmp',
+                           "ruby-prof-report-#{printer_type}-#{RubyProf.measure_mode}" \
+                           "-#{ex.full_description.parameterize}.html")
     File.open(path.to_s, 'w') { |f| printer.new(result).print(f, min_percent: 1) }
   end
 end
