@@ -50,14 +50,18 @@ describe MPI::V1::Service do
   before do
     allow(Settings.mvi).to receive(:pii_logging).and_return(true)
     allow(Settings.mvi).to receive(:mock).and_return(true)
-    load "#{Rails.root}/config/initializers/02_mpi_gem.rb" rescue FrozenError
+
+    unless instance.connection.builder.handlers.size == 6
+      load "#{Rails.root}/config/initializers/02_mpi_gem.rb"
+      instance.connection.builder.handlers.delete_at(0)
+    end
   end
 
   describe 'middlewares' do
     it 'adds middlewares in the right positions' do
-      described_class.new
       expect(instance.connection.builder.handlers).to eq(
         [
+          Breakers::UptimeMiddleware,
           MasterPersonIndex::Common::Client::Middleware::SOAPHeaders,
           MasterPersonIndex::Common::Client::Middleware::SOAPParser,
           Common::Client::Middleware::Logging,
