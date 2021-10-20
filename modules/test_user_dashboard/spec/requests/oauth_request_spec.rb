@@ -33,7 +33,7 @@ RSpec.describe TestUserDashboard::OAuthController, type: :request do
           avatar_url: 'https://en.wikipedia.org/wiki/Ted_Lasso'
         }
       end
-  
+
       before do
         allow_any_instance_of(described_class).to receive(:authorized?).and_return(true)
         allow_any_instance_of(Warden::GitHub::User).to receive(:id).and_return(github_user[:id])
