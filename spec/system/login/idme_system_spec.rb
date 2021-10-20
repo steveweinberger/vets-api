@@ -1,22 +1,9 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require 'authentication_system_helper'
 
 if ENV['LOGIN_SYSTEM_TESTS']
   RSpec.describe 'ID.me login', type: :system do
-    before do
-      driven_by :selenium_chrome_headless
-      Capybara.server = :puma
-      Capybara.app_host = 'https://staging.va.gov'
-      Capybara.run_server = false # don't start Rack
-      Capybara.default_max_wait_time = 15
-      VCR.turn_off!
-
-      # Fixes issue with WebMock and Ruby 2.7
-      # https://github.com/bblimke/webmock/blob/master/README.md#connecting-on-nethttpstart
-      WebMock.allow_net_connect!(net_http_connect_on_start: true)
-    end
-
     it 'can log in an LOA3 user' do
       visit '/'
       click_button 'Sign in'
