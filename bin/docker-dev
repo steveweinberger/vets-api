@@ -25,12 +25,12 @@ web_run() {
     --env Settings.redis.rails_cache.url=$REDIS_URL \
     --env Settings.saml.cert_path=/app/config/certs/vetsgov-localhost.crt \
     --env Settings.saml.key_path=/app/config/certs/vetsgov-localhost.key \
-    --env RAILS_ENV=test \
+    --env RAILS_ENV=development \
     --publish $PORT:3000 \
     --rm \
     --interactive \
     --tty \
-    $tag_name rspec
+    $tag_name rails server
     # $tag_name bin/rails db:drop db:setup db:migrate
 }
 
