@@ -189,6 +189,7 @@ group :development, :test do
   gem 'overcommit'
   gem 'parallel_tests'
   gem 'pry-byebug'
+  gem 'rack-mini-profiler'
   gem 'rack-test', require: 'rack/test'
   gem 'rack-vcr'
   gem 'rainbow' # Used to colorize output for rake tasks
@@ -200,13 +201,12 @@ group :development, :test do
   gem 'rubocop-rails'
   gem 'rubocop-rspec'
   gem 'rubocop-thread_safety'
+  gem 'ruby-prof'
+  gem 'ruby-prof-flamegraph'
   gem 'sidekiq'
   gem 'timecop'
   gem 'webmock'
   gem 'yard'
-  gem 'ruby-prof-flamegraph'
-  gem 'ruby-prof'
-  gem 'rack-mini-profiler'
   gem 'stackprof'
 end
 
