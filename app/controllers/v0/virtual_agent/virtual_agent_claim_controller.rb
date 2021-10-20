@@ -15,8 +15,9 @@ module V0
 
         open_comp_claims_data = synchronized == 'REQUESTED' ? nil : data_for_three_most_recent_open_comp_claims(claims)
         puts(open_comp_claims_data)
-        x = ClaimAugmenter.new
-        data = synchronized == 'REQUESTED' ? nil : x.getSupplementalClaimData(open_comp_claims_data, current_user)
+        claimAugmenter = ClaimAugmenter.new
+        data = synchronized == 'REQUESTED' ? nil : claimAugmenter.getSupplementalClaimData(open_comp_claims_data, current_user, service)
+        puts('data with extra details')
         puts(data)
 
         render json: {
@@ -26,9 +27,12 @@ module V0
       end
 
       def show
+        puts('in show')
         claim = EVSSClaim.for_user(current_user).find_by(evss_id: params[:id])
 
         claim, synchronized = service.update_from_remote(claim)
+        puts(claim)
+        puts(synchronized)
 
         render json: {
           data: { va_representative: get_va_representative(claim) },
@@ -36,76 +40,49 @@ module V0
         }
       end
 
-
-
-# const arr = [claim,1 claim2, claim3];
-#
-# const asyncRes = await Promise.all(arr.map(async (claim) => {
-# 	await callApiUntilSyncStatusIsSuccess;
-# 	return claimWithRepAppended;
-# }));`
-
-      # def callApiUntilSyncStatusIsSuccess {
-      #   while syncStatus == REQUESTED {
-      #     sleep(1)
-      #     keep calling the API
-      #   }
-      # }
-
-
       class ClaimAugmenter
         include Concurrent::Async
 
-        def getSupplementalClaimData(claims, current_user)
+        def getSupplementalClaimData(claims, current_user, service)
           puts('made it!!')
-          # puts(logged_in?)
-          # puts(current_user)
-          # puts(@current_user)
-          claims.map do |claim|
+          claimsWithSupplementalData = claims.map do |claim|
             puts('in map!!')
-            puts(claim[:evss_id])
-            puts('random1')
-            # puts(current_user)
-            puts('random2')
+            puts(claim)
             claim_db_record = EVSSClaim.for_user(current_user).find_by(evss_id: claim[:evss_id])
-            puts(claim_db_record)
-            puts('before empty obj')
             single_claim_response = {}
-            puts('after empty obj')
             synchronized = 'REQUESTED'
             until synchronized == 'SUCCESS' do
-              sleep(10)
-              puts(synchronized)
               single_claim_response, synchronized = service.update_from_remote(claim_db_record)
-              puts(synchronized)
-              puts(single_claim_response)
+              if synchronized == 'REQUESTED' then sleep(10) end
             end
             transform_single_claim_to_augmented_response(claim, single_claim_response)
           end
+          puts('finished transofrming list of claims')
+          puts(claimsWithSupplementalData)
+          return claimsWithSupplementalData
         end
+
+        def transform_single_claim_to_augmented_response(claim, claim_db_record)
+          puts('inside augment claim')
+          va_representative = get_va_representative(claim_db_record)
+          puts(va_representative)
+          return { claim_status: claim[:claim_status],
+                   claim_type: claim[:claim_type],
+                   filing_date: claim[:filing_date],
+                   evss_id: claim[:evss_id],
+                   updated_date: claim[:updated_date],
+                   va_representative: va_representative
+          }
+        end
+
+        def get_va_representative(claim)
+          va_rep = claim.data['poa']
+          va_rep.gsub(/&[^ ;]+;/, '')
+        end
+
       end
 
-      def transform_single_claim_to_augmented_response(claim, claim_db_record)
-        status_type = claim.list_data['status_type']
-        claim_status = claim.list_data['status']
-        filing_date = claim.list_data['date']
-        evss_id = claim.list_data['id']
-        updated_date = get_updated_date(claim)
-        va_representative = get_va_representative(claim_db_record)
-
-        { claim_status: claim_status,
-          claim_type: status_type,
-          filing_date: filing_date,
-          evss_id: evss_id,
-          updated_date: updated_date,
-          va_representative: va_representative
-        }
-      end
-
-
-
-
-          private
+      private
 
       def data_for_three_most_recent_open_comp_claims(claims)
         comp_claims = three_most_recent_open_comp_claims claims
@@ -126,15 +103,11 @@ module V0
         evss_id = claim.list_data['id']
         updated_date = get_updated_date(claim)
 
-        # # claim_supplement = EVSSClaim.for_user(current_user).find_by(evss_id: params[:id])
-        # claim_supplement = EVSSClaim.for_user(current_user).find_by(evss_id: evss_id)
-
         { claim_status: claim_status,
           claim_type: status_type,
           filing_date: filing_date,
           evss_id: evss_id,
           updated_date: updated_date
-          # va_representative: get_va_representative(claim_supplement)
         }
       end
 
@@ -166,6 +139,7 @@ module V0
         va_rep = claim.data['poa']
         va_rep.gsub(/&[^ ;]+;/, '')
       end
+
     end
   end
 end

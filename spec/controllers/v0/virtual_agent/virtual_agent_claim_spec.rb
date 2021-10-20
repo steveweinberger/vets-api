@@ -20,7 +20,6 @@ RSpec.describe 'VirtualAgentClaims', type: :request do
     it 'returns information on multiple open compensation claims in descending chronological order by updated date' do
       sign_in_as(user)
 
-
       get '/v0/virtual_agent/claim'
       expect(response).to have_http_status(:ok)
       expect(JSON.parse(response.body)['meta']['sync_status']).to eq 'REQUESTED'
@@ -30,39 +29,17 @@ RSpec.describe 'VirtualAgentClaims', type: :request do
       VCR.use_cassette('evss/claims/claims_multiple_open_compensation_claims') do
         EVSS::RetrieveClaimsFromRemoteJob.new.perform(user.uuid)
       end
-
-      get '/v0/virtual_agent/claim'
-
-      expect(response).to have_http_status(:ok)
-      expect(JSON.parse(response.body)['meta']['sync_status']).to eq 'REQUESTED'
-      expect(JSON.parse(response.body)['data']).to eq nil
-
       VCR.use_cassette('evss/claims/claim_with_docs1') do
         EVSS::UpdateClaimFromRemoteJob.new.perform(user.uuid, 1)
       end
-
-      get '/v0/virtual_agent/claim'
-
-      expect(response).to have_http_status(:ok)
-      expect(JSON.parse(response.body)['meta']['sync_status']).to eq 'REQUESTED'
-      expect(JSON.parse(response.body)['data']).to eq nil
-
       VCR.use_cassette('evss/claims/claim_with_docs2') do
         EVSS::UpdateClaimFromRemoteJob.new.perform(user.uuid, 2)
       end
-
-      get '/v0/virtual_agent/claim'
-
-      expect(response).to have_http_status(:ok)
-      expect(JSON.parse(response.body)['meta']['sync_status']).to eq 'REQUESTED'
-      expect(JSON.parse(response.body)['data']).to eq nil
-
       VCR.use_cassette('evss/claims/claim_with_docs3') do
         EVSS::UpdateClaimFromRemoteJob.new.perform(user.uuid, 3)
       end
 
       get '/v0/virtual_agent/claim'
-
 
       expect(response).to have_http_status(:ok)
       expect(JSON.parse(response.body)['meta']['sync_status']).to eq 'SUCCESS'
@@ -75,7 +52,7 @@ RSpec.describe 'VirtualAgentClaims', type: :request do
                                                         'filing_date' => '02/08/2017',
                                                         'evss_id' => '600118854',
                                                         'updated_date' => '03/10/2018',
-                                                        'va_representative' => 'John Smith'
+                                                        'va_representative' => 'JOHN SMITH'
                                                       },
                                                        {
                                                          'claim_type' => 'Compensation',
@@ -83,7 +60,7 @@ RSpec.describe 'VirtualAgentClaims', type: :request do
                                                          'filing_date' => '01/08/2018',
                                                          'evss_id' => '600118855',
                                                          'updated_date' => '01/10/2018',
-                                                         'va_representative' => 'John Smith'
+                                                         'va_representative' => 'VAL KILMER'
                                                        },
                                                        {
                                                          'claim_type' => 'Compensation',
@@ -91,20 +68,17 @@ RSpec.describe 'VirtualAgentClaims', type: :request do
                                                          'filing_date' => '12/08/2017',
                                                          'evss_id' => '600118851',
                                                          'updated_date' => '12/08/2017',
-                                                         'va_representative' => 'John Smith'
+                                                         'va_representative' => 'JESSE BROWN'
                                                        }])
     end
-    describe 'this is a test' do
+
+    describe 'for a single claim' do
       let!(:claim) do
-        # FactoryBot.create(:evss_claim, id: 1, evss_id: 600_118_854,
-        #                   user_uuid: user.uuid)
-        # FactoryBot.create(:evss_claim, id: 2, evss_id: 600_118_855,
-        #                   user_uuid: user.uuid)
         FactoryBot.create(:evss_claim, id: 3, evss_id: 600_118_851,
                           user_uuid: user.uuid)
       end
 
-      fit 'returns information on single open compensation claim' do
+      it 'returns information on single open compensation claim' do
         sign_in_as(user)
 
         get '/v0/virtual_agent/claim'
@@ -116,16 +90,9 @@ RSpec.describe 'VirtualAgentClaims', type: :request do
         VCR.use_cassette('evss/claims/claims_with_single_open_compensation_claim') do
           EVSS::RetrieveClaimsFromRemoteJob.new.perform(user.uuid)
         end
-
-        get '/v0/virtual_agent/claim'
-        expect(response).to have_http_status(:ok)
-        expect(JSON.parse(response.body)['meta']['sync_status']).to eq 'REQUESTED'
-        expect(JSON.parse(response.body)['data']).to eq nil
-
         VCR.use_cassette('evss/claims/claim_with_docs1') do
           EVSS::UpdateClaimFromRemoteJob.new.perform(user.uuid, 3)
         end
-
 
         get '/v0/virtual_agent/claim'
         expect(response).to have_http_status(:ok)
@@ -137,10 +104,11 @@ RSpec.describe 'VirtualAgentClaims', type: :request do
                                                                'claim_status' => 'UNDER REVIEW',
                                                                'filing_date' => '12/08/2017',
                                                                'evss_id' => '600118851',
-                                                               'updated_date' => '12/08/2017'
+                                                               'updated_date' => '12/08/2017',
+                                                               'va_representative' => 'JOHN SMITH'
                                                              })
       end
-  end
+    end
 
 
     it 'returns empty array when no open claims are found' do
@@ -181,29 +149,41 @@ RSpec.describe 'VirtualAgentClaims', type: :request do
       expect(JSON.parse(response.body)['data'].size).to equal(0)
     end
 
-    it 'returns information when there is a more recent non-compensation open claim' do
-      sign_in_as(user)
-      get '/v0/virtual_agent/claim'
-      expect(response).to have_http_status(:ok)
-      expect(JSON.parse(response.body)['meta']['sync_status']).to eq 'REQUESTED'
-      expect(JSON.parse(response.body)['data']).to eq nil
-
-      # run job
-      VCR.use_cassette('evss/claims/claims_most_recent_dependent') do
-        EVSS::RetrieveClaimsFromRemoteJob.new.perform(user.uuid)
+    describe 'for a user who has non-compensation and compensation claims' do
+      let!(:claim) do
+        FactoryBot.create(:evss_claim, id: 3, evss_id: 600_114_693,
+                          user_uuid: user.uuid)
       end
+      it 'returns information when there is a more recent non-compensation open claim' do
+        sign_in_as(user)
+        get '/v0/virtual_agent/claim'
+        expect(response).to have_http_status(:ok)
+        expect(JSON.parse(response.body)['meta']['sync_status']).to eq 'REQUESTED'
+        expect(JSON.parse(response.body)['data']).to eq nil
 
-      get '/v0/virtual_agent/claim'
-      expect(response).to have_http_status(:ok)
-      expect(JSON.parse(response.body)['meta']['sync_status']).to eq 'SUCCESS'
-      expect(JSON.parse(response.body)['data']).to include({
-                                                             'claim_type' => 'Compensation',
-                                                             'claim_status' => 'CLAIM RECEIVED',
-                                                             'filing_date' => '09/28/2017',
-                                                             'evss_id' => '600114693',
-                                                             'updated_date' => '09/28/2017'
-                                                           })
+        # run job
+        VCR.use_cassette('evss/claims/claims_most_recent_dependent') do
+          EVSS::RetrieveClaimsFromRemoteJob.new.perform(user.uuid)
+        end
+        VCR.use_cassette('evss/claims/claim_with_docs4') do
+          EVSS::UpdateClaimFromRemoteJob.new.perform(user.uuid, 3)
+        end
+
+        get '/v0/virtual_agent/claim'
+        expect(response).to have_http_status(:ok)
+        expect(JSON.parse(response.body)['meta']['sync_status']).to eq 'SUCCESS'
+        expect(JSON.parse(response.body)['data']).to include({
+                                                                 'claim_type' => 'Compensation',
+                                                                 'claim_status' => 'CLAIM RECEIVED',
+                                                                 'filing_date' => '09/28/2017',
+                                                                 'evss_id' => '600114693',
+                                                                 'updated_date' => '09/28/2017',
+                                                                 'va_representative' => 'JESSE BROWN'
+                                                             })
+      end
     end
+
+
   end
 
   describe 'GET /v0/virtual_agent/claim/{EVSS_ID}' do
