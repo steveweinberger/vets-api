@@ -44,28 +44,36 @@ module V0
         include Concurrent::Async
 
         def getSupplementalClaimData(claims, current_user, service)
-          puts('made it!!')
+          #puts('made it!!')
           claimsWithSupplementalData = claims.map do |claim|
-            puts('in map!!')
-            puts(claim)
+            #puts('in map!!')
+            #puts(claim)
             claim_db_record = EVSSClaim.for_user(current_user).find_by(evss_id: claim[:evss_id])
             single_claim_response = {}
             synchronized = 'REQUESTED'
-            until synchronized == 'SUCCESS' do
+            attempts = 0
+            until synchronized == 'SUCCESS' or attempts == 10 do
+              puts('attempt #')
+              puts(attempts)
               single_claim_response, synchronized = service.update_from_remote(claim_db_record)
-              if synchronized == 'REQUESTED' then sleep(10) end
+              if synchronized == 'REQUESTED' then sleep(1) end
+              attempts = attempts+1
             end
-            transform_single_claim_to_augmented_response(claim, single_claim_response)
+
+            if synchronized == 'SUCCESS' then
+              va_representative = get_va_representative(single_claim_response)
+              transform_single_claim_to_augmented_response(claim, va_representative)
+            else
+              transform_single_claim_to_augmented_response(claim, '')
+            end
+
           end
-          puts('finished transofrming list of claims')
-          puts(claimsWithSupplementalData)
+          #puts('finished transofrming list of claims')
+          #puts(claimsWithSupplementalData)
           return claimsWithSupplementalData
         end
 
-        def transform_single_claim_to_augmented_response(claim, claim_db_record)
-          puts('inside augment claim')
-          va_representative = get_va_representative(claim_db_record)
-          puts(va_representative)
+        def transform_single_claim_to_augmented_response(claim, va_representative)
           return { claim_status: claim[:claim_status],
                    claim_type: claim[:claim_type],
                    filing_date: claim[:filing_date],

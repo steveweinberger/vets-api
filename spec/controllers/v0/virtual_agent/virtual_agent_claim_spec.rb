@@ -108,6 +108,34 @@ RSpec.describe 'VirtualAgentClaims', type: :request do
                                                                'va_representative' => 'JOHN SMITH'
                                                              })
       end
+
+      fit 'returns information on single open compensation claim without representative when claim details service times out' do
+        sign_in_as(user)
+
+        get '/v0/virtual_agent/claim'
+        expect(response).to have_http_status(:ok)
+        expect(JSON.parse(response.body)['meta']['sync_status']).to eq 'REQUESTED'
+        expect(JSON.parse(response.body)['data']).to eq nil
+
+        # run job
+        VCR.use_cassette('evss/claims/claims_with_single_open_compensation_claim') do
+          EVSS::RetrieveClaimsFromRemoteJob.new.perform(user.uuid)
+        end
+
+        get '/v0/virtual_agent/claim'
+        expect(response).to have_http_status(:ok)
+        expect(JSON.parse(response.body)['meta']['sync_status']).to eq 'SUCCESS'
+        expect(JSON.parse(response.body)['data']).to be_kind_of(Array)
+        expect(JSON.parse(response.body)['data'].size).to equal(1)
+        expect(JSON.parse(response.body)['data']).to include({
+                                                                 'claim_type' => 'Compensation',
+                                                                 'claim_status' => 'UNDER REVIEW',
+                                                                 'filing_date' => '12/08/2017',
+                                                                 'evss_id' => '600118851',
+                                                                 'updated_date' => '12/08/2017',
+                                                                 'va_representative' => '',
+                                                             })
+      end
     end
 
 
