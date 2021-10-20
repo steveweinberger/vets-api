@@ -21,7 +21,58 @@ RSpec.describe TestUserDashboard::ApplicationController, type: :controller do
     end
   end
 
+  describe 'authenticated?' do
+    subject do
+      controller.authenticated?
+    end
+
+    context 'Rails.env.test? is set to true' do
+      it 'returns true when Rails.env.test? is set to true' do
+        Rails.env.stub(test?: true)
+        expect(subject).to be_truthy
+      end
+    end
+
+    context 'authenticated user' do
+      let!(:user_details) { 'test user details'}
+
+      before do
+        Rails.env.stub(test?: false)
+        allow_any_instance_of(described_class).to receive_message_chain(:warden, :authenticated?) { true }
+        allow_any_instance_of(described_class).to receive(:set_current_user) { true }
+        allow_any_instance_of(described_class).to receive(:github_user_details) { user_details }
+      end
+
+      it 'logs the authentication success message' do
+        expect(Rails.logger).to receive(:info).with("TUD authentication successful: #{user_details}")
+        subject
+      end
+
+      it 'returns true' do
+        expect(subject).to be_truthy
+      end
+    end
+
+    context 'unauthenticated user' do
+      before do
+        Rails.env.stub(test?: false)
+        allow_any_instance_of(described_class).to receive_message_chain(:warden, :authenticated?) { false }
+      end
+
+      it 'logs the authentication failure message' do
+        expect(Rails.logger).to receive(:info).with('TUD authentication unsuccessful')
+        subject
+      end
+
+      it 'returns false' do
+        expect(subject).to be_falsey
+      end
+    end
+  end
+
   describe '#authorize!' do
+    let!(:user_details) { 'test user details'}
+
     before do
       allow_any_instance_of(described_class).to receive(:authorized?) { true }
     end
