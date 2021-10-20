@@ -20,9 +20,7 @@ module BGS
         # this is temp logging
         if @user.common_name.present? && @user.common_name.length > 39
           log_message_to_sentry('common name greater than 39', :info, {}, { team: 'vfs-ebenefits' })
-        end
-
-        if @user.email.present? && @user.email.length > 39
+        elsif @user.email.present? && @user.email.length > 39
           log_message_to_sentry('email greater than 39', :info, {}, { team: 'vfs-ebenefits' })
         end
       end
