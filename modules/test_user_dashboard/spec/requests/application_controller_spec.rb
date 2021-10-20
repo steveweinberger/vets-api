@@ -3,6 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe TestUserDashboard::ApplicationController, type: :controller do
+  # rubocop:disable RSpec/MessageChain
+
   controller do
     def index; end
   end
@@ -140,4 +142,6 @@ RSpec.describe TestUserDashboard::ApplicationController, type: :controller do
       expect(subject).to eq('ID: 1, Login: tedlasso, Name: Ted Lasso, Email: ted.lasso@richmond.co.uk')
     end
   end
+
+  # rubocop:enable RSpec/MessageChain
 end
