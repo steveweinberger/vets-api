@@ -19,7 +19,8 @@ module AppealsApi
       it 'filters the response for NODs' do
         VCR.use_cassette('caseflow/notice_of_disagreements/contestable_issues') do
           headers = { 'X-VA-Receipt-Date' => '1900-01-01', 'X-VA-SSN' => '123456789' }
-          response = ContestableIssuesRetrieval.new(decision_review_type: 'notice_of_disagreements', raw_headers: headers).start!
+          response = ContestableIssuesRetrieval.new(decision_review_type: 'notice_of_disagreements',
+                                                    raw_headers: headers).start!
 
           expect(response[:body]['data'].count).to eq(5)
           expect(response[:status]).to eq(200)
@@ -30,17 +31,18 @@ module AppealsApi
 
       it 'returns an error if a header is missing' do
         request_headers = { 'X-VA-Receipt-Date' => '1900-01-01' }
-        retrieval = ContestableIssuesRetrieval.new(decision_review_type: 'nonsense', raw_headers: request_headers).start!
+        retrieval = ContestableIssuesRetrieval.new(decision_review_type: 'nonsense',
+                                                   raw_headers: request_headers).start!
 
         expect(retrieval[:errors].first).to eq(
           {
-            title: "Missing required fields",
-            detail: "One or more expected fields were not found",
-            code: "145",
-            source: {pointer: "/"},
+            title: 'Missing required fields',
+            detail: 'One or more expected fields were not found',
+            code: '145',
+            source: { pointer: '/' },
             links: [],
-            status: "422",
-            meta: { missing_fields: ["X-VA-SSN"] }
+            status: '422',
+            meta: { missing_fields: ['X-VA-SSN'] }
           }
         )
       end
@@ -49,9 +51,12 @@ module AppealsApi
         headers = { 'X-VA-Receipt-Date' => '1900-01-01', 'X-VA-SSN' => '123456789' }
         caseflow_service_double = instance_double('Caseflow::Service')
         allow(Caseflow::Service).to receive(:new).and_return(caseflow_service_double)
-        allow(caseflow_service_double).to receive(:get_contestable_issues).and_raise(Common::Exceptions::BackendServiceException.new('CASEFLOWSTATUS502', {}, '502', {}))
+        allow(caseflow_service_double).to receive(:get_contestable_issues).and_raise(Common::Exceptions::BackendServiceException.new(
+                                                                                       'CASEFLOWSTATUS502', {}, '502', {}
+                                                                                     ))
 
-        response = ContestableIssuesRetrieval.new(decision_review_type: 'notice_of_disagreements', raw_headers: headers).start!
+        response = ContestableIssuesRetrieval.new(decision_review_type: 'notice_of_disagreements',
+                                                  raw_headers: headers).start!
 
         expect(response[:errors].first[:detail]).to eq('Received an invalid response from the upstream server')
         expect(response[:status]).to eq('502')
@@ -60,7 +65,8 @@ module AppealsApi
       it 'returns caseflow error status if Caseflow returns a 4xx' do
         VCR.use_cassette('caseflow/higher_level_reviews/bad_date') do
           headers = { 'X-VA-Receipt-Date' => '1900-01-01', 'X-VA-SSN' => '123456789' }
-          response = ContestableIssuesRetrieval.new(decision_review_type: 'higher_level_reviews', benefit_type: 'compensation', raw_headers: headers).start!
+          response = ContestableIssuesRetrieval.new(decision_review_type: 'higher_level_reviews',
+                                                    benefit_type: 'compensation', raw_headers: headers).start!
           expect(response[:errors].first[:detail]).to eq('One or more unprocessable properties or validation errors')
           expect(response[:status]).to eq('422')
         end

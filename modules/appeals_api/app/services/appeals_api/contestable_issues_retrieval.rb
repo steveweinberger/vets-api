@@ -4,10 +4,9 @@ require 'appeals_api/form_schemas'
 
 module AppealsApi
   class ContestableIssuesRetrieval
-
     VALID_DECISION_REVIEW_TYPES = %w[higher_level_reviews notice_of_disagreements supplemental_claims].freeze
 
-    def initialize(decision_review_type:, benefit_type: nil, raw_headers:)
+    def initialize(decision_review_type:, raw_headers:, benefit_type: nil)
       @decision_review_type = decision_review_type
       @benefit_type = benefit_type
       @raw_headers = raw_headers
@@ -23,7 +22,7 @@ module AppealsApi
     private
 
     def filter_response(caseflow_response)
-      return caseflow_response unless caseflow_response[:status] == 200
+      return caseflow_response unless caseflow_response && caseflow_response[:status] == 200
       return caseflow_response unless decision_review_type == 'notice_of_disagreements'
       return caseflow_response if caseflow_response.body['data'].nil?
 
@@ -36,6 +35,8 @@ module AppealsApi
       end
 
       caseflow_response.body['data'].reverse!
+
+      caseflow_response
     end
 
     def call_caseflow
@@ -44,36 +45,52 @@ module AppealsApi
         benefit_type: benefit_type,
         decision_review_type: caseflow_decision_review_type
       )
-    rescue Common::Exceptions::BackendServiceException => backend_service_exception
-      errors = map_error_class_to_hash(backend_service_exception.errors)
+    rescue Common::Exceptions::BackendServiceException => e
+      errors = map_error_class_to_hash(e.errors)
       error_response(errors)
     end
-
-    private
 
     attr_reader :decision_review_type, :benefit_type, :header_errors
 
     def caseflow_decision_review_type
       return 'appeals' if decision_review_type == 'notice_of_disagreements'
+
       decision_review_type
+    end
+
+    def caseflow_benefit_type
+      return benefit_type unless decision_review_type == 'supplemental_claims'
+      caseflow_benefit_type_mapping[benefit_type]
+    end
+
+    def caseflow_benefit_type_mapping
+      {
+        "compensation" => "compensation",
+        "pensionSurvivorsBenefits" => "pension",
+        "fiduciary" => "fiduciary",
+        "lifeInsurance" => "insurance",
+        "veteransHealthAdministration" => "vha",
+        "veteranReadinessAndEmployment" => "voc_rehab",
+        "loanGuaranty" => "loan_guaranty",
+        "education" => "education",
+        "nationalCemeteryAdministration" => "nca"
+      }
     end
 
     def request_headers
       @request_headers ||=
-        required_contestable_issues_headers.index_with { |key| @raw_headers[key]}.compact
+        required_contestable_issues_headers.index_with { |key| @raw_headers[key] }.compact
     end
 
     def headers_valid?
-      begin
-        AppealsApi::FormSchemas.new(
-          Common::Exceptions::DetailedSchemaErrors,
-          schema_version: 'v2'
-        ).validate!('CONTESTABLE_ISSUES_HEADERS', request_headers)
-      rescue => e
-        errors = map_error_class_to_hash(e.errors)
-        @header_errors = error_response(errors)
-        false
-      end
+      AppealsApi::FormSchemas.new(
+        Common::Exceptions::DetailedSchemaErrors,
+        schema_version: 'v2'
+      ).validate!('CONTESTABLE_ISSUES_HEADERS', request_headers)
+    rescue => e
+      errors = map_error_class_to_hash(e.errors)
+      @header_errors = error_response(errors)
+      false
     end
 
     def required_contestable_issues_headers
