@@ -14,6 +14,19 @@ module TestUserDashboard
       warden.authenticate!(scope: :tud)
     end
 
+    def authenticated?
+      return true if Rails.env.test?
+
+      if warden.authenticated?(:tud)
+        set_current_user
+        Rails.logger.info("TUD authentication successful: #{github_user_details}")
+        return true
+      end
+
+      Rails.logger.info('TUD authentication unsuccessful')
+      false
+    end
+
     def authorize!
       authorized?
     end
@@ -34,19 +47,6 @@ module TestUserDashboard
     end
 
     private
-
-    def authenticated?
-      return true if Rails.env.test?
-
-      if warden.authenticated?(:tud)
-        set_current_user
-        Rails.logger.info("TUD authentication successful: #{github_user_details}")
-        return true
-      end
-
-      Rails.logger.info('TUD authentication unsuccessful')
-      false
-    end
 
     def github_user
       warden.user(:tud)
