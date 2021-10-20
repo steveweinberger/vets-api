@@ -204,6 +204,10 @@ group :development, :test do
   gem 'timecop'
   gem 'webmock'
   gem 'yard'
+  gem 'ruby-prof-flamegraph'
+  gem 'ruby-prof'
+  gem 'rack-mini-profiler'
+  gem 'stackprof'
 end
 
 # sidekiq enterprise requires a license key to download. In many cases, basic sidekiq is enough for local development
