@@ -8,12 +8,12 @@ RSpec.describe TestUserDashboard::ApplicationController, type: :controller do
   end
 
   describe 'authenticate!' do
-    before do
-      allow_any_instance_of(described_class).to receive(:authenticated?) { true }
-    end
-
     subject do
       controller.authenticate!
+    end
+
+    before do
+      allow_any_instance_of(described_class).to receive(:authenticated?).and_return(true)
     end
 
     it 'returns true for an authenticated user' do
@@ -27,19 +27,19 @@ RSpec.describe TestUserDashboard::ApplicationController, type: :controller do
     end
 
     context 'Rails.env.test? is set to true' do
-      it 'returns true when Rails.env.test? is set to true' do
+      it 'returns true' do
         Rails.env.stub(test?: true)
         expect(subject).to be_truthy
       end
     end
 
     context 'authenticated user' do
-      let!(:user_details) { 'test user details'}
+      let!(:user_details) { 'test user details' }
 
       before do
         Rails.env.stub(test?: false)
-        allow_any_instance_of(described_class).to receive_message_chain(:warden, :authenticated?) { true }
-        allow_any_instance_of(described_class).to receive(:set_current_user) { true }
+        allow_any_instance_of(described_class).to receive_message_chain(:warden, :authenticated?).and_return(true)
+        allow_any_instance_of(described_class).to receive(:set_current_user).and_return(true)
         allow_any_instance_of(described_class).to receive(:github_user_details) { user_details }
       end
 
@@ -56,7 +56,7 @@ RSpec.describe TestUserDashboard::ApplicationController, type: :controller do
     context 'unauthenticated user' do
       before do
         Rails.env.stub(test?: false)
-        allow_any_instance_of(described_class).to receive_message_chain(:warden, :authenticated?) { false }
+        allow_any_instance_of(described_class).to receive_message_chain(:warden, :authenticated?).and_return(false)
       end
 
       it 'logs the authentication failure message' do
@@ -71,40 +71,42 @@ RSpec.describe TestUserDashboard::ApplicationController, type: :controller do
   end
 
   describe '#authorize!' do
-    let!(:user_details) { 'test user details'}
-
-    before do
-      allow_any_instance_of(described_class).to receive(:authorized?) { true }
-    end
-
     subject do
       controller.authorize!
     end
 
-    it "returns true" do
+    let!(:user_details) { 'test user details' }
+
+    before do
+      allow_any_instance_of(described_class).to receive(:authorized?).and_return(true)
+    end
+
+    it 'returns true' do
       expect(subject).to be_truthy
     end
   end
 
   describe '#authorized?' do
-    let!(:user_details) { 'test user details'}
+    subject do
+      controller.authorized?
+    end
+
+    let!(:user_details) { 'test user details' }
 
     context 'authenticated user' do
       before do
-        allow_any_instance_of(described_class).to receive(:authenticated?) { true }
-        allow_any_instance_of(described_class).to receive_message_chain(:github_user, :organization_member?) { true }
+        allow_any_instance_of(described_class).to receive(:authenticated?).and_return(true)
+        allow_any_instance_of(described_class)
+          .to receive_message_chain(:github_user, :organization_member?)
+          .and_return(true)
         allow_any_instance_of(described_class).to receive(:github_user_details) { user_details }
       end
-  
-      subject do
-        controller.authorized?
-      end
-  
-      it 'logs the GitHub user details' do
+
+      it 'logs the authorization success message' do
         expect(Rails.logger).to receive(:info).with("TUD authorization successful: #{user_details}")
         subject
       end
-  
+
       it 'returns true' do
         expect(subject).to be_truthy
       end
@@ -112,13 +114,9 @@ RSpec.describe TestUserDashboard::ApplicationController, type: :controller do
 
     context 'unauthenticated user' do
       before do
-        allow_any_instance_of(described_class).to receive(:authenticated?) { false }
+        allow_any_instance_of(described_class).to receive(:authenticated?).and_return(false)
       end
 
-      subject do
-        controller.authorized?
-      end
-  
       it 'returns false' do
         expect(subject).to be_falsey
       end
@@ -126,15 +124,16 @@ RSpec.describe TestUserDashboard::ApplicationController, type: :controller do
   end
 
   describe '#github_user_details' do
+    subject do
+      controller.github_user_details
+    end
+
     before do
       allow_any_instance_of(described_class).to receive_message_chain(:github_user, :id) { 1 }
       allow_any_instance_of(described_class).to receive_message_chain(:github_user, :login) { 'tedlasso' }
       allow_any_instance_of(described_class).to receive_message_chain(:github_user, :name) { 'Ted Lasso' }
-      allow_any_instance_of(described_class).to receive_message_chain(:github_user, :email) { 'ted.lasso@richmond.co.uk' }    
-    end
-
-    subject do
-      controller.github_user_details
+      allow_any_instance_of(described_class)
+        .to receive_message_chain(:github_user, :email) { 'ted.lasso@richmond.co.uk' }
     end
 
     it "returns a string containing the user's github information" do
