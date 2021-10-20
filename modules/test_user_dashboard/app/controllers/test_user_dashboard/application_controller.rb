@@ -33,8 +33,7 @@ module TestUserDashboard
     end
 
     def authorized?
-      if authenticated?
-      # if authenticated? && github_user.organization_member?('department-of-veterans-affairs')
+      if authenticated? && github_user.organization_member?('department-of-veterans-affairs')
         Rails.logger.info("TUD authorization successful: #{github_user_details}")
         true
       else
