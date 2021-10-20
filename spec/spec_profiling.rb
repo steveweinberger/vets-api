@@ -20,9 +20,9 @@ module SpecProfiling
 
       at_exit do
         result = profiler.stop
-        
+
         # Common RSpec methods
-        result.eliminate_methods!(
+        result.exclude_methods!(
           [
             /instance_exec/,
             /Example(Group)?>?#run(_examples)?/,
@@ -40,16 +40,14 @@ module SpecProfiling
     end
 
     def stack_prof
-  binding.pry
       require 'stackprof'
       mode = ENV['RMODE'] || 'wall'
       $stdout.puts "StackProf enabled (mode: #{mode})"
-      #path = Rails.root.join("tmp", "stackprof-#{mode}-test-total.dump")
-      path = File.join(File.dirname(__FILE__), "tmp", "stackprof-#{mode}-test")
       # we use raw to make it possible to generate flamegraphs
       StackProf.start(mode: mode.to_sym, raw: true)
 
       at_exit do
+        path = Rails.root.join("tmp", "stackprof-#{mode}-test-total.dump")
         StackProf.stop
         StackProf.results path.to_s
       end
