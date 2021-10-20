@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
-module WardenGitHubUserExtensions  
+module WardenGitHubUserExtensions
   def api
+    binding.pry
     # Confirm this works with Sidekiq
-    if self.token
+    if token
       super
     else
       Octokit::Client.new(access_token: Settings.sidekiq.github_api_key)
