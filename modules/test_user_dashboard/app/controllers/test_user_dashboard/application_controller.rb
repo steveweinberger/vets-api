@@ -5,6 +5,7 @@ require 'sentry_logging'
 module TestUserDashboard
   class ApplicationController < ActionController::API
     include SentryLogging
+    before_action :set_tags_and_extra_context
 
     attr_reader :current_user
 
@@ -64,6 +65,11 @@ module TestUserDashboard
 
     def warden
       request.env['warden']
+    end
+
+    def set_tags_and_extra_context
+      RequestStore.store['additional_request_attributes'] = { 'source' => 'test-user-dashboard' }
+      Raven.tags_context(source: 'test-user-dashboard')
     end
   end
 end
