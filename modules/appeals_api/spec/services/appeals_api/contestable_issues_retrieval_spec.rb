@@ -51,9 +51,10 @@ module AppealsApi
         headers = { 'X-VA-Receipt-Date' => '1900-01-01', 'X-VA-SSN' => '123456789' }
         caseflow_service_double = instance_double('Caseflow::Service')
         allow(Caseflow::Service).to receive(:new).and_return(caseflow_service_double)
-        allow(caseflow_service_double).to receive(:get_contestable_issues).and_raise(Common::Exceptions::BackendServiceException.new(
-                                                                                       'CASEFLOWSTATUS502', {}, '502', {}
-                                                                                     ))
+        allow(caseflow_service_double).to receive(:get_contestable_issues)
+          .and_raise(Common::Exceptions::BackendServiceException.new(
+                       'CASEFLOWSTATUS502', {}, '502', {}
+                     ))
 
         response = ContestableIssuesRetrieval.new(decision_review_type: 'notice_of_disagreements',
                                                   raw_headers: headers).start!
@@ -75,13 +76,13 @@ module AppealsApi
       it 'returns an error if an invalid decision_review_type has been passed in' do
         headers = { 'X-VA-Receipt-Date' => '1900-01-01', 'X-VA-SSN' => '123456789' }
         retrieval = ContestableIssuesRetrieval.new(decision_review_type: 'nonsense', raw_headers: headers).start!
-
+        types = ContestableIssuesRetrieval::VALID_DECISION_REVIEW_TYPES.join(', ')
         expect(retrieval).to eq(
           errors: [
             {
               title: 'Unprocessable Entity',
               code: 'unprocessable_entity',
-              detail: "decision_review_type must be one of: #{ContestableIssuesRetrieval::VALID_DECISION_REVIEW_TYPES.join(', ')}",
+              detail: "decision_review_type must be one of: #{types}",
               status: '422'
             }
           ],

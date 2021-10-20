@@ -60,20 +60,21 @@ module AppealsApi
 
     def caseflow_benefit_type
       return benefit_type unless decision_review_type == 'supplemental_claims'
+
       caseflow_benefit_type_mapping[benefit_type]
     end
 
     def caseflow_benefit_type_mapping
       {
-        "compensation" => "compensation",
-        "pensionSurvivorsBenefits" => "pension",
-        "fiduciary" => "fiduciary",
-        "lifeInsurance" => "insurance",
-        "veteransHealthAdministration" => "vha",
-        "veteranReadinessAndEmployment" => "voc_rehab",
-        "loanGuaranty" => "loan_guaranty",
-        "education" => "education",
-        "nationalCemeteryAdministration" => "nca"
+        'compensation' => 'compensation',
+        'pensionSurvivorsBenefits' => 'pension',
+        'fiduciary' => 'fiduciary',
+        'lifeInsurance' => 'insurance',
+        'veteransHealthAdministration' => 'vha',
+        'veteranReadinessAndEmployment' => 'voc_rehab',
+        'loanGuaranty' => 'loan_guaranty',
+        'education' => 'education',
+        'nationalCemeteryAdministration' => 'nca'
       }
     end
 
