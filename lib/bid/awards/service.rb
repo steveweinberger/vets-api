@@ -25,6 +25,7 @@ module BID
 
       def request_headers
         external_key = @user.common_name || @user.email
+        external_key = external_key[0, 39] if external_key.length > 39
 
         {
           Authorization: "Bearer #{Settings.bid.awards.credentials}",
