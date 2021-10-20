@@ -16,8 +16,6 @@ module TestUserDashboard
     end
 
     def authenticated?
-      return true if Rails.env.test?
-
       if warden.authenticated?(:tud)
         set_current_user
         Rails.logger.info("TUD authentication successful: #{github_user_details}")
