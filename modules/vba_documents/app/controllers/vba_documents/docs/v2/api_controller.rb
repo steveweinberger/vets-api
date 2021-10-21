@@ -34,7 +34,9 @@ module VBADocuments
         ].freeze
 
         def index
-          render json: Swagger::Blocks.build_root_json(SWAGGERED_CLASSES)
+          #render json: Swagger::Blocks.build_root_json(SWAGGERED_CLASSES)
+          swagger = JSON.parse(File.read(VBADocuments::Engine.root.join('app/swagger/vba_documents/v2/swagger.json')))
+          render json: swagger
         end
       end
     end
