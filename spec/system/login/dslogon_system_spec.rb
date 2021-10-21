@@ -18,6 +18,9 @@ if ENV['LOGIN_SYSTEM_TESTS']
       click_button 'Continue'
 
       click_button 'Continue' if has_content?('Contact Information Verification')
+
+      expect(page).to have_content('My Health')
+      expect(page).not_to have_content('Sign in')
     end
   end
 end
