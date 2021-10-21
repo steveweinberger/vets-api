@@ -12,8 +12,7 @@ module Mobile
         resource = MessageSignatureStruct.new(id,
                                               signature_info[:signature_name],
                                               signature_info[:include_signature],
-                                              signature_info[:signature_title]
-        )
+                                              signature_info[:signature_title])
         super(resource, options)
       end
     end
