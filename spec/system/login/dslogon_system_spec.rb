@@ -16,6 +16,8 @@ if ENV['LOGIN_SYSTEM_TESTS']
 
       find(:xpath, "//img[@alt='tiger-relaxing.png']").click
       click_button 'Continue'
+
+      click_button 'Continue' if has_content?('Contact Information Verification')
     end
   end
 end
