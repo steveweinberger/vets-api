@@ -11,15 +11,15 @@ module V0
       before_action { authorize :evss, :access? }
 
       def index
-        claims, synchronized = service.all
+        puts(current_user)
+        claims, synchronized = service(current_user).all
+        puts(synchronized)
+        puts('claims:')
+        puts(claims)
 
         open_comp_claims_data = synchronized == 'REQUESTED' ? nil : data_for_three_most_recent_open_comp_claims(claims)
-        puts(open_comp_claims_data)
         claimAugmenter = ClaimAugmenter.new
         data = synchronized == 'REQUESTED' ? nil : claimAugmenter.getSupplementalClaimData(open_comp_claims_data, current_user, service)
-        puts('data with extra details')
-        puts(data)
-
         render json: {
           data: data,
           meta: { sync_status: synchronized }
@@ -27,12 +27,9 @@ module V0
       end
 
       def show
-        puts('in show')
         claim = EVSSClaim.for_user(current_user).find_by(evss_id: params[:id])
 
-        claim, synchronized = service.update_from_remote(claim)
-        puts(claim)
-        puts(synchronized)
+        claim, synchronized = service(current_user).update_from_remote(claim)
 
         render json: {
           data: { va_representative: get_va_representative(claim) },
@@ -44,16 +41,12 @@ module V0
         include Concurrent::Async
 
         def getSupplementalClaimData(claims, current_user, service)
-          #puts('made it!!')
           claimsWithSupplementalData = claims.map do |claim|
-            #puts('in map!!')
-            #puts(claim)
             claim_db_record = EVSSClaim.for_user(current_user).find_by(evss_id: claim[:evss_id])
             single_claim_response = {}
             synchronized = 'REQUESTED'
             attempts = 0
-            until synchronized == 'SUCCESS' or attempts == 10 do
-              puts('attempt #')
+            until synchronized == 'SUCCESS' or attempts == 40 do
               puts(attempts)
               single_claim_response, synchronized = service.update_from_remote(claim_db_record)
               if synchronized == 'REQUESTED' then sleep(1) end
@@ -68,8 +61,6 @@ module V0
             end
 
           end
-          #puts('finished transofrming list of claims')
-          #puts(claimsWithSupplementalData)
           return claimsWithSupplementalData
         end
 
@@ -93,6 +84,7 @@ module V0
       private
 
       def data_for_three_most_recent_open_comp_claims(claims)
+        puts('trasnforming initial data')
         comp_claims = three_most_recent_open_comp_claims claims
 
         return [] if comp_claims.nil?
@@ -127,7 +119,7 @@ module V0
           .take(3)
       end
 
-      def service
+      def self.service(current_user)
         EVSSClaimServiceAsync.new(current_user)
       end
 

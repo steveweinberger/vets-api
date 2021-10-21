@@ -109,7 +109,7 @@ RSpec.describe 'VirtualAgentClaims', type: :request do
                                                              })
       end
 
-      fit 'returns information on single open compensation claim without representative when claim details service times out' do
+      it 'returns information on single open compensation claim with blank representative field when claim details service times out' do
         sign_in_as(user)
 
         get '/v0/virtual_agent/claim'
@@ -137,6 +137,29 @@ RSpec.describe 'VirtualAgentClaims', type: :request do
                                                              })
       end
     end
+
+      describe 'test' do
+        #let(:claims_service) { double('EVSSClaimServiceAsync') }
+        #let(:current_user) { double(current_user) }
+          fit 'returns information on single open compensation claim when claims details service requires polling' do
+            sign_in_as(user)
+
+            #allow(claims_service).to receive(:all) { [["hi"], 'REQUESTED'] }
+            #allow(:current_user).to receive(:uuid) { 1 }
+            allow(V0::VirtualAgent::VirtualAgentClaimController::service(user)).to receive(:all) { [["hi"], 'REQUESTED'] }
+
+            #def service2
+            #  foo.new(current_user)
+            #end
+
+            #controller.service -> service2 entity
+            get '/v0/virtual_agent/claim'
+            expect(response).to have_http_status(:ok)
+            expect(JSON.parse(response.body)['meta']['sync_status']).to eq 'REQUESTED'
+            expect(JSON.parse(response.body)['data']).to eq nil
+          end
+      end
+
 
 
     it 'returns empty array when no open claims are found' do

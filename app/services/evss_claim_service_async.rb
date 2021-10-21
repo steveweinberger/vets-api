@@ -9,6 +9,7 @@ class EVSSClaimServiceAsync
   end
 
   def all
+    put('in real implementation')
     status = @tracker.get_collection_status
     unless status
       status = 'REQUESTED'
