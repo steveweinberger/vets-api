@@ -14,8 +14,7 @@ if ENV['LOGIN_SYSTEM_TESTS']
       click_button 'Continue'
       click_button 'Continue'
 
-      expect(page).to have_content('My Health')
-      expect(page).not_to have_content('Sign in')
+      expect_logged_in_home_screen
     end
 
     it 'can log in an LOA1 user' do
@@ -29,8 +28,7 @@ if ENV['LOGIN_SYSTEM_TESTS']
       click_button 'Continue'
       click_button 'Allow' if has_button?('Allow')
 
-      expect(page).to have_content('My Health')
-      expect(page).not_to have_content('Sign in')
+      expect_logged_in_home_screen
     end
   end
 end
