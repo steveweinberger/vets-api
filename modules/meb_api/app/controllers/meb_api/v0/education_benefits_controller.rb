@@ -48,10 +48,16 @@ module MebApi
 
       def eligibility
         render json:
-        { data: {
-          'veteranIsEligible': true,
-          'chapter': 'chapter33'
-        } }
+        { data: [
+          {
+            'veteranIsEligible': true,
+            'chapter': 'chapter33'
+          },
+          {
+            'veteranIsEligible': true,
+            'chapter': 'chapter1606'
+          }
+        ] }
       end
 
       def claim_status
