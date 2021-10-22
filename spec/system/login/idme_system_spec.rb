@@ -9,18 +9,9 @@ if ENV['LOGIN_SYSTEM_TESTS']
       include_examples 'logs in LOA1 ID.me user', 'joe.niquette+idmetest5@oddball.io'
     end
 
-    it 'can log in an LOA3 user' do
-      visit '/'
-      click_button 'Sign in'
-      click_button 'Sign in with ID.me'
-      fill_in 'Email', with: ENV['EMAIL']
-      fill_in 'Password', with: ENV['PASSWORD']
-      click_button 'Sign in to ID.me'
-      click_button 'Continue'
-      click_button 'Continue'
-      click_button 'Allow' if has_button?('Allow')
-
-      expect_logged_in_home_screen
+    context 'LOA3' do
+      include_examples 'logs in LOA3 ID.me user', 'ssoissoetesting+SPO1@gmail.com'
+      include_examples 'logs in LOA3 ID.me user', 'ssoissoetesting+spokane1@gmail.com'
     end
   end
 end
