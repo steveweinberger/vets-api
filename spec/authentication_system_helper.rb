@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-require 'support/authentication_system_helpers'
+require 'support/authentication_shared_examples'
 
 RSpec.configure do |config|
-  config.before(:all) do
+  config.before do
     driven_by :selenium_chrome_headless
     Capybara.server = :puma
     Capybara.app_host = 'https://staging.va.gov'
@@ -16,6 +16,6 @@ RSpec.configure do |config|
     # https://github.com/bblimke/webmock/blob/master/README.md#connecting-on-nethttpstart
     WebMock.allow_net_connect!(net_http_connect_on_start: true)
 
-    config.include AuthenticationSystemHelpers, type: :system
+    config.include AuthenticationSharedExamples, type: :system
   end
 end
