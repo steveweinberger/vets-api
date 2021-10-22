@@ -6,18 +6,35 @@ module MebApi
       def claimant_info
         render json:
           { data: {
-            "claimant": {
-              "claimantId": 0, "firstName": 'Hector', "middleName": 'Oliver', "lastName": 'Stanley',
-              "dateOfBirth": '1992-07-23',
-              "contactInfos": [{ "addressLine1": '2222 Avon Street', "addressLine2": 'Apt 6',
-                                 "addressLine3": 'string', "city": 'Arlington', "zipcode": '22205',
-                                 "effectiveDate": '2021-09-17', "emailAddress": 'vets.gov.user+1@gmail.com',
-                                 "addressType": 'DOMESTIC' }],
-              "personComments": [{ "personCommentKey": 0, "commentDate": '2021-09-23', "comments": 'string' }],
-              "dobChanged": true,
-              "firstAndLastNameChanged": true
-            }
-          } }
+                      "claimant": {
+                        "claimantId": 1000000000000246,
+                         "suffix": "",
+                         "dateOfBirth": "1970-01-01",
+                         "firstName": "Herbert",
+                         "lastName": "Hoover",
+                         "middleName": "",
+                         "contactInfo": {
+                                    "addressLine1": "123 Martin Luther King Blvd",
+                                    "addressLine2": "",
+                                    "city": "New Orleans",
+                                    "zipcode": "70115",
+                                    "effectiveDate": "",
+                                    "zipCodeExtension": "",
+                                    "emailAddress": "test@test.com",
+                                    "addressType": "MILITARY_OVERSEAS",
+                                    "mobilePhoneNumber": "512-825-5445",
+                                    "homePhoneNumber": "222-333-3333",
+                                    "countryCode": "US",
+                                    "stateCode": "ME"
+                          },
+                          "dobChanged": false,
+                          "firstAndLastNameChanged": false,
+                          "contactInfoChanged": false,
+                          "notificationMethod": "email",
+                          "preferredContact": "mail"
+                      }
+                    }
+                }
       end
 
       def service_history
