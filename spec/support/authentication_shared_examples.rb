@@ -51,6 +51,11 @@ module AuthenticationSharedExamples
 
       click_button 'Continue' if has_content?('Contact Information Verification')
 
+      click_button 'Continue' if has_content?('Enter a code from your device')
+
+      # Confirm email address page
+      click_link 'Complete confirmation' if has_link?('Complete confirmation')
+
       expect_logged_in_home_screen
     end
   end
