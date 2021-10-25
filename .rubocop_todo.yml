@@ -108,23 +108,6 @@ Naming/InclusiveLanguage:
     - 'lib/statsd_middleware.rb'
     - 'modules/vaos/app/controllers/vaos/v0/appointment_requests_controller.rb'
 
-# Offense count: 29
-# Cop supports --auto-correct.
-RSpec/ContextMethod:
-  Exclude:
-    - 'spec/controllers/application_controller_spec.rb'
-    - 'spec/jobs/education_form/create_daily_spool_files_spec.rb'
-    - 'spec/jobs/education_form/forms/base_spec.rb'
-    - 'spec/jobs/education_form/forms/va0993_spec.rb'
-    - 'spec/jobs/education_form/forms/va1990_spec.rb'
-    - 'spec/jobs/education_form/forms/va1995_spec.rb'
-    - 'spec/lib/common/client/configuration/base_spec.rb'
-    - 'spec/lib/pension_burial/processing_office_spec.rb'
-    - 'spec/models/mhv_account_spec.rb'
-    - 'spec/requests/address_request_spec.rb'
-    - 'spec/requests/evss_claims_async_spec.rb'
-    - 'spec/services/users/profile_spec.rb'
-
 # Offense count: 155
 # Cop supports --auto-correct.
 # Configuration parameters: AllowConsecutiveOneLiners.
@@ -171,27 +154,6 @@ RSpec/RepeatedExampleGroupDescription:
 # Offense count: 538
 RSpec/StubbedMock:
   Enabled: false
-
-# Offense count: 2
-# Cop supports --auto-correct.
-# Configuration parameters: Include.
-# Include: app/models/**/*.rb
-Rails/ActiveRecordCallbacksOrder:
-  Exclude:
-    - 'modules/claims_api/app/models/claims_api/auto_established_claim.rb'
-    - 'modules/vba_documents/app/models/vba_documents/upload_submission.rb'
-
-# Offense count: 7
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: numeric, symbolic
-Rails/HttpStatus:
-  Exclude:
-    - 'app/controllers/v0/search_click_tracking_controller.rb'
-    - 'modules/appeals_api/app/controllers/appeals_api/v1/decision_reviews/notice_of_disagreements_controller.rb'
-    - 'modules/covid_research/app/controllers/covid_research/volunteer/submissions_controller.rb'
-    - 'modules/vaos/app/controllers/vaos/v0/appointments_controller.rb'
-    - 'modules/veteran/app/controllers/veteran/v0/representatives_controller.rb'
 
 # Offense count: 1
 # Cop supports --auto-correct.
@@ -275,22 +237,6 @@ Rails/UniqueValidationWithoutIndex:
 Rails/WhereNot:
   Exclude:
     - 'modules/claims_api/lib/tasks/claims_tasks.rake'
-
-# Offense count: 24
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: separated, grouped
-Style/AccessorGrouping:
-  Exclude:
-    - 'app/models/health_care_application.rb'
-    - 'lib/central_mail/upload_error.rb'
-    - 'lib/common/client/errors.rb'
-    - 'lib/common/exceptions/open_id_service_error.rb'
-    - 'lib/evss/error_middleware.rb'
-    - 'lib/json_schema/json_api_missing_attribute.rb'
-    - 'lib/search/pagination.rb'
-    - 'lib/search/service.rb'
-    - 'lib/search_click_tracking/service.rb'
 
 # Offense count: 17
 # Cop supports --auto-correct.
@@ -488,12 +434,6 @@ Style/RedundantBegin:
 Style/RedundantFileExtensionInRequire:
   Enabled: false
 
-# Offense count: 1
-# Cop supports --auto-correct.
-Style/RedundantParentheses:
-  Exclude:
-    - 'modules/vba_documents/app/workers/vba_documents/report_unsuccessful_submissions.rb'
-
 # Offense count: 15
 # Cop supports --auto-correct.
 Style/RedundantRegexpCharacterClass:
@@ -535,20 +475,6 @@ Style/SlicingWithRange:
     - 'lib/pdf_fill/forms/va21p527ez.rb'
     - 'rakelib/mvi.rake'
     - 'spec/lib/hca/service_spec.rb'
-
-# Offense count: 8
-# Cop supports --auto-correct.
-# Configuration parameters: AllowModifier.
-Style/SoleNestedConditional:
-  Exclude:
-    - 'app/controllers/openid_application_controller.rb'
-    - 'config/initializers/filter_parameter_logging.rb'
-    - 'lib/emis/responses/response.rb'
-    - 'lib/generators/module_component/module_component_generator.rb'
-    - 'lib/va_profile/models/base.rb'
-    - 'spec/jobs/cypress_viewport_updater/google_analytics_reports_spec.rb'
-    - 'spec/jobs/cypress_viewport_updater/viewport_spec.rb'
-    - 'spec/jobs/cypress_viewport_updater/viewports_spec.rb'
 
 # Offense count: 135
 # Cop supports --auto-correct.

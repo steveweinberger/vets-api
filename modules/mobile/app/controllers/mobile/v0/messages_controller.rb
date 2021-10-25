@@ -102,6 +102,13 @@ module Mobile
         head :no_content
       end
 
+      def signature
+        result = client.get_signature[:data]
+        Rails.logger.info('Mobile Get Message Signature Result', result: result)
+        result = { signature_name: nil, include_signature: false, signature_title: nil } if result.nil?
+        render json: Mobile::V0::MessageSignatureSerializer.new(@current_user.id, result).to_json
+      end
+
       private
 
       # When we get message parameters as part of a multipart payload (i.e. with attachments),

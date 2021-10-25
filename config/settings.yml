@@ -22,6 +22,14 @@ saml_ssoe:
   response_signing: false
   response_encryption: false
   authn_context_comparison: 'exact'
+  redirect_urls:
+    mhv:
+      base: 'https://int.eauth.va.gov/mhv-portal-web/eauth'
+      mhv_download_my_data: '?deeplinking=download_my_data'
+      mhv_prescription_refill: '?deeplinking=prescription_refill'
+      mhv_secure_messaging: '?deeplinking=secure_messaging'
+      mhv_appointments: '?deeplinking=appointments'
+      mhv_home: ''
 
 ssoe_eauth_cookie:
   name: vagov_saml_request_localhost
@@ -67,6 +75,7 @@ mcp:
     base_path: /base/path
     service_name: VBS
     mock: false
+    mock_vista: false
 
 fsr:
   prefill: true
@@ -203,6 +212,7 @@ modules_appeals_api:
   supplemental_claims_enabled: true
   notice_of_disagreement_pii_expunge_enabled: true
   notice_of_disagreement_updater_enabled: true
+  supplemental_claim_updater_enabled: true
   reports:
     daily_decision_review:
       enabled: false
@@ -806,7 +816,7 @@ flipper:
     - scy0846@gmail.com # Taylor Mitchell - GCIO
     - shefai.nayak@thoughtworks.com
     - ssuddath@governmentcio.com
-    - stephen.barrs@va.gov
+    - stephen.barrs@gmail.com
     - tony.williams@va.gov
     - travis.hilton@oddball.io
     - trevor.bosaw@oddball.io
@@ -1163,6 +1173,8 @@ test_user_dashboard:
     client_secret:
 
 lighthouse_health_immunization:
+  client_id: '0oad0xggirKLf2ger2p7'
+  audience_claim_url: 'https://deptva-eval.okta.com/oauth2/aus8nm1q0f7VQ0a482p7/v1/token'
   key_path: ~
   access_token_url: 'https://sandbox-api.va.gov/oauth2/health/system/v1/token'
   api_url: 'https://sandbox-api.va.gov/services/fhir/v0/r4'
