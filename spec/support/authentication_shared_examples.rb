@@ -59,4 +59,16 @@ module AuthenticationSharedExamples
       expect_logged_in_home_screen
     end
   end
+
+  RSpec.shared_examples 'logs in My HealtheVet LOA1 user' do |username, password|
+    it 'logs in mhv loa1 user' do
+      visit '/'
+      click_button 'Sign in'
+      click_button 'Sign in with My HealtheVet'
+
+      fill_in 'My HealtheVet User ID', with: username
+      fill_in 'My HealtheVet Password', with: password
+      click_button 'Sign in'
+    end
+  end
 end
