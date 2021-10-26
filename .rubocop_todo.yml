@@ -238,25 +238,6 @@ Rails/WhereNot:
   Exclude:
     - 'modules/claims_api/lib/tasks/claims_tasks.rake'
 
-# Offense count: 17
-# Cop supports --auto-correct.
-Style/CaseLikeIf:
-  Exclude:
-    - 'app/models/form_profile.rb'
-    - 'app/services/form1010cg/auditor.rb'
-    - 'lib/common/client/configuration/base.rb'
-    - 'lib/common/hash_helpers.rb'
-    - 'lib/debt_management_center/payments_service.rb'
-    - 'lib/evss/dependents/service.rb'
-    - 'lib/hca/enrollment_system.rb'
-    - 'lib/pdf_fill/forms/va21p527ez.rb'
-    - 'lib/pdf_fill/forms/va288832.rb'
-    - 'lib/pdf_fill/hash_converter.rb'
-    - 'modules/covid_research/app/serializers/covid_research/genisis_serializer.rb'
-    - 'modules/vba_documents/lib/vba_documents/multipart_parser.rb'
-    - 'rakelib/redis.rake'
-    - 'spec/models/form_profile_spec.rb'
-
 # Offense count: 10
 # Cop supports --auto-correct.
 # Configuration parameters: IgnoredMethods.
@@ -278,18 +259,6 @@ Style/ClassEqualityComparison:
 Style/CombinableLoops:
   Exclude:
     - 'modules/vba_documents/spec/mailers/unsuccessful_report_mailer_spec.rb'
-
-# Offense count: 5
-# Cop supports --auto-correct.
-# Configuration parameters: Keywords, RequireColon.
-# Keywords: TODO, FIXME, OPTIMIZE, HACK, REVIEW, NOTE
-Style/CommentAnnotation:
-  Exclude:
-    - 'app/controllers/v0/backend_statuses_controller.rb'
-    - 'modules/claims_api/app/workers/claims_api/flash_updater.rb'
-    - 'spec/controllers/v0/evss_claims_async_controller_spec.rb'
-    - 'spec/controllers/v0/evss_claims_controller_spec.rb'
-    - 'spec/models/form_profile_spec.rb'
 
 # Offense count: 1
 # Cop supports --auto-correct.
@@ -317,15 +286,6 @@ Style/ExplicitBlockArgument:
     - 'lib/mpi/orch_search_service.rb'
     - 'lib/mpi/service.rb'
     - 'spec/lib/debt_management_center/debt_letter_downloader_spec.rb'
-
-# Offense count: 2
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: always, always_true, never
-Style/FrozenStringLiteralComment:
-  Exclude:
-    - 'app/workers/education_form/forms/base.rb'
-    - 'spec/support/spec_builders.rb'
 
 # Offense count: 16
 # Cop supports --auto-correct.
