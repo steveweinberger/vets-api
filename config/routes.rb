@@ -114,6 +114,7 @@ Rails.application.routes.draw do
 
     namespace :virtual_agent do
       get 'claim', to: 'virtual_agent_claim#index'
+      get 'claim/:id', to: 'virtual_agent_claim#show'
     end
 
     resources :virtual_agent_claim, only: %i[index]
@@ -420,7 +421,7 @@ Rails.application.routes.draw do
     Sidekiq::Web.use Warden::Manager do |config|
       config.failure_app = Sidekiq::Web
       config.default_strategies :github
-      config.scope_defaults :default, config: {
+      config.scope_defaults :sidekiq, config: {
         client_id: Settings.sidekiq.github_oauth_key,
         client_secret: Settings.sidekiq.github_oauth_secret,
         scope: 'read:org',

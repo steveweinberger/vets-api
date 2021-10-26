@@ -216,6 +216,17 @@ RSpec.describe SAML::PostURLService do
             expect(subject.base_redirect_url).to eq(values[:base_redirect])
           end
 
+          context 'with an MHV inbound-outbound user' do
+            context 'with a valid redirect code' do
+              let(:redirect) { 'https://int.eauth.va.gov/mhv-portal-web/eauth?deeplinking=secure_messaging' }
+
+              it 'redirects to MHV' do
+                params[:redirect] = redirect
+                expect(subject.login_redirect_url).to eq(redirect)
+              end
+            end
+          end
+
           context 'with an user that needs to verify' do
             it 'goes to verify URL before login redirect' do
               expect(user.authn_context).to eq('http://idmanagement.gov/ns/assurance/loa/1/vets')

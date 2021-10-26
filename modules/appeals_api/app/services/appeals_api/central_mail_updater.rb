@@ -43,7 +43,7 @@ module AppealsApi
       delegate :present?, to: :id
 
       def status
-        if _status == 'Completed'
+        if _status == 'Complete'
           packet_results_status
         else
           _status
@@ -55,7 +55,7 @@ module AppealsApi
       end
 
       def packet_results_status
-        if packets.any? { |p| p['status'] == 'UnidentifiableMail' }
+        if Array(packets).any? { |p| p['completedReason'] == 'UnidentifiableMail' }
           'Error'
         else
           'Success'
@@ -119,6 +119,7 @@ module AppealsApi
     def central_mail_status_lookup(appeal)
       case appeal
       when AppealsApi::NoticeOfDisagreement then NOD_CENTRAL_STATUS_ATTRIBUTES
+      when AppealsApi::SupplementalClaim then V2_HLR_CENTRAL_STATUS_ATTRIBUTES
       when AppealsApi::HigherLevelReview
         case appeal.api_version
         when 'V2' then V2_HLR_CENTRAL_STATUS_ATTRIBUTES

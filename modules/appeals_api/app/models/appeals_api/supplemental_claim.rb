@@ -15,7 +15,9 @@ module AppealsApi
       nil
     end
 
-    STATUSES = %w[pending success error].freeze
+    STATUSES = %w[pending received success error].freeze
+    RECEIVED_OR_PROCESSING = %w[received processing].freeze
+    scope :received_or_processing, -> { where status: RECEIVED_OR_PROCESSING }
 
     serialize :auth_headers, JsonMarshal::Marshaller
     serialize :form_data, JsonMarshal::Marshaller
@@ -39,15 +41,15 @@ module AppealsApi
     end
 
     def veteran_first_name
-      auth_headers.dig('X-VA-First-Name')
+      auth_headers['X-VA-First-Name']
     end
 
     def veteran_middle_initial
-      auth_headers.dig('X-VA-Middle-Initial')
+      auth_headers['X-VA-Middle-Initial']
     end
 
     def veteran_last_name
-      auth_headers.dig('X-VA-Last-Name')
+      auth_headers['X-VA-Last-Name']
     end
 
     def full_name
@@ -55,11 +57,11 @@ module AppealsApi
     end
 
     def ssn
-      auth_headers.dig('X-VA-SSN')
+      auth_headers['X-VA-SSN']
     end
 
     def file_number
-      auth_headers.dig('X-VA-File-Number')
+      auth_headers['X-VA-File-Number']
     end
 
     def veteran_dob_month
@@ -75,11 +77,11 @@ module AppealsApi
     end
 
     def veteran_service_number
-      auth_headers.dig('X-VA-Service-Number')
+      auth_headers['X-VA-Service-Number']
     end
 
     def insurance_policy_number
-      auth_headers.dig('X-VA-Insurance-Policy-Number')
+      auth_headers['X-VA-Insurance-Policy-Number']
     end
 
     def mailing_address_number_and_street
@@ -135,7 +137,7 @@ module AppealsApi
     end
 
     def contestable_issues
-      issues = form_data.dig('included') || []
+      issues = form_data['included'] || []
 
       @contestable_issues ||= issues.map do |issue|
         AppealsApi::ContestableIssue.new(issue)
@@ -172,6 +174,33 @@ module AppealsApi
 
     def date_signed
       veterans_local_time.strftime('%m/%d/%Y')
+    end
+
+    def update_status!(status:, code: nil, detail: nil)
+      handler = Events::Handler.new(event_type: :sc_status_updated, opts: {
+                                      from: self.status,
+                                      to: status,
+                                      status_update_time: Time.zone.now.iso8601,
+                                      statusable_id: id
+                                    })
+
+      update!(status: status, code: code, detail: detail)
+
+      handler.handle!
+    end
+
+    def lob
+      {
+        'compensation' => 'CMP',
+        'pensionSurvivorsBenefits' => 'PMC',
+        'fiduciary' => 'FID',
+        'lifeInsurance' => 'INS',
+        'veteransHealthAdministration' => 'OTH',
+        'veteranReadinessAndEmployment' => 'VRE',
+        'loanGuaranty' => 'OTH',
+        'education' => 'EDU',
+        'nationalCemeteryAdministration' => 'OTH'
+      }[benefit_type]
     end
 
     private

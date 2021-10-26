@@ -3,6 +3,7 @@
 require 'json_marshal/marshaller'
 require 'claims_api/special_issue_mappers/evss'
 require 'claims_api/homelessness_situation_type_mapper'
+require 'claims_api/service_branch_mapper'
 
 module ClaimsApi
   class AutoEstablishedClaim < ApplicationRecord
@@ -16,6 +17,8 @@ module ClaimsApi
              **lockbox_options
 
     validate :validate_service_dates
+    before_validation :set_md5
+    after_validation :remove_encrypted_fields, on: [:update]
     after_create :log_special_issues
     after_create :log_flashes
 
@@ -32,8 +35,6 @@ module ClaimsApi
                                documents_needed development_letter_sent decision_letter_sent
                                requested_decision va_representative].freeze
 
-    before_validation :set_md5
-    after_validation :remove_encrypted_fields, on: [:update]
     validates :md5, uniqueness: true, on: :create
 
     EVSS_CLAIM_ATTRIBUTES.each do |attribute|
@@ -59,7 +60,9 @@ module ClaimsApi
       form_data['veteran']['changeOfAddress'] = transform_change_of_address_ending_date if invalid_change_of_address_ending_date? # rubocop:disable Layout/LineLength
       form_data['disabilites'] = transform_disability_approximate_begin_dates
       form_data['disabilites'] = massage_invalid_disability_names
+      form_data['disabilites'] = remove_special_issues_from_secondary_disabilities
       form_data['treatments'] = transform_treatment_dates if treatments?
+      form_data['serviceInformation'] = transform_service_branch
 
       resolve_special_issue_mappings!
       resolve_homelessness_situation_type_mappings!
@@ -164,7 +167,7 @@ module ClaimsApi
     # We (ClaimsApi) require a date string that is then validated to be a valid date
     # Convert our validated date into the components required by EVSS
     def transform_disability_approximate_begin_dates
-      disabilities = form_data.dig('disabilities')
+      disabilities = form_data['disabilities']
 
       disabilities.map do |disability|
         next if disability['approximateBeginDate'].blank?
@@ -192,12 +195,6 @@ module ClaimsApi
         disability['specialIssues'] = (disability['specialIssues'] || []).map do |special_issue|
           mapper.code_from_name(special_issue)
         end.compact
-
-        (disability['secondaryDisabilities'] || []).each do |secondary_disability|
-          secondary_disability['specialIssues'] = (secondary_disability['specialIssues'] || []).map do |special_issue|
-            mapper.code_from_name(special_issue)
-          end.compact
-        end
       end
     end
 
@@ -291,7 +288,7 @@ module ClaimsApi
     # EVSS requires disability names to be less than 255 characters and cannot contain special characters.
     # Rather than raise an exception to the user, massage the name into a valid state that EVSS will accept.
     def massage_invalid_disability_names
-      disabilities = form_data.dig('disabilities')
+      disabilities = form_data['disabilities']
       invalid_characters = %r{[^a-zA-Z0-9\\\-'\.,\/\(\) ]}
 
       disabilities.map do |disability|
@@ -359,6 +356,41 @@ module ClaimsApi
       change_of_address = form_data['veteran']['changeOfAddress']
       change_of_address.delete('endingDate')
       change_of_address
+    end
+
+    # For whatever reason, legacy ClaimsApi code previously allowed
+    # 'serviceInformation.servicePeriod.serviceBranch' values that are not accepted by EVSS.
+    # Rather than refuse those invalid values, this maps them to an equivalent value that EVSS will accept.
+    def transform_service_branch
+      received_service_periods = form_data['serviceInformation']['servicePeriods']
+
+      transformed_service_periods = received_service_periods.map do |period|
+        name = period['serviceBranch']
+        period['serviceBranch'] = ClaimsApi::ServiceBranchMapper.new(name).value
+
+        period
+      end
+
+      form_data['serviceInformation']['servicePeriods'] = transformed_service_periods
+      form_data['serviceInformation']
+    end
+
+    # The legacy ClaimsApi code has always allowed 'secondaryDisabilities' to have 'specialIssues'.
+    # EVSS does not allow this.
+    # Rather than break the API by removing 'specialIssues' from the 'secondaryDisabilities' schema,
+    # just detect the invalid case and remove the 'specialIssues' before sending to EVSS.
+    def remove_special_issues_from_secondary_disabilities
+      disabilities = form_data['disabilites']
+
+      disabilities.map do |disability|
+        next if disability['secondaryDisabilities'].blank?
+
+        disability['secondaryDisabilities'].map do |secondary|
+          secondary.delete('specialIssues') if secondary['specialIssues'].present?
+
+          secondary
+        end
+      end
     end
   end
 end

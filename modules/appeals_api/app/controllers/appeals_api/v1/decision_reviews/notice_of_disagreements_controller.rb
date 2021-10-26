@@ -27,7 +27,7 @@ class AppealsApi::V1::DecisionReviews::NoticeOfDisagreementsController < Appeals
 
   def create
     @notice_of_disagreement.save
-    AppealsApi::NoticeOfDisagreementPdfSubmitJob.perform_async(@notice_of_disagreement.id)
+    AppealsApi::PdfSubmitJob.perform_async(@notice_of_disagreement.id, 'AppealsApi::NoticeOfDisagreement', api_version)
     render_notice_of_disagreement
   end
 
@@ -52,7 +52,7 @@ class AppealsApi::V1::DecisionReviews::NoticeOfDisagreementsController < Appeals
     validate_json_schema_for_headers
     validate_json_schema_for_body
   rescue SCHEMA_ERROR_TYPE => e
-    render json: { errors: e.errors }, status: 422
+    render json: { errors: e.errors }, status: :unprocessable_entity
   end
 
   def validate_json_schema_for_headers

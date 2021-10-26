@@ -3,7 +3,6 @@
 module Veteran
   module V0
     class RepresentativesController < ApplicationController
-      skip_before_action :set_tags_and_extra_content, raise: false
       skip_before_action :authenticate
       before_action :check_required_fields
 
@@ -25,7 +24,7 @@ module Veteran
         errors = []
         errors << error_hash('first_name') if params[:first_name].blank?
         errors << error_hash('last_name') if params[:last_name].blank?
-        render json: { errors: errors }, status: 422 if errors.any?
+        render json: { errors: errors }, status: :unprocessable_entity if errors.any?
       end
 
       def error_hash(parameter)

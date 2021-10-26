@@ -12,6 +12,10 @@
 # Sorted using http://yaml-sorter.herokuapp.com/
 
 features:
+  caregiver_sigi_enabled:
+    actor_type: user
+    description: Whether Self-Identifying Gender Identity is enabled for caregiver.
+    enable_in_development: true
   can_upload_10_10cg_poa:
     actor_type: cookie_id
     description: Allows users to upload POA documentation when completing the 10-10CG.
@@ -48,11 +52,15 @@ features:
     enable_in_development: true
   check_in_experience_demographics_page_enabled:
     actor_type: user
-    description: Enables the health care check-in experiences to show demographics page. 
+    description: Enables the health care check-in experiences to show demographics page.
     enable_in_development: true
   check_in_experience_low_authentication_enabled:
     actor_type: user
     description: Enables the health care check-in experiences to use the lowest tier of authentication, i.e. last 4 and last name
+    enable_in_development: true
+  check_in_experience_next_of_kin_enabled:
+    actor_type: user
+    description: Enables the health care check-in experiences to show the next of kin page.
     enable_in_development: true
   check_in_experience_update_information_page_enabled:
     actor_type: user
@@ -287,6 +295,10 @@ features:
     actor_type: user
     description: Enable frontend application and cta for Search Representative application
     enable_in_development: true
+  search_dropdown_component_enabled:
+    actor_type: user
+    description: Enables typeahead 2.0 functionality
+    enable_in_development: true
   search_typeahead_enabled:
     actor_type: user
     description: Enables type ahead search functionality
@@ -327,6 +339,10 @@ features:
   show_financial_status_report_wizard:
     actor_type: user
     description: Enables the Wizard for VA Form 5655 (Financial Status Report)
+    enable_in_development: true
+  show_header_v2:
+    action_type: user
+    description: Enables the new header
     enable_in_development: true
   show_meb_mock_endpoints:
     actor_type: user
