@@ -58,9 +58,10 @@ describe 'uploads', swagger_doc: 'modules/vba_documents/app/swagger/vba_document
                  }
 
           before do |example|
-            VCR.use_cassette('/vba_documents/uploads/unauthorized_401.yml') do
-              submit_request(example.metadata)
-            end
+            allow_any_instance_of(VBADocuments::V2::UploadsController)
+              .to receive(:create).and_return(ApplicationController.render status: 401,
+                                                     json: { message: "Invalid authentication credentials"})
+            submit_request(example.metadata)
           end
 
           it 'returns a 401 response' do |example|
