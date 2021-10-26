@@ -69,6 +69,8 @@ module AuthenticationSharedExamples
       fill_in 'My HealtheVet User ID', with: username
       fill_in 'My HealtheVet Password', with: password
       click_button 'Sign in'
+
+      click_button 'Continue'
     end
   end
 end
