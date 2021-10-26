@@ -3,6 +3,8 @@
 module MebApi
   module V0
     class EducationBenefitsController < MebApi::V0::BaseController
+      # disabling checks while we serve big mock JSON objects
+      # rubocop:disable all
       def claimant_info
         render json:
           {
@@ -17,32 +19,37 @@ module MebApi
                           'emailAddress': 'test@test.com',
                           'addressType': 'MILITARY_OVERSEAS', 'mobilePhoneNumber': '512-825-5445',
                           'homePhoneNumber': '222-333-3333', 'countryCode': 'US', 'stateCode': 'ME' },
-                    'dobChanged': false,
-                    'firstAndLastNameChanged': false,
-                    'contactInfoChanged': false,
-                    'notificationMethod': 'email',
-                    'preferredContact': 'mail' }
-              }
+                    'dobChanged': false, 'firstAndLastNameChanged': false, 'contactInfoChanged': false,
+                    'notificationMethod': 'email', 'preferredContact': 'mail' }
+              },
+            'serviceData': {
+              'beginDate': '2010-10-26T18:00:54.302Z', 'endDate': '2021-10-26T18:00:54.302Z',
+              'branchOfService': 'ArmyActiveDuty',
+              'trainingPeriods': [
+                { 'beginDate': '2018-10-26T18:00:54.302Z', 'endDate': '2019-10-26T18:00:54.302Z' }
+              ],
+              'exclusionPeriods': [{ 'beginDate': '2012-10-26T18:00:54.302Z', 'endDate': '2013-10-26T18:00:54.302Z' }],
+              'characterOfService': 'Honorable', 'reasonForSeparation': 'ExpirationTimeOfService'
+            }
           }
       end
+      # rubocop:enable all
 
       def service_history
         render json:
         { data: {
-          'beginDate': '2021-09-23',
-          'endDate': '2021-09-23',
+          'beginDate': '2010-10-26T18:00:54.302Z',
+          'endDate': '2021-10-26T18:00:54.302Z',
           'branchOfService': 'ArmyActiveDuty',
           'trainingPeriods': [
             {
-              'beginDate': '2021-09-23',
-              'endDate': '2021-09-23'
+              'beginDate': '2018-10-26T18:00:54.302Z',
+              'endDate': '2019-10-26T18:00:54.302Z'
             }
           ],
-          'exclusionPeriods': [{ 'beginDate': '2021-09-23', 'endDate': '2021-09-23' }],
-          'characterOfService': 'string',
-          'separationReason': 'string',
-          'serviceStatus': 'Veteran',
-          'disagreeWithServicePeriod': true
+          'exclusionPeriods': [{ 'beginDate': '2012-10-26T18:00:54.302Z', 'endDate': '2013-10-26T18:00:54.302Z' }],
+          'characterOfService': 'Honorable',
+          'reasonForSeparation': 'ExpirationTimeOfService'
         } }
       end
 
