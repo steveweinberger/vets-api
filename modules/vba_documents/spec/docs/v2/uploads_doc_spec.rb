@@ -15,32 +15,67 @@ describe 'uploads', swagger_doc: 'modules/vba_documents/app/swagger/vba_document
                ]
       produces 'application/json'
       # parameter name: param_name, in: :path, type: :string, description: 'Param Description'
+      #
+      describe 'Getting a 200 response' do
+        response '202', 'Accepted. Location generated.' do
+          schema type: :object,
+                 properties: {
+                   data: {
+                     '$ref': '#/components/schemas/DocumentUploadPath'
+                   }
+                 }
 
-      response '202', 'Accepted. Location generated.' do
-        schema JSON.parse(File.read(VBADocuments::Engine.root.join('spec', 'support', 'schemas',
-                                                                   'document_upload_path.json')))
+          before do |example|
+            submit_request(example.metadata)
+          end
 
-        let (:uuid) { FactoryBot.create(:upload_submission).guid }
+          it 'returns a 202 response' do |example|
+            assert_response_matches_metadata(example.metadata)
+          end
 
-        before do |example|
-          submit_request(example.metadata)
-        end
-
-        it 'returns a 202 response' do |example|
-          assert_response_matches_metadata(example.metadata)
-        end
-
-        after do |example|
-          example.metadata[:response][:content] = {
-            'application/json' => {
-              example: JSON.parse(response.body, symbolize_names:true)
+          after do |example|
+            example.metadata[:response][:content] = {
+              'application/json' => {
+                example: JSON.parse(response.body, symbolize_names:true)
+              }
             }
-          }
+          end
         end
       end
 
+      describe 'Getting a 401 response' do
+        response '401', 'Unauthorized Request' do
+          schema type: :object,
+                 required: %w[message],
+                 properties: {
+                   Message: {
+                     type: :string,
+                     example: 'Invalid authentication credentials',
+                     minLength: 0,
+                     maxLength: 1000,
+                     description: 'Error detail'
+                   }
+                 }
+
+          before do |example|
+            VCR.use_cassette('/vba_documents/uploads/unauthorized_401.yml') do
+              submit_request(example.metadata)
+            end
+          end
+
+          it 'returns a 401 response' do |example|
+            assert_response_matches_metadata(example.metadata)
+          end
+
+          after do |example|
+            example.metadata[:response][:content] = {
+              'application/json' => {
+                example: JSON.parse(response.body, symbolize_names:true)
+              }
+            }
+          end
+        end
+      end
     end
-
-
   end
 end

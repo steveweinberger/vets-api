@@ -150,12 +150,16 @@ class VBADocuments::RswagConfig
       "properties": {
         "detail": {
           "type": 'string',
+          "minLength": 0,
+          "maxLength": 1000,
           "example": 'DOC104 - Upload rejected by upstream system. Processing failed and upload must be resubmitted',
           "description": 'A more detailed message about why the error occured'
         },
         "status": {
           "type": 'integer',
           "format": 'int32',
+          "minimum": 100,
+          "maximum": 599,
           "example": 422,
           "description": 'Standard HTTP Status returned with Error'
         }
@@ -174,11 +178,15 @@ class VBADocuments::RswagConfig
           "format": 'uuid',
           "pattern": '^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$',
           "example": '6d8433c1-cd55-4c24-affd-f592287a7572',
+          "minLength": 36,
+          "maxLength": 36,
           "description": 'JSON API identifier'
         },
         "type": {
           "type": 'string',
           "example": 'document_upload',
+          "minLength": 15,
+          "maxLength": 15,
           "description": 'JSON API type specification'
         },
         "attributes": {
@@ -202,10 +210,14 @@ class VBADocuments::RswagConfig
             "page_count": {
               "type": 'integer',
               "example": 1,
+              "minimum": 0,
+              "maximum": 32767,
               "description": 'The total number of pages solely in this PDF document'
             },
             "attachments": {
               "type": 'array',
+              "minItems": 0,
+              "maxItems": 32767,
               "items": {
                 "type": 'object',
                 "properties": {
@@ -215,6 +227,8 @@ class VBADocuments::RswagConfig
                   "page_count": {
                     "type": 'integer',
                     "example": 2,
+                    "minimum": 0,
+                    "maximum": 32767,
                     "description": 'The number of pages in this attachment'
                   }
                 }
@@ -225,11 +239,15 @@ class VBADocuments::RswagConfig
         "total_pages": {
           "type": 'integer',
           "example": 3,
+          "minimum": 0,
+          "maximum": 32767,
           "description": 'The total number of pages contained in this upload'
         },
         "total_documents": {
           "type": 'integer',
           "example": 2,
+          "minimum": 0,
+          "maximum": 32767,
           "description": 'The total number of documents contained in this upload'
         }
       }
@@ -245,12 +263,17 @@ class VBADocuments::RswagConfig
         "id": {
           "type": 'string',
           "format": 'uuid',
-          "example":'6d8433c1-cd55-4c24-affd-f592287a7572',
+          "pattern": '^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$',
+          "example": '6d8433c1-cd55-4c24-affd-f592287a7572',
+          "minLength": 36,
+          "maxLength": 36,
           "description": 'JSON API identifier'
         },
         "type": {
           "type": 'string',
           "example": "document_upload",
+          "minLength": 15,
+          "maxLength": 15,
           "description": 'JSON API type specification'
         },
         "attributes": {
@@ -314,17 +337,23 @@ class VBADocuments::RswagConfig
           "type": 'string',
           "example": '20571',
           "pattern": '^[0-9]{5}|[0-9]{5}-[0-9]{4}$',
+          "minLength": 5,
+          "maxLength": 10,
           "description": "Veteran zip code. Either five digits (XXXXX) or five digits then four digits separated by a hyphen (XXXXX-XXXX). Use '00000' for Veterans with non-US addresses."
         },
         "fileNumber": {
           "type": 'string',
           "example": '999887777',
           "pattern": '^[0-9]{8,9}$',
+          "minLength": 8,
+          "maxLength": 9,
           "description": 'The Veteran\'s file number is exactly 9 digits with no alpha characters, hyphens, spaces or punctuation. In most cases, this is the Veteran\'s SSN but may also be an 8 digit BIRL number. If no file number has been established or if it is unknown, the application should use the Veteran\'s SSN and the file number will be associated with the submission later in the process. Incorrect file numbers can cause delays.'
         },
         "businessLine": {
           "type": 'string',
           "example": 'CMP',
+          "minLength": 0,
+          "maxLength": 1000,
           "enum": %w[CMP PMC INS EDU VRE BVA FID OTH],
           "description":
             <<~DESCRIPTION
@@ -343,11 +372,15 @@ class VBADocuments::RswagConfig
           "type": 'string',
           "example": 'Doe-Smith',
           "pattern": '^[a-zA-Z\-\/\s]{1,50}$',
+          "minLength": 1,
+          "maxLength": 50,
           "description": 'Veteran last name. Cannot be missing or empty or longer than 50 characters. Only upper/lower case letters, hyphens(-), spaces and forward-slash(/) allowed.'
         },
         "veteranFirstName": {
           "type": 'string',
           "example": 'Jane',
+          "minLength": 1,
+          "maxLength": 50,
           "pattern": '^[a-zA-Z\-\/\s]{1,50}$',
           "description": 'Veteran first name. Cannot be missing or empty or longer than 50 characters. Only upper/lower case letters, hyphens(-), spaces and forward-slash(/) allowed.'
         }
@@ -385,15 +418,18 @@ class VBADocuments::RswagConfig
       "required": %w[guid status],
       "properties": {
         "code": {
-          "type": 'string',
+          "type": %w[string null],
           "pattern": '^DOC[0-9]{3}$',
+          "minLength": 6,
+          "maxLength": 6,
           "description": File.read(VBADocuments::Engine.root.join('app', 'swagger', 'vba_documents',
                                                                   'document_upload', 'status_code_description.md'))
         },
         "status": {
           "type": 'string',
-          "description": File.read(VBADocuments::Engine.root.join('app', 'swagger', 'vba_documents',
-                                                                  'document_upload', 'status_description.md')),
+          "minLength": 0,
+          "maxLength": 1000,
+          "description": 'Document upload status.',
           "enum": %w[pending uploaded received processing success vbms error]
         },
         "guid": {
@@ -401,6 +437,8 @@ class VBADocuments::RswagConfig
           "format": 'uuid',
           "pattern": '^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$',
           "example": '6d8433c1-cd55-4c24-affd-f592287a7572',
+          "minLength": 36,
+          "maxLength": 36,
           "description": 'The document upload identifier'
         },
         "detail": {
@@ -421,12 +459,21 @@ class VBADocuments::RswagConfig
           "type": 'string',
           "format": 'date-time',
           "example": '2018-07-30T17:31:15.958Z',
+          "minLength": 24,
+          "maxLenght": 24,
           "pattern": '^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3}Z$',
           "description": 'The last time the submission was updated'
         },
         "uploaded_pdf": {
-          "type": 'object',
-          "description": 'Only populated after submission starts processing'
+          "type": %w[object null],
+          "description": "Only populated after submission starts processing",
+          "properties": {
+            "description": {
+              "type": "string",
+              "minLength": 0,
+              "maxLength": 1000
+            }
+          }
         }
       }
     }
@@ -443,11 +490,15 @@ class VBADocuments::RswagConfig
           "format": 'uuid',
           "example": '6d8433c1-cd55-4c24-affd-f592287a7572',
           "pattern": '^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$',
+          "minLength": 36,
+          "maxLength": 36,
           "description": 'JSON API Identifier'
         },
         "type": {
           "type": 'string',
           "example": "document_upload",
+          "minLength": 15,
+          "maxLength": 15,
           "description": 'JSON API type specification'
         },
         "attributes": {
@@ -460,6 +511,8 @@ class VBADocuments::RswagConfig
   def document_upload_status_report(ref_root)
     {
       "type": 'array',
+      "minItems": 0,
+      "maxItems": 32767,
       "items": {
         '$ref': "#{ref_root}/DocumentUploadStatus"
       }
@@ -480,6 +533,8 @@ class VBADocuments::RswagConfig
             "type": 'string',
             "format": 'uuid',
             "pattern": '^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$',
+            "minLength": 36,
+            "maxLength": 36,
             "example": '6d8433c1-cd55-4c24-affd-f592287a7572'
           }
         }
@@ -495,13 +550,16 @@ class VBADocuments::RswagConfig
         "code": {
           "type": 'string',
           "pattern": '^DOC[0-9]{3}$',
+          "minLength": 6,
+          "maxLength": 6,
           "description": File.read(VBADocuments::Engine.root.join('app', 'swagger', 'vba_documents',
                                                                   'document_upload', 'status_code_description.md'))
         },
         "status": {
           "type": 'string',
-          "description": File.read(VBADocuments::Engine.root.join('app', 'swagger', 'vba_documents',
-                                                                  'document_upload', 'status_description.md')),
+          "minLength": 0,
+          "maxLength": 1000,
+          "description": 'Document upload status.',
           "enum": %w[pending uploaded received processing success vbms error]
         },
         "guid": {
@@ -509,6 +567,8 @@ class VBADocuments::RswagConfig
           "format": 'uuid',
           "pattern": '^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$',
           "example": '6d8433c1-cd55-4c24-affd-f592287a7572',
+          "minLength": 36,
+          "maxLength": 36,
           "description": 'The document upload identifier'
         },
         "detail": {
@@ -522,6 +582,8 @@ class VBADocuments::RswagConfig
           "format": 'date-time',
           "example": '2018-07-30T17:31:15.958Z',
           "pattern": '^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3}Z$',
+          "minLength": 24,
+          "maxLength": 24,
           "description": 'The last time the submission was updated'
         },
         "uploaded_pdf": {
@@ -539,6 +601,8 @@ class VBADocuments::RswagConfig
         "code": {
           "type": 'string',
           "pattern": '^DOC[0-9]{3}$',
+          "minLength": 6,
+          "maxLength": 6,
           "description": File.read(VBADocuments::Engine.root.join('app', 'swagger', 'vba_documents',
                                                                   'document_upload', 'status_code_description.md'))
         },
@@ -547,6 +611,8 @@ class VBADocuments::RswagConfig
           "format": 'uuid',
           "pattern": '^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$',
           "example": '6d8433c1-cd55-4c24-affd-f592287a7572',
+          "minLength": 36,
+          "maxLength": 36,
           "description": 'The document upload identifier'
         },
         "detail": {
@@ -557,8 +623,9 @@ class VBADocuments::RswagConfig
         },
         "status": {
           "type": 'string',
-          "description": File.read(VBADocuments::Engine.root.join('app', 'swagger', 'vba_documents',
-                                                                  'document_upload', 'status_description.md')),
+          "minLength": 0,
+          "maxLength": 1000,
+          "description": 'Document upload status.',
           "enum": %w[pending uploaded received processing success vbms error]
         },
         "updated_at": {
@@ -566,6 +633,8 @@ class VBADocuments::RswagConfig
           "format": 'date-time',
           "example": '2018-07-30T17:31:15.958Z',
           "pattern": '^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3}Z$',
+          "minLength": 24,
+          "maxLength": 24,
           "description": 'The last time the submission was updated'
         },
         "uploaded_pdf": {
@@ -573,5 +642,9 @@ class VBADocuments::RswagConfig
         }
       }
     }
+  end
+
+  def delete_me
+    JSON.parse(File.read(VBADocuments::Engine.root.join('spec', 'support', 'schemas', 'document_upload_path.json')))
   end
 end
