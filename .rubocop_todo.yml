@@ -318,26 +318,6 @@ Style/ExplicitBlockArgument:
     - 'lib/mpi/service.rb'
     - 'spec/lib/debt_management_center/debt_letter_downloader_spec.rb'
 
-# Offense count: 2
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: always, always_true, never
-Style/FrozenStringLiteralComment:
-  Exclude:
-    - 'app/workers/education_form/forms/base.rb'
-    - 'spec/support/spec_builders.rb'
-
-# Offense count: 12
-# Cop supports --auto-correct.
-Style/GlobalStdStream:
-  Exclude:
-    - 'config/environments/production.rb'
-    - 'modules/covid_vaccine/app/services/covid_vaccine/v0/vetext_configuration.rb'
-    - 'modules/vaos/app/services/vaos/configuration.rb'
-    - 'modules/vaos/app/services/vaos/v1/fhir_configuration.rb'
-    - 'rakelib/connectivity.rake'
-    - 'spec/support/silence_stream.rb'
-
 # Offense count: 16
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle.
@@ -411,11 +391,6 @@ Style/QuotedSymbols:
     - 'spec/models/preneeds/attachment_spec.rb'
     - 'spec/requests/swagger_spec.rb'
 
-# Offense count: 31
-# Cop supports --auto-correct.
-Style/RedundantFileExtensionInRequire:
-  Enabled: false
-
 # Offense count: 63
 # Cop supports --auto-correct.
 Style/RedundantRegexpEscape:
@@ -429,11 +404,6 @@ Style/RedundantSelfAssignmentBranch:
     - 'app/controllers/v0/prescriptions_controller.rb'
     - 'modules/mobile/app/controllers/mobile/v0/messages_controller.rb'
     - 'spec/support/authenticated_session_helper.rb'
-
-# Offense count: 134
-# Cop supports --auto-correct.
-Style/SingleArgumentDig:
-  Enabled: false
 
 # Offense count: 135
 # Cop supports --auto-correct.
