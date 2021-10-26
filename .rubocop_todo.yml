@@ -327,17 +327,6 @@ Style/FrozenStringLiteralComment:
     - 'app/workers/education_form/forms/base.rb'
     - 'spec/support/spec_builders.rb'
 
-# Offense count: 12
-# Cop supports --auto-correct.
-Style/GlobalStdStream:
-  Exclude:
-    - 'config/environments/production.rb'
-    - 'modules/covid_vaccine/app/services/covid_vaccine/v0/vetext_configuration.rb'
-    - 'modules/vaos/app/services/vaos/configuration.rb'
-    - 'modules/vaos/app/services/vaos/v1/fhir_configuration.rb'
-    - 'rakelib/connectivity.rake'
-    - 'spec/support/silence_stream.rb'
-
 # Offense count: 16
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle.
@@ -411,41 +400,6 @@ Style/QuotedSymbols:
     - 'spec/models/preneeds/attachment_spec.rb'
     - 'spec/requests/swagger_spec.rb'
 
-# Offense count: 4
-# Cop supports --auto-correct.
-Style/RedundantAssignment:
-  Exclude:
-    - 'app/models/facilities_query/base.rb'
-    - 'lib/central_mail/service.rb'
-    - 'lib/pdf_fill/forms/form_helper.rb'
-    - 'lib/va_profile/service.rb'
-
-# Offense count: 5
-# Cop supports --auto-correct.
-Style/RedundantBegin:
-  Exclude:
-    - 'app/models/emis_redis/military_information.rb'
-    - 'lib/common/models/base.rb'
-    - 'modules/health_quest/app/services/health_quest/questionnaire_manager/factory.rb'
-    - 'modules/vba_documents/lib/vba_documents/object_store.rb'
-
-# Offense count: 31
-# Cop supports --auto-correct.
-Style/RedundantFileExtensionInRequire:
-  Enabled: false
-
-# Offense count: 15
-# Cop supports --auto-correct.
-Style/RedundantRegexpCharacterClass:
-  Exclude:
-    - 'app/models/vso_appointment.rb'
-    - 'app/workers/education_form/forms/base.rb'
-    - 'lib/common/client/middleware/response/facility_parser.rb'
-    - 'lib/common/client/middleware/response/facility_validator.rb'
-    - 'spec/jobs/cypress_viewport_updater/github_service_spec.rb'
-    - 'spec/jobs/cypress_viewport_updater/google_analytics_reports_spec.rb'
-    - 'spec/lib/vsopdf/vso_appointment_form_spec.rb'
-
 # Offense count: 63
 # Cop supports --auto-correct.
 Style/RedundantRegexpEscape:
@@ -459,22 +413,6 @@ Style/RedundantSelfAssignmentBranch:
     - 'app/controllers/v0/prescriptions_controller.rb'
     - 'modules/mobile/app/controllers/mobile/v0/messages_controller.rb'
     - 'spec/support/authenticated_session_helper.rb'
-
-# Offense count: 134
-# Cop supports --auto-correct.
-Style/SingleArgumentDig:
-  Enabled: false
-
-# Offense count: 6
-# Cop supports --auto-correct.
-Style/SlicingWithRange:
-  Exclude:
-    - 'app/models/form_profile.rb'
-    - 'app/models/user.rb'
-    - 'lib/common/models/collection.rb'
-    - 'lib/pdf_fill/forms/va21p527ez.rb'
-    - 'rakelib/mvi.rake'
-    - 'spec/lib/hca/service_spec.rb'
 
 # Offense count: 135
 # Cop supports --auto-correct.

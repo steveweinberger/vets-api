@@ -2,12 +2,17 @@
 
 module WardenGitHubUserExtensions
   def api
-    # Confirm this works with Sidekiq
-    if token
-      super
-    else
+    if scope == :sidekiq
       Octokit::Client.new(access_token: Settings.sidekiq.github_api_key)
+    else
+      super
     end
+
+    # if token
+    #   super
+    # else
+    #   Octokit::Client.new(access_token: Settings.sidekiq.github_api_key)
+    # end
   end
 end
 
