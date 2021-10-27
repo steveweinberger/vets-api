@@ -94,8 +94,7 @@ module SAML
 
     def logingov_url
       @type = 'logingov'
-      SAML::SSOeSettingsService.saml_settings({ 'authn_context_comparison' => 'minimum' })
-      build_sso_url(build_logingov_authn_context([IAL::LOGIN_GOV_IAL1, AAL::LOGIN_GOV_AAL2]))
+      build_logingov_sso_url(build_logingov_authn_context([IAL::LOGIN_GOV_IAL1, AAL::LOGIN_GOV_AAL2]))
     end
 
     def custom_url(authn)
@@ -235,10 +234,15 @@ module SAML
       previous = uuid && SAMLRequestTracker.find(uuid)
       type = previous&.payload_attr(:type) || params[:type]
       transaction_id = previous&.payload_attr(:transaction_id) || SecureRandom.uuid
+      redirect = previous&.payload_attr(:redirect) || params[:redirect]
+      skip_dupe = previous&.payload_attr(:skip_dupe) || params[:skip_dupe]
       # if created_at is set to nil (meaning no previous tracker to use), it
       # will be initialized to the current time when it is saved
       SAMLRequestTracker.new(
-        payload: { type: type, transaction_id: transaction_id }.compact,
+        payload: { type: type,
+                   redirect: redirect,
+                   transaction_id: transaction_id,
+                   skip_dupe: skip_dupe }.compact,
         created_at: previous&.created_at
       )
     end

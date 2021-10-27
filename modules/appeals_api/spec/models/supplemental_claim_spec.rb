@@ -11,15 +11,15 @@ describe AppealsApi::SupplementalClaim, type: :model do
     let(:supplemental_claim) { create(:supplemental_claim) }
 
     describe 'veteran_first_name' do
-      it { expect(supplemental_claim.veteran_first_name).to eq(auth_headers.dig('X-VA-First-Name')) }
+      it { expect(supplemental_claim.veteran_first_name).to eq(auth_headers['X-VA-First-Name']) }
     end
 
     describe 'veteran_middle_initial' do
-      it { expect(supplemental_claim.veteran_middle_initial).to eq(auth_headers.dig('X-VA-Middle-Initial')) }
+      it { expect(supplemental_claim.veteran_middle_initial).to eq(auth_headers['X-VA-Middle-Initial']) }
     end
 
     describe 'veteran_last_name' do
-      it { expect(supplemental_claim.veteran_last_name).to eq(auth_headers.dig('X-VA-Last-Name')) }
+      it { expect(supplemental_claim.veteran_last_name).to eq(auth_headers['X-VA-Last-Name']) }
     end
 
     describe 'full_name' do
@@ -27,11 +27,11 @@ describe AppealsApi::SupplementalClaim, type: :model do
     end
 
     describe 'ssn' do
-      it { expect(supplemental_claim.ssn).to eq(auth_headers.dig('X-VA-SSN')) }
+      it { expect(supplemental_claim.ssn).to eq(auth_headers['X-VA-SSN']) }
     end
 
     describe 'file_number' do
-      it { expect(supplemental_claim.file_number).to eq(auth_headers.dig('X-VA-File-Number')) }
+      it { expect(supplemental_claim.file_number).to eq(auth_headers['X-VA-File-Number']) }
     end
 
     describe 'veteran_dob_month' do
@@ -47,15 +47,15 @@ describe AppealsApi::SupplementalClaim, type: :model do
     end
 
     describe 'veteran_service_number' do
-      it { expect(supplemental_claim.veteran_service_number).to eq(auth_headers.dig('X-VA-Service-Number')) }
+      it { expect(supplemental_claim.veteran_service_number).to eq(auth_headers['X-VA-Service-Number']) }
     end
 
     describe 'consumer_name' do
-      it { expect(supplemental_claim.consumer_name).to eq(auth_headers.dig('X-Consumer-Username')) }
+      it { expect(supplemental_claim.consumer_name).to eq(auth_headers['X-Consumer-Username']) }
     end
 
     describe 'consumer_id' do
-      it { expect(supplemental_claim.consumer_id).to eq(auth_headers.dig('X-Consumer-ID')) }
+      it { expect(supplemental_claim.consumer_id).to eq(auth_headers['X-Consumer-ID']) }
     end
   end
 
@@ -94,6 +94,42 @@ describe AppealsApi::SupplementalClaim, type: :model do
       describe 'phone' do
         it { expect(supplemental_claim.phone).to eq '+03-555-800-1111' }
       end
+    end
+  end
+
+  describe '#update_status!' do
+    let(:supplemental_claim) { create(:supplemental_claim) }
+
+    it 'error status' do
+      supplemental_claim.update_status!(status: 'error', code: 'code', detail: 'detail')
+
+      expect(supplemental_claim.status).to eq('error')
+      expect(supplemental_claim.code).to eq('code')
+      expect(supplemental_claim.detail).to eq('detail')
+    end
+
+    it 'other valid status' do
+      supplemental_claim.update_status!(status: 'success')
+
+      expect(supplemental_claim.status).to eq('success')
+    end
+
+    # TODO: should be implemented with status checking
+    xit 'invalid status' do
+      expect do
+        supplemental_claim.update_status!(status: 'invalid_status')
+      end.to raise_error(ActiveRecord::RecordInvalid,
+                         'Validation failed: Status is not included in the list')
+    end
+
+    it 'emits an event' do
+      handler = instance_double(AppealsApi::Events::Handler)
+      allow(AppealsApi::Events::Handler).to receive(:new).and_return(handler)
+      allow(handler).to receive(:handle!)
+
+      supplemental_claim.update_status!(status: 'pending')
+
+      expect(handler).to have_received(:handle!)
     end
   end
 end
