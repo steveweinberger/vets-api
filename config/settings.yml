@@ -11,6 +11,8 @@ web_origin_regex: \Ahttps?:\/\/www\.va\.gov\z
 # Settings for new SAML authentication with SSOe
 saml_ssoe:
   idp_metadata_file: config/ssoe_idp_int_metadata_isam.xml
+  idp_metadata_url: https://int.eauth.va.gov/isam/saml/metadata/saml20idp
+  idp_metadata: ~
   cert_path: ~
   cert_new_path: ~
   key_path: ~

@@ -17,8 +17,7 @@ module SAML
       end
 
       def base_settings
-        idp_metadata_parser = OneLogin::RubySaml::IdpMetadataParser.new
-        settings = idp_metadata_parser.parse(File.read(Settings.saml_ssoe.idp_metadata_file))
+        settings = Settings.saml_ssoe.idp_metadata
 
         if pki_needed?
           settings.certificate = Settings.saml_ssoe.certificate
