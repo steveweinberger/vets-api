@@ -37,7 +37,9 @@ module Common
       @metadata = metadata
       @errors = errors
       @cache_key = cache_key
+
       (@data = data) && return if defined?(::WillPaginate::Collection) && data.is_a?(WillPaginate::Collection)
+
       @data = data.collect do |element|
         element.is_a?(Hash) ? klass.new(element) : element
       end
@@ -166,6 +168,7 @@ module Common
           if pager.out_of_bounds?
             raise Common::Exceptions::InvalidPaginationParams.new({ page: page, per_page: per_page })
           end
+
           pager.replace @data[pager.offset, pager.per_page]
         end
       else
@@ -199,7 +202,7 @@ module Common
     def convert_fields_to_ordered_hash(fields)
       fields.each_with_object({}) do |field, hash|
         if field.start_with?('-')
-          field = field[1..-1]
+          field = field[1..]
           hash[field] = 'DESC'
         else
           hash[field] = 'ASC'

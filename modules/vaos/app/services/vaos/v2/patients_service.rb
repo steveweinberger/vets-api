@@ -9,8 +9,8 @@ module VAOS
     class PatientsService < VAOS::SessionService
       def get_patient_appointment_metadata(clinic_service_id, facility_id, type)
         params = {
-          clinical_service_id: clinic_service_id,
-          facility_id: facility_id,
+          clinicalServiceId: clinic_service_id,
+          facilityId: facility_id,
           type: type
         }
 
@@ -23,7 +23,7 @@ module VAOS
       private
 
       def url
-        "/vaos/v1/patients/#{user.icn}"
+        "/vaos/v1/patients/#{user.icn}/eligibility"
       end
     end
   end

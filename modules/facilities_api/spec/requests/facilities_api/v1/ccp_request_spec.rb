@@ -17,18 +17,37 @@ RSpec.describe 'FacilitiesApi::V1::Ccp', type: :request, team: :facilities, vcr:
 
   let(:params) do
     {
-      latitude: 40.415217,
-      longitude: -74.057114,
+      lat: 40.415217,
+      long: -74.057114,
       radius: 200,
       type: 'provider',
       specialties: ['213E00000X']
     }
   end
 
-  [false, true].each do |feature_flag|
-    context "facility_locator_ppms_use_secure_api == #{feature_flag}" do
+  [
+    {
+      secure_api: false,
+      paginated: false
+    },
+    {
+      secure_api: false,
+      paginated: true
+    },
+    {
+      secure_api: true,
+      paginated: false
+    },
+    {
+      secure_api: true,
+      paginated: true
+    }
+  ].each do |feature_flags|
+    context "facility_locator_ppms_use_secure_api == #{feature_flags[:secure_api]}, "\
+            "facility_locator_ppms_use_paginated_endpoint == #{feature_flags[:paginated]}" do
       before do
-        Flipper.enable(:facility_locator_ppms_use_secure_api, feature_flag)
+        Flipper.enable(:facility_locator_ppms_use_secure_api, feature_flags[:secure_api])
+        Flipper.enable(:facility_locator_ppms_use_paginated_endpoint, feature_flags[:paginated])
       end
 
       let(:place_of_service) do
@@ -72,8 +91,8 @@ RSpec.describe 'FacilitiesApi::V1::Ccp', type: :request, team: :facilities, vcr:
           context 'Missing specialties param' do
             let(:params) do
               {
-                latitude: 40.415217,
-                longitude: -74.057114,
+                lat: 40.415217,
+                long: -74.057114,
                 radius: 200,
                 type: 'provider'
               }
@@ -102,8 +121,8 @@ RSpec.describe 'FacilitiesApi::V1::Ccp', type: :request, team: :facilities, vcr:
           context 'specialties=261QU0200X' do
             let(:params) do
               {
-                latitude: 40.415217,
-                longitude: -74.057114,
+                lat: 40.415217,
+                long: -74.057114,
                 radius: 200,
                 type: 'provider',
                 specialties: ['261QU0200X']
@@ -124,17 +143,31 @@ RSpec.describe 'FacilitiesApi::V1::Ccp', type: :request, team: :facilities, vcr:
           it "sends a 'facilities.ppms.request.faraday' notification to any subscribers listening" do
             allow(StatsD).to receive(:measure)
 
-            expect(StatsD).to receive(:measure).with(
-              'facilities.ppms.provider_locator',
-              kind_of(Numeric),
-              hash_including(
-                tags: [
-                  'facilities.ppms',
-                  'facilities.ppms.radius:200',
-                  'facilities.ppms.results:11'
-                ]
+            if feature_flags[:paginated]
+              expect(StatsD).to receive(:measure).with(
+                'facilities.ppms.facility_service_locator',
+                kind_of(Numeric),
+                hash_including(
+                  tags: [
+                    'facilities.ppms',
+                    'facilities.ppms.radius:200',
+                    'facilities.ppms.results:10'
+                  ]
+                )
               )
-            )
+            else
+              expect(StatsD).to receive(:measure).with(
+                'facilities.ppms.provider_locator',
+                kind_of(Numeric),
+                hash_including(
+                  tags: [
+                    'facilities.ppms',
+                    'facilities.ppms.radius:200',
+                    'facilities.ppms.results:11'
+                  ]
+                )
+              )
+            end
 
             expect do
               get '/facilities_api/v1/ccp', params: params
@@ -154,7 +187,14 @@ RSpec.describe 'FacilitiesApi::V1::Ccp', type: :request, team: :facilities, vcr:
 
               client = FacilitiesApi::V1::PPMS::Client.new
               expect(FacilitiesApi::V1::PPMS::Client).to receive(:new).and_return(client)
-              expect(client).to receive(:provider_locator).and_return(
+
+              mock_method = if feature_flags[:paginated]
+                              :facility_service_locator
+                            else
+                              :provider_locator
+                            end
+
+              expect(client).to receive(mock_method).and_return(
                 FacilitiesApi::V1::PPMS::Response.new(
                   FactoryBot.build_list(:facilities_api_v1_ppms_provider, total_items).collect(&:attributes),
                   params_with_pagination
@@ -214,8 +254,8 @@ RSpec.describe 'FacilitiesApi::V1::Ccp', type: :request, team: :facilities, vcr:
         context 'type=pharmacy' do
           let(:params) do
             {
-              latitude: 40.415217,
-              longitude: -74.057114,
+              lat: 40.415217,
+              long: -74.057114,
               radius: 200,
               type: 'pharmacy'
             }
@@ -260,8 +300,8 @@ RSpec.describe 'FacilitiesApi::V1::Ccp', type: :request, team: :facilities, vcr:
         context 'type=urgent_care' do
           let(:params) do
             {
-              latitude: 40.415217,
-              longitude: -74.057114,
+              lat: 40.415217,
+              long: -74.057114,
               radius: 200,
               type: 'urgent_care'
             }
@@ -283,8 +323,8 @@ RSpec.describe 'FacilitiesApi::V1::Ccp', type: :request, team: :facilities, vcr:
         context 'Missing specialties param' do
           let(:params) do
             {
-              latitude: 40.415217,
-              longitude: -74.057114,
+              lat: 40.415217,
+              long: -74.057114,
               radius: 200
             }
           end
@@ -312,8 +352,8 @@ RSpec.describe 'FacilitiesApi::V1::Ccp', type: :request, team: :facilities, vcr:
         context 'specialties=261QU0200X' do
           let(:params) do
             {
-              latitude: 40.415217,
-              longitude: -74.057114,
+              lat: 40.415217,
+              long: -74.057114,
               radius: 200,
               specialties: ['261QU0200X']
             }
@@ -368,8 +408,8 @@ RSpec.describe 'FacilitiesApi::V1::Ccp', type: :request, team: :facilities, vcr:
       describe '#pharmacy' do
         let(:params) do
           {
-            latitude: 40.415217,
-            longitude: -74.057114,
+            lat: 40.415217,
+            long: -74.057114,
             radius: 200
           }
         end
@@ -413,8 +453,8 @@ RSpec.describe 'FacilitiesApi::V1::Ccp', type: :request, team: :facilities, vcr:
       describe '#urgent_care' do
         let(:params) do
           {
-            latitude: 40.415217,
-            longitude: -74.057114,
+            lat: 40.415217,
+            long: -74.057114,
             radius: 200
           }
         end
@@ -450,10 +490,10 @@ RSpec.describe 'FacilitiesApi::V1::Ccp', type: :request, team: :facilities, vcr:
               'specialization' => nil,
               'specialtyCode' => '101Y00000X',
               'specialtyDescription' => 'A provider who is trained and educated in the performance of behavior ' \
-              'health services through interpersonal communications and analysis. ' \
-              'Training and education at the specialty level usually requires a ' \
-              'master\'s degree and clinical experience and supervision for licensure ' \
-              'or certification.'
+                                        'health services through interpersonal communications and analysis. ' \
+                                        'Training and education at the specialty level usually requires a ' \
+                                        'master\'s degree and clinical experience and supervision for licensure ' \
+                                        'or certification.'
             }
           },
           {

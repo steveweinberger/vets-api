@@ -27,8 +27,8 @@ RSpec.describe V1::SessionsController, type: :controller do
   let(:callback_url)        { "http://#{request_host}/v1/sessions/callback" }
   let(:logout_redirect_url) { 'http://127.0.0.1:3001/logout/' }
 
-  let(:settings_no_context) { build(:settings_no_context_v1, assertion_consumer_service_url: callback_url) }
-  let(:rubysaml_settings)   { build(:rubysaml_settings_v1, assertion_consumer_service_url: callback_url) }
+  let(:settings_no_context) { build(:settings_no_context, assertion_consumer_service_url: callback_url) }
+  let(:rubysaml_settings)   { build(:rubysaml_settings, assertion_consumer_service_url: callback_url) }
 
   let(:logout_uuid) { '1234' }
   let(:invalid_logout_response) { SAML::Responses::Logout.new('', rubysaml_settings) }
@@ -83,16 +83,18 @@ RSpec.describe V1::SessionsController, type: :controller do
   context 'when not logged in' do
     describe 'new' do
       context 'routes not requiring auth' do
-        %w[mhv dslogon idme].each do |type|
+        %w[mhv dslogon idme logingov].each do |type|
           context "routes /sessions/#{type}/new to SessionsController#new with type: #{type}" do
             let(:authn) do
               case type
               when 'mhv'
-                'myhealthevet'
+                ['myhealthevet', AuthnContext::ID_ME]
               when 'idme'
-                [LOA::IDME_LOA1_VETS, Settings.saml_ssoe.idme_authn_context]
+                [LOA::IDME_LOA1_VETS, AuthnContext::ID_ME]
               when 'dslogon'
-                'dslogon'
+                ['dslogon', AuthnContext::ID_ME]
+              when 'logingov'
+                [IAL::LOGIN_GOV_IAL1, AAL::LOGIN_GOV_AAL2, AuthnContext::LOGIN_GOV]
               end
             end
 
@@ -212,9 +214,10 @@ RSpec.describe V1::SessionsController, type: :controller do
       context 'loa3_user' do
         let(:saml_user_attributes) { loa3_user.attributes.merge(loa3_user.identity.attributes) }
 
-        it 'creates an after login job' do
+        it 'makes a call to AfterLoginActions' do
           allow(SAML::User).to receive(:new).and_return(saml_user)
-          expect { post :saml_callback }.to change(AfterLoginJob.jobs, :size).by(1)
+          expect_any_instance_of(AfterLoginActions).to receive(:perform)
+          post :saml_callback
         end
       end
 
@@ -554,7 +557,7 @@ RSpec.describe V1::SessionsController, type: :controller do
                                 short_message: 'Other SAML Response Error(s)',
                                 level: :error,
                                 full_message: 'The status code of the Response was not Success, was Requester =>'\
-                                  ' NoAuthnContext -> AuthnRequest without an authentication context.' }]
+                                              ' NoAuthnContext -> AuthnRequest without an authentication context.' }]
             )
           expect(post(:saml_callback)).to redirect_to('http://127.0.0.1:3001/auth/login/callback?auth=fail&code=007')
           expect(response).to have_http_status(:found)
@@ -579,10 +582,10 @@ RSpec.describe V1::SessionsController, type: :controller do
 
       context 'when saml response error contains status_detail' do
         status_detail_xml = '<samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Responder">'\
-        '</samlp:StatusCode>'\
-        '<samlp:StatusDetail>'\
-        '<fim:FIMStatusDetail MessageID="could_not_perform_token_exchange"></fim:FIMStatusDetail>'\
-        '</samlp:StatusDetail>'\
+                            '</samlp:StatusCode>'\
+                            '<samlp:StatusDetail>'\
+                            '<fim:FIMStatusDetail MessageID="could_not_perform_token_exchange"></fim:FIMStatusDetail>'\
+                            '</samlp:StatusDetail>'\
 
         before do
           allow(SAML::Responses::Login).to receive(:new).and_return(saml_response_detail_error(status_detail_xml))
@@ -618,10 +621,10 @@ RSpec.describe V1::SessionsController, type: :controller do
       context 'when saml response error contains invalid_message_timestamp' do
         let(:status_detail_xml) do
           '<samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Responder">'\
-          '</samlp:StatusCode>'\
-          '<samlp:StatusDetail>'\
-          '<fim:FIMStatusDetail MessageID="invalid_message_timestamp"></fim:FIMStatusDetail>'\
-          '</samlp:StatusDetail>'
+            '</samlp:StatusCode>'\
+            '<samlp:StatusDetail>'\
+            '<fim:FIMStatusDetail MessageID="invalid_message_timestamp"></fim:FIMStatusDetail>'\
+            '</samlp:StatusDetail>'
         end
         let(:expected_error_message) { "<fim:FIMStatusDetail MessageID='invalid_message_timestamp'/>" }
         let(:extra_content) do
@@ -871,26 +874,23 @@ RSpec.describe V1::SessionsController, type: :controller do
       context 'when creating a user account' do
         context 'and the current user does not yet have an Account record' do
           before do
+            Account.first.destroy
             expect(Account.count).to eq 0
           end
 
           it 'creates an Account record for the user' do
             post :saml_callback
-            AfterLoginJob.drain
 
             expect(Account.first.idme_uuid).to eq uuid
           end
         end
 
         context 'and the current user already has an Account record' do
-          let!(:account) { create :account, idme_uuid: uuid }
-
           it 'does not create a new Account record for the user', :aggregate_failures do
             post :saml_callback
-            AfterLoginJob.drain
 
             expect(Account.count).to eq 1
-            expect(Account.first.idme_uuid).to eq account.idme_uuid
+            expect(Account.first.idme_uuid).to eq loa3_user.idme_uuid
           end
         end
       end

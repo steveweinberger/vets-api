@@ -166,10 +166,10 @@ namespace :form526 do
       dates = []
       array.each do |value|
         date = begin
-                 value.to_date
-               rescue
-                 nil
-               end
+          value.to_date
+        rescue
+          nil
+        end
         dates << date if date
       end
       dates
@@ -261,20 +261,23 @@ namespace :form526 do
 
   desc 'Get an error report within a given date period. [<start date: yyyy-mm-dd>,<end date: yyyy-mm-dd>,<flag>]'
   task :errors, %i[start_date end_date flag] => [:environment] do |_, args|
-    def print_row(sub_id, p_id, created_at, is_bdd, job_class)
-      printf "%-15s %-16s  %-25s %-10s %-20s\n", sub_id, p_id, created_at, is_bdd, job_class
-      # rubocop:enable Style/FormatStringToken
+    # rubocop:disable Metrics/ParameterLists
+    def print_row(sub_id, evss_id, user_uuid, created_at, is_bdd, job_class)
+      printf "%-15s %-45s %-35s %-25s %-10s %-20s\n", sub_id, evss_id, user_uuid, created_at, is_bdd, job_class
     end
 
+    # rubocop:enable Metrics/ParameterLists
+    # rubocop:enable Style/FormatStringToken
     def print_errors(errors)
       errors.sort_by { |_message, hash| -hash[:submission_ids].length }.each do |(k, v)|
         puts k
         puts '*****************'
         puts "Unique Participant ID count: #{v[:participant_ids].count}"
-        print_row('submission_id:', 'participant_id:', 'created_at:', 'is_bdd?', 'job_class')
+        print_row('submission_id:', 'evss_id', 'user_uuid', 'created_at:', 'is_bdd?', 'job_class')
         v[:submission_ids].each do |submission|
           print_row(submission[:sub_id],
-                    submission[:p_id],
+                    submission[:evss_id],
+                    submission[:user_uuid],
                     submission[:date],
                     submission[:is_bdd],
                     submission[:job_class])
@@ -285,14 +288,14 @@ namespace :form526 do
     end
 
     def message_string(msg)
-      return nil if msg.dig('severity') == 'WARN'
+      return nil if msg['severity'] == 'WARN'
 
-      message = msg.dig('key')&.gsub(/\[(\d*)\]|\\/, '')
+      message = msg['key']&.gsub(/\[(\d*)\]|\\/, '')
       # strip the GUID from BGS errors for grouping purposes
 
       # don't show disability names, for better grouping. Can be removed after we fix inflection issue
       unless message == 'form526.treatments.treatedDisabilityNames.isInvalidValue'
-        message += msg.dig('text').gsub(/GUID.*/, '')
+        message += msg['text'].gsub(/GUID.*/, '')
       end
       message
     end
@@ -344,6 +347,8 @@ namespace :form526 do
           errors[message][:submission_ids].append(
             sub_id: submission.id,
             p_id: submission.auth_headers['va_eauth_pid'],
+            evss_id: submission.auth_headers['va_eauth_service_transaction_id'],
+            user_uuid: submission.user_uuid,
             date: submission.created_at,
             is_bdd: submission.bdd?,
             job_class: job_status.job_class
@@ -425,6 +430,107 @@ namespace :form526 do
     end
   end
 
+  # context in https://github.com/department-of-veterans-affairs/va.gov-team/issues/29651
+  desc 'get a csv of all vets affected by BIRLS id mismatch errors since date'
+  task :birls_errors, [:start_date] => [:environment] do |_, args|
+    start_date = args[:start_date]&.to_date || 30.days.ago.utc
+    fss = Form526JobStatus.where(status: 'exhausted',
+                                 updated_at: [start_date..Time.now.utc])
+    CSV.open('tmp/birls_errors.csv', 'wb') do |csv|
+      csv << %w[veteran_name edipi birls_id ssn]
+      fss.each do |form_status|
+        fs = form_status.submission
+        next unless fs
+
+        ssn = fs.auth_headers['va_eauth_pnid']
+        birls_id = fs.auth_headers['va_eauth_birlsfilenumber']
+        edipi = fs.auth_headers['va_eauth_dodedipnid']
+        vname = fs.auth_headers['va_eauth_firstName'] + ' ' + fs.auth_headers['va_eauth_lastName']
+
+        diff =  StringHelpers.levenshtein_distance(birls_id, ssn)
+        csv << [vname, edipi, birls_id, ssn] if diff.positive? && diff < 3
+      end
+    end
+    puts 'tmp/birls_errors.csv'
+  end
+
+  # context in https://github.com/department-of-veterans-affairs/va.gov-team/issues/11353
+  desc 'get a csv of all vets affected by payee code errors with multiple corp ids since date'
+  task :corp_id_errors, [:start_date] => [:environment] do |_, args|
+    start_date = args[:start_date]&.to_date || 30.days.ago.utc
+    fss = Form526JobStatus.where(status: 'non_retryable_error',
+                                 updated_at: [start_date..Time.now.utc]).where("error_message like '%Payee code%'")
+    file_path = 'tmp/corp_errors.csv'
+    edipis = []
+    CSV.open(file_path, 'wb') do |csv|
+      csv << %w[veteran_name edipi corp_ids]
+      fss.each do |form_status|
+        fs = form_status.submission
+        next unless fs
+
+        edipi = fs.auth_headers['va_eauth_dodedipnid']
+        if edipis.include? edipi
+          next
+        else
+          edipis << edipi
+        end
+
+        user_identity = OpenStruct.new(mhv_icn: '', edipi: edipi)
+        response = MPI::Service.new.find_profile(user_identity).profile
+        active_corp_ids = response.full_mvi_ids.select { |id| id.match?(/\d*\^PI\^200CORP\^USVBA\^A/) }
+        vname = fs.auth_headers['va_eauth_firstName'] + ' ' + fs.auth_headers['va_eauth_lastName']
+        csv << [vname, edipi, active_corp_ids] if active_corp_ids.count > 1
+      end
+    end
+    puts file_path
+  end
+
+  desc 'get a csv of all vets affected by PIF errors since date'
+  task :pif_errors,  [:start_date] =>  [:environment] do |_, args|
+    start_date = args[:start_date]&.to_date || 30.days.ago.utc
+    fss = Form526JobStatus.where(status: 'exhausted',
+                                 updated_at: [start_date..Time.now.utc]).where("error_message like '%PIF%'")
+    ssns = []
+    CSV.open('tmp/pif_errors.csv', 'wb') do |csv|
+      csv << %w[veteran_name ssn soj form526_submission_id]
+      fss.each do |form_status|
+        fs = form_status.submission
+
+        ssn = fs.auth_headers['va_eauth_pnid']
+
+        if ssns.include? ssn
+          next
+        else
+          ssns << ssn
+        end
+
+        vname = fs.auth_headers['va_eauth_firstName'] + ' ' + fs.auth_headers['va_eauth_lastName']
+        icn = Account.where(idme_uuid: fs.user_uuid).first&.icn
+        if icn.blank?
+          # TODO: make this work for blank icn's
+          puts "icn blank #{fs.id}"
+          next
+        end
+        user = OpenStruct.new(participant_id: fs.auth_headers['va_eauth_pid'], icn: icn, common_name: vname,
+                              ssn: ssn)
+        award_response = BGS::AwardsService.new(user).get_awards
+        if award_response
+          soj = award_response[:award_stn_nbr]
+        else
+          addr = fs.form.dig('form526', 'form526', 'veteran', 'currentMailingAddress')
+          soj = BGS::Service.new(user).get_regional_office_by_zip_code(addr['zipFirstFive'], addr['country'],
+                                                                       addr['state'], 'CP', ssn)
+        end
+        row = [vname, ssn, soj]
+        csv << row
+        row
+      rescue
+        puts "failed for #{form_status.id}"
+      end
+    end
+    puts 'csv complete in tmp/pif_errors.csv'
+  end
+
   # EVSS has asked us to re-upload files that were corrupted upstream
   desc 'Resubmit uploads to EVSS for submitted claims given an array of saved_claim_ids'
   task retry_corrupted_uploads: :environment do |_, args|
@@ -438,7 +544,7 @@ namespace :form526 do
     puts "reuploaded files for #{form_submissions.count} submissions"
   end
 
-  desc 'Convert SIP data to camel case and fix checkboxes [/export/path.csv, ids]'
+  desc 'Convert SIP data to camel case and fix checkboxes [/export/path.csv]'
   task :convert_sip_data, [:csv_path] => :environment do |_, args|
     raise 'No CSV path provided' unless args[:csv_path]
 
@@ -464,7 +570,7 @@ namespace :form526 do
     end
 
     def get_disability_array(form_data_hash)
-      new_conditions = form_data_hash['newDisabilities']&.collect { |d| d.dig('condition') } || []
+      new_conditions = form_data_hash['newDisabilities']&.collect { |d| d['condition'] } || []
       rated_disabilities = form_data_hash['ratedDisabilities']&.collect { |rd| rd['name'] } || []
       new_conditions + rated_disabilities
     end

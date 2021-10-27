@@ -20,6 +20,14 @@ class AppealsApi::RswagConfig
           {
             name: 'Notice of Disagreements',
             description: ''
+          },
+          {
+            name: 'Contestable Issues',
+            description: ''
+          },
+          {
+            name: 'Legacy Appeals',
+            description: ''
           }
         ],
         components: {
@@ -31,11 +39,14 @@ class AppealsApi::RswagConfig
             }
           },
           schemas: [
-            generic_schemas,
-            hlr_v2_schemas('#/components/schemas'),
-            contestable_issues_schema,
-            nod_schemas('#/components/schemas')
-          ].reduce(&:merge)
+            generic_schemas('#/components/schemas'),
+            hlr_v2_create_schemas('#/components/schemas'),
+            hlr_v2_response_schemas('#/components/schemas'),
+            contestable_issues_schema('#/components/schemas'),
+            nod_create_schemas('#/components/schemas'),
+            nod_response_schemas('#/components/schemas'),
+            legacy_appeals_schema('#/components/schemas')
+          ].reduce(&:merge).sort_by { |k, _| k.to_s.downcase }.to_h
         },
         paths: {},
         basePath: '/services/appeals/v2/decision_reviews',
@@ -65,7 +76,7 @@ class AppealsApi::RswagConfig
 
   private
 
-  def generic_schemas
+  def generic_schemas(ref_root)
     {
       'nonBlankString': {
         'type': 'string',
@@ -77,25 +88,108 @@ class AppealsApi::RswagConfig
         'pattern': '^[0-9]{4}-[0-9]{2}-[0-9]{2}$',
         'maxLength': 10,
         'minLength': 10
+      },
+      'errorModel': JSON.parse(File.read(AppealsApi::Engine.root.join('spec', 'support', 'schemas', 'errors', 'default.json'))),
+      'errorWithTitleAndDetail': {
+        "type": 'array',
+        "items": {
+          "type": 'object',
+          "properties": {
+            "title": {
+              "type": 'string'
+            },
+            "detail": {
+              "type": 'string'
+            }
+          }
+        }
+      },
+      'documentUploadMetadata': JSON.parse(File.read(AppealsApi::Engine.root.join('spec', 'support', 'schemas', 'document_upload_metadata.json'))),
+      "X-VA-SSN": {
+        "allOf": [
+          { "description": 'social security number' },
+          {
+            "type": 'string',
+            "minLength": 0,
+            "maxLength": 9,
+            "pattern": '^[0-9]{9}$'
+          }
+        ]
+      },
+      "X-VA-First-Name": {
+        "allOf": [
+          { "description": 'first name' },
+          { "type": 'string' }
+        ]
+      },
+      "X-VA-Middle-Initial": {
+        "allOf": [
+          { "description": 'middle initial' },
+          { "$ref": "#{ref_root}/nonBlankString" }
+        ]
+      },
+      "X-VA-Last-Name": {
+        "allOf": [
+          { "description": 'last name' },
+          { "$ref": "#{ref_root}/nonBlankString" }
+        ]
+      },
+      "X-VA-Birth-Date": {
+        "allOf": [
+          { "description": 'birth date' },
+          { "minLength": 10 },
+          { "maxLength": 10 },
+          { "$ref": "#{ref_root}/date" }
+        ]
+      },
+      "X-VA-File-Number": {
+        "allOf": [
+          { "description": 'VA file number (c-file / css)' },
+          { "maxLength": 9 },
+          { "$ref": "#{ref_root}/nonBlankString" }
+        ]
+      },
+      "X-Consumer-Username": {
+        "allOf": [
+          { "description": 'Consumer Username (passed from Kong)' },
+          { "$ref": "#{ref_root}/nonBlankString" }
+        ]
+      },
+      "X-Consumer-ID": {
+        "allOf": [
+          { "description": 'Consumer GUID' },
+          { "$ref": "#{ref_root}/nonBlankString" }
+        ]
+      },
+      "uuid": {
+        "type": 'string',
+        "pattern": '^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$'
+      },
+      "timeStamp": {
+        "type": 'string',
+        "pattern": '\\d{4}(-\\d{2}){2}T\\d{2}(:\\d{2}){2}\\.\\d{3}Z'
       }
     }
   end
 
-  def contestable_issues_schema
+  def contestable_issues_schema(ref_root)
     {
       'contestableIssues': {
         'type': 'object',
         'properties': {
           'data': {
             'type': 'array',
-            'items': JSON.parse(File.read(AppealsApi::Engine.root.join('spec', 'support', 'schemas', 'contestable_issue.json')))
+            'items': {
+              "$ref": "#{ref_root}/contestableIssue"
+            }
           }
         }
-      }
+      },
+      'contestableIssue': JSON.parse(File.read(AppealsApi::Engine.root.join('spec', 'support', 'schemas', 'contestable_issue.json')))
     }
   end
 
-  def hlr_v2_schemas(ref_root)
+  def hlr_v2_create_schemas(ref_root)
     {
       'hlrCreatePhone': {
         'type': 'object',
@@ -205,6 +299,7 @@ class AppealsApi::RswagConfig
                         'minLength': 6,
                         'maxLength': 255
                       },
+                      # Generated using: File.write('timezones.json', (TZInfo::Timezone.all.map(&:name) + ActiveSupport::TimeZone.all.map(&:name)).uniq.sort) #Although this might seem like it should be generated dynamically, it's been written to file in case TZInfo or ActiveSupport deletes/modifies a timezone with a future version, which would change our APIs enum (a non-additve change to the current API version).
                       'timezone': JSON.parse(File.read(AppealsApi::Engine.root.join('spec', 'support', 'time_zones.json')))
                     },
                     'additionalProperties': false,
@@ -348,11 +443,243 @@ class AppealsApi::RswagConfig
           data
           included
         ]
+      },
+      'hlrCreateParameters': {
+        "type": 'object',
+        "properties": {
+          "X-VA-SSN": {
+            "type": 'string',
+            "description": "Veteran's SSN",
+            "pattern": '^[0-9]{9}$'
+          },
+          "X-VA-First-Name": {
+            "type": 'string',
+            "description": "Veteran's first name",
+            "maxLength": 30,
+            "$comment": 'can be whitespace, to accommodate those with 1 legal name'
+          },
+          "X-VA-Middle-Initial": {
+            "allOf": [
+              { "description": "Veteran's middle initial", "maxLength": 1 },
+              { "$ref": "#{ref_root}/nonBlankString" }
+            ]
+          },
+          "X-VA-Last-Name": { "allOf": [
+            { "description": "Veteran's last name", "maxLength": 40 },
+            { "$ref": "#{ref_root}/nonBlankString" }
+          ] },
+          "X-VA-Birth-Date": { "allOf": [
+            { "description": "Veteran's birth date" },
+            { "$ref": "#{ref_root}/date" }
+          ] },
+          "X-VA-File-Number": { "allOf": [
+            { "description": "Veteran's file number", "maxLength": 9 },
+            { "$ref": "#{ref_root}/nonBlankString" }
+          ] },
+          "X-VA-Insurance-Policy-Number": { "allOf": [
+            { "description": "Veteran's insurance policy number", "maxLength": 18 },
+            { "$ref": "#{ref_root}/nonBlankString" }
+          ] },
+          "X-Consumer-Username": {
+            "allOf": [
+              { "description": 'Consumer User Name (passed from Kong)' },
+              { "$ref": "#{ref_root}/nonBlankString" }
+            ]
+          },
+          "X-Consumer-ID": { "allOf": [
+            { "description": 'Consumer GUID' },
+            { "$ref": "#{ref_root}/nonBlankString" }
+          ] }
+        },
+        "additionalProperties": false,
+        "required": %w[
+          X-VA-SSN
+          X-VA-First-Name
+          X-VA-Last-Name
+          X-VA-Birth-Date
+        ]
       }
     }
   end
 
-  def nod_schemas(ref_root)
+  def hlr_v2_response_schemas(ref_root)
+    {
+      "hlrShow": {
+        "type": 'object',
+        "properties": {
+          "data": {
+            "properties": {
+              "id": {
+                '$ref': "#{ref_root}/uuid"
+              },
+              "type": {
+                "type": 'string',
+                "enum": ['higherLevelReview']
+              },
+              "attributes": {
+                "properties": {
+                  "status": {
+                    "type": 'string',
+                    "example": AppealsApi::HlrStatus::V2_STATUSES.first,
+                    "enum": AppealsApi::HlrStatus::V2_STATUSES
+                  },
+                  "updatedAt": {
+                    '$ref': "#{ref_root}/timeStamp"
+                  },
+                  "createdAt": {
+                    '$ref': "#{ref_root}/timeStamp"
+                  },
+                  "formData": {
+                    '$ref' => "#{ref_root}/hlrCreate"
+                  }
+                }
+              }
+            },
+            "required": %w[id type attributes]
+          }
+        },
+        "required": ['data']
+      },
+      "hlrContestableIssuesShow": {
+        "type": 'object',
+        "properties": {
+          "data": {
+            "type": 'array',
+            "items": {
+              "type": 'object',
+              "description": 'A contestable issue (to contest this, you include it as a RequestIssue when creating a HigherLevelReview, SupplementalClaim, or Appeal)',
+              "properties": {
+                "type": {
+                  "type": 'string',
+                  "enum": [
+                    'contestableIssue'
+                  ]
+                },
+                "id": {
+                  "type": 'string',
+                  "nullable": true
+                },
+                "attributes": {
+                  "type": 'object',
+                  "properties": {
+                    "ratingIssueReferenceId": {
+                      "type": 'string',
+                      "nullable": true,
+                      "description": 'RatingIssue ID',
+                      "example": '2385'
+                    },
+                    "ratingIssueProfileDate": {
+                      "type": 'string',
+                      "nullable": true,
+                      "format": 'date',
+                      "description": '(yyyy-mm-dd) RatingIssue profile date',
+                      "example": '2006-05-31'
+                    },
+                    "ratingIssueDiagnosticCode": {
+                      "type": 'string',
+                      "nullable": true,
+                      "description": 'RatingIssue diagnostic code',
+                      "example": '5005'
+                    },
+                    "ratingDecisionReferenceId": {
+                      "type": 'string',
+                      "nullable": true,
+                      "description": 'The BGS ID for the contested rating decision. This may be populated while ratingIssueReferenceId is nil',
+                      "example": 'null'
+                    },
+                    "decisionIssueId": {
+                      "type": 'integer',
+                      "nullable": true,
+                      "description": 'DecisionIssue ID',
+                      "example": 'null'
+                    },
+                    "approxDecisionDate": {
+                      "type": 'string',
+                      "nullable": true,
+                      "format": 'date',
+                      "description": '(yyyy-mm-dd) Approximate decision date',
+                      "example": '2006-11-27'
+                    },
+                    "description": {
+                      "type": 'string',
+                      "nullable": true,
+                      "description": 'Description',
+                      "example": 'Service connection for hypertension is granted with an evaluation of 10 percent effective July 24, 2005.'
+                    },
+                    "rampClaimId": {
+                      "type": 'string',
+                      "nullable": true,
+                      "description": 'RampClaim ID',
+                      "example": 'null'
+                    },
+                    "titleOfActiveReview": {
+                      "type": 'string',
+                      "nullable": true,
+                      "description": 'Title of DecisionReview that this issue is still active on',
+                      "example": 'null'
+                    },
+                    "sourceReviewType": {
+                      "type": 'string',
+                      "nullable": true,
+                      "description": 'The type of DecisionReview (HigherLevelReview, SupplementalClaim, Appeal) the issue was last decided on (if any)',
+                      "example": 'null'
+                    },
+                    "timely": {
+                      "type": 'boolean',
+                      "description": 'An issue is timely if the receipt date is within 372 dates of the decision date.',
+                      "example": false
+                    },
+                    "latestIssuesInChain": {
+                      "type": 'array',
+                      "description": 'Shows the chain of decision and rating issues that preceded this issue. Only the most recent issue can be contested (the object itself that contains the latestIssuesInChain attribute).',
+                      "items": {
+                        "type": 'object',
+                        "properties": {
+                          "id": {
+                            "type": %w[
+                              integer
+                              string
+                            ],
+                            "nullable": true,
+                            "example": 'null'
+                          },
+                          "approxDecisionDate": {
+                            "type": 'string',
+                            "nullable": true,
+                            "format": 'date',
+                            "example": '2006-11-27'
+                          }
+                        }
+                      }
+                    },
+                    "ratingIssueSubjectText": {
+                      "type": 'string',
+                      "nullable": true,
+                      "description": 'Short description of RatingIssue',
+                      "example": 'Hypertension'
+                    },
+                    "ratingIssuePercentNumber": {
+                      "type": 'string',
+                      "nullable": true,
+                      "description": 'Numerical rating for RatingIssue',
+                      "example": '10'
+                    },
+                    "isRating": {
+                      "type": 'boolean',
+                      "description": 'Whether or not this is a RatingIssue',
+                      "example": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  end
+
+  def nod_create_schemas(ref_root)
     {
       'nodCreateRoot': {
         'type': 'object',
@@ -413,6 +740,7 @@ class AppealsApi::RswagConfig
                   },
                   'boardReviewOption': { 'type': 'string', 'enum': %w[direct_review evidence_submission hearing] },
                   'hearingTypePreference': { 'type': 'string', 'enum': %w[virtual_hearing video_conference central_office] },
+                  # Generated using: File.write('timezones.json', (TZInfo::Timezone.all.map(&:name) + ActiveSupport::TimeZone.all.map(&:name)).uniq.sort) #Although this might seem like it should be generated dynamically, it's been written to file in case TZInfo or ActiveSupport deletes/modifies a timezone with a future version, which would change our APIs enum (a non-additve change to the current API version).
                   'timezone': JSON.parse(File.read(AppealsApi::Engine.root.join('spec', 'support', 'time_zones.json'))),
                   'socOptIn': { 'type': 'boolean' }
                 },
@@ -433,7 +761,7 @@ class AppealsApi::RswagConfig
                   'additionalProperties': false,
                   'properties': {
                     'issue': { '$ref': "#{ref_root}/nonBlankString", 'maxLength': 180 },
-                    'decisionDate': { '$ref': "#{ref_root}/date" },
+                    'decisionDate': { '$ref': "#{ref_root}/nodCreateHeadersDate" },
                     'decisionIssueId': { 'type': 'integer' },
                     'ratingIssueReferenceId': { 'type': 'string' },
                     'ratingDecisionReferenceId': { 'type': 'string' },
@@ -450,7 +778,185 @@ class AppealsApi::RswagConfig
           }
         },
         'required': %w[data included]
+      },
+      "nodCreateHeadersDate": {
+        "type": 'string',
+        "pattern": '^[0-9]{4}(-[0-9]{2}){2}$'
+      },
+      "nodCreateHeadersRoot": {
+        "type": 'object',
+        "additionalProperties": false,
+        "properties": {
+          "X-VA-First-Name": {
+            "$ref": "#{ref_root}/X-VA-First-Name"
+          },
+          "X-VA-Middle-Initial": {
+            "$ref": "#{ref_root}/X-VA-Middle-Initial"
+          },
+          "X-VA-Last-Name": {
+            "$ref": "#{ref_root}/X-VA-Last-Name"
+          },
+          "X-VA-SSN": {
+            "$ref": "#{ref_root}/X-VA-SSN"
+          },
+          "X-VA-File-Number": {
+            "$ref": "#{ref_root}/X-VA-File-Number"
+          },
+          "X-VA-Birth-Date": {
+            "$ref": "#{ref_root}/X-VA-Birth-Date"
+          },
+          "X-Consumer-Username": {
+            "$ref": "#{ref_root}/X-Consumer-Username"
+          },
+          "X-Consumer-ID": {
+            "$ref": "#{ref_root}/X-Consumer-ID"
+          }
+        },
+        "required": %w[
+          X-VA-First-Name
+          X-VA-Last-Name
+          X-VA-SSN
+          X-VA-Birth-Date
+        ]
       }
+    }
+  end
+
+  def nod_response_schemas(ref_root)
+    {
+      "nodCreateResponse": {
+        "description": 'Successful response of a 10182 form submission',
+        "type": 'object',
+        "properties": {
+          "data": {
+            "properties": {
+              "id": {
+                "type": 'string',
+                "description": 'Unique ID of created NOD',
+                "example": '97751cb6-d06d-4179-87f6-75e3fc9d875c'
+              },
+              "type": {
+                "type": 'string',
+                "description": 'Name of record class',
+                "example": 'noticeOfDisagreement'
+              },
+              "attributes": {
+                "type": 'object',
+                "properties": {
+                  "status": {
+                    "type": 'string',
+                    "description": 'Status of NOD',
+                    "example": AppealsApi::NodStatus::STATUSES.first,
+                    "enum": AppealsApi::NodStatus::STATUSES
+                  },
+                  "createdAt": {
+                    "type": 'string',
+                    "description": 'Created timestamp of the NOD',
+                    "example": '2020-12-16T19:52:23.909Z'
+                  },
+                  "updatedAt": {
+                    "type": 'string',
+                    "description": 'Updated timestamp of the NOD',
+                    "example": '2020-12-16T19:52:23.909Z'
+                  }
+                }
+              },
+              "formData": {
+                "$ref": "#{ref_root}/nodCreateRoot"
+              }
+            }
+          },
+          "included": {
+            "type": 'array',
+            "items": {
+              "$ref": "#{ref_root}/contestableIssue"
+            }
+          }
+        }
+      },
+      "evidenceSubmissionResponse": {
+        "type": 'object',
+        "properties": {
+          "data": {
+            "properties": {
+              "id": {
+                "description": 'The document upload identifier',
+                "type": 'string',
+                "format": 'uuid',
+                "example": '6d8433c1-cd55-4c24-affd-f592287a7572'
+              },
+              "type": {
+                "description": 'JSON API type specification',
+                "type": 'string',
+                "example": 'evidenceSubmission'
+              },
+              "attributes": {
+                "properties": {
+                  "status": {
+                    "type": 'string',
+                    "example": VBADocuments::UploadSubmission::ALL_STATUSES.first,
+                    "enum": VBADocuments::UploadSubmission::ALL_STATUSES
+                  },
+                  "code": {
+                    "type": %i[string null]
+                  },
+                  "detail": {
+                    "type": %i[string null],
+                    "description": 'Human readable error detail. Only present if status = "error"'
+                  },
+                  "appealType": {
+                    "description": 'Type of associated appeal',
+                    "type": 'string',
+                    "example": 'NoticeOfDisagreement'
+                  },
+                  "appealId": {
+                    "description": 'GUID of associated appeal',
+                    "type": 'uuid',
+                    "example": '2926ad2a-9372-48cf-8ec1-69e08e4799ef'
+                  },
+                  "location": {
+                    "type": %i[string null],
+                    "description": 'Location to which to PUT document Payload',
+                    "format": 'uri',
+                    "example": 'https://sandbox-api.va.gov/example_path_here/{idpath}'
+                  },
+                  "updatedAt": {
+                    "description": 'The last time the submission was updated',
+                    "type": 'string',
+                    "format": 'date-time',
+                    "example": '2018-07-30T17:31:15.958Z'
+                  },
+                  "createdAt": {
+                    "description": 'The last time the submission was updated',
+                    "type": 'string',
+                    "format": 'date-time',
+                    "example": '2018-07-30T17:31:15.958Z'
+                  }
+                }
+              }
+            },
+            "required": %w[id type attributes]
+          }
+        },
+        "required": ['data']
+      }
+    }
+  end
+
+  def legacy_appeals_schema(ref_root)
+    {
+      'legacyAppeals': {
+        'type': 'object',
+        'properties': {
+          'data': {
+            'type': 'array',
+            'items': {
+              "$ref": "#{ref_root}/legacyAppeal"
+            }
+          }
+        }
+      },
+      'legacyAppeal': JSON.parse(File.read(AppealsApi::Engine.root.join('spec', 'support', 'schemas', 'legacy_appeal.json')))
     }
   end
 end

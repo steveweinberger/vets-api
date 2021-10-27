@@ -16,8 +16,8 @@ describe 'Notice of Disagreements', swagger_doc: 'modules/appeals_api/app/swagge
       tags 'Notice of Disagreements'
       operationId 'createNod'
       description 'Submits an appeal of type Notice of Disagreement.' \
-      ' This endpoint is the same as submitting [VA Form 10182](https://www.va.gov/vaforms/va/pdf/VA10182.pdf)' \
-      ' via mail or fax directly to the Board of Veterans’ Appeals.'
+                  ' This endpoint is the same as submitting [VA Form 10182](https://www.va.gov/vaforms/va/pdf/VA10182.pdf)' \
+                  ' via mail or fax directly to the Board of Veterans’ Appeals.'
 
       security [
         { apikey: [] }
@@ -59,7 +59,7 @@ describe 'Notice of Disagreements', swagger_doc: 'modules/appeals_api/app/swagge
           JSON.parse(File.read(AppealsApi::Engine.root.join('spec', 'fixtures', 'valid_10182_minimum.json')))
         end
 
-        schema AppealsApi::SwaggerSharedComponents.response_schemas[:nod_response_schema]
+        schema '$ref' => '#/components/schemas/nodCreateResponse'
 
         before do |example|
           submit_request(example.metadata)
@@ -88,7 +88,7 @@ describe 'Notice of Disagreements', swagger_doc: 'modules/appeals_api/app/swagge
           JSON.parse(File.read(AppealsApi::Engine.root.join('spec', 'fixtures', 'valid_10182.json')))
         end
 
-        schema AppealsApi::SwaggerSharedComponents.response_schemas[:nod_response_schema]
+        schema '$ref' => '#/components/schemas/nodCreateResponse'
 
         before do |example|
           submit_request(example.metadata)
@@ -113,8 +113,8 @@ describe 'Notice of Disagreements', swagger_doc: 'modules/appeals_api/app/swagge
       end
 
       response '422', 'Violates JSON schema' do
-        schema JSON.parse(File.read(AppealsApi::Engine.root.join('spec', 'support', 'schemas', 'errors',
-                                                                 'default.json')))
+        schema '$ref' => '#/components/schemas/errorModel'
+
         let(:nod_body) do
           request_body = JSON.parse(File.read(AppealsApi::Engine.root.join('spec', 'fixtures', 'valid_10182.json')))
           request_body['data']['attributes'].delete('socOptIn')
@@ -154,7 +154,7 @@ describe 'Notice of Disagreements', swagger_doc: 'modules/appeals_api/app/swagge
       parameter name: :uuid, in: :path, type: :string, description: 'Notice of Disagreement UUID'
 
       response '200', 'Info about a single Notice of Disagreement' do
-        schema AppealsApi::SwaggerSharedComponents.response_schemas[:nod_response_schema]
+        schema '$ref' => '#/components/schemas/nodCreateResponse'
 
         let(:uuid) { FactoryBot.create(:minimal_notice_of_disagreement).id }
 
@@ -203,7 +203,7 @@ describe 'Notice of Disagreements', swagger_doc: 'modules/appeals_api/app/swagge
     get 'Gets the Notice of Disagreement JSON Schema.' do
       tags 'Notice of Disagreements'
       operationId 'nodSchema'
-      description 'Returns the JSON Schema for the POST /notice_of_disagreements endpoint.'
+      description 'Returns the [JSON Schema](https://json-schema.org/) for the `POST /notice_of_disagreement` endpoint.'
       security [
         { apikey: [] }
       ]
@@ -328,7 +328,7 @@ describe 'Notice of Disagreements', swagger_doc: 'modules/appeals_api/app/swagge
       end
 
       response '422', 'Error' do
-        schema JSON.parse(File.read(AppealsApi::Engine.root.join('spec', 'support', 'schemas', 'errors', 'default.json')))
+        schema '$ref' => '#/components/schemas/errorModel'
 
         let(:nod_body) do
           request_body = JSON.parse(File.read(AppealsApi::Engine.root.join('spec', 'fixtures', 'valid_10182_minimum.json')))
@@ -411,29 +411,15 @@ describe 'Notice of Disagreements', swagger_doc: 'modules/appeals_api/app/swagge
       response '202', 'Accepted. Location generated' do
         let(:nod_uuid) { FactoryBot.create(:minimal_notice_of_disagreement, board_review_option: 'evidence_submission').id }
 
-        schema AppealsApi::SwaggerSharedComponents.response_schemas[:evidence_submission_response_schema]
+        schema '$ref' => '#/components/schemas/evidenceSubmissionResponse'
 
         before do |example|
-          with_settings(Settings.modules_appeals_api.evidence_submissions.location,
-                        prefix: 'http://some.fakesite.com/path',
-                        replacement: 'http://another.fakesite.com/rewrittenpath') do
-            s3_client = instance_double(Aws::S3::Resource)
-            allow(Aws::S3::Resource).to receive(:new).and_return(s3_client)
-            s3_bucket = instance_double(Aws::S3::Bucket)
-            s3_object = instance_double(Aws::S3::Object)
-            allow(s3_client).to receive(:bucket).and_return(s3_bucket)
-            allow(s3_bucket).to receive(:object).and_return(s3_object)
-            allow(s3_object).to receive(:presigned_url).and_return(+'http://some.fakesite.com/path/uuid')
-            submit_request(example.metadata)
-          end
+          allow_any_instance_of(VBADocuments::UploadSubmission).to receive(:get_location).and_return(+'http://some.fakesite.com/path/uuid')
+          submit_request(example.metadata)
         end
 
         it 'returns a 202 response' do |example|
-          with_settings(Settings.vba_documents.location,
-                        prefix: 'https://fake.s3.url/foo/',
-                        replacement: 'https://api.vets.gov/proxy/') do
-            assert_response_matches_metadata(example.metadata)
-          end
+          assert_response_matches_metadata(example.metadata)
         end
 
         after do |example|
@@ -671,7 +657,7 @@ describe 'Notice of Disagreements', swagger_doc: 'modules/appeals_api/app/swagge
       parameter name: :uuid, in: :path, type: :string, description: 'Notice of Disagreement UUID Evidence Submission'
 
       response '200', 'Info about a single Notice of Disagreement Evidence Submission.' do
-        schema AppealsApi::SwaggerSharedComponents.response_schemas[:evidence_submission_response_schema]
+        schema '$ref' => '#/components/schemas/evidenceSubmissionResponse'
 
         let(:uuid) { FactoryBot.create(:evidence_submission).guid }
 

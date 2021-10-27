@@ -12,6 +12,10 @@
 # Sorted using http://yaml-sorter.herokuapp.com/
 
 features:
+  caregiver_sigi_enabled:
+    actor_type: user
+    description: Whether Self-Identifying Gender Identity is enabled for caregiver.
+    enable_in_development: true
   can_upload_10_10cg_poa:
     actor_type: cookie_id
     description: Allows users to upload POA documentation when completing the 10-10CG.
@@ -46,9 +50,17 @@ features:
     actor_type: user
     description: Enables the health care check-in experiences
     enable_in_development: true
+  check_in_experience_demographics_page_enabled:
+    actor_type: user
+    description: Enables the health care check-in experiences to show demographics page.
+    enable_in_development: true
   check_in_experience_low_authentication_enabled:
     actor_type: user
     description: Enables the health care check-in experiences to use the lowest tier of authentication, i.e. last 4 and last name
+    enable_in_development: true
+  check_in_experience_next_of_kin_enabled:
+    actor_type: user
+    description: Enables the health care check-in experiences to show the next of kin page.
     enable_in_development: true
   check_in_experience_update_information_page_enabled:
     actor_type: user
@@ -62,6 +74,9 @@ features:
     actor_type: user
     description: Feature gates the certificate of eligibility application
     enable_in_development: true
+  communication_preferences:
+    actor_type: user
+    description: Allow user to access backend communication_preferences API
   contact_info_change_email:
     actor_type: user
     description: Send user a notification email when their contact info changes.
@@ -122,6 +137,10 @@ features:
   direct_deposit_vanotify:
     actor_type: user
     description: Send direct deposit emails using VaNotify service
+  disability_compensation_flashes:
+    actor_type: user
+    description: enables sending flashes to BGS for disability_compensation submissions.
+    enable_in_development: true
   education_reports_cleanup:
     actor_type: user
     description: Updates to the daily education reports to remove old data that isn't needed in the new fiscal year
@@ -171,6 +190,9 @@ features:
   facility_locator_ppms_use_secure_api:
     actor_type: user
     description: Use the new secure ppms api with new auth headers
+  facility_locator_ppms_use_paginated_endpoint:
+    actor_type: user
+    description: Use the new paginated endpoint for providers
   facility_locator_predictive_location_search:
     actor_type: user
     description: Use predictive location search in the Facility Locator UI
@@ -234,9 +256,9 @@ features:
     actor_type: user
     description: Enable/disable custom expiration dates for forms
     enable_in_development: true
-  language_support:
-    actor_type: user
-    description: Toggles the availability of language support links (spanish et al) in the footer
+  login_gov:
+    actor_type: cookie
+    description: Enables/disables the usage of the new service provider Login.gov (VSP Identity)
     enable_in_development: true
   mega_menu_mobile_v2:
     actor_type: user
@@ -275,6 +297,10 @@ features:
   search_representative:
     actor_type: user
     description: Enable frontend application and cta for Search Representative application
+    enable_in_development: true
+  search_dropdown_component_enabled:
+    actor_type: user
+    description: Enables typeahead 2.0 functionality
     enable_in_development: true
   search_typeahead_enabled:
     actor_type: user
@@ -316,6 +342,14 @@ features:
   show_financial_status_report_wizard:
     actor_type: user
     description: Enables the Wizard for VA Form 5655 (Financial Status Report)
+    enable_in_development: true
+  show_header_v2:
+    action_type: user
+    description: Enables the new header
+    enable_in_development: true
+  show_meb_mock_endpoints:
+    actor_type: user
+    description: Allows for frontend to have progressivley enhanced backend endpoints to consume in staging.
     enable_in_development: true
   show_medical_copays:
     actor_type: user

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'saml/ssoe_settings_service'
 require_relative 'responses/login'
 
 module SAML
@@ -64,8 +65,8 @@ module SAML
       @query_params[:auth] = auth if auth != 'success'
       @query_params[:code] = code if code
 
-      if Settings.saml.relay.present?
-        add_query(Settings.saml.relay, query_params)
+      if Settings.saml_ssoe.relay.present?
+        add_query(Settings.saml_ssoe.relay, query_params)
       else
         add_query("#{base_redirect_url}#{LOGIN_REDIRECT_PARTIAL}", query_params)
       end
@@ -78,17 +79,22 @@ module SAML
     # SIGN ON URLS
     def mhv_url
       @type = 'mhv'
-      build_sso_url('myhealthevet')
+      build_sso_url(build_authn_context('myhealthevet'))
     end
 
     def dslogon_url
       @type = 'dslogon'
-      build_sso_url('dslogon')
+      build_sso_url(build_authn_context('dslogon'))
     end
 
     def idme_url
       @type = 'idme'
       build_sso_url(build_authn_context(LOA::IDME_LOA1_VETS))
+    end
+
+    def logingov_url
+      @type = 'logingov'
+      build_logingov_sso_url(build_logingov_authn_context([IAL::LOGIN_GOV_IAL1, AAL::LOGIN_GOV_AAL2]))
     end
 
     def custom_url(authn)
@@ -99,7 +105,7 @@ module SAML
     def signup_url
       @type = 'signup'
       @query_params[:op] = 'signup'
-      build_sso_url(LOA::IDME_LOA1_VETS)
+      build_sso_url(build_authn_context(LOA::IDME_LOA1_VETS))
     end
 
     def verify_url
@@ -112,9 +118,9 @@ module SAML
         when LOA::IDME_LOA1_VETS, 'multifactor'
           build_authn_context(@loa3_context)
         when 'myhealthevet', 'myhealthevet_multifactor'
-          'myhealthevet_loa3'
+          build_authn_context('myhealthevet_loa3')
         when 'dslogon', 'dslogon_multifactor'
-          'dslogon_loa3'
+          build_authn_context('dslogon_loa3')
         when SAML::UserAttributes::SSOe::INBOUND_AUTHN_CONTEXT
           "#{@user.identity.sign_in[:service_name]}_loa3"
         end
@@ -127,11 +133,11 @@ module SAML
       link_authn_context =
         case authn_context
         when LOA::IDME_LOA1_VETS, LOA::IDME_LOA3_VETS, LOA::IDME_LOA3
-          'multifactor'
+          build_authn_context('multifactor')
         when 'myhealthevet', 'myhealthevet_loa3'
-          'myhealthevet_multifactor'
+          build_authn_context('myhealthevet_multifactor')
         when 'dslogon', 'dslogon_loa3'
-          'dslogon_multifactor'
+          build_authn_context('dslogon_multifactor')
         when SAML::UserAttributes::SSOe::INBOUND_AUTHN_CONTEXT
           "#{@user.identity.sign_in[:service_name]}_multifactor"
         end
@@ -166,9 +172,18 @@ module SAML
       saml_auth_request.create(new_url_settings, query_params)
     end
 
-    def build_authn_context(assurance_level_url, identity_provider = Settings.saml_ssoe.idme_authn_context)
+    def build_authn_context(assurance_level_url, identity_provider = AuthnContext::ID_ME)
       if identity_provider
         [assurance_level_url, identity_provider]
+      else
+        assurance_level_url
+      end
+    end
+
+    def build_logingov_authn_context(assurance_level_url, identity_provider = AuthnContext::LOGIN_GOV)
+      if identity_provider
+        assurance_level_url = [assurance_level_url] unless assurance_level_url.is_a?(Array)
+        assurance_level_url.push(identity_provider)
       else
         assurance_level_url
       end
@@ -219,10 +234,15 @@ module SAML
       previous = uuid && SAMLRequestTracker.find(uuid)
       type = previous&.payload_attr(:type) || params[:type]
       transaction_id = previous&.payload_attr(:transaction_id) || SecureRandom.uuid
+      redirect = previous&.payload_attr(:redirect) || params[:redirect]
+      skip_dupe = previous&.payload_attr(:skip_dupe) || params[:skip_dupe]
       # if created_at is set to nil (meaning no previous tracker to use), it
       # will be initialized to the current time when it is saved
       SAMLRequestTracker.new(
-        payload: { type: type, transaction_id: transaction_id }.compact,
+        payload: { type: type,
+                   redirect: redirect,
+                   transaction_id: transaction_id,
+                   skip_dupe: skip_dupe }.compact,
         created_at: previous&.created_at
       )
     end

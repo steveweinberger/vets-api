@@ -12,6 +12,10 @@ describe 'Higher-Level Reviews', swagger_doc: 'modules/appeals_api/app/swagger/a
 
   path '/higher_level_reviews' do
     post 'Creates a new Higher-Level Review' do
+      description 'Submits an appeal of type Higher Level Review. ' \
+                  'This endpoint is the same as submitting [VA Form 20-0996](https://www.va.gov/decision-reviews/higher-level-review/request-higher-level-review-form-20-0996)' \
+                  ' via mail or fax directly to the Board of Veterans’ Appeals.'
+
       tags 'Higher-Level Reviews'
       operationId 'createHlr'
       security [
@@ -27,7 +31,7 @@ describe 'Higher-Level Reviews', swagger_doc: 'modules/appeals_api/app/swagger/a
           value: JSON.parse(File.read(AppealsApi::Engine.root.join('spec', 'fixtures', 'valid_200996_minimum_v2.json')))
         },
         'all fields used' => {
-          value: JSON.parse(File.read(AppealsApi::Engine.root.join('spec', 'fixtures', 'valid_200996_v2.json')))
+          value: JSON.parse(File.read(AppealsApi::Engine.root.join('spec', 'fixtures', 'valid_200996_v2_extra.json')))
         }
       }
 
@@ -55,7 +59,7 @@ describe 'Higher-Level Reviews', swagger_doc: 'modules/appeals_api/app/swagger/a
           JSON.parse(File.read(AppealsApi::Engine.root.join('spec', 'fixtures', 'valid_200996_minimum_v2.json')))
         end
 
-        schema AppealsApi::SwaggerSharedComponents.response_schemas[:hlr_response_schema]
+        schema '$ref' => '#/components/schemas/hlrShow'
 
         before do |example|
           submit_request(example.metadata)
@@ -84,7 +88,7 @@ describe 'Higher-Level Reviews', swagger_doc: 'modules/appeals_api/app/swagger/a
           JSON.parse(File.read(AppealsApi::Engine.root.join('spec', 'fixtures', 'valid_200996_v2.json')))
         end
 
-        schema AppealsApi::SwaggerSharedComponents.response_schemas[:hlr_response_schema]
+        schema '$ref' => '#/components/schemas/hlrShow'
 
         before do |example|
           submit_request(example.metadata)
@@ -109,8 +113,8 @@ describe 'Higher-Level Reviews', swagger_doc: 'modules/appeals_api/app/swagger/a
       end
 
       response '422', 'Violates JSON schema' do
-        schema JSON.parse(File.read(AppealsApi::Engine.root.join('spec', 'support', 'schemas', 'errors',
-                                                                 'default.json')))
+        schema '$ref' => '#/components/schemas/errorModel'
+
         let(:hlr_body) do
           request_body = JSON.parse(File.read(AppealsApi::Engine.root.join('spec', 'fixtures', 'valid_200996_v2.json')))
           request_body['data']['attributes'].delete('informalConference')
@@ -138,6 +142,7 @@ describe 'Higher-Level Reviews', swagger_doc: 'modules/appeals_api/app/swagger/a
 
   path '/higher_level_reviews/{uuid}' do
     get 'Shows a specific Higher-Level Review. (a.k.a. the Show endpoint)' do
+      description 'Returns all of the data associated with a specific Higher-Level Review.'
       tags 'Higher-Level Reviews'
       operationId 'showHlr'
       security [
@@ -148,7 +153,7 @@ describe 'Higher-Level Reviews', swagger_doc: 'modules/appeals_api/app/swagger/a
       parameter name: :uuid, in: :path, type: :string, description: 'Higher-Level Review UUID'
 
       response '200', 'Info about a single Higher-Level Review' do
-        schema AppealsApi::SwaggerSharedComponents.response_schemas[:hlr_response_schema]
+        schema '$ref' => '#/components/schemas/hlrShow'
 
         let(:uuid) { FactoryBot.create(:minimal_higher_level_review_v2).id }
 
@@ -198,8 +203,8 @@ describe 'Higher-Level Reviews', swagger_doc: 'modules/appeals_api/app/swagger/a
       tags 'Higher-Level Reviews'
       operationId 'hlrContestableIssues'
       description = 'Returns all issues associated with a Veteran that have not previously been decided by a ' \
-      'Higher-Level Review as of the receiptDate and bound by benefitType. Not all issues returned are guaranteed '\
-      'to be eligible for appeal. Associate these results when creating a new Higher-Level Review.'
+                    'Higher-Level Review as of the receiptDate and bound by benefitType. Not all issues returned are guaranteed '\
+                    'to be eligible for appeal. Associate these results when creating a new Higher-Level Review.'
       description description
       security [
         { apikey: [] }
@@ -268,8 +273,7 @@ describe 'Higher-Level Reviews', swagger_doc: 'modules/appeals_api/app/swagger/a
       end
 
       response '422', 'Bad receipt date' do
-        schema JSON.parse(File.read(AppealsApi::Engine.root.join('spec', 'support', 'schemas', 'errors',
-                                                                 'default.json')))
+        schema '$ref' => '#/components/schemas/errorModel'
 
         let(:benefit_type) { 'compensation' }
         let(:'X-VA-SSN') { '872958715' }
@@ -327,7 +331,7 @@ describe 'Higher-Level Reviews', swagger_doc: 'modules/appeals_api/app/swagger/a
     get 'Gets the Higher-Level Review JSON Schema.' do
       tags 'Higher-Level Reviews'
       operationId 'hlrSchema'
-      description 'Returns the JSON Schema for the POST /higher_level_reviews endpoint.'
+      description 'Returns the [JSON Schema](https://json-schema.org/) for the `POST /higher_level_reviews` endpoint.'
       security [
         { apikey: [] }
       ]
@@ -453,8 +457,8 @@ describe 'Higher-Level Reviews', swagger_doc: 'modules/appeals_api/app/swagger/a
       end
 
       response '422', 'Error' do
-        schema JSON.parse(File.read(AppealsApi::Engine.root.join('spec', 'support', 'schemas', 'errors',
-                                                                 'default.json')))
+        schema '$ref' => '#/components/schemas/errorModel'
+
         let(:hlr_body) do
           request_body = JSON.parse(File.read(AppealsApi::Engine.root.join('spec', 'fixtures', 'valid_200996_v2.json')))
           request_body['data']['attributes'].delete('informalConference')

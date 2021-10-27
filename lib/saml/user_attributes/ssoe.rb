@@ -15,12 +15,12 @@ module SAML
                                    person_types].freeze
       INBOUND_AUTHN_CONTEXT = 'urn:oasis:names:tc:SAML:2.0:ac:classes:Password'
 
-      attr_reader :attributes, :authn_context, :warnings
+      attr_reader :attributes, :authn_context, :tracker_uuid, :warnings
 
-      def initialize(saml_attributes, authn_context, saml_settings = nil)
+      def initialize(saml_attributes, authn_context, tracker_uuid)
         @attributes = saml_attributes # never default this to {}
         @authn_context = authn_context
-        @saml_settings = saml_settings
+        @tracker_uuid = tracker_uuid
         @warnings = []
       end
 
@@ -204,19 +204,38 @@ module SAML
           data = SAML::UserAttributeError::ERRORS[:idme_uuid_missing].merge({ identifier: mhv_icn })
           raise SAML::UserAttributeError, data
         end
-        raise SAML::UserAttributeError, SAML::UserAttributeError::ERRORS[:multiple_mhv_ids] if mhv_id_mismatch?
+
+        multiple_id_validations
+      end
+
+      private
+
+      def multiple_id_validations
+        # EDIPI, ICN, and CORP ID all trigger errors if multiple unique IDs are found
         raise SAML::UserAttributeError, SAML::UserAttributeError::ERRORS[:multiple_edipis] if edipi_mismatch?
         raise SAML::UserAttributeError, SAML::UserAttributeError::ERRORS[:mhv_icn_mismatch] if mhv_icn_mismatch?
         raise SAML::UserAttributeError, SAML::UserAttributeError::ERRORS[:multiple_corp_ids] if corp_id_mismatch?
 
-        # Multiple BIRLS IDs are more common, only raise a warning
+        # temporary conditional validation for MHV, can be only a warning if user is MHV inbound-outbound
+        conditional_validate_mhv_ids
+
+        # SEC & BIRLS multiple IDs are more common, only log a warning
+        if sec_id_mismatch?
+          log_message_to_sentry(
+            'User attributes contains multiple sec_id values',
+            'warn',
+            { sec_id: @attributes['va_eauth_secid'] }
+          )
+        end
+
         if birls_id_mismatch?
-          log_message_to_sentry('User attributes contain multiple distinct BIRLS ID values.', 'warn',
-                                birls_ids: @attributes['va_eauth_birlsfilenumber'])
+          log_message_to_sentry(
+            'User attributes contain multiple distinct BIRLS ID values.',
+            'warn',
+            { birls_ids: @attributes['va_eauth_birlsfilenumber'] }
+          )
         end
       end
-
-      private
 
       def should_raise_idme_uuid_error
         return false if idme_uuid
@@ -246,17 +265,35 @@ module SAML
         @attributes[key] == 'NOT_FOUND' ? nil : @attributes[key]
       end
 
-      # Gather all available MHV IDs, de-duplicate, and see if n > 1
-      def mhv_id_mismatch?
-        uuid = safe_attr('va_eauth_mhvuuid')
-        iens = safe_attr('va_eauth_mhvien')&.split(',') || []
-        iens.append(uuid).reject(&:nil?).uniq.size > 1
+      def conditional_validate_mhv_ids
+        if mhv_id_mismatch?
+          if mhv_inbound_outbound
+            log_message_to_sentry(
+              'User attributes contain multiple distinct MHV ID values.',
+              'warn',
+              { mhv_ids: mhv_ids }
+            )
+          else
+            raise SAML::UserAttributeError, SAML::UserAttributeError::ERRORS[:multiple_mhv_ids]
+          end
+        end
       end
 
-      # Gather all available EDIPIs, de-duplicate, and see if n > 1
-      def edipi_mismatch?
-        edipis = safe_attr('va_eauth_dodedipnid')&.split(',') || []
-        edipis.reject(&:nil?).uniq.size > 1
+      def mhv_ids
+        return @mhv_ids if @mhv_ids
+
+        uuid = safe_attr('va_eauth_mhvuuid')
+        iens = safe_attr('va_eauth_mhvien')&.split(',') || []
+        @mhvs_ids = iens.append(uuid).reject(&:nil?).uniq
+      end
+
+      def mhv_id_mismatch?
+        mhv_ids.size > 1
+      end
+
+      def mhv_inbound_outbound
+        tracker = SAMLRequestTracker.find(@tracker_uuid)
+        tracker&.payload_attr(:skip_dupe) == 'mhv'
       end
 
       def mhv_icn_mismatch?
@@ -265,14 +302,25 @@ module SAML
         icn_val.present? && mhvicn_val.present? && icn_val != mhvicn_val
       end
 
+      def edipi_mismatch?
+        attribute_has_multiple_values?('va_eauth_dodedipnid')
+      end
+
       def birls_id_mismatch?
-        birls_ids = safe_attr('va_eauth_birlsfilenumber')&.split(',') || []
-        birls_ids.reject(&:nil?).uniq.size > 1
+        attribute_has_multiple_values?('va_eauth_birlsfilenumber')
       end
 
       def corp_id_mismatch?
-        corp_ids = safe_attr('vba_corp_id')&.split(',') || []
-        corp_ids.reject(&:nil?).uniq.size > 1
+        attribute_has_multiple_values?('vba_corp_id')
+      end
+
+      def sec_id_mismatch?
+        attribute_has_multiple_values?('va_eauth_secid')
+      end
+
+      def attribute_has_multiple_values?(attribute)
+        var = safe_attr(attribute)&.split(',') || []
+        var.reject(&:nil?).uniq.size > 1
       end
 
       def csid

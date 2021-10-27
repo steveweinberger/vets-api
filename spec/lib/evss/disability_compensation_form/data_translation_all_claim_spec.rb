@@ -100,9 +100,10 @@ describe EVSS::DisabilityCompensationForm::DataTranslationAllClaim do
 
       it 'adds the correct overflow text' do
         expect(subject.send(:overflow_text)).to eq "Corporate Flash Details\n" \
-          "This applicant has indicated that they're terminally ill.\n" \
-          'VA Form 21-4142/4142a has been completed by the applicant and sent to the ' \
-          'PMR contractor for processing in accordance with M21-1 III.iii.1.D.2.'
+                                                   "This applicant has indicated that they're terminally ill.\n" \
+                                                   'VA Form 21-4142/4142a has been completed by the applicant and ' \
+                                                   'sent to the PMR contractor for processing in accordance with ' \
+                                                   'M21-1 III.iii.1.D.2.'
       end
     end
 
@@ -111,8 +112,8 @@ describe EVSS::DisabilityCompensationForm::DataTranslationAllClaim do
 
       it 'adds the correct overflow text' do
         expect(subject.send(:overflow_text)).to eq 'VA Form 21-4142/4142a has been completed ' \
-          'by the applicant and sent to the ' \
-          'PMR contractor for processing in accordance with M21-1 III.iii.1.D.2.'
+                                                   'by the applicant and sent to the PMR contractor ' \
+                                                   'for processing in accordance with M21-1 III.iii.1.D.2.'
       end
     end
 
@@ -127,7 +128,7 @@ describe EVSS::DisabilityCompensationForm::DataTranslationAllClaim do
 
       it 'adds the correct overflow text' do
         expect(subject.send(:overflow_text)).to eq "Corporate Flash Details\n" \
-          "This applicant has indicated that they're terminally ill.\n"
+                                                   "This applicant has indicated that they're terminally ill.\n"
       end
     end
 
@@ -1028,6 +1029,44 @@ describe EVSS::DisabilityCompensationForm::DataTranslationAllClaim do
               'month' => '01',
               'day' => '01'
             },
+            'treatedDisabilityNames' => %w[PTSD PTSD2 PTSD3],
+            'center' => {
+              'name' => 'Super Hospital',
+              'country' => 'USA',
+              'city' => 'Portland',
+              'state' => 'OR'
+            }
+          }
+        ]
+      end
+    end
+
+    context 'when given a treatment center an incomplete "from" date' do
+      let(:form_content) do
+        {
+          'form526' => {
+            'vaTreatmentFacilities' => [
+              {
+                'treatmentDateRange' => {
+                  'from' => 'XXXX-07-XX',
+                  'to' => ''
+                },
+                'treatmentCenterName' => 'Super Hospital',
+                'treatmentCenterAddress' => {
+                  'country' => 'USA',
+                  'city' => 'Portland',
+                  'state' => 'OR'
+                },
+                'treatedDisabilityNames' => %w[PTSD PTSD2 PTSD3]
+              }
+            ]
+          }
+        }
+      end
+
+      it 'translates the data correctly' do
+        expect(subject.send(:translate_treatments)).to eq 'treatments' => [
+          {
             'treatedDisabilityNames' => %w[PTSD PTSD2 PTSD3],
             'center' => {
               'name' => 'Super Hospital',

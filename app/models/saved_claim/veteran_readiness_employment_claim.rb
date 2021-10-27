@@ -5,6 +5,7 @@ require 'vre/ch31_form'
 
 class SavedClaim::VeteranReadinessEmploymentClaim < SavedClaim
   include SentryLogging
+
   FORM = '28-1900'
   # We will be adding numbers here and eventually completeley removing this and the caller to open up VRE submissions
   # to all vets
@@ -74,6 +75,11 @@ class SavedClaim::VeteranReadinessEmploymentClaim < SavedClaim
 
   validate :veteran_information, on: :prepare_form_data
 
+  def initialize(args)
+    @sent_to_cmp = false
+    super
+  end
+
   def add_claimant_info(user)
     return if form.blank?
 
@@ -114,10 +120,11 @@ class SavedClaim::VeteranReadinessEmploymentClaim < SavedClaim
     else
       begin
         upload_to_vbms
-      rescue VBMS::DownForMaintenance
+      rescue
         send_to_central_mail!
       end
     end
+
     @office_location = check_office_location[0] if @office_location.nil?
 
     email_addr = REGIONAL_OFFICE_EMAILS[@office_location] || 'VRE.VBACO@va.gov'
@@ -134,7 +141,7 @@ class SavedClaim::VeteranReadinessEmploymentClaim < SavedClaim
       )
     end
 
-    VeteranReadinessEmploymentMailer.build(user, email_addr).deliver_now if user.present?
+    VeteranReadinessEmploymentMailer.build(user, email_addr, @sent_to_cmp).deliver_now if user.present?
 
     # During Roll out our partners ask that we check vet location and if within proximity to specific offices,
     # send the data to them. We always send a pdf to VBMS
@@ -172,6 +179,7 @@ class SavedClaim::VeteranReadinessEmploymentClaim < SavedClaim
     update(form: form_copy.to_json)
 
     log_message_to_sentry(guid, :warn, { attachment_id: guid }, { team: 'vfs-ebenefits' })
+    @sent_to_cmp = true
     process_attachments!
   end
 

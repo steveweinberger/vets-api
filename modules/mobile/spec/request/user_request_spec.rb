@@ -11,8 +11,19 @@ RSpec.describe 'user', type: :request do
   describe 'GET /mobile/v0/user' do
     before { iam_sign_in }
 
+    before(:all) do
+      @original_cassette_dir = VCR.configure(&:cassette_library_dir)
+      VCR.configure { |c| c.cassette_library_dir = 'modules/mobile/spec/support/vcr_cassettes' }
+    end
+
+    after(:all) { VCR.configure { |c| c.cassette_library_dir = @original_cassette_dir } }
+
     context 'with no upstream errors' do
-      before { get '/mobile/v0/user', headers: iam_headers }
+      before do
+        VCR.use_cassette('user/get_facilities', match_requests_on: %i[method uri]) do
+          get '/mobile/v0/user', headers: iam_headers
+        end
+      end
 
       let(:attributes) { response.parsed_body.dig('data', 'attributes') }
 
@@ -131,6 +142,10 @@ RSpec.describe 'user', type: :request do
         )
       end
 
+      it 'includes sign-in service' do
+        expect(attributes['profile']['signinService']).to eq('IDME')
+      end
+
       it 'includes the service the user has access to' do
         expect(attributes['authorizedServices']).to eq(
           %w[
@@ -138,6 +153,7 @@ RSpec.describe 'user', type: :request do
             appointments
             claims
             directDepositBenefits
+            disabilityRating
             lettersAndDocuments
             militaryServiceHistory
             userProfileUpdate
@@ -152,6 +168,7 @@ RSpec.describe 'user', type: :request do
             appointments
             claims
             directDepositBenefits
+            disabilityRating
             lettersAndDocuments
             militaryServiceHistory
             userProfileUpdate
@@ -167,11 +184,13 @@ RSpec.describe 'user', type: :request do
             'facilities' => [
               {
                 'facilityId' => '757',
-                'isCerner' => true
+                'isCerner' => true,
+                'facilityName' => 'Cheyenne VA Medical Center'
               },
               {
                 'facilityId' => '358',
-                'isCerner' => false
+                'isCerner' => false,
+                'facilityName' => 'COLUMBUS VAMC'
               }
             ]
           }
@@ -181,7 +200,9 @@ RSpec.describe 'user', type: :request do
       context 'when user object birth_date is nil' do
         before do
           iam_sign_in(FactoryBot.build(:iam_user, :no_birth_date))
-          get '/mobile/v0/user', headers: iam_headers
+          VCR.use_cassette('user/get_facilities_no_ids', match_requests_on: %i[method uri]) do
+            get '/mobile/v0/user', headers: iam_headers
+          end
         end
 
         it 'returns a nil birthdate' do
@@ -195,7 +216,9 @@ RSpec.describe 'user', type: :request do
       context 'with a user who does not have access to evss' do
         before do
           iam_sign_in(FactoryBot.build(:iam_user, :no_edipi_id))
-          get '/mobile/v0/user', headers: iam_headers
+          VCR.use_cassette('user/get_facilities_no_ids', match_requests_on: %i[method uri]) do
+            get '/mobile/v0/user', headers: iam_headers
+          end
         end
 
         it 'does not include edipi services (claims, direct deposit, letters, military history)' do
@@ -213,7 +236,9 @@ RSpec.describe 'user', type: :request do
         before do
           user = FactoryBot.build(:iam_user, :no_multifactor)
           iam_sign_in(user)
-          get '/mobile/v0/user', headers: iam_headers
+          VCR.use_cassette('user/get_facilities', match_requests_on: %i[method uri]) do
+            get '/mobile/v0/user', headers: iam_headers
+          end
         end
 
         it 'does not include directDepositBenefits in the authorized services list' do
@@ -223,6 +248,7 @@ RSpec.describe 'user', type: :request do
               appointments
               claims
               directDepositBenefits
+              disabilityRating
               lettersAndDocuments
               militaryServiceHistory
               userProfileUpdate
@@ -307,7 +333,39 @@ RSpec.describe 'user', type: :request do
     context 'after a profile request' do
       it 'kicks off a pre cache appointments job' do
         expect(Mobile::V0::PreCacheAppointmentsJob).to receive(:perform_async).once
-        get '/mobile/v0/user', headers: iam_headers
+        VCR.use_cassette('user/get_facilities', match_requests_on: %i[method uri]) do
+          get '/mobile/v0/user', headers: iam_headers
+        end
+      end
+    end
+
+    context 'empty get_facility test' do
+      before do
+        VCR.use_cassette('user/get_facilities_empty', match_requests_on: %i[method uri]) do
+          get '/mobile/v0/user', headers: iam_headers
+        end
+      end
+
+      let(:attributes) { response.parsed_body.dig('data', 'attributes') }
+
+      it 'returns empty appropriate facilities list' do
+        expect(attributes['health']).to include(
+          {
+            'isCernerPatient' => true,
+            'facilities' => [
+              {
+                'facilityId' => '757',
+                'isCerner' => true,
+                'facilityName' => ''
+              },
+              {
+                'facilityId' => '358',
+                'isCerner' => false,
+                'facilityName' => ''
+              }
+            ]
+          }
+        )
       end
     end
   end

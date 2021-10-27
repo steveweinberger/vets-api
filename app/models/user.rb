@@ -36,20 +36,26 @@ class User < Common::RedisStore
   attribute :uuid
   attribute :last_signed_in, Common::UTCTime # vaafi attributes
   attribute :mhv_last_signed_in, Common::UTCTime # MHV audit logging
+  attribute :account_uuid, String
+  attribute :account_id, Integer
 
   delegate :email, to: :identity, allow_nil: true
   delegate :loa3?, to: :identity, allow_nil: true
 
-  # This delegated method is called with #account_uuid
-  delegate :uuid, to: :account, prefix: true, allow_nil: true
-
-  # Retrieve a user's Account record.  Checks the cache before executing
-  # any database calls.
+  # Retrieve a user's Account record
   #
   # @return [Account] an instance of the Account object
   #
   def account
-    Account.cache_or_create_by!(self)
+    @account ||= Account.create_by!(self)
+  end
+
+  def account_uuid
+    @account_uuid ||= account&.uuid
+  end
+
+  def account_id
+    @account_id ||= account&.id
   end
 
   def pciu_email
@@ -80,7 +86,7 @@ class User < Common::RedisStore
   end
 
   def first_name
-    identity.first_name || first_name_mpi
+    identity.first_name.presence || first_name_mpi
   end
 
   def full_name_normalized
@@ -93,7 +99,7 @@ class User < Common::RedisStore
   end
 
   def gender
-    identity.gender || gender_mpi
+    identity.gender.presence || gender_mpi
   end
 
   def icn
@@ -113,11 +119,11 @@ class User < Common::RedisStore
   end
 
   def middle_name
-    identity.middle_name || mpi&.profile&.given_names.to_a[1..-1]&.join(' ').presence
+    identity.middle_name.presence || middle_name_mpi
   end
 
   def last_name
-    identity.last_name || last_name_mpi
+    identity.last_name.presence || last_name_mpi
   end
 
   def participant_id
@@ -125,7 +131,7 @@ class User < Common::RedisStore
   end
 
   def sec_id
-    identity.sec_id || mpi_profile&.sec_id
+    identity&.sec_id || mpi_profile&.sec_id
   end
 
   def ssn
@@ -174,6 +180,10 @@ class User < Common::RedisStore
 
   def first_name_mpi
     given_names&.first
+  end
+
+  def middle_name_mpi
+    mpi&.profile&.given_names.to_a[1..]&.join(' ').presence
   end
 
   def gender_mpi
@@ -259,6 +269,7 @@ class User < Common::RedisStore
   delegate :authn_context, to: :identity, allow_nil: true
   delegate :mhv_icn, to: :identity, allow_nil: true
   delegate :idme_uuid, to: :identity, allow_nil: true
+  delegate :logingov_uuid, to: :identity, allow_nil: true
   delegate :common_name, to: :identity, allow_nil: true
   delegate :person_types, to: :identity, allow_nil: true, prefix: true
 
@@ -434,7 +445,7 @@ class User < Common::RedisStore
   end
 
   def mpi_profile
-    return nil unless mpi
+    return nil unless identity && mpi
 
     mpi.profile
   end

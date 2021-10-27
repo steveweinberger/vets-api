@@ -158,6 +158,16 @@ RSpec.describe 'vaos appointments', type: :request, skip_mvi: true do
           end
         end
 
+        it 'increments statsD on a partial' do
+          VCR.use_cassette('vaos/appointments/get_appointments_200_partial_error', match_requests_on: %i[method uri]) do
+            expect { get('/vaos/v0/appointments', params: params) }
+              .to trigger_statsd_increment(
+                'api.vaos.va_mobile.response.partial',
+                tags: ['errors:[{:code=>1 :source=>"test result" :summary=>"test summary"}]']
+              )
+          end
+        end
+
         it 'has access and returns va appointments when camel-inflected' do
           VCR.use_cassette('vaos/appointments/get_appointments', match_requests_on: %i[method uri]) do
             get '/vaos/v0/appointments', params: params, headers: inflection_header
@@ -189,6 +199,24 @@ RSpec.describe 'vaos appointments', type: :request, skip_mvi: true do
             expect(response.body).to be_a(String)
             expect(JSON.parse(response.body)['data']['id']).to eq('202006031600983000030800000000000000.aaaaaa')
             expect(response).to match_camelized_response_schema('vaos/va_appointment')
+          end
+        end
+      end
+
+      context 'when the upstream service returns an http status of 204, no content' do
+        it 'returns an http status of 404 to the vets website' do
+          VCR.use_cassette('vaos/appointments/show_appointment', match_requests_on: %i[method uri]) do
+            get '/vaos/v0/appointments/va/123456789101112'
+            expect(response).to have_http_status(:not_found)
+          end
+        end
+      end
+
+      context 'when the upstream service returns an http status of 204, no content and X-Key-Inflection set' do
+        it 'returns an http status of 404 to the vets website' do
+          VCR.use_cassette('vaos/appointments/show_appointment', match_requests_on: %i[method uri]) do
+            get '/vaos/v0/appointments/va/123456789101112', params: params, headers: inflection_header
+            expect(response).to have_http_status(:not_found)
           end
         end
       end
@@ -303,8 +331,8 @@ RSpec.describe 'vaos appointments', type: :request, skip_mvi: true do
     describe 'POST appointments' do
       let(:error_detail) do
         'This appointment cannot be booked using VA Online Scheduling.  Please contact the site directly to schedule ' \
-        'your appointment and advise them to <b>contact the VAOS Support Team for assistance with Clinic configuratio' \
-        'n.</b> <a class="external-link" href="https://www.va.gov/find-locations/">VA Facility Locator</a>'
+          'your appointment and advise them to <b>contact the VAOS Support Team for assistance with Clinic configurat' \
+          'ion.</b> <a class="external-link" href="https://www.va.gov/find-locations/">VA Facility Locator</a>'
       end
 
       context 'with flipper disabled' do
@@ -325,11 +353,14 @@ RSpec.describe 'vaos appointments', type: :request, skip_mvi: true do
 
         it 'returns bad request with detail in errors' do
           VCR.use_cassette('vaos/appointments/post_appointment_409', match_requests_on: %i[method uri]) do
+            allow(Rails.logger).to receive(:warn).at_least(:once)
             post '/vaos/v0/appointments', params: request_body
 
             expect(response).to have_http_status(:conflict)
             expect(JSON.parse(response.body)['errors'].first['detail'])
               .to eq(error_detail)
+            expect(Rails.logger).to have_received(:warn).with('Direct schedule submission error',
+                                                              any_args).at_least(:once)
           end
         end
       end
@@ -341,6 +372,7 @@ RSpec.describe 'vaos appointments', type: :request, skip_mvi: true do
 
         it 'returns bad request with detail in errors' do
           VCR.use_cassette('vaos/appointments/post_appointment_400', match_requests_on: %i[method uri]) do
+            expect(Rails.logger).to receive(:warn).with('Direct schedule submission error', any_args)
             expect(Rails.logger).to receive(:warn).with('VAOS service call failed!', any_args)
             expect(Rails.logger).to receive(:warn).with(
               'Clinic does not support VAOS appointment create',
@@ -422,8 +454,8 @@ RSpec.describe 'vaos appointments', type: :request, skip_mvi: true do
             expect(response).to have_http_status(:conflict)
             expect(JSON.parse(response.body)['errors'].first['detail'])
               .to eq('This appointment cannot be cancelled using VA Online Scheduling.  Please contact the site direc' \
-                'tly to cancel your appointment. <a class="external-link" href="https://www.va.gov/find-locations/">V' \
-                'A Facility Locator</a>')
+                     'tly to cancel your appointment. <a class="external-link" ' \
+                     'href="https://www.va.gov/find-locations/">VA Facility Locator</a>')
           end
         end
       end

@@ -13,17 +13,16 @@ RSpec.describe SAML::User do
     let(:highest_attained_loa) { '1' }
     let(:multifactor) { false }
     let(:existing_saml_attributes) { nil }
+    let(:login_uuid) { '1234567890' }
     let(:callback_url) { 'http://http://127.0.0.1:3000/v1/sessions/callback/v1/sessions/callback' }
-    let(:rubysaml_settings) { build(:rubysaml_settings_v1, assertion_consumer_service_url: callback_url) }
-
     let(:saml_response) do
       build_saml_response(
         authn_context: authn_context,
         level_of_assurance: [highest_attained_loa],
         attributes: saml_attributes,
         existing_attributes: existing_saml_attributes,
-        issuer: 'https://int.eauth.va.gov/FIM/sps/saml20fedCSP/saml20',
-        settings: rubysaml_settings
+        in_response_to: login_uuid,
+        issuer: 'https://int.eauth.va.gov/FIM/sps/saml20fedCSP/saml20'
       )
     end
 
@@ -483,11 +482,32 @@ RSpec.describe SAML::User do
           )
         end
 
-        it 'does not validate' do
-          expect { subject.validate! }.to raise_error { |error|
-            expect(error).to be_a(SAML::UserAttributeError)
-            expect(error.message).to eq('User attributes contain multiple distinct MHV ID values')
-          }
+        context 'normal validation flow' do
+          it 'does not validate and throws an error' do
+            SAMLRequestTracker.create(
+              uuid: '1234567890',
+              payload: { skip_dupe: false }
+            )
+            expect { subject.validate! }.to raise_error { |error|
+              expect(error).to be_a(SAML::UserAttributeError)
+              expect(error.message).to eq('User attributes contain multiple distinct MHV ID values')
+            }
+          end
+        end
+
+        context 'MHV inbound-outbound flow' do
+          it 'does not validate and logs a Sentry warning' do
+            SAMLRequestTracker.create(
+              uuid: '1234567890',
+              payload: { skip_dupe: 'mhv' }
+            )
+            expect_any_instance_of(SentryLogging).to receive(:log_message_to_sentry).with(
+              'User attributes contain multiple distinct MHV ID values.',
+              'warn',
+              { mhv_ids: %w[888777 999888] }
+            )
+            subject.validate!
+          end
         end
       end
 
@@ -621,6 +641,38 @@ RSpec.describe SAML::User do
             'User attributes contain multiple distinct BIRLS ID values.',
             'warn',
             { birls_ids: birls_id }
+          )
+          subject.validate!
+        end
+      end
+    end
+
+    context 'with multi-value sec_id string' do
+      let(:saml_attributes) do
+        build(:ssoe_idme_mhv_loa3, va_eauth_secid: [sec_id])
+      end
+
+      context 'with one id string' do
+        let(:sec_id) { '1234567890' }
+
+        it 'will not log a warning to sentry' do
+          expect_any_instance_of(SentryLogging).not_to receive(:log_message_to_sentry).with(
+            'User attributes contains multiple sec_id values',
+            'warn',
+            { sec_id: sec_id }
+          )
+          subject.validate!
+        end
+      end
+
+      context 'with two ids string' do
+        let(:sec_id) { '1234567890,0987654321' }
+
+        it 'will log a warning to sentry' do
+          expect_any_instance_of(SentryLogging).to receive(:log_message_to_sentry).with(
+            'User attributes contains multiple sec_id values',
+            'warn',
+            { sec_id: sec_id }
           )
           subject.validate!
         end

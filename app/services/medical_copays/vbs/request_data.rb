@@ -14,6 +14,8 @@ module MedicalCopays
     # @!attribute errors
     #   @return [Array]
     class RequestData
+      MOCK_VISTA_ACCOUNT_NUMBERS = [5_160_000_000_012_345].freeze
+
       attr_reader :user, :edipi, :vha_facility_hash, :vista_account_numbers
       attr_accessor :errors
 
@@ -44,7 +46,7 @@ module MedicalCopays
             'vistaAccountNumbers' => {
               'type' => 'array',
               'items' => {
-                'type' => 'string',
+                'type' => 'integer',
                 'minLength' => 16,
                 'maxLength' => 16
               }
@@ -80,8 +82,8 @@ module MedicalCopays
       #
       def to_hash
         {
-          edipi: edipi,
-          vistaAccountNumbers: vista_account_numbers.list
+          'edipi' => edipi,
+          'vistaAccountNumbers' => Settings.mcp.vbs.mock_vista ? MOCK_VISTA_ACCOUNT_NUMBERS : vista_account_numbers.list
         }
       end
 

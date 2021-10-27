@@ -23,7 +23,8 @@ module VAOS
 
       with_monitoring do
         response = perform(:get, show_appointment_url(id), params, headers)
-        OpenStruct.new(response.body)
+        # handle VAMF http status 204 and an empty string is returned in the body, issue va.gov-team/28630
+        response.body.blank? ? OpenStruct.new(nil) : OpenStruct.new(response.body)
       end
     end
 
@@ -38,6 +39,7 @@ module VAOS
           meta: {}
         }
       rescue Common::Exceptions::BackendServiceException => e
+        log_direct_schedule_submission_errors(e)
         # TODO: Reevaluate the need to log clinic data three months after launch (6/15/20)
         log_clinic_details(:create, params.dig(:clinic, :clinic_id), site_code) if e.key == 'VAOS_400'
         raise e
@@ -62,6 +64,10 @@ module VAOS
     end
 
     private
+
+    def log_direct_schedule_submission_errors(e)
+      Rails.logger.warn('Direct schedule submission error', { status: e.status_code, message: e.message })
+    end
 
     def log_clinic_details(action, clinic_id, site_code)
       Rails.logger.warn(

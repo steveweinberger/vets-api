@@ -487,9 +487,10 @@ module PdfFill
           end
 
           key[acct_type][:limit] =
-            if acct_type == 'netWorths'
+            case acct_type
+            when 'netWorths'
               8
-            elsif acct_type == 'monthlyIncomes'
+            when 'monthlyIncomes'
               10
             else
               6
@@ -608,7 +609,7 @@ module PdfFill
       def split_phone(phone)
         return [nil, nil] if phone.blank?
 
-        [phone[0..2], phone[3..-1]]
+        [phone[0..2], phone[3..]]
       end
 
       def expand_gender(gender)

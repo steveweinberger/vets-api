@@ -5,12 +5,12 @@ module SAML
     class Base
       REQUIRED_ATTRIBUTES = %i[email uuid idme_uuid sec_id loa sign_in multifactor].freeze
 
-      attr_reader :attributes, :authn_context, :warnings
+      attr_reader :attributes, :authn_context, :tracker_uuid, :warnings
 
-      def initialize(saml_attributes, authn_context, saml_settings = nil)
+      def initialize(saml_attributes, authn_context, tracker_uuid)
         @attributes = saml_attributes # never default this to {}
         @authn_context = authn_context
-        @saml_settings = saml_settings
+        @tracker_uuid = tracker_uuid
         @warnings = []
       end
 

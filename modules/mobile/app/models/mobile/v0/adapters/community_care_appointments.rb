@@ -54,12 +54,15 @@ module Mobile
             healthcare_service: appointment_hash[:provider_practice],
             location: location,
             minutes_duration: 60, # not in raw data, matches va.gov default for cc appointments
+            phone_only: false,
             start_date_local: start_date_local,
             start_date_utc: start_date_utc,
             status: BOOKED_STATUS,
             status_detail: nil, # not currently used by community care appointments
             time_zone: time_zone,
-            vetext_id: nil
+            vetext_id: nil,
+            reason: nil,
+            is_covid_vaccine: false
           }
         end
         # rubocop:enable Metrics/MethodLength

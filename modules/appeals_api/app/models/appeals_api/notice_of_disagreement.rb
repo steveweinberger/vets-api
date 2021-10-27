@@ -26,8 +26,9 @@ module AppealsApi
       nil
     end
 
-    attr_encrypted(:form_data, key: Settings.db_encryption_key, marshal: true, marshaler: JsonMarshal::Marshaller)
-    attr_encrypted(:auth_headers, key: Settings.db_encryption_key, marshal: true, marshaler: JsonMarshal::Marshaller)
+    serialize :auth_headers, JsonMarshal::Marshaller
+    serialize :form_data, JsonMarshal::Marshaller
+    encrypts :auth_headers, :form_data, **lockbox_options
 
     validate :validate_hearing_type_selection, if: :pii_present?
 
@@ -89,7 +90,7 @@ module AppealsApi
     end
 
     def email
-      veteran_contact_info.dig('emailAddressText')
+      veteran_contact_info['emailAddressText']
     end
 
     def veteran_homeless?
@@ -128,11 +129,15 @@ module AppealsApi
       board_review_option == 'evidence_submission'
     end
 
+    def evidence_submission_days_window
+      91
+    end
+
     def update_status!(status:, code: nil, detail: nil)
       handler = Events::Handler.new(event_type: :nod_status_updated, opts: {
                                       from: self.status,
                                       to: status,
-                                      status_update_time: Time.zone.now,
+                                      status_update_time: Time.zone.now.iso8601,
                                       statusable_id: id
                                     })
 

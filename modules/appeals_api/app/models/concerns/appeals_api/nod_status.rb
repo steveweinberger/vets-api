@@ -9,11 +9,11 @@ module AppealsApi
     INTERNAL_STATUSES = %w[pending submitting submitted].freeze
     STATUSES = [*INTERNAL_STATUSES, *CentralMailUpdater::CENTRAL_MAIL_STATUSES].uniq.freeze
 
-    RECEIVED_OR_PROCESSING = %w[submitted processing].freeze
+    IN_PROCESS_STATUSES = %w[submitted processing].freeze
     COMPLETE_STATUSES = %w[success caseflow error].freeze
 
     included do
-      scope :received_or_processing, -> { where status: RECEIVED_OR_PROCESSING }
+      scope :in_process_statuses, -> { where status: IN_PROCESS_STATUSES }
 
       validates :status, inclusion: { in: STATUSES }
     end

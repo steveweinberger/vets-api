@@ -39,11 +39,27 @@ module AppealsApi
 
     V2_HLR_CENTRAL_STATUS_ATTRIBUTES = NOD_CENTRAL_STATUS_ATTRIBUTES
 
-    CENTRAL_MAIL_STATUS = Struct.new(:id, :status, :error_message) do
+    CENTRAL_MAIL_STATUS = Struct.new(:id, :_status, :error_message, :packets) do
       delegate :present?, to: :id
+
+      def status
+        if _status == 'Complete'
+          packet_results_status
+        else
+          _status
+        end
+      end
 
       def error?
         status.in?(CENTRAL_MAIL_ERROR_STATUSES) && error_message
+      end
+
+      def packet_results_status
+        if Array(packets).any? { |p| p['completedReason'] == 'UnidentifiableMail' }
+          'Error'
+        else
+          'Success'
+        end
       end
     end
 
@@ -79,7 +95,7 @@ module AppealsApi
 
     def parse_central_mail_response(raw_response)
       JSON.parse(raw_response.body).flatten.map do |hash|
-        CENTRAL_MAIL_STATUS.new(*hash.values_at('uuid', 'status', 'errorMessage'))
+        CENTRAL_MAIL_STATUS.new(*hash.values_at('uuid', 'status', 'errorMessage', 'packets'))
       end
     end
 
@@ -103,6 +119,7 @@ module AppealsApi
     def central_mail_status_lookup(appeal)
       case appeal
       when AppealsApi::NoticeOfDisagreement then NOD_CENTRAL_STATUS_ATTRIBUTES
+      when AppealsApi::SupplementalClaim then V2_HLR_CENTRAL_STATUS_ATTRIBUTES
       when AppealsApi::HigherLevelReview
         case appeal.api_version
         when 'V2' then V2_HLR_CENTRAL_STATUS_ATTRIBUTES

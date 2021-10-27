@@ -6,12 +6,14 @@ module VAOS
   module V0
     class AppointmentsController < VAOS::V0::BaseController
       before_action :validate_params, only: :index
-
+      STATSD_KEY = 'api.vaos.va_mobile.response.partial'
       def index
         if appointments[:meta][:errors]&.any?
-          render json: each_serializer.new(appointments[:data], meta: appointments[:meta]), status: 207
+          StatsDMetric.new(key: STATSD_KEY).save
+          StatsD.increment(STATSD_KEY, tags: ["errors:#{appointments[:meta][:errors]}"])
+          render json: each_serializer.new(appointments[:data], meta: appointments[:meta]), status: :multi_status
         else
-          render json: each_serializer.new(appointments[:data], meta: appointments[:meta]), status: 200
+          render json: each_serializer.new(appointments[:data], meta: appointments[:meta]), status: :ok
         end
       end
 
@@ -21,7 +23,12 @@ module VAOS
       end
 
       def show
-        render json: VAOS::V0::VAAppointmentsSerializer.new(appointment)
+        appt = appointment
+        if appt.to_h.count.positive?
+          render json: VAOS::V0::VAAppointmentsSerializer.new(appt)
+        else
+          render status: :not_found    # edge case for the few times where the service does not return content
+        end
       end
 
       def cancel

@@ -20,10 +20,13 @@ describe VAOS::AppointmentService do
 
       it 'returns a 400 Bad Request' do
         VCR.use_cassette('vaos/appointments/post_appointment_400', match_requests_on: %i[method uri]) do
+          allow(Rails.logger).to receive(:warn).at_least(:once)
           expect { subject.post_appointment(request_body) }
             .to raise_error(Common::Exceptions::BackendServiceException) do |error|
               expect(error.status_code).to eq(400)
             end
+          expect(Rails.logger).to have_received(:warn).with('Direct schedule submission error',
+                                                            any_args).at_least(:once)
         end
       end
     end
@@ -35,10 +38,13 @@ describe VAOS::AppointmentService do
 
       it 'returns a 400 Bad Request for 409 conlicts as well' do
         VCR.use_cassette('vaos/appointments/post_appointment_409', match_requests_on: %i[method uri]) do
+          allow(Rails.logger).to receive(:warn).at_least(:once)
           expect { subject.post_appointment(request_body) }
             .to raise_error(Common::Exceptions::BackendServiceException) do |error|
               expect(error.status_code).to eq(409)
             end
+          expect(Rails.logger).to have_received(:warn).with('Direct schedule submission error',
+                                                            any_args).at_least(:once)
         end
       end
     end
@@ -119,8 +125,7 @@ describe VAOS::AppointmentService do
             level: 'info'
           )
           expect(Raven).to receive(:extra_context).with(
-            errors: '[{"code":1,"source":"test result","summary":"test summary"}' \
-                    ',{"code":2,"source":"test result 2","summary":"test summary 2"}]'
+            errors: '[{"code":1,"source":"test result","summary":"test summary"}]'
           )
           subject.get_appointments(type, start_date, end_date)
         end
@@ -187,6 +192,15 @@ describe VAOS::AppointmentService do
         VCR.use_cassette('vaos/appointments/show_appointment', match_requests_on: %i[method uri]) do
           response = subject.get_appointment(id)
           expect(response[:id]).to eq(id)
+        end
+      end
+    end
+
+    context 'when upstream service returns an empty string in body' do
+      it 'returns nil in body' do
+        VCR.use_cassette('vaos/appointments/show_appointment', match_requests_on: %i[method uri]) do
+          response = subject.get_appointment('123456789101112')
+          expect(response.body).to be_nil
         end
       end
     end

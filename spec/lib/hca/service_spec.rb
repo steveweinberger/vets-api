@@ -22,7 +22,7 @@ describe HCA::Service do
     </S:Envelope>
      )))
   end
-  let(:current_user) { FactoryBot.build(:user, :loa3) }
+  let(:current_user) { FactoryBot.build(:user, :loa3, icn: nil) }
 
   describe '#submit_form' do
     context 'conformance tests', run_at: '2016-12-12' do
@@ -45,7 +45,7 @@ describe HCA::Service do
           expect(service).to receive(:perform) do |_verb, _, body|
             submission = body
             pretty_printed = Ox.dump(Ox.parse(submission).locate('soap:Envelope/soap:Body/ns1:submitFormRequest').first)
-            expect(pretty_printed[1..-1]).to eq(xml)
+            expect(pretty_printed[1..]).to eq(xml)
           end.and_return(response)
 
           service.submit_form(json)

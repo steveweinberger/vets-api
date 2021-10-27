@@ -161,7 +161,6 @@ module ClaimsApi
         end
 
         def validate_form_526_change_of_address!
-          validate_form_526_change_of_address_ending_date!
           validate_form_526_change_of_address_beginning_date!
           validate_form_526_change_of_address_country!
         end
@@ -173,15 +172,6 @@ module ClaimsApi
           return if Date.parse(change_of_address['beginningDate']) > Time.zone.now
 
           raise ::Common::Exceptions::InvalidFieldValue.new('beginningDate', change_of_address['beginningDate'])
-        end
-
-        def validate_form_526_change_of_address_ending_date!
-          change_of_address = form_attributes.dig('veteran', 'changeOfAddress')
-          return if change_of_address.blank?
-          return if change_of_address['addressChangeType'] == 'TEMPORARY' && change_of_address['endingDate'].present?
-          return if change_of_address['addressChangeType'] == 'PERMANENT' && change_of_address['endingDate'].blank?
-
-          raise ::Common::Exceptions::InvalidFieldValue.new('endingDate', change_of_address['endingDate'])
         end
 
         def validate_form_526_change_of_address_country!
@@ -452,7 +442,7 @@ module ClaimsApi
         end
 
         def validate_form_526_disability_approximate_begin_date!
-          disabilities = form_attributes.dig('disabilities')
+          disabilities = form_attributes['disabilities']
           return if disabilities.blank?
 
           disabilities.each do |disability|
@@ -466,7 +456,7 @@ module ClaimsApi
         end
 
         def validate_form_526_special_issues!
-          disabilities = form_attributes.dig('disabilities')
+          disabilities = form_attributes['disabilities']
           return if disabilities.blank?
 
           disabilities.each do |disability|
@@ -474,11 +464,13 @@ module ClaimsApi
             next if special_issues.blank?
 
             if invalid_hepatitis_c_special_issue?(special_issues: special_issues, disability: disability)
-              raise ::Common::Exceptions::InvalidFieldValue.new('disability.specialIssues', special_issues)
+              message = "'disability.specialIssues' :: Claim must include a disability with the name 'hepatitis'"
+              raise ::Common::Exceptions::InvalidFieldValue.new(message, special_issues)
             end
 
             if invalid_pow_special_issue?(special_issues: special_issues)
-              raise ::Common::Exceptions::InvalidFieldValue.new('disability.specialIssues', special_issues)
+              message = "'disability.specialIssues' :: Claim must include valid 'serviceInformation.confinements' value"
+              raise ::Common::Exceptions::InvalidFieldValue.new(message, special_issues)
             end
           end
         end
@@ -497,7 +489,7 @@ module ClaimsApi
         end
 
         def validate_form_526_treatments!
-          treatments = form_attributes.dig('treatments')
+          treatments = form_attributes['treatments']
           return if treatments.blank?
 
           validate_treatment_start_dates!
@@ -506,7 +498,7 @@ module ClaimsApi
         end
 
         def validate_treatment_start_dates!
-          treatments = form_attributes.dig('treatments')
+          treatments = form_attributes['treatments']
           return if treatments.blank?
 
           earliest_begin_date = form_attributes['serviceInformation']['servicePeriods'].map do |service_period|
@@ -521,7 +513,7 @@ module ClaimsApi
         end
 
         def validate_treatment_end_dates!
-          treatments = form_attributes.dig('treatments')
+          treatments = form_attributes['treatments']
           return if treatments.blank?
 
           treatments.each do |treatment|
@@ -537,13 +529,14 @@ module ClaimsApi
         end
 
         def validate_treated_disability_names!
-          treatments = form_attributes.dig('treatments')
+          treatments = form_attributes['treatments']
           return if treatments.blank?
 
-          declared_disability_names = form_attributes['disabilities'].pluck('name')
+          declared_disability_names = form_attributes['disabilities'].pluck('name').map(&:strip).map(&:downcase)
 
           treatments.each do |treatment|
-            next if treatment['treatedDisabilityNames'].all? { |name| declared_disability_names.include?(name) }
+            treated_disability_names = treatment['treatedDisabilityNames'].map(&:strip).map(&:downcase)
+            next if treated_disability_names.all? { |name| declared_disability_names.include?(name) }
 
             raise ::Common::Exceptions::InvalidFieldValue.new(
               'treatments.treatedDisabilityNames',

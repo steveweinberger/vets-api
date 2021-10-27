@@ -2,8 +2,6 @@
 
 module VeteranVerification
   class ApplicationController < ::OpenidApplicationController
-    skip_before_action :set_tags_and_extra_content, raise: false
-
     # The Veteran Verification Rails Engine used to have a route constraint
     # that made all responses come in as JSON. Because of support for the
     # application/jwt mimetype, that constraint was too limiting. But many
@@ -17,7 +15,7 @@ module VeteranVerification
 
       @session = Session.find(Digest::SHA256.hexdigest(token.to_s))
       if @session.nil?
-        profile = fetch_profile(token.identifiers.okta_uid)
+        profile = fetch_okta_profile(token.identifiers.okta_uid)
         establish_session(profile)
       end
       return false if @session.nil? || @session.uuid.nil?
@@ -40,6 +38,11 @@ module VeteranVerification
 
     def fetch_aud
       Settings.oidc.isolated_audience.veteran_verification
+    end
+
+    def set_tags_and_extra_context
+      RequestStore.store['additional_request_attributes'] = { 'source' => 'veteran_verification' }
+      Raven.tags_context(source: 'veteran_verification')
     end
   end
 end

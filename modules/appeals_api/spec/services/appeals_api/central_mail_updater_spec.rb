@@ -115,6 +115,114 @@ describe AppealsApi::CentralMailUpdater do
       expect(appeal_2.status).to eq('pending')
     end
 
+    describe 'correctly maps packet statuses' do
+      describe 'with one returned packet' do
+        it 'completedReason == UnidentifiableMail' do
+          central_mail_response = [
+            {
+              uuid: appeal_1.id,
+              status: 'Complete',
+              errorMessage: '',
+              lastUpdated: '2018-04-25 00:02:39',
+              packets: [
+                {
+                  veteranId: appeal_1.ssn,
+                  status: 'Complete',
+                  completedReason: 'UnidentifiableMail',
+                  transactionDate: Time.zone.today
+                }
+              ]
+            }
+          ]
+          allow(faraday_response).to receive(:body).at_least(:once).and_return([central_mail_response].to_json)
+
+          subject.call([appeal_1])
+          appeal_1.reload
+          expect(appeal_1.status).to eq('error')
+        end
+
+        it 'completedReason == DownloadConfirmed' do
+          central_mail_response = [
+            {
+              uuid: appeal_1.id,
+              status: 'Complete',
+              errorMessage: '',
+              lastUpdated: '2018-04-25 00:02:39',
+              packets: [
+                {
+                  veteranId: appeal_1.ssn,
+                  status: 'Complete',
+                  completedReason: 'DownloadConfirmed',
+                  transactionDate: Time.zone.today
+                }
+              ]
+            }
+          ]
+          allow(faraday_response).to receive(:body).at_least(:once).and_return([central_mail_response].to_json)
+
+          subject.call([appeal_1])
+          appeal_1.reload
+          expect(appeal_1.status).to eq('success')
+        end
+
+        it 'completedReason == UploadSucceeded' do
+          central_mail_response = [
+            {
+              uuid: appeal_1.id,
+              status: 'Complete',
+              errorMessage: '',
+              lastUpdated: '2018-04-25 00:02:39',
+              packets: [
+                {
+                  veteranId: appeal_1.ssn,
+                  status: 'Complete',
+                  completedReason: 'UploadSucceeded',
+                  transactionDate: Time.zone.today
+                }
+              ]
+            }
+          ]
+          allow(faraday_response).to receive(:body).at_least(:once).and_return([central_mail_response].to_json)
+
+          subject.call([appeal_1])
+          appeal_1.reload
+          expect(appeal_1.status).to eq('success')
+        end
+      end
+
+      describe 'with multiple packets' do
+        it 'UnidentifiableMail, UploadSucceeded' do
+          central_mail_response = [
+            {
+              uuid: appeal_1.id,
+              status: 'Complete',
+              errorMessage: '',
+              lastUpdated: '2018-04-25 00:02:39',
+              packets: [
+                {
+                  veteranId: appeal_1.ssn,
+                  status: 'Complete',
+                  completedReason: 'UnidentifiableMail',
+                  transactionDate: Time.zone.today
+                },
+                {
+                  veteranId: appeal_1.ssn,
+                  status: 'Complete',
+                  completedReason: 'UploadSucceeded',
+                  transactionDate: Time.zone.today
+                }
+              ]
+            }
+          ]
+          allow(faraday_response).to receive(:body).at_least(:once).and_return([central_mail_response].to_json)
+
+          subject.call([appeal_1])
+          appeal_1.reload
+          expect(appeal_1.status).to eq('error')
+        end
+      end
+    end
+
     context 'when unknown status passed from central mail' do
       before do
         central_mail_response[0][:status] = 'SOME_UNKNOWN_STATUS'

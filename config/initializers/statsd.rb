@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+StatsD.logger = Logger.new 'log/statsd.log' if Rails.env.development?
+
 require 'caseflow/service'
 require 'central_mail/service'
 require 'emis/service'
@@ -182,7 +184,10 @@ Rails.application.reloader.to_prepare do
     StatsD.increment('facilities.ppms.response.total', tags: payload_statuses)
 
     duration = end_time - start_time
+
     measurement = case payload[:url].path
+                  when /FacilityServiceLocator/
+                    'facilities.ppms.facility_service_locator'
                   when /ProviderLocator/
                     'facilities.ppms.provider_locator'
                   when /PlaceOfServiceLocator/
@@ -239,17 +244,23 @@ Rails.application.reloader.to_prepare do
   end
 
   # init VEText Push Notifications
-  VEText::Service.extend StatsD::Instrument
-  VEText::Service.statsd_count_success :register,
-                                       "#{VEText::Service::STATSD_KEY_PREFIX}.register"
-  VEText::Service.statsd_count_success :get_preferences,
-                                       "#{VEText::Service::STATSD_KEY_PREFIX}.get_prefs"
-  VEText::Service.statsd_count_success :set_preference,
-                                       "#{VEText::Service::STATSD_KEY_PREFIX}.set_pref"
-  VEText::Service.statsd_count_success :send_notification,
-                                       "#{VEText::Service::STATSD_KEY_PREFIX}.send_notification"
-  VEText::Service.statsd_count_success :app_sid,
-                                       "#{VEText::Service::STATSD_KEY_PREFIX}.app_lookup"
+  begin
+    VEText::Service.extend StatsD::Instrument
+    VEText::Service.statsd_count_success :register,
+                                         "#{VEText::Service::STATSD_KEY_PREFIX}.register"
+    VEText::Service.statsd_count_success :get_preferences,
+                                         "#{VEText::Service::STATSD_KEY_PREFIX}.get_prefs"
+    VEText::Service.statsd_count_success :set_preference,
+                                         "#{VEText::Service::STATSD_KEY_PREFIX}.set_pref"
+    VEText::Service.statsd_count_success :send_notification,
+                                         "#{VEText::Service::STATSD_KEY_PREFIX}.send_notification"
+    VEText::Service.statsd_count_success :app_sid,
+                                         "#{VEText::Service::STATSD_KEY_PREFIX}.app_lookup"
+  rescue ArgumentError
+    # noop
+    # if these are already registered, they will throw - see source
+    # https://github.com/Shopify/statsd-instrument/blob/3c9bf8675e97d98ebeb778a146168cc940b2fc8d/lib/statsd/instrument.rb#L262
+  end
 
   StatsD.increment("#{VEText::Service::STATSD_KEY_PREFIX}.register.success", 0)
   StatsD.increment("#{VEText::Service::STATSD_KEY_PREFIX}.register.failure", 0)

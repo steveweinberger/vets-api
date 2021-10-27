@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'EVSS Claims management', type: :request do
   include SchemaMatchers
 
-  let(:user) { create(:user, :loa3) }
+  let(:user) { create(:user, :loa3, edipi: nil) }
   let(:evss_user) { create(:evss_user) }
   let(:claim) { create(:evss_claim, user_uuid: user.uuid) }
   let(:inflection_header) { { 'X-Key-Inflection' => 'camel' } }
@@ -23,7 +23,7 @@ RSpec.describe 'EVSS Claims management', type: :request do
     end
   end
 
-  context '#index (all user claims) is polled' do
+  describe '#index (all user claims) is polled' do
     it 'returns empty result, kicks off job, returns full result when job is completed' do
       # initial request
       sign_in_as(evss_user)
@@ -61,7 +61,7 @@ RSpec.describe 'EVSS Claims management', type: :request do
     end
   end
 
-  context '#show (single claim) is polled' do
+  describe '#show (single claim) is polled' do
     let!(:claim) do
       FactoryBot.create(:evss_claim, id: 1, evss_id: 600_117_255,
                                      user_uuid: user.uuid)

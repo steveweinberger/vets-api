@@ -54,7 +54,8 @@ module Mobile
           hidden: 'HIDDEN'
         }.freeze
 
-        VIDEO_GFE_FLAG = 'MOBILE_GFE'
+        VIDEO_GFE_CODE = 'MOBILE_GFE'
+        COVID_VACCINE_CODE = 'CDQC'
 
         # Takes a result set of VA appointments from the appointments web service
         # and returns the set adapted to a common schema.
@@ -117,12 +118,15 @@ module Mobile
             healthcare_service: healthcare_service(appointment_hash, details, type),
             location: location(details, type, facility_id),
             minutes_duration: minutes_duration(details, type),
+            phone_only: appointment_hash[:phone_only] == true,
             start_date_local: start_date_local,
             start_date_utc: start_date_utc,
             status: status,
             status_detail: status_detail,
             time_zone: time_zone,
-            vetext_id: vetext_id(appointment_hash, start_date_local)
+            vetext_id: vetext_id(appointment_hash, start_date_local),
+            reason: details[:booking_note],
+            is_covid_vaccine: covid_vaccine?(appointment_hash)
           }
 
           Rails.logger.info('metric.mobile.appointment.type', type: type)
@@ -249,14 +253,18 @@ module Mobile
           type == APPOINTMENT_TYPES[:va] && status == STATUSES[:booked]
         end
 
-        def on_site?(appointment)
-          appointment[:vds_appointments]&.size&.positive?
-        end
-
         def parse_by_appointment_type(appointment)
           return [appointment[:vds_appointments]&.first, APPOINTMENT_TYPES[:va]] if on_site?(appointment)
 
           [appointment[:vvs_appointments]&.first, video_type(appointment)]
+        end
+
+        def covid_vaccine?(appointment)
+          appointment[:char4] == COVID_VACCINE_CODE
+        end
+
+        def on_site?(appointment)
+          appointment[:vds_appointments]&.size&.positive?
         end
 
         def should_hide_status?(is_past, status)
@@ -276,7 +284,7 @@ module Mobile
         def video_gfe?(appointment)
           return false unless appointment[:vvs_appointments]
 
-          appointment[:vvs_appointments].first[:appointment_kind] == VIDEO_GFE_FLAG
+          appointment[:vvs_appointments].first[:appointment_kind] == VIDEO_GFE_CODE
         end
 
         def video_healthcare_service(details)

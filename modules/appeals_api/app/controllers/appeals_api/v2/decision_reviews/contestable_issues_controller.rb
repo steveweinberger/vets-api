@@ -2,14 +2,19 @@
 
 require 'caseflow/service'
 require 'common/exceptions'
+require 'appeals_api/form_schemas'
 
 module AppealsApi::V2
   module DecisionReviews
     class ContestableIssuesController < AppealsApi::ApplicationController
-      SSN_REGEX = /^[0-9]{9}$/.freeze
-
-      skip_before_action(:authenticate)
-      before_action :validate_headers, only: %i[index]
+      HEADERS = JSON.parse(
+        File.read(
+          AppealsApi::Engine.root.join('config/schemas/v2/contestable_issues_headers.json')
+        )
+      )['definitions']['contestableIssuesIndexParameters']['properties'].keys
+      SCHEMA_ERROR_TYPE = Common::Exceptions::DetailedSchemaErrors
+      skip_before_action :authenticate
+      before_action :validate_json_schema, only: %i[index]
       before_action :validate_params, only: %i[index]
 
       EXPECTED_HEADERS = %w[X-VA-SSN X-VA-Receipt-Date X-VA-File-Number].freeze
@@ -92,11 +97,19 @@ module AppealsApi::V2
       end
 
       def decision_review_type
-        params[:decision_review_type]
+        if params[:decision_review_type] == 'notice_of_disagreements'
+          'appeals'
+        else
+          params[:decision_review_type]
+        end
       end
 
       def benefit_type
-        params[:benefit_type].to_s
+        if params[:decision_review_type] == 'notice_of_disagreements'
+          ''
+        else
+          caseflow_benefit_type_mapping[params[:benefit_type].to_s]
+        end
       end
 
       def validate_params
@@ -105,20 +118,11 @@ module AppealsApi::V2
             "decision_review_type must be one of: #{VALID_DECISION_REVIEW_TYPES.join(', ')}"
           )
         end
-
-        if benefit_type_needed_and_missing?
-          render_unprocessable_entity(
-            'benefit_type required for Higher Level Review'
-          )
-        end
       end
 
       def invalid_decision_review_type?
-        !decision_review_type.in?(VALID_DECISION_REVIEW_TYPES)
-      end
-
-      def benefit_type_needed_and_missing?
-        decision_review_type == 'higher_level_reviews' && benefit_type.empty?
+        raw_decision_review_type = params[:decision_review_type]
+        !raw_decision_review_type.in?(VALID_DECISION_REVIEW_TYPES)
       end
 
       def render_unprocessable_entity(message)
@@ -128,37 +132,40 @@ module AppealsApi::V2
               title: 'Unprocessable Entity',
               code: 'unprocessable_entity',
               detail: message,
-              status: 422
+              status: '422'
             }
           ]
-        }, code: 422
+        }, status: '422'
       end
 
       def request_headers
         EXPECTED_HEADERS.index_with { |key| request.headers[key] }.compact
       end
 
-      def validate_headers
-        validation_errors = []
-        ssn = request.headers['X-VA-SSN']
-
-        if request.headers['X-VA-Receipt-Date'].nil?
-          validation_errors << { status: 422, detail: 'X-VA-Receipt-Date is required' }
-        end
-        if ssn.nil? && request.headers['X-VA-File-Number'].nil?
-          validation_errors << { status: 422, detail: 'X-VA-SSN or X-VA-File-Number is required' }
-        end
-        if ssn.present? && !SSN_REGEX.match?(ssn)
-          validation_errors << { status: 422, detail: "X-VA-SSN has an invalid format. Pattern: #{SSN_REGEX.inspect}" }
-        end
-
-        render_validation_errors(validation_errors)
+      def validate_json_schema
+        validate_json_schema_for_headers
+        validate_params
       end
 
-      def render_validation_errors(validation_errors)
-        return if validation_errors.empty?
+      def validate_json_schema_for_headers
+        AppealsApi::FormSchemas.new(
+          SCHEMA_ERROR_TYPE,
+          schema_version: 'v2'
+        ).validate!('CONTESTABLE_ISSUES_HEADERS', request_headers)
+      end
 
-        render json: { errors: validation_errors }, status: :unprocessable_entity unless validation_errors.empty?
+      def caseflow_benefit_type_mapping
+        {
+          'compensation' => 'compensation',
+          'pensionSurvivorsBenefits' => 'pension',
+          'fiduciary' => 'fiduciary',
+          'lifeInsurance' => 'insurance',
+          'veteransHealthAdministration' => 'vha',
+          'veteranReadinessAndEmployment' => 'voc_rehab',
+          'loanGuaranty' => 'loan_guaranty',
+          'education' => 'education',
+          'nationalCemeteryAdministration' => 'nca'
+        }
       end
     end
   end

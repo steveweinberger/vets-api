@@ -21,8 +21,9 @@ module AppealsApi
       nil
     end
 
-    attr_encrypted(:form_data, key: Settings.db_encryption_key, marshal: true, marshaler: JsonMarshal::Marshaller)
-    attr_encrypted(:auth_headers, key: Settings.db_encryption_key, marshal: true, marshaler: JsonMarshal::Marshaller)
+    serialize :auth_headers, JsonMarshal::Marshaller
+    serialize :form_data, JsonMarshal::Marshaller
+    encrypts :auth_headers, :form_data, **lockbox_options
 
     NO_ADDRESS_PROVIDED_SENTENCE = 'USE ADDRESS ON FILE'
     NO_EMAIL_PROVIDED_SENTENCE = 'USE EMAIL ON FILE'
@@ -48,15 +49,15 @@ module AppealsApi
 
     # 1. VETERAN'S NAME
     def first_name
-      auth_headers.dig('X-VA-First-Name')
+      auth_headers['X-VA-First-Name']
     end
 
     def middle_initial
-      auth_headers.dig('X-VA-Middle-Initial')
+      auth_headers['X-VA-Middle-Initial']
     end
 
     def last_name
-      auth_headers.dig('X-VA-Last-Name')
+      auth_headers['X-VA-Last-Name']
     end
 
     def full_name
@@ -65,12 +66,12 @@ module AppealsApi
 
     # 2. VETERAN'S SOCIAL SECURITY NUMBER
     def ssn
-      auth_headers.dig('X-VA-SSN')
+      auth_headers['X-VA-SSN']
     end
 
     # 3. VA FILE NUMBER
     def file_number
-      auth_headers.dig('X-VA-File-Number')
+      auth_headers['X-VA-File-Number']
     end
 
     # 4. VETERAN'S DATE OF BIRTH
@@ -88,12 +89,12 @@ module AppealsApi
 
     # 5. VETERAN'S SERVICE NUMBER
     def service_number
-      auth_headers.dig('X-VA-Service-Number')
+      auth_headers['X-VA-Service-Number']
     end
 
     # 6. INSURANCE POLICY NUMBER
     def insurance_policy_number
-      auth_headers.dig('X-VA-Insurance-Policy-Number')
+      auth_headers['X-VA-Insurance-Policy-Number']
     end
 
     # 7. CLAIMANT'S NAME
@@ -186,7 +187,7 @@ module AppealsApi
 
     # 15. YOU MUST INDICATE BELOW EACH ISSUE...
     def contestable_issues
-      issues = form_data.dig('included') || []
+      issues = form_data['included'] || []
 
       @contestable_issues ||= issues.map do |issue|
         AppealsApi::ContestableIssue.new(issue)
@@ -276,7 +277,7 @@ module AppealsApi
     end
 
     def birth_date_string
-      auth_headers.dig('X-VA-Birth-Date')
+      auth_headers['X-VA-Birth-Date']
     end
 
     def birth_date

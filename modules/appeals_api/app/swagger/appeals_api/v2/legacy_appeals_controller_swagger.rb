@@ -5,6 +5,8 @@ module AppealsApi
     class LegacyAppealsControllerSwagger
       include Swagger::Blocks
 
+      PATH_ENABLED_FOR_ENV = Settings.modules_appeals_api.documentation.path_enabled_flag
+
       ERROR_500_EXAMPLE = {
         errors: [
           {
@@ -42,18 +44,22 @@ module AppealsApi
       }.freeze
 
       swagger_path '/legacy_appeals' do
+        next unless PATH_ENABLED_FOR_ENV
+
         operation :get, tags: ['Legacy Appeals'] do
           key :operationId, 'getLegacyAppeals'
-          key :summary, 'returns a list of Legacy Appeals scoped to the Veteran'
+          key :summary, 'Returns eligible legacy appeals for a Veteran. A legacy appeal is eligible if a statement ' \
+                        'of the case (SOC) or supplemental statement of the case (SSOC) has been declared, and if the date of ' \
+                        'declaration is within the last 60 days.'
           key :description, 'Returns all of the data associated with a Veteran\'s Legacy Appeals'
 
           parameter name: 'X-VA-SSN', in: 'header', description: 'veteran\'s ssn' do
-            key :description, 'Either X-VA-SSN or X-VA-File-Number is required'
+            key :description, 'Either X-VA-SSN or X-VA-File-Number is required. Example X-VA-SSN: 123456789'
             schema '$ref': 'X-VA-SSN'
           end
 
           parameter name: 'X-VA-File-Number', in: 'header', description: 'veteran\'s file number' do
-            key :description, 'Either X-VA-SSN or X-VA-File-Number is required'
+            key :description, 'Either X-VA-SSN or X-VA-File-Number is required. Example X-VA-File-Number: 123456789'
             schema type: :string
           end
 
