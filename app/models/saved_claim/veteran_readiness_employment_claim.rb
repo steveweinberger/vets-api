@@ -166,7 +166,7 @@ class SavedClaim::VeteranReadinessEmploymentClaim < SavedClaim
     message = "#{parsed_form['veteranInformation']['pid']}: VRE #upload_to_vbms #{form_path} does not exist"
     log_message_to_sentry(message, :warn, {}, { team: 'vfs-ebenefits' }) unless file_exists
 
-    sleep 60
+    sleep 90
     uploader.upload!
   end
 
