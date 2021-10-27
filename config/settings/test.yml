@@ -238,5 +238,12 @@ bid:
     base_url: https://fake_url.com
     credentials: fake_auth
 
+dgi:
+  cert_path: spec/support/certificates/
+  key_path: spec/support/certificates/
+  url: https://fake_url.com/
+  credentials: fake_auth
+
+
 test_user_dashboard:
   env: staging
