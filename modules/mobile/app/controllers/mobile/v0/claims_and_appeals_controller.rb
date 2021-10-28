@@ -42,6 +42,7 @@ module Mobile
       end
 
       def upload_document
+        require 'pry'; binding.pry
         jid = claims_proxy.upload_document(params)
         render json: { data: { job_id: jid } }, status: :accepted
       end

@@ -13,9 +13,11 @@ RUN wget -q -r -np -nH -nd -a .cer -P /usr/local/share/ca-certificates http://ai
 
 RUN mkdir /app
 WORKDIR /app
-COPY modules ./modules
+COPY .bundle .bundle
 COPY Gemfile Gemfile.lock ./
+COPY modules ./modules
 RUN gem install bundler
+RUN bundle config set path '.bundle/bundle'
 RUN bundle install
 COPY . .
 

@@ -1,5 +1,9 @@
 version: '3.4'
 services:
+  redis:
+    image: redis:5.0-alpine
+    ports:
+      - 63790:6379
   postgres:
     image: mdillon/postgis:11-alpine
     command: postgres -c shared_preload_libraries=pg_stat_statements -c pg_stat_statements.track=all -c max_connections=200
@@ -12,7 +16,6 @@ services:
       target: development
       args:
         sidekiq_license: "${BUNDLE_ENTERPRISE__CONTRIBSYS__COM}"
-        userid: "${VETS_API_USER_ID}"
     image: "vets-api:${DOCKER_IMAGE:-latest}"
     volumes:
       - ".:/srv/vets-api/src"
@@ -27,11 +30,6 @@ services:
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-password}"
       CI: "true"
       RAILS_ENV: test
-      CC_TEST_REPORTER_ID: '0c396adc254b0317e2c3a89a1c929fd61270b133c944d3e9c0f13b3937a7ce45'
-      CHANGE_ID:           "${CHANGE_ID}"
-      GIT_URL:             "${GIT_URL}"
-      JENKINS_URL:         "${JENKINS_URL}"
-      DANGER_GITHUB_API_TOKEN: "${DANGER_GITHUB_API_TOKEN}"
     depends_on:
       - postgres
     links:

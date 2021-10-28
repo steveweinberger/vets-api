@@ -1,0 +1,2 @@
+docker-compose -f docker-compose.test.yml run --rm --service-ports vets-api bash -c "bin/rails db:setup db:migrate"
+
