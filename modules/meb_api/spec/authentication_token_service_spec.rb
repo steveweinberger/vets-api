@@ -10,22 +10,20 @@ Rspec.describe AuthenticationTokenService do
       decoded_token = JWT.decode(token,
                                  described_class::RSA_PUBLIC,
                                  true,
-                                 { algorithm: described_class::ALGORITHM_TYPE }
-      )
+                                 { algorithm: described_class::ALGORITHM_TYPE })
 
       expect(decoded_token).to eq([
                                     {
-                                      'sub' => '1234567890',
-                                      'name' => 'John Doe',
-                                      'admin' => true,
-                                      'realm_access' => {
-                                        'roles' => [
+                                      'sub': '1234567890',
+                                      'name': 'John Doe',
+                                      'admin': true,
+                                      'realm_access': {
+                                        'roles': [
                                           'dgi_user'
                                         ]
                                       }
-                                    }, header_fields= {'alg' => 'RS256'}
-                                    
-                                    ])
+                                    }
+                                  ])
     end
   end
 end
