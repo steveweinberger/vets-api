@@ -18,6 +18,20 @@ FactoryBot.define do
     trait :status_error do
       status { 'error' }
     end
+
+    trait :status_submitted do
+      status { 'submitted' }
+    end
+
+    trait :completed_a_day_ago do
+      updated_at { 1.day.ago }
+      status { 'success' }
+    end
+
+    trait :completed_a_week_ago do
+      updated_at { 8.days.ago }
+      status { 'success' }
+    end
   end
 
   factory :extra_supplemental_claim, class: 'AppealsApi::SupplementalClaim' do

@@ -28,7 +28,8 @@ module AppealsApi
 
     serialize :auth_headers, JsonMarshal::Marshaller
     serialize :form_data, JsonMarshal::Marshaller
-    encrypts :auth_headers, :form_data, **lockbox_options
+    has_kms_key
+    encrypts :auth_headers, :form_data, key: :kms_key, **lockbox_options
 
     validate :validate_hearing_type_selection, if: :pii_present?
 
@@ -90,7 +91,7 @@ module AppealsApi
     end
 
     def email
-      veteran_contact_info.dig('emailAddressText')
+      veteran_contact_info['emailAddressText']
     end
 
     def veteran_homeless?
@@ -137,7 +138,7 @@ module AppealsApi
       handler = Events::Handler.new(event_type: :nod_status_updated, opts: {
                                       from: self.status,
                                       to: status,
-                                      status_update_time: Time.zone.now,
+                                      status_update_time: Time.zone.now.iso8601,
                                       statusable_id: id
                                     })
 

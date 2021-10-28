@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'date'
+require 'concurrent'
 
 module V0
   module VirtualAgent
@@ -12,7 +13,11 @@ module V0
       def index
         claims, synchronized = service.all
 
-        data = synchronized == 'REQUESTED' ? nil : data_for_three_most_recent_open_comp_claims(claims)
+        data = if synchronized == 'REQUESTED'
+                 nil
+               else
+                 data_for_three_most_recent_open_comp_claims(claims)
+               end
 
         render json: {
           data: data,

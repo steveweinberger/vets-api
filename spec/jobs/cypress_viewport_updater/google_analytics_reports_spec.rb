@@ -7,10 +7,9 @@ RSpec.describe CypressViewportUpdater::GoogleAnalyticsReports do
     # the following filter is used on requests to
     # https://analyticsreporting.googleapis.com/v4/reports:batchGet
     c.filter_sensitive_data('removed') do |interaction|
-      if interaction.request.headers['Authorization']
-        if (match = interaction.request.headers['Authorization'].first.match(/^Bearer.+/))
-          match[0]
-        end
+      if interaction.request.headers['Authorization'] &&
+         (match = interaction.request.headers['Authorization'].first.match(/^Bearer.+/))
+        match[0]
       end
     end
 
@@ -137,7 +136,7 @@ RSpec.describe CypressViewportUpdater::GoogleAnalyticsReports do
 
       it 'returns a report object that includes screen resolutions' do
         includes_screen_resolutions = @request_report.viewport_report.data.rows.any? do |row|
-          /[\d]+x[\d]+/.match(row.dimensions.second)
+          /\d+x\d+/.match(row.dimensions.second)
         end
 
         expect(includes_screen_resolutions).to be true

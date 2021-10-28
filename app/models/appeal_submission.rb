@@ -5,14 +5,15 @@ class AppealSubmission < ApplicationRecord
   validates :user_uuid, :submitted_appeal_uuid, presence: true
   validates :type_of_appeal, inclusion: APPEAL_TYPES
 
-  encrypts :upload_metadata, **lockbox_options
+  has_kms_key
+  encrypts :upload_metadata, key: :kms_key, **lockbox_options
 
   has_many :appeal_submission_uploads, dependent: :destroy
 
   def self.submit_nod(request_body_hash:, current_user:)
     appeal_submission = new(type_of_appeal: 'NOD',
                             user_uuid: current_user.uuid,
-                            board_review_option: request_body_hash.dig('data')['attributes']['boardReviewOption'],
+                            board_review_option: request_body_hash['data']['attributes']['boardReviewOption'],
                             upload_metadata: DecisionReview::Service.file_upload_metadata(current_user))
 
     uploads_arr = request_body_hash.delete('nodUploads')

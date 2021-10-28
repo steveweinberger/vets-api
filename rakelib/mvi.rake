@@ -80,7 +80,7 @@ namespace :mvi do
               when 'first_name'
                 row['first_name'] = response.profile.given_names.first
               when 'middle_name'
-                row['middle_name'] = response.profile.given_names.to_a[1..-1]&.join(' ')
+                row['middle_name'] = response.profile.given_names.to_a[1..]&.join(' ')
               when 'last_name'
                 row['last_name'] = response.profile.family_name
               else
@@ -141,7 +141,7 @@ namespace :mvi do
 
     path = File.join(Settings.betamocks.cache_dir, 'mvi', 'profile', "#{ssn}.yml")
     yaml = YAML.safe_load(File.read(path))
-    xml = yaml.dig(:body).dup.prepend('<?xml version="1.0" encoding="UTF-8"?>') unless xml.match?(/^<\?xml/)
+    xml = yaml[:body].dup.prepend('<?xml version="1.0" encoding="UTF-8"?>') unless xml.match?(/^<\?xml/)
 
     yaml[:body] = update_ids(xml, ids)
     File.open(path, 'w') { |f| f.write(yaml.to_yaml) }

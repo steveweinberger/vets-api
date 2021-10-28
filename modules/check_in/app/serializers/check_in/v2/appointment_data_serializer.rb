@@ -10,12 +10,12 @@ module CheckIn
 
       attribute :payload do |object|
         appointments =
-          object.payload.dig(:appointments).map do |appt|
+          object.payload[:appointments].map do |appt|
             appt.except!(:patientDFN, :stationNo)
           end
 
         if Flipper.enabled?(:check_in_experience_demographics_page_enabled)
-          raw_demographics = object.payload.dig(:demographics)
+          raw_demographics = object.payload[:demographics]
           demographics = {
             mailingAddress: {
               street1: raw_demographics.dig(:mailingAddress, :street1),
@@ -42,6 +42,28 @@ module CheckIn
             workPhone: raw_demographics[:workPhone],
             emailAddress: raw_demographics[:emailAddress]
           }
+
+          if Flipper.enabled?(:check_in_experience_next_of_kin_enabled)
+            raw_next_of_kin = object.payload.dig(:demographics, :nextOfKin1)
+            next_of_kin1 = {
+              name: raw_next_of_kin[:name],
+              relationship: raw_next_of_kin[:relationship],
+              phone: raw_next_of_kin[:phone],
+              workPhone: raw_next_of_kin[:workPhone],
+              address: {
+                street1: raw_next_of_kin.dig(:address, :street1),
+                street2: raw_next_of_kin.dig(:address, :street2),
+                street3: raw_next_of_kin.dig(:address, :street3),
+                city: raw_next_of_kin.dig(:address, :city),
+                county: raw_next_of_kin.dig(:address, :county),
+                state: raw_next_of_kin.dig(:address, :state),
+                zip: raw_next_of_kin.dig(:address, :zip),
+                zip4: raw_next_of_kin.dig(:address, :zip4),
+                country: raw_next_of_kin.dig(:address, :country)
+              }
+            }
+            demographics.merge!(nextOfKin1: next_of_kin1)
+          end
 
           { demographics: demographics, appointments: appointments }
         else
