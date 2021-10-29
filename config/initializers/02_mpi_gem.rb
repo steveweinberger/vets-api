@@ -19,17 +19,21 @@ handlers.unshift(
   )
 )
 
-handlers.insert(
-  -2,
-  Faraday::RackBuilder::Handler.new(
-    Common::Client::Middleware::Logging,
-    'MVIRequest'
+if Settings.mvi.pii_logging
+  handlers.insert(
+    -2,
+    Faraday::RackBuilder::Handler.new(
+      Common::Client::Middleware::Logging,
+      'MVIRequest'
+    )
   )
-) if Settings.mvi.pii_logging
+end
 
-handlers.insert(
-  -2,
-  Faraday::RackBuilder::Handler.new(
-    Betamocks::Middleware
+if Settings.mvi.mock
+  handlers.insert(
+    -2,
+    Faraday::RackBuilder::Handler.new(
+      Betamocks::Middleware
+    )
   )
-) if Settings.mvi.mock
+end
