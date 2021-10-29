@@ -4,14 +4,11 @@ require 'dgi/configuration'
 require 'common/client/base'
 
 module DGI
-  class Service
+  class Service < Common::Client::Base
+    include Common::Client::Concerns::Monitoring
 
     def initialize(user)
       @user = user
-    end
-
-    def self.process(**args)
-      new(args).process
     end
   end
 end

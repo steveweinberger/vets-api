@@ -1002,7 +1002,7 @@ dgi:
     public_key_path: fake_api_path
     private_key_path: fake_api_path
   veteran-services:
-    url: "localhost:8070/vets/v1"
+    url: "http://localhost:8070/vets/v1"
     mock: false
 
 # Settings for the VEText integration (mobile push notifications)
