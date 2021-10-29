@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module MPI
   module V1
     module BreakersMethods
