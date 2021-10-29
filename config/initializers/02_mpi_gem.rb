@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'mpi/v1/breakers_methods'
 
 instance = MasterPersonIndex::Configuration.instance
