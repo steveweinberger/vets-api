@@ -18,7 +18,7 @@ RSpec.describe TestUserDashboard::ApplicationController, type: :controller do
       allow_any_instance_of(described_class).to receive(:authenticated?).and_return(true)
     end
 
-    it 'returns true for an authenticated user' do
+    it 'returns nil for an authenticated user' do
       expect(subject).to be_nil
     end
   end
@@ -26,13 +26,6 @@ RSpec.describe TestUserDashboard::ApplicationController, type: :controller do
   describe 'authenticated?' do
     subject do
       controller.authenticated?
-    end
-
-    context 'Rails.env.test? is set to true' do
-      it 'returns true' do
-        Rails.env.stub(test?: true)
-        expect(subject).to be_truthy
-      end
     end
 
     context 'authenticated user' do
