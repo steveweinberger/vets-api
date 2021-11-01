@@ -47,4 +47,15 @@ RSpec.describe SAML::SSOeSettingsService do
       end
     end
   end
+
+  describe '.parse_idp_metadata_file' do
+    it 'returns parsed metadata' do
+      VCR.use_cassette()
+      with_settings(Settings.saml_ssoe, certificate: 'foobar',
+        request_signing: true, response_signing: false,
+        response_encryption: true, idp_metadata_url: 'https://int.eauth.va.gov/isam/saml/metadata/saml20idp') do
+          expect(SAML::SSOeSettingsService.parse_idp_metadata_file).to be_an_instance_of(OneLogin::RubySaml::Settings)
+      end
+    end
+  end
 end
