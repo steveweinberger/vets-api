@@ -17,9 +17,14 @@ module AppealsApi
       nil
     end
 
+    scope :pii_expunge_policy, lambda {
+      where('updated_at < ? AND status IN (?)', 7.days.ago, COMPLETE_STATUSES)
+    }
+
     serialize :auth_headers, JsonMarshal::Marshaller
     serialize :form_data, JsonMarshal::Marshaller
-    encrypts :auth_headers, :form_data, **lockbox_options
+    has_kms_key
+    encrypts :auth_headers, :form_data, key: :kms_key, **lockbox_options
 
     has_many :evidence_submissions, as: :supportable, dependent: :destroy
     has_many :status_updates, as: :statusable, dependent: :destroy
@@ -182,9 +187,17 @@ module AppealsApi
                                       statusable_id: id
                                     })
 
+      email_handler = Events::Handler.new(event_type: :sc_received, opts: {
+                                            email_identifier: email_identifier,
+                                            first_name: veteran_first_name,
+                                            date_submitted: veterans_local_time.iso8601,
+                                            guid: id
+                                          })
+
       update!(status: status, code: code, detail: detail)
 
       handler.handle!
+      email_handler.handle! if status == 'submitted' && email_identifier.present?
     end
 
     def lob
@@ -202,6 +215,23 @@ module AppealsApi
     end
 
     private
+
+    def mpi_veteran
+      AppealsApi::Veteran.new(
+        ssn: ssn,
+        first_name: veteran_first_name,
+        last_name: veteran_last_name,
+        birth_date: birth_date.iso8601
+      )
+    end
+
+    def email_identifier
+      return { id_type: 'email', id_value: email } if email.present?
+
+      icn = mpi_veteran.mpi_icn
+
+      return { id_type: 'ICN', id_value: icn } if icn.present?
+    end
 
     def data_attributes
       form_data&.dig('data', 'attributes')

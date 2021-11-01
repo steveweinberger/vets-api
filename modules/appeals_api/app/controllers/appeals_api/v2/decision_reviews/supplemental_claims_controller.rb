@@ -4,7 +4,7 @@ require 'appeals_api/form_schemas'
 
 class AppealsApi::V2::DecisionReviews::SupplementalClaimsController < AppealsApi::ApplicationController
   include AppealsApi::JsonFormatValidation
-  # include AppealsApi::StatusSimulation
+  include AppealsApi::StatusSimulation
   include AppealsApi::CharacterUtilities
   include AppealsApi::CharacterValidation
 
@@ -34,12 +34,24 @@ class AppealsApi::V2::DecisionReviews::SupplementalClaimsController < AppealsApi
 
     sc.save
 
+    AppealsApi::PdfSubmitJob.perform_async(sc.id, 'AppealsApi::SupplementalClaim', 'V2')
+
     render json: AppealsApi::SupplementalClaimSerializer.new(sc).serializable_hash
+  end
+
+  def schema
+    render json: AppealsApi::JsonSchemaToSwaggerConverter.remove_comments(
+      AppealsApi::FormSchemas.new(
+        SCHEMA_ERROR_TYPE,
+        schema_version: 'v2'
+      ).schema(FORM_NUMBER)
+    )
   end
 
   def show
     id = params[:id]
     sc = AppealsApi::SupplementalClaim.find(id)
+    sc = with_status_simulation(sc) if status_requested_and_allowed?
 
     render json: AppealsApi::SupplementalClaimSerializer.new(sc).serializable_hash
   rescue ActiveRecord::RecordNotFound
