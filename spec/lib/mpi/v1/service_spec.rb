@@ -3,8 +3,6 @@
 require 'rails_helper'
 require 'mpi/v1/service'
 
-# TODO: remove references to old MPI code
-
 describe MPI::V1::Service do
   let(:user_hash) do
     {
@@ -324,7 +322,7 @@ describe MPI::V1::Service do
 
       context 'when a status of 500 is returned' do
         it 'raises a request failure error', :aggregate_failures do
-          allow_any_instance_of(MPI::Service).to receive(:create_profile_message).and_return('<nobeuno></nobeuno>')
+          allow_any_instance_of(MasterPersonIndex::Service).to receive(:create_profile_message).and_return('<nobeuno></nobeuno>')
           expect(subject).to receive(:log_message_to_sentry).with(
             'MVI find_profile error: SOAP HTTP call failed',
             :warn
@@ -419,7 +417,7 @@ describe MPI::V1::Service do
           expect(MasterPersonIndex::Messages::FindProfileMessage).to receive(:new).once.and_call_original
         end
 
-        it 'raises MPI::Errors::RecordNotFound', :aggregate_failures do
+        it 'raises MasterPersonIndex::Errors::RecordNotFound', :aggregate_failures do
           expect(subject).to receive(:log_exception_to_sentry)
 
           VCR.use_cassette('mpi/find_candidate/failure_multiple_matches') do
