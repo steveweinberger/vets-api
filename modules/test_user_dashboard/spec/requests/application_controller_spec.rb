@@ -50,7 +50,6 @@ RSpec.describe TestUserDashboard::ApplicationController, type: :controller do
 
     context 'unauthenticated user' do
       before do
-        Rails.env.stub(test?: false)
         allow_any_instance_of(described_class).to receive_message_chain(:warden, :authenticated?).and_return(false)
       end
 
