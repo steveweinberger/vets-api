@@ -29,18 +29,3 @@ end
 Warden::GitHub::User.module_eval do
   prepend WardenGitHubUserExtensions
 end
-
-if Settings.test_user_dashboard.env == 'staging'
-  Rails.configuration.middleware.use Warden::Manager do |config|
-    config.default_strategies :github
-    config.serialize_from_session { |key| Warden::GitHub::Verifier.load(key) }
-    config.serialize_into_session { |user| Warden::GitHub::Verifier.dump(user) }
-
-    config.scope_defaults :tud, config: {
-      client_id: Settings.test_user_dashboard.github_oauth.client_id,
-      client_secret: Settings.test_user_dashboard.github_oauth.client_secret,
-      scope: 'read:user,read:org',
-      redirect_uri: 'test_user_dashboard/oauth'
-    }
-  end
-end
