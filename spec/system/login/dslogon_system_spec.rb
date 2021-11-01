@@ -4,11 +4,11 @@ require 'authentication_system_helper'
 
 if ENV['LOGIN_SYSTEM_TESTS']
   RSpec.describe 'DS Logon login', type: :system do
-    context 'outobund' do
+    context 'outbound' do
       context 'LOA2 premium' do
-        include_examples 'logs in DS Logon user', 'ace.a.mcghee1', ENV['DSLOGON_LOA2_PASSWORD']
-        include_examples 'logs in DS Logon user', 'ardeshir.t.caulder1', ENV['DSLOGON_LOA2_PASSWORD']
-        include_examples 'logs in DS Logon user', 'marti.c.ortizrivera1', ENV['DSLOGON_LOA2_PASSWORD']
+        include_examples 'logs in outbound DS Logon user', 'ace.a.mcghee1', ENV['DSLOGON_LOA2_PASSWORD']
+        include_examples 'logs in outbound DS Logon user', 'ardeshir.t.caulder1', ENV['DSLOGON_LOA2_PASSWORD']
+        include_examples 'logs in outbound DS Logon user', 'marti.c.ortizrivera1', ENV['DSLOGON_LOA2_PASSWORD']
       end
     end
   end

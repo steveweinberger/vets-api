@@ -23,8 +23,8 @@ module AuthenticationSharedExamples
     end
   end
 
-  RSpec.shared_examples 'logs in DS Logon user' do |username, password|
-    it 'logs in dslogon user' do
+  RSpec.shared_examples 'logs in outbound DS Logon user' do |username, password|
+    it 'logs in outbound dslogon user' do
       visit '/'
       click_button 'Sign in'
       click_button 'Sign in with DS Logon'
@@ -48,8 +48,8 @@ module AuthenticationSharedExamples
     end
   end
 
-  RSpec.shared_examples 'logs in My HealtheVet user' do |username, password|
-    it 'logs in mhv user' do
+  RSpec.shared_examples 'logs in outbound My HealtheVet user' do |username, password|
+    it 'logs in outbound mhv user' do
       visit '/'
       click_button 'Sign in'
       click_button 'Sign in with My HealtheVet'
