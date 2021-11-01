@@ -11,9 +11,11 @@ module AuthenticationSharedExamples
       visit '/'
       click_button 'Sign in'
       click_button 'Sign in with ID.me'
+
       fill_in 'Email', with: email
       fill_in 'Password', with: password
       click_button 'Sign in to ID.me'
+
       click_button 'Continue' if has_content?('COMPLETE YOUR SIGN IN')
       click_button 'Continue' if has_content?('COMPLETE YOUR SIGN IN')
 
@@ -56,7 +58,10 @@ module AuthenticationSharedExamples
       fill_in 'My HealtheVet Password', with: password
       click_button 'Sign in'
 
-      click_button 'Continue'
+      click_button 'Continue' if has_content?('Complete your sign in')
+      click_button 'Continue' if has_content?('Complete your sign in')
+
+      expect_logged_in_home_screen
     end
   end
 end
