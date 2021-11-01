@@ -6,44 +6,30 @@ module AuthenticationSharedExamples
     expect(page).not_to have_content('Sign in')
   end
 
-  RSpec.shared_examples 'logs in LOA1 ID.me user' do |email|
-    it 'logs in idme loa1 user' do
+  RSpec.shared_examples 'logs in outbound ID.me user' do |email, password|
+    it 'logs in outbound idme user' do
       visit '/'
       click_button 'Sign in'
       click_button 'Sign in with ID.me'
       fill_in 'Email', with: email
-      fill_in 'Password', with: ENV['IDME_LOA1_PASSWORD']
+      fill_in 'Password', with: password
       click_button 'Sign in to ID.me'
-      click_button 'Continue'
+      click_button 'Continue' if has_content?('COMPLETE YOUR SIGN IN')
+      click_button 'Continue' if has_content?('COMPLETE YOUR SIGN IN')
 
       expect_logged_in_home_screen
     end
   end
 
-  RSpec.shared_examples 'logs in LOA3 ID.me user' do |email|
-    it 'logs in idme loa3 user' do
-      visit '/'
-      click_button 'Sign in'
-      click_button 'Sign in with ID.me'
-      fill_in 'Email', with: email
-      fill_in 'Password', with: ENV['IDME_LOA3_PASSWORD']
-      click_button 'Sign in to ID.me'
-      click_button 'Continue'
-      click_button 'Continue'
-
-      expect_logged_in_home_screen
-    end
-  end
-
-  RSpec.shared_examples 'logs in DS Logon LOA2 user' do |username|
-    it 'logs in dslogon loa2 user' do
+  RSpec.shared_examples 'logs in DS Logon user' do |username, password|
+    it 'logs in dslogon user' do
       visit '/'
       click_button 'Sign in'
       click_button 'Sign in with DS Logon'
 
       fill_in 'userName', with: username
       find_field('password-clear').click
-      fill_in 'password', with: ENV['DSLOGON_LOA2_PASSWORD']
+      fill_in 'password', with: password
       click_button 'Login'
 
       find(:xpath, "//img[@alt='tiger-relaxing.png']").click
@@ -60,8 +46,8 @@ module AuthenticationSharedExamples
     end
   end
 
-  RSpec.shared_examples 'logs in My HealtheVet LOA1 user' do |username, password|
-    it 'logs in mhv loa1 user' do
+  RSpec.shared_examples 'logs in My HealtheVet user' do |username, password|
+    it 'logs in mhv user' do
       visit '/'
       click_button 'Sign in'
       click_button 'Sign in with My HealtheVet'
