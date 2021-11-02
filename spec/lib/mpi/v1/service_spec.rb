@@ -50,7 +50,7 @@ describe MPI::V1::Service do
     allow(Settings.mvi).to receive(:mock).and_return(true)
 
     unless instance.connection.builder.handlers.size == 6
-      load "#{Rails.root}/config/initializers/02_mpi_gem.rb"
+      load Rails.root.join('config', 'initializers', '02_mpi_gem.rb')
       instance.connection.builder.handlers.delete_at(0)
     end
   end
