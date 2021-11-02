@@ -13,6 +13,12 @@ module FacilitiesApi
       render_json(V1::PPMS::ProviderSerializer, ppms_params, api_results)
     end
 
+    def show
+      api_results = ppms_search
+
+      render_json(V1::PPMS::ProviderSerializer, ppms_params, api_results)
+    end
+
     def urgent_care
       api_results = api.pos_locator(ppms_action_params)
 
