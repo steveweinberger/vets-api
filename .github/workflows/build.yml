@@ -2,7 +2,7 @@ name: Build & Push to ECR
 on:
   workflow_run:
     workflows: ["Code Checks"]
-    branches: [master]
+    branches: [eb-docker-origins]
     types: [completed]
 jobs:
   build_and_push:
@@ -12,9 +12,6 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
-
-      - name: Setup Environment
-        run: echo "VETS_API_USER_ID=$(id -u)" >> $GITHUB_ENV
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -32,11 +29,10 @@ jobs:
         with:
           build-args: |
             sidekiq_license=${{ env.BUNDLE_ENTERPRISE__CONTRIBSYS__COM }}
-            userid=${{ env.VETS_API_USER_ID }}
           context: .
           target: production
           push: true
           tags: |
-            ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:${{ github.sha }}
+            ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:edo-${{ github.sha }}
           cache-from: type=registry,ref=$ECR_REGISTRY/$ECR_REPOSITORY
           cache-to: type=inline
