@@ -19,6 +19,7 @@ if ENV['LOGIN_SYSTEM_TESTS']
     context 'inbound' do
       context 'LOA3' do
         include_examples 'logs in inbound ID.me user from eauth', 'ssoissoetesting+SPO1@gmail.com', ENV['IDME_LOA3_PASSWORD']
+        include_examples 'logs in inbound ID.me user from eauth', 'ssoissoetesting+spokane1@gmail.com', ENV['IDME_LOA3_PASSWORD']
       end
     end
   end
