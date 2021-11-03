@@ -2,6 +2,7 @@
 
 require 'rails_helper'
 require 'support/authentication/outbound_shared_examples'
+require 'support/authentication/inbound_shared_examples'
 
 RSpec.configure do |config|
   config.before do
@@ -17,5 +18,6 @@ RSpec.configure do |config|
     WebMock.allow_net_connect!(net_http_connect_on_start: true)
 
     config.include Authentication::OutboundSharedExamples, type: :system
+    config.include Authentication::InboundSharedExamples, type: :system
   end
 end
