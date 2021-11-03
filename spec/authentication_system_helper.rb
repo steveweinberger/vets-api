@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-require 'support/authentication_shared_examples'
+require 'support/authentication/outbound_shared_examples'
 
 RSpec.configure do |config|
   config.before do
@@ -16,6 +16,6 @@ RSpec.configure do |config|
     # https://github.com/bblimke/webmock/blob/master/README.md#connecting-on-nethttpstart
     WebMock.allow_net_connect!(net_http_connect_on_start: true)
 
-    config.include AuthenticationSharedExamples, type: :system
+    config.include Authentication::OutboundSharedExamples, type: :system
   end
 end
