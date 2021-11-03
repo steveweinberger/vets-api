@@ -34,7 +34,7 @@ web_run() {
     --rm \
     --interactive \
     --tty \
-    $tag_name
+    $tag_name bundle
     # $tag_name bin/rails db:drop db:setup db:migrate
 }
 

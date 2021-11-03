@@ -11,15 +11,10 @@ RUN wget -q -r -np -nH -nd -a .cer -P /usr/local/share/ca-certificates http://ai
   for f in /usr/local/share/ca-certificates/*.cer; do openssl x509 -inform der -in $f -out $f.crt; done && \
   update-ca-certificates
 
-RUN mkdir /app
+RUN gem install bundler --no-document
+RUN bundle config --global jobs 4
+
 WORKDIR /app
-# COPY .bundle .bundle
-COPY Gemfile Gemfile.lock ./
-COPY modules ./modules
-RUN gem install bundler
-RUN bundle config set path '.bundle/bundle'
-RUN bundle install
-COPY . .
 
 EXPOSE 3000
 
