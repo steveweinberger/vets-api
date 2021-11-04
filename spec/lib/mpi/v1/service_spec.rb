@@ -322,13 +322,15 @@ describe MPI::V1::Service do
 
       context 'when a status of 500 is returned' do
         it 'raises a request failure error', :aggregate_failures do
-          allow_any_instance_of(MasterPersonIndex::Service).to receive(:create_profile_message).and_return('<nobeuno></nobeuno>')
-          expect(subject).to receive(:log_message_to_sentry).with(
+          allow_any_instance_of(MasterPersonIndex::Service).to receive(
+            :create_profile_message
+          ).and_return('<nobeuno></nobeuno>')
+          expect(service).to receive(:log_message_to_sentry).with(
             'MVI find_profile error: SOAP HTTP call failed',
             :warn
           )
           VCR.use_cassette('mpi/find_candidate/five_hundred') do
-            response = subject.find_profile(user)
+            response = service.find_profile(user)
             server_error_504_expectations_for(response)
           end
         end
