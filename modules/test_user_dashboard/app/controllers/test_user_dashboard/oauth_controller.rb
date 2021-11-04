@@ -11,6 +11,8 @@ module TestUserDashboard
 
     # Action for the redirect_uri for GitHub OAuth
     def index
+      # the following doesn't work but illustrates an idea
+      override_session_cookie if session_cookie?
       redirect_to "#{url}/signin"
     end
 

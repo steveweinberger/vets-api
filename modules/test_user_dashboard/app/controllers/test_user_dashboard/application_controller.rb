@@ -4,6 +4,7 @@ require 'sentry_logging'
 
 module TestUserDashboard
   class ApplicationController < ActionController::API
+    include ActionController::Cookies
     include SentryLogging
     before_action :set_tags_and_extra_context
 
@@ -67,6 +68,18 @@ module TestUserDashboard
     def set_tags_and_extra_context
       RequestStore.store['additional_request_attributes'] = { 'source' => 'test-user-dashboard' }
       Raven.tags_context(source: 'test-user-dashboard')
+    end
+
+    def session_cookie?
+      cookies[:api_session]
+    end
+
+    # the following doesn't work but illustrates an idea
+    def override_session_cookie
+      cookies[:api_session] = {
+        value: cookies[:api_session],
+        domain: 'va.gov'
+      }
     end
   end
 end
