@@ -13,14 +13,14 @@ class DisabilityCompensationFastTrackJob
     icn = Account.where(idme_uuid: submission.user_uuid).first.icn
 
     client = Lighthouse::ClinicalHealth::Client.new
-    condition_repsonse = client.get_condition(icn)
-    pdf_body = generate_pdf(condition_repsonse)
+    condition_response = client.get_condition(icn)
+    pdf_body = generate_pdf(condition_response)
 
     client = EVSS::DocumentsService.new(submission.auth_headers)
     client.upload(pdf_body, create_document_data(upload_data))
   end
 
-  def generate_pdf(_condition_repsonse)
+  def generate_pdf(_condition_response)
     # Prawn documentation - https://prawnpdf.org/manual.pdf
     # todo: do something with lighthouse response to put in PDF
     pdf = Prawn::Document.new
