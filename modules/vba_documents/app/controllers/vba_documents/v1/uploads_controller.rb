@@ -20,10 +20,7 @@ module VBADocuments
         )
         submission.metadata['version'] = 1
         submission.save!
-        render status: :accepted,
-               json: submission,
-               serializer: VBADocuments::V1::UploadSerializer,
-               render_location: true
+        render get_response_object_create(submission)
       end
 
       def show
@@ -38,9 +35,7 @@ module VBADocuments
           submission.refresh_status! unless submission.status == 'expired'
         end
 
-        render json: submission,
-               serializer: VBADocuments::V1::UploadSerializer,
-               render_location: false
+        render get_response_object_show(submission)
       end
 
       def download
@@ -59,7 +54,31 @@ module VBADocuments
       private
 
       def verify_settings
-        render plain: 'Not found', status: :not_found unless Settings.vba_documents.enable_download_endpoint
+        render get_response_object_verify_settings unless Settings.vba_documents.enable_download_endpoint
+      end
+
+      def get_response_object_create(json)
+        {
+          status: :accepted,
+          json: json,
+          serializer: VBADocuments::V1::UploadSerializer,
+          render_location: true
+        }
+      end
+
+      def get_response_object_show(json)
+        {
+          json: json,
+          serializer: VBADocuments::V1::UploadSerializer,
+          render_location: false
+        }
+      end
+
+      def get_response_object_verify_settings()
+        {
+          plain: 'Not found',
+          status: :not_found
+        }
       end
     end
   end

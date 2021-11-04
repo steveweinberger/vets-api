@@ -42,10 +42,8 @@ module VBADocuments
             )
           end
         end
-        render status: :accepted,
-               json: submission,
-               serializer: VBADocuments::V2::UploadSerializer,
-               render_location: true
+
+        render get_response_object_create(submission=submission)
       rescue JSON::ParserError => e
         raise Common::Exceptions::SchemaValidationErrors, ["invalid JSON. #{e.message}"] if e.is_a? JSON::ParserError
       end
@@ -63,9 +61,7 @@ module VBADocuments
           submission.refresh_status! unless submission.status == 'expired'
         end
 
-        render json: submission,
-               serializer: VBADocuments::V2::UploadSerializer,
-               render_location: false
+        render get_response_object_show(submission)
       end
 
       def download
@@ -100,13 +96,45 @@ module VBADocuments
           upload_model.update(status: 'error', code: 'DOC104', detail: e.message)
         end
         status = upload_model.status.eql?('error') ? 400 : 200
-        render json: upload_model, serializer: VBADocuments::V2::UploadSerializer, status: status
+        render get_response_object_submit(upload_model, status)
       end
 
       private
 
       def verify_settings
-        render plain: 'Not found', status: :not_found unless Settings.vba_documents.enable_download_endpoint
+        render get_response_object_verify_settings unless Settings.vba_documents.enable_download_endpoint
+      end
+
+      def get_response_object_create(json)
+        {
+          status: :accepted,
+          json: json,
+          serializer: VBADocuments::V2::UploadSerializer,
+          render_location: true
+        }
+      end
+
+      def get_response_object_show(json)
+        {
+          json: json,
+          serializer: VBADocuments::V2::UploadSerializer,
+          render_location: false
+        }
+      end
+
+      def get_response_object_submit(json, status)
+        {
+          status: status,
+          json: json,
+          serializer: VBADocuments::V2::UploadSerializer
+        }
+      end
+
+      def get_response_object_verify_settings()
+        {
+          plain: 'Not found',
+          status: :not_found
+        }
       end
     end
   end

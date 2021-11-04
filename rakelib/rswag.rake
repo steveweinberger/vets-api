@@ -31,7 +31,7 @@ namespace :rswag do
   namespace :vba_documents do
     desc 'Generate rswag docs and schemas for vba_documents'
     task run: :environment do
-      ENV['PATTERN'] = 'modules/vba_documents/spec/docs/**/*_spec.rb'
+      ENV['PATTERN'] = 'modules/vba_documents/spec/docs/v1/uploads_report_rswag_spec.rb'
       ENV['RAILS_MODULE'] = 'vba_documents'
       ENV['SWAGGER_DRY_RUN'] = '0'
       Rake::Task['rswag:specs:swaggerize'].invoke

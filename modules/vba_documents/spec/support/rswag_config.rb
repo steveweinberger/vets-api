@@ -156,11 +156,10 @@ class VBADocuments::RswagConfig
           "description": 'A more detailed message about why the error occured'
         },
         "status": {
-          "type": 'integer',
-          "format": 'int32',
-          "minimum": 100,
-          "maximum": 599,
-          "example": 422,
+          "type": 'string',
+          "minLength": 3,
+          "maxLength": 3,
+          "example": "422",
           "description": 'Standard HTTP Status returned with Error'
         }
       }
@@ -548,7 +547,7 @@ class VBADocuments::RswagConfig
       "required": %w[guid status],
       "properties": {
         "code": {
-          "type": 'string',
+          "type": %w[string null],
           "pattern": '^DOC[0-9]{3}$',
           "minLength": 6,
           "maxLength": 6,
