@@ -22,6 +22,20 @@ module AppealsApi
         vanotify_service.send_email(params(template))
       end
 
+      def sc_received
+        return unless Flipper.enabled?(:decision_review_sc_email)
+
+        unless valid_email_identifier?
+          log_error(guid, 'SC')
+          raise InvalidKeys
+        end
+
+        template_type = 'supplemental_claim_received'
+        template = { template_id: template_id(template_type) }
+
+        vanotify_service.send_email(params(template))
+      end
+
       private
 
       attr_accessor :opts
@@ -65,12 +79,7 @@ module AppealsApi
       end
 
       def date_submitted
-        # TODO: Remove "%m/%d/%Y" format parsing after all old jobs using that format have cleared the queue
-        @date_submitted ||= if opts['date_submitted'] =~ %r{^\d{2}/\d{2}/\d{4}}
-                              DateTime.strptime(opts['date_submitted'], '%m/%d/%Y').strftime('%B %d, %Y')
-                            else
-                              DateTime.iso8601(opts['date_submitted']).strftime('%B %d, %Y')
-                            end
+        @date_submitted ||= DateTime.iso8601(opts['date_submitted']).strftime('%B %d, %Y')
       end
 
       def valid_email_identifier?

@@ -747,7 +747,6 @@ flipper:
     - adewitt@thoughtworks.com
     - agarcia@clarityinnovates.com
     - alastair@adhocteam.us
-    - anna@adhoc.team
     - bill.ryan@adhocteam.us
     - clark@governmentcio.com # Designer on GCIO
     - cameron@oddball.io
@@ -1170,6 +1169,9 @@ bid:
 # Settings for Test User Dashboard modules
 test_user_dashboard:
   env: dev
+  github_oauth:
+    client_id:
+    client_secret:
 
 lighthouse_health_immunization:
   client_id: '0oad0xggirKLf2ger2p7'
@@ -1181,3 +1183,16 @@ lighthouse_health_immunization:
     - "launch launch/patient"
     - "patient/Immunization.read"
     - "patient/Location.read"
+
+token_validation:
+  url: https://dev-api.va.gov/internal/auth
+
+notifications:
+  public_key: ~
+
+sidekiq:
+  github_organization: ~
+  github_team: ~
+  github_oauth_key: ~
+  github_oauth_secret: ~
+  github_api_key: ~

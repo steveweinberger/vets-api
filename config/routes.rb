@@ -338,6 +338,8 @@ Rails.application.routes.draw do
   namespace :v1, defaults: { format: 'json' } do
     resources :apidocs, only: [:index]
 
+    resources :notifications, only: %i[create]
+
     resource :sessions, only: [] do
       post :saml_callback, to: 'sessions#saml_callback'
       post :saml_slo_callback, to: 'sessions#saml_slo_callback'
@@ -415,23 +417,7 @@ Rails.application.routes.draw do
 
   mount Sidekiq::Web, at: '/sidekiq'
 
-  unless Rails.env.development? || Settings.sidekiq_admin_panel
-    Sidekiq::Web.register GithubAuthentication::SidekiqWeb
-
-    Sidekiq::Web.use Warden::Manager do |config|
-      config.failure_app = Sidekiq::Web
-      config.default_strategies :github
-      config.scope_defaults :sidekiq, config: {
-        client_id: Settings.sidekiq.github_oauth_key,
-        client_secret: Settings.sidekiq.github_oauth_secret,
-        scope: 'read:org',
-        redirect_uri: 'sidekiq/auth/github/callback'
-      }
-
-      config.serialize_from_session { |key| Warden::GitHub::Verifier.load(key) }
-      config.serialize_into_session { |user| Warden::GitHub::Verifier.dump(user) }
-    end
-  end
+  Sidekiq::Web.register GithubAuthentication::SidekiqWeb unless Rails.env.development? || Settings.sidekiq_admin_panel
 
   mount PgHero::Engine, at: 'pghero'
 
