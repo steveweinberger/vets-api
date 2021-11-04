@@ -2,7 +2,7 @@
 
 Vets API requires:
 
-- Ruby 2.6.6
+- Ruby 2.7.4
 - PostgreSQL 11.x (including PostGIS 2.5)
 - Redis 5.0.x
 
@@ -28,12 +28,6 @@ Vets API requires:
    ```
 
    More information about installing _with_ Sidekiq Enterprise as well as our credentials are on the internal system [here](https://github.com/department-of-veterans-affairs/vets.gov-team/blob/master/Products/Platform/Vets-API/Sidekiq%20Enterprise%20Setup.md)
-
-1. Install overcommit
-
-   ```bash
-   overcommit --install --sign
-   ```
 
 1. Make sure you have the [vets-api-mockdata](https://github.com/department-of-veterans-affairs/vets-api-mockdata) repo locally installed, preferably in a sibling directory to `vets-api`.
 

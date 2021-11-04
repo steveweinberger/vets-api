@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'saml/ssoe_settings_service'
 require_relative 'responses/login'
 
 module SAML
@@ -91,6 +92,14 @@ module SAML
       build_sso_url(build_authn_context(LOA::IDME_LOA1_VETS))
     end
 
+    def logingov_url
+      @type = 'logingov'
+      build_sso_url(
+        build_authn_context([IAL::LOGIN_GOV_IAL1, AAL::LOGIN_GOV_AAL2], AuthnContext::LOGIN_GOV),
+        'minimum'
+      )
+    end
+
     def custom_url(authn)
       @type = 'custom'
       build_sso_url(authn)
@@ -166,9 +175,10 @@ module SAML
       saml_auth_request.create(new_url_settings, query_params)
     end
 
-    def build_authn_context(assurance_level_url, identity_provider = Settings.saml_ssoe.idme_authn_context)
+    def build_authn_context(assurance_level_url, identity_provider = AuthnContext::ID_ME)
       if identity_provider
-        [assurance_level_url, identity_provider]
+        assurance_level_url = [assurance_level_url] unless assurance_level_url.is_a?(Array)
+        assurance_level_url.push(identity_provider)
       else
         assurance_level_url
       end
@@ -219,10 +229,18 @@ module SAML
       previous = uuid && SAMLRequestTracker.find(uuid)
       type = previous&.payload_attr(:type) || params[:type]
       transaction_id = previous&.payload_attr(:transaction_id) || SecureRandom.uuid
+      redirect = previous&.payload_attr(:redirect) || params[:redirect]
+      skip_dupe = previous&.payload_attr(:skip_dupe) || params[:skip_dupe]
+      post_login = previous&.payload_attr(:post_login) || params[:postLogin]
       # if created_at is set to nil (meaning no previous tracker to use), it
       # will be initialized to the current time when it is saved
       SAMLRequestTracker.new(
-        payload: { type: type, transaction_id: transaction_id }.compact,
+        payload: { type: type,
+                   redirect: redirect,
+                   transaction_id: transaction_id,
+                   skip_dupe: skip_dupe,
+                   post_login: post_login }.compact,
+
         created_at: previous&.created_at
       )
     end

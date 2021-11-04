@@ -28,9 +28,9 @@ class InProgressForm < ApplicationRecord
   scope :return_url, ->(url) { where(%( #{RETURN_URL_SQL} = ? ), '"' + url + '"') }
 
   attribute :user_uuid, CleanUUID.new
-  attr_encrypted :form_data, key: Settings.db_encryption_key
   serialize :form_data, JsonMarshal::Marshaller
-  encrypts :form_data, migrating: true, **lockbox_options
+  has_kms_key
+  encrypts :form_data, key: :kms_key, **lockbox_options
   validates(:form_data, presence: true)
   validates(:user_uuid, presence: true)
   validate(:id_me_user_uuid)

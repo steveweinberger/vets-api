@@ -29,64 +29,7 @@ pipeline {
       }
     }
 
-    stage('Build Docker Images'){
-      steps {
-        withCredentials([string(credentialsId: 'sidekiq-enterprise-license', variable: 'BUNDLE_ENTERPRISE__CONTRIBSYS__COM')]) {
-          sh 'env=$RAILS_ENV make build'
-        }
-      }
-    }
-
-    stage('Setup Testing parallel DBs') {
-      steps {
-        sh 'env=$RAILS_ENV make spec_parallel_setup'
-      }
-    }
-
-    stage('Lint Changed Files') {
-      when { changeRequest() }
-      steps {
-        script {
-          files_to_lint = ''
-          try {
-            files_to_lint = getGithubChangedFiles('vets-api', env.CHANGE_ID.toInteger(),
-                              change_types: ['modified', 'added']).join(' ')
-          } catch(IOException e) {
-            echo "WARNING: Unable to fetch changed PR files from Github!"
-            echo "${e}"           
-          }
-        }
-        sh """env=$RAILS_ENV make files='${files_to_lint}' lint"""
-      }
-    }
-
-    stage('Lint All Files') {
-      when { branch 'master' }
-      steps {
-        sh 'env=$RAILS_ENV make lint'
-      }
-    }
-
-    stage('Security Scan') {
-      steps {
-        sh 'env=$RAILS_ENV make security'
-      }
-    }
-
-    stage('Run tests') {
-      steps {
-        sh 'env=$RAILS_ENV make spec_parallel'
-      }
-      post {
-        success {
-          archiveArtifacts artifacts: "coverage/**"
-          publishHTML(target: [reportDir: 'coverage', reportFiles: 'index.html', reportName: 'Coverage', keepAll: true])
-          junit 'log/*.xml'
-        }
-      }
-    }
-
-    stage('Review') {
+    stage('Scheudle Review Instance Creation') {
       when { not { branch 'master' } }
 
       steps {
@@ -159,11 +102,13 @@ pipeline {
       deleteDir() /* clean up our workspace */
     }
     failure {
-      when { branch 'master' }
-
-      slackSend message: "Failed vets-api CI on branch: `${env.THE_BRANCH}`! ${env.RUN_DISPLAY_URL}".stripMargin(),
-      color: 'danger',
-      failOnError: true
+      script {
+        if (env.BRANCH_NAME == 'master') {
+          slackSend message: "Failed vets-api CI on branch: `${env.THE_BRANCH}`! ${env.RUN_DISPLAY_URL}".stripMargin(),
+          color: 'danger',
+          failOnError: true
+        }
+      }
     }
   }
 }

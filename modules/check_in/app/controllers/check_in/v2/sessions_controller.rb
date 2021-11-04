@@ -6,11 +6,8 @@ module CheckIn
       def show
         check_in_session = CheckIn::V2::Session.build(data: { uuid: params[:id] }, jwt: session[:jwt])
 
-        render json: check_in_session.client_error, status: :bad_request and return unless check_in_session.valid_uuid?
-
-        unless check_in_session.authorized?
-          render json: check_in_session.unauthorized_message, status: :unauthorized and return
-        end
+        render json: check_in_session.client_error, status: :ok and return unless check_in_session.valid_uuid?
+        render json: check_in_session.unauthorized_message, status: :ok and return unless check_in_session.authorized?
 
         render json: check_in_session.success_message
       end
@@ -20,17 +17,17 @@ module CheckIn
 
         render json: check_in_session.client_error, status: :bad_request and return unless check_in_session.valid?
 
-        resp =
-          if check_in_session.authorized?
-            check_in_session.success_message
+        render json: check_in_session.success_message and return if check_in_session.authorized?
+
+        token_data =
+          if Flipper.enabled?('check_in_experience_services_refactor')
+            ::V2::Lorota::Service.build(check_in: check_in_session).token
           else
-            token_data = ::V2::Lorota::Service.build(check_in: check_in_session).token_with_permissions
-            session[:jwt] = token_data[:jwt]
-
-            token_data[:permission_data]
+            ::V2::Lorota::Service.build(check_in: check_in_session).token_with_permissions
           end
+        session[:jwt] = token_data[:jwt]
 
-        render json: resp
+        render json: token_data[:permission_data]
       end
 
       private

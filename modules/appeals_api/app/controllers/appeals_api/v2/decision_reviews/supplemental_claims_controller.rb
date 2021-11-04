@@ -4,7 +4,7 @@ require 'appeals_api/form_schemas'
 
 class AppealsApi::V2::DecisionReviews::SupplementalClaimsController < AppealsApi::ApplicationController
   include AppealsApi::JsonFormatValidation
-  # include AppealsApi::StatusSimulation
+  include AppealsApi::StatusSimulation
   include AppealsApi::CharacterUtilities
   include AppealsApi::CharacterValidation
 
@@ -34,12 +34,24 @@ class AppealsApi::V2::DecisionReviews::SupplementalClaimsController < AppealsApi
 
     sc.save
 
+    AppealsApi::PdfSubmitJob.perform_async(sc.id, 'AppealsApi::SupplementalClaim', 'V2')
+
     render json: AppealsApi::SupplementalClaimSerializer.new(sc).serializable_hash
+  end
+
+  def schema
+    render json: AppealsApi::JsonSchemaToSwaggerConverter.remove_comments(
+      AppealsApi::FormSchemas.new(
+        SCHEMA_ERROR_TYPE,
+        schema_version: 'v2'
+      ).schema(FORM_NUMBER)
+    )
   end
 
   def show
     id = params[:id]
     sc = AppealsApi::SupplementalClaim.find(id)
+    sc = with_status_simulation(sc) if status_requested_and_allowed?
 
     render json: AppealsApi::SupplementalClaimSerializer.new(sc).serializable_hash
   rescue ActiveRecord::RecordNotFound
@@ -92,5 +104,21 @@ class AppealsApi::V2::DecisionReviews::SupplementalClaimsController < AppealsApi
         ]
       }
     )
+  end
+
+  def render_errors(va_exception)
+    case va_exception
+    when JsonSchema::JsonApiMissingAttribute
+      render json: va_exception.to_json_api, status: va_exception.code
+    else
+      if (notice_index = va_exception.errors.find_index do |e|
+            e.source[:pointer] == '/data/attributes/noticeAcknowledgement'
+          end)
+        va_exception.errors[notice_index].detail = 'Please ensure the Veteran reviews the 38 U.S.CC 5103 information ' \
+                                                   'regarding evidence necessary to substantiate the claim found here' \
+                                                   ': https://www.va.gov/disability/how-to-file-claim/evidence-needed'
+      end
+      render json: { errors: va_exception.errors }, status: va_exception.status_code
+    end
   end
 end

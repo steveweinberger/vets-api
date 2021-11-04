@@ -48,7 +48,7 @@ module Mobile
       attribute :sta6aid, Types::String.optional
       attribute :healthcare_provider, Types::String.optional
       attribute :healthcare_service, Types::String.optional
-      attribute :location, AppointmentLocation.optional
+      attribute :location, Location.optional
       attribute :minutes_duration, Types::Integer
       attribute :phone_only, Types::Bool
       attribute :start_date_local, Types::DateTime
@@ -58,6 +58,7 @@ module Mobile
       attribute :time_zone, TIME_ZONE_TYPE
       attribute :vetext_id, Types::String.optional
       attribute :reason, Types::String.optional
+      attribute :is_covid_vaccine, Types::Bool
 
       def self.toggle_non_prod_id!(id)
         return id if Settings.hostname == 'api.va.gov' || id.nil?

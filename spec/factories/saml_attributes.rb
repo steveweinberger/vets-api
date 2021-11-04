@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :idme_loa1, class: OneLogin::RubySaml::Attributes do
+  factory :idme_loa1, class: 'OneLogin::RubySaml::Attributes' do
     transient do
       authn_context { 'http://idmanagement.gov/ns/assurance/loa/1/vets' }
     end
@@ -13,7 +13,7 @@ FactoryBot.define do
     initialize_with { new(attributes.stringify_keys) }
   end
 
-  factory :idme_loa3, class: OneLogin::RubySaml::Attributes do
+  factory :idme_loa3, class: 'OneLogin::RubySaml::Attributes' do
     transient do
       authn_context { 'http://idmanagement.gov/ns/assurance/loa/3/vets' }
     end
@@ -31,7 +31,7 @@ FactoryBot.define do
     initialize_with { new(attributes.stringify_keys) }
   end
 
-  factory :mhv_basic, class: OneLogin::RubySaml::Attributes do
+  factory :mhv_basic, class: 'OneLogin::RubySaml::Attributes' do
     transient do
       authn_context { 'myhealthevet' }
     end
@@ -46,7 +46,7 @@ FactoryBot.define do
     initialize_with { new(attributes.stringify_keys) }
   end
 
-  factory :mhv_advanced, class: OneLogin::RubySaml::Attributes do
+  factory :mhv_advanced, class: 'OneLogin::RubySaml::Attributes' do
     transient do
       authn_context { 'myhealthevet' }
     end
@@ -61,7 +61,7 @@ FactoryBot.define do
     initialize_with { new(attributes.stringify_keys) }
   end
 
-  factory :mhv_premium, class: OneLogin::RubySaml::Attributes do
+  factory :mhv_premium, class: 'OneLogin::RubySaml::Attributes' do
     transient do
       authn_context { 'myhealthevet' }
     end
@@ -84,7 +84,7 @@ FactoryBot.define do
   end
 
   # TODO: is this by definition identical to the idme_loa3 factory
-  factory :mhv_loa3, class: OneLogin::RubySaml::Attributes do
+  factory :mhv_loa3, class: 'OneLogin::RubySaml::Attributes' do
     transient do
       authn_context { 'myhealthevet_loa3' }
     end
@@ -102,7 +102,7 @@ FactoryBot.define do
     initialize_with { new(attributes.stringify_keys) }
   end
 
-  factory :dslogon_level1, class: OneLogin::RubySaml::Attributes do
+  factory :dslogon_level1, class: 'OneLogin::RubySaml::Attributes' do
     transient do
       authn_context { 'dslogon' }
     end
@@ -125,7 +125,7 @@ FactoryBot.define do
     initialize_with { new(attributes.stringify_keys) }
   end
 
-  factory :dslogon_level2, class: OneLogin::RubySaml::Attributes do
+  factory :dslogon_level2, class: 'OneLogin::RubySaml::Attributes' do
     transient do
       authn_context { 'dslogon' }
     end
@@ -148,7 +148,7 @@ FactoryBot.define do
     initialize_with { new(attributes.stringify_keys) }
   end
 
-  factory :ssoe_unmappable_response, class: OneLogin::RubySaml::Attributes do
+  factory :ssoe_unmappable_response, class: 'OneLogin::RubySaml::Attributes' do
     iam_eai_auth_level { ['[Filtered]'] }
     am_eai_ext_user_groups { ['[Filtered]'] }
     am_eai_ext_user_id { ['[Filtered]'] }
@@ -159,7 +159,29 @@ FactoryBot.define do
     initialize_with { new(attributes.stringify_keys) }
   end
 
-  factory :ssoe_idme_loa1_unproofed, class: OneLogin::RubySaml::Attributes do
+  factory :ssoe_logingov_ial1, class: 'OneLogin::RubySaml::Attributes' do
+    transient do
+      authn_context { IAL::LOGIN_GOV_IAL1 }
+    end
+    va_eauth_csid { ['LOGINGOV'] }
+    va_eauth_lastname { ['GPKTESTNINE'] }
+    va_eauth_credentialassurancelevel { ['1'] }
+    va_eauth_ial { ['1'] }
+    va_eauth_firstname { ['JERRY'] }
+    va_eauth_csponly { ['true'] }
+    va_eauth_authenticationMethod { ['http://idmanagement.gov/ns/assurance/ial/1'] }
+    va_eauth_aal { ['2'] }
+    va_eauth_emailaddress { ['vets.gov.user+262@example.com'] }
+    va_eauth_transactionid { ['abcd1234xyz'] }
+    va_eauth_authncontextclassref { ['http://idmanagement.gov/ns/assurance/ial/1'] }
+    va_eauth_uid { ['54e78de6140d473f87960f211be49c08'] }
+    va_eauth_issueinstant { ['2020-02-05T21:14:20Z'] }
+    va_eauth_middlename { ['NOT_FOUND'] }
+
+    initialize_with { new(attributes.stringify_keys) }
+  end
+
+  factory :ssoe_idme_loa1_unproofed, class: 'OneLogin::RubySaml::Attributes' do
     transient do
       authn_context { LOA::IDME_LOA1_VETS }
     end
@@ -183,7 +205,7 @@ FactoryBot.define do
     initialize_with { new(attributes.stringify_keys) }
   end
 
-  factory :ssoe_idme_loa1, class: OneLogin::RubySaml::Attributes do
+  factory :ssoe_idme_loa1, class: 'OneLogin::RubySaml::Attributes' do
     transient do
       authn_context { LOA::IDME_LOA1_VETS }
     end
@@ -209,7 +231,7 @@ FactoryBot.define do
   end
 
   # Assertion for user with no multifactor
-  factory :ssoe_idme_singlefactor, class: OneLogin::RubySaml::Attributes do
+  factory :ssoe_idme_singlefactor, class: 'OneLogin::RubySaml::Attributes' do
     transient do
       authn_context { LOA::IDME_LOA1_VETS }
     end
@@ -235,7 +257,7 @@ FactoryBot.define do
   end
 
   # Assertion for multifactor enrollment
-  factory :ssoe_idme_multifactor, class: OneLogin::RubySaml::Attributes do
+  factory :ssoe_idme_multifactor, class: 'OneLogin::RubySaml::Attributes' do
     transient do
       authn_context { 'multifactor' }
     end
@@ -260,7 +282,7 @@ FactoryBot.define do
     initialize_with { new(attributes.stringify_keys) }
   end
 
-  factory :ssoe_idme_loa3, class: OneLogin::RubySaml::Attributes do
+  factory :ssoe_idme_loa3, class: 'OneLogin::RubySaml::Attributes' do
     transient do
       authn_context { LOA::IDME_LOA3 }
     end
@@ -324,7 +346,7 @@ FactoryBot.define do
 
   # Federated SSOe-ID.me user with MHV basic credential
   # for a user who has never been identity proofed
-  factory :ssoe_idme_mhv_basic_neverproofed, class: OneLogin::RubySaml::Attributes do
+  factory :ssoe_idme_mhv_basic_neverproofed, class: 'OneLogin::RubySaml::Attributes' do
     transient do
       authn_context { 'myhealthevet' }
     end
@@ -352,7 +374,7 @@ FactoryBot.define do
 
   # Federated SSOe-ID.me user with MHV basic credential
   # for a user who has not enrolled in 2FA
-  factory :ssoe_idme_mhv_basic_singlefactor, class: OneLogin::RubySaml::Attributes do
+  factory :ssoe_idme_mhv_basic_singlefactor, class: 'OneLogin::RubySaml::Attributes' do
     transient do
       authn_context { 'myhealthevet' }
     end
@@ -381,7 +403,7 @@ FactoryBot.define do
 
   # Federated SSOe-ID.me user with MHV basic credential
   # for a user who is adding multifactor
-  factory :ssoe_idme_mhv_basic_multifactor, class: OneLogin::RubySaml::Attributes do
+  factory :ssoe_idme_mhv_basic_multifactor, class: 'OneLogin::RubySaml::Attributes' do
     transient do
       authn_context { 'myhealthevet_multifactor' }
     end
@@ -410,7 +432,7 @@ FactoryBot.define do
   # Federated SSOe-ID.me user with MHV basic credential
   # Note this user has previously been verified but this
   # SAML attribute set represents the initial non-verified request
-  factory :ssoe_idme_mhv_advanced, class: OneLogin::RubySaml::Attributes do
+  factory :ssoe_idme_mhv_advanced, class: 'OneLogin::RubySaml::Attributes' do
     transient do
       authn_context { 'myhealthevet' }
     end
@@ -438,7 +460,7 @@ FactoryBot.define do
 
   # Federated SSOe-ID.me user with MHV advanced credential who
   # has been verified through ID.me
-  factory :ssoe_idme_mhv_loa3, class: OneLogin::RubySaml::Attributes do
+  factory :ssoe_idme_mhv_loa3, class: 'OneLogin::RubySaml::Attributes' do
     transient do
       authn_context { 'myhealthevet_loa3' }
     end
@@ -501,7 +523,7 @@ FactoryBot.define do
   end
 
   # Federated SSOe-ID.me user with MHV premium credential
-  factory :ssoe_idme_mhv_premium, class: OneLogin::RubySaml::Attributes do
+  factory :ssoe_idme_mhv_premium, class: 'OneLogin::RubySaml::Attributes' do
     transient do
       authn_context { 'myhealthevet' }
     end
@@ -577,7 +599,7 @@ FactoryBot.define do
   end
 
   # TODO: make this reflective of DSLogon 1 user
-  factory :ssoe_idme_dslogon_level1, class: OneLogin::RubySaml::Attributes do
+  factory :ssoe_idme_dslogon_level1, class: 'OneLogin::RubySaml::Attributes' do
     transient do
       authn_context { 'dslogon' }
     end
@@ -637,7 +659,7 @@ FactoryBot.define do
     initialize_with { new(attributes.stringify_keys) }
   end
 
-  factory :ssoe_idme_dslogon_level2, class: OneLogin::RubySaml::Attributes do
+  factory :ssoe_idme_dslogon_level2, class: 'OneLogin::RubySaml::Attributes' do
     transient do
       authn_context { 'dslogon' }
     end
@@ -705,7 +727,7 @@ FactoryBot.define do
     initialize_with { new(attributes.stringify_keys) }
   end
 
-  factory :ssoe_idme_dslogon_level2_singlefactor, class: OneLogin::RubySaml::Attributes do
+  factory :ssoe_idme_dslogon_level2_singlefactor, class: 'OneLogin::RubySaml::Attributes' do
     transient do
       authn_context { 'dslogon' }
     end
@@ -767,7 +789,7 @@ FactoryBot.define do
     initialize_with { new(attributes.stringify_keys) }
   end
 
-  factory :ssoe_inbound_dslogon_level2, class: OneLogin::RubySaml::Attributes do
+  factory :ssoe_inbound_dslogon_level2, class: 'OneLogin::RubySaml::Attributes' do
     transient do
       authn_context { 'urn:oasis:names:tc:SAML:2.0:ac:classes:Password' }
     end
@@ -832,7 +854,7 @@ FactoryBot.define do
     initialize_with { new(attributes.stringify_keys) }
   end
 
-  factory :ssoe_inbound_mhv_premium, class: OneLogin::RubySaml::Attributes do
+  factory :ssoe_inbound_mhv_premium, class: 'OneLogin::RubySaml::Attributes' do
     transient do
       authn_context { 'urn:oasis:names:tc:SAML:2.0:ac:classes:Password' }
     end
@@ -889,7 +911,7 @@ FactoryBot.define do
     initialize_with { new(attributes.stringify_keys) }
   end
 
-  factory :ssoe_inbound_idme_loa3, class: OneLogin::RubySaml::Attributes do
+  factory :ssoe_inbound_idme_loa3, class: 'OneLogin::RubySaml::Attributes' do
     transient do
       authn_context { LOA::IDME_LOA3 }
     end

@@ -404,3 +404,9 @@ Lint/NoReturnInBeginEndBlocks:
 
 Lint/SymbolConversion:
   Enabled: false
+
+Layout/EmptyLineBetweenDefs:
+  AllowAdjacentOneLineDefs: true
+
+Layout/LineEndStringConcatenationIndentation:
+  Enabled: true

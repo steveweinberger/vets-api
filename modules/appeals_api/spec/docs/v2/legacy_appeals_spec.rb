@@ -18,8 +18,8 @@ describe 'Legacy Appeals', swagger_doc: 'modules/appeals_api/app/swagger/appeals
       consumes 'application/json'
       produces 'application/json'
       description = 'Returns eligible legacy appeals for a Veteran. A legacy appeal is eligible if a statement of ' \
-      'the case (SOC)  or supplemental statement of the case (SSOC) has been declared, and if the date of ' \
-      'declaration is within the last 60 days.'
+                    'the case (SOC)  or supplemental statement of the case (SSOC) has been declared, and if the ' \
+                    'date of declaration is within the last 60 days.'
       description description
 
       ssn_override = { required: false,
@@ -132,6 +132,45 @@ describe 'Legacy Appeals', swagger_doc: 'modules/appeals_api/app/swagger/appeals
           it 'returns a 422 response' do |example|
             assert_response_matches_metadata(example.metadata)
           end
+        end
+      end
+
+      response '502', 'Unknown Error' do
+        let(:'X-VA-SSN') { nil }
+
+        schema type: :object,
+               properties: {
+                 errors: {
+                   type: :array,
+                   items: {
+                     properties: {
+                       status: {
+                         type: 'string',
+                         example: '502'
+                       },
+                       detail: {
+                         type: 'string',
+                         example: 'Received a 500 response from the upstream server'
+                       },
+                       code: {
+                         type: 'string',
+                         example: 'CASEFLOWSTATUS500'
+                       },
+                       title: {
+                         type: 'string',
+                         example: 'Bad Gateway'
+                       }
+                     }
+                   }
+                 }
+               }
+
+        before do |example|
+          submit_request(example.metadata)
+        end
+
+        it 'returns a 500 response' do |example|
+          # NOOP
         end
       end
     end

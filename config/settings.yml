@@ -17,11 +17,19 @@ saml_ssoe:
   issuer: https://ssoe-sp-localhost.va.gov
   callback_url: http://localhost:3000/v1/sessions/callback
   logout_url: https://int.eauth.va.gov/slo/globallogout?appKey=https%253A%252F%252Fssoe-sp-dev.va.gov
-  idme_authn_context: ~
   request_signing: false
   relay: ~
   response_signing: false
   response_encryption: false
+  authn_context_comparison: 'exact'
+  redirect_urls:
+    mhv:
+      base: 'https://int.eauth.va.gov/mhv-portal-web/eauth'
+      mhv_download_my_data: '?deeplinking=download_my_data'
+      mhv_prescription_refill: '?deeplinking=prescription_refill'
+      mhv_secure_messaging: '?deeplinking=secure_messaging'
+      mhv_appointments: '?deeplinking=appointments'
+      mhv_home: ''
 
 ssoe_eauth_cookie:
   name: vagov_saml_request_localhost
@@ -63,9 +71,11 @@ dmc:
 mcp:
   vbs:
     url: https://fake_url.com:9000
-    host: fake_url.com
+    host: fake_url.com:9000
+    base_path: /base/path
     service_name: VBS
-    mock: true
+    mock: false
+    mock_vista: false
 
 fsr:
   prefill: true
@@ -202,6 +212,7 @@ modules_appeals_api:
   supplemental_claims_enabled: true
   notice_of_disagreement_pii_expunge_enabled: true
   notice_of_disagreement_updater_enabled: true
+  supplemental_claim_updater_enabled: true
   reports:
     daily_decision_review:
       enabled: false
@@ -736,7 +747,6 @@ flipper:
     - adewitt@thoughtworks.com
     - agarcia@clarityinnovates.com
     - alastair@adhocteam.us
-    - anna@adhoc.team
     - bill.ryan@adhocteam.us
     - clark@governmentcio.com # Designer on GCIO
     - cameron@oddball.io
@@ -748,7 +758,6 @@ flipper:
     - dnalbach@governmentcio.com
     - draju@governmentcio.com
     - dror@matal.com
-    - eric.buckley@adhocteam.us
     - eric.boehs@oddball.io
     - erik@adhocteam.us
     - filip.fafara@gmail.com
@@ -769,7 +778,6 @@ flipper:
     - jwolf@governmentcio.com # Jason Wolf Product Manager for GCIO
     - kabrown@thoughtworks.com
     - kadams@governmentcio.com
-    - kam@adhocteam.us
     - kathleen.crawford@gcio.com
     - kenneth.gary@va.gov
     - kenneth.santiago2010@gmail.com
@@ -779,7 +787,7 @@ flipper:
     - lauren.ernest@adhocteam.us
     - lihan@adhocteam.us
     - lindsey.hattamer@oddball.io
-    - lsanchez@governmentcio.com
+    - lance.sanchez@gcio.com
     - ltran@thoughtworks.com
     - marisa.hoenig@thoughtworks.com
     - mark.greenburg@adhocteam.us
@@ -793,9 +801,9 @@ flipper:
     - mnunemak@thoughtworks.com
     - n.ratana@gmail.com
     - narin@adhocteam.us
-    - nick.sullivan@adhocteam.us
     - patrick.bateman@va.gov
     - patrick@adhocteam.us
+    - patrickryll@yahoo.com
     - paul.phillips@thoughtworks.com
     - pherbert@thoughtworks.com
     - regarr@gmail.com # Robin Garrison - AdHoc
@@ -807,7 +815,7 @@ flipper:
     - scy0846@gmail.com # Taylor Mitchell - GCIO
     - shefai.nayak@thoughtworks.com
     - ssuddath@governmentcio.com
-    - stephen.barrs@va.gov
+    - stephen.barrs@gmail.com
     - tony.williams@va.gov
     - travis.hilton@oddball.io
     - trevor.bosaw@oddball.io
@@ -1123,6 +1131,7 @@ check_in:
     mock: false
     key_path: fake_api_path
     redis_session_prefix: check_in_lorota_v1
+    redis_token_expiry: 43200 # 12 Hours
   chip_api_v2:
     url: https://vpce-06399548ef94bdb41-lk4qp2nd.execute-api.us-gov-west-1.vpce.amazonaws.com
     base_path: dev
@@ -1145,6 +1154,7 @@ check_in:
     mock: false
     key_path: fake_api_path
     redis_session_prefix: check_in_lorota_v2
+    redis_token_expiry: 43200 # 12 Hours
 
 rack:
   cookie_secret: ~
@@ -1159,3 +1169,30 @@ bid:
 # Settings for Test User Dashboard modules
 test_user_dashboard:
   env: dev
+  github_oauth:
+    client_id:
+    client_secret:
+
+lighthouse_health_immunization:
+  client_id: '0oad0xggirKLf2ger2p7'
+  audience_claim_url: 'https://deptva-eval.okta.com/oauth2/aus8nm1q0f7VQ0a482p7/v1/token'
+  key_path: ~
+  access_token_url: 'https://sandbox-api.va.gov/oauth2/health/system/v1/token'
+  api_url: 'https://sandbox-api.va.gov/services/fhir/v0/r4'
+  scopes:
+    - "launch launch/patient"
+    - "patient/Immunization.read"
+    - "patient/Location.read"
+
+token_validation:
+  url: https://dev-api.va.gov/internal/auth
+
+notifications:
+  public_key: ~
+
+sidekiq:
+  github_organization: ~
+  github_team: ~
+  github_oauth_key: ~
+  github_oauth_secret: ~
+  github_api_key: ~

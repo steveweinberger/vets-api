@@ -9,8 +9,8 @@ class ModuleComponentGenerator < Rails::Generators::NamedBase
   COMPONENT_TYPES = %w[controller model serializer service].freeze
 
   def prompt_user
-    unless Dir.exist?("modules/#{file_name}")
-      `rails g module #{file_name}` if yes?("Module #{file_name} does not exist. Would you like to create it?")
+    if !Dir.exist?("modules/#{file_name}") && yes?("Module #{file_name} does not exist. Would you like to create it?")
+      `rails g module #{file_name}`
     end
   end
 
@@ -33,7 +33,7 @@ class ModuleComponentGenerator < Rails::Generators::NamedBase
       end
     else
       $stdout.puts "\n#{method} is not a known generator command."\
-        "Commands allowed are controller, model, serializer and service\n"
+                   "Commands allowed are controller, model, serializer and service\n"
     end
   end
 

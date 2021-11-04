@@ -278,32 +278,6 @@ RSpec.describe User, type: :model do
     end
   end
 
-  context 'user without attributes' do
-    let(:test_user) { build(:user) }
-
-    it 'expect ttl to an Integer' do
-      expect(subject.ttl).to be_an(Integer)
-      expect(subject.ttl).to be_between(-Float::INFINITY, 0)
-    end
-
-    it 'assigns an email' do
-      expect(subject.email).to eq(test_user.email)
-    end
-
-    it 'assigns an uuid' do
-      expect(subject.uuid).to eq(test_user.uuid)
-    end
-
-    it 'has a persisted attribute of false' do
-      expect(subject).not_to be_persisted
-    end
-
-    it 'has nil edipi locally and from IDENTITY' do
-      expect(subject.identity.edipi).to be_nil
-      expect(subject.edipi).to be_nil
-    end
-  end
-
   it 'has a persisted attribute of false' do
     expect(subject).not_to be_persisted
   end
@@ -393,7 +367,7 @@ RSpec.describe User, type: :model do
     describe 'getter methods' do
       context 'when saml user attributes available, icn is available, and user LOA3' do
         let(:mvi_profile) { build(:mvi_profile) }
-        let(:user) { build(:user, :loa3, middle_name: 'J', mhv_icn: mvi_profile.icn) }
+        let(:user) { build(:user, :loa3, middle_name: 'J', edipi: nil, mhv_icn: mvi_profile.icn) }
 
         before do
           stub_mpi(mvi_profile)
@@ -878,12 +852,6 @@ RSpec.describe User, type: :model do
 
         expect(user.account).to eq account
       end
-
-      it 'first attempts to fetch the Account record from the Redis cache' do
-        expect(Account).to receive(:do_cached_with) { Account.create(idme_uuid: user.uuid) }
-
-        user.account
-      end
     end
 
     context 'when user does not have an existing Account record' do
@@ -891,11 +859,12 @@ RSpec.describe User, type: :model do
 
       before do
         account = Account.find_by(idme_uuid: user.uuid)
-
-        expect(account).to be_nil
+        account.destroy
       end
 
       it 'creates and returns the users Account record', :aggregate_failures do
+        account = Account.find_by(idme_uuid: user.uuid)
+        expect(account).to be_nil
         account = user.account
 
         expect(account.class).to eq Account

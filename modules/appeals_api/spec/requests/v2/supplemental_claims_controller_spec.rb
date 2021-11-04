@@ -69,6 +69,19 @@ describe AppealsApi::V2::DecisionReviews::SupplementalClaimsController, type: :r
       end
     end
 
+    context 'noticeAcknowledgement' do
+      it 'benefitType = compensation and noticeAcknowledgement = false' do
+        mod_data = JSON.parse(data)
+        mod_data['data']['attributes']['noticeAcknowledgement'] = false
+
+        post(path, params: mod_data.to_json, headers: headers)
+        expect(response.status).to eq(422)
+        expect(parsed['errors']).to be_an Array
+        expect(response.body).to include('/data/attributes/noticeAcknowledgement')
+        expect(response.body).to include('https://www.va.gov/disability/how-to-file-claim/evidence-needed')
+      end
+    end
+
     context 'when request.body is a Puma::NullIO' do
       it 'responds with a 422' do
         fake_puma_null_io_object = Object.new.tap do |obj|
@@ -131,6 +144,31 @@ describe AppealsApi::V2::DecisionReviews::SupplementalClaimsController, type: :r
         expect(parsed['errors'][0]['meta']).to include 'pattern'
       end
     end
+
+    it 'creates the job to build the PDF' do
+      client_stub = instance_double('CentralMail::Service')
+      faraday_response = instance_double('Faraday::Response')
+
+      allow(CentralMail::Service).to receive(:new) { client_stub }
+      allow(client_stub).to receive(:upload).and_return(faraday_response)
+      allow(faraday_response).to receive(:success?).and_return(true)
+
+      Sidekiq::Testing.inline! do
+        post(path, params: data, headers: headers)
+      end
+
+      sc = AppealsApi::SupplementalClaim.find_by(id: parsed['data']['id'])
+      expect(sc.status).to eq('submitted')
+    end
+  end
+
+  describe '#schema' do
+    let(:path) { base_path 'supplemental_claims/schema' }
+
+    it 'renders the json schema' do
+      get path
+      expect(response.status).to eq(200)
+    end
   end
 
   describe '#show' do
@@ -143,7 +181,7 @@ describe AppealsApi::V2::DecisionReviews::SupplementalClaimsController, type: :r
       expect(parsed.dig('data', 'attributes', 'formData')).to be_a Hash
     end
 
-    xit 'allow for status simulation' do
+    it 'allow for status simulation' do
       with_settings(Settings, vsp_environment: 'development') do
         with_settings(Settings.modules_appeals_api, status_simulation_enabled: true) do
           uuid = create(:supplemental_claim).id

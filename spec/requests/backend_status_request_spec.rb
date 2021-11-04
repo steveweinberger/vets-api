@@ -94,6 +94,7 @@ RSpec.describe 'Backend Status' do
         expect(response).to have_http_status(:ok)
         expect(response).to match_response_schema('backend_statuses')
       end
+
       it 'matches the backend_statuses schema when camel-inflected', :aggregate_failures do
         get '/v0/backend_statuses', headers: { 'X-Key-Inflection' => 'camel' }
 
@@ -108,7 +109,7 @@ RSpec.describe 'Backend Status' do
           get '/v0/backend_statuses'
 
           body = JSON.parse(response.body)
-          error = body.dig('errors').first
+          error = body['errors'].first
 
           expect(response.status).to be_a(Integer).and eq 429
           expect(error['code']).to be_a(String).and eq 'PAGERDUTY_429'

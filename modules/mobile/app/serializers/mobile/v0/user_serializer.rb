@@ -43,6 +43,7 @@ module Mobile
         appointments: :vaos,
         claims: :evss,
         directDepositBenefits: %i[evss ppiu],
+        disabilityRating: :evss,
         lettersAndDocuments: :evss,
         militaryServiceHistory: :emis,
         userProfileUpdate: :vet360,
@@ -77,8 +78,10 @@ module Mobile
       end
 
       attribute :health do |user|
+        facility_ids = user.va_treatment_facility_ids
+        facility_names = Mobile::FacilitiesHelper.get_facility_names(facility_ids)
         {
-          facilities: user.va_treatment_facility_ids.map { |id| facility(user, id) },
+          facilities: facility_ids.map.with_index { |id, index| facility(user, id, facility_names[index]) },
           is_cerner_patient: !user.cerner_id.nil?
         }
       end
@@ -87,11 +90,12 @@ module Mobile
         [*policies].all? { |policy| user.authorize(policy, :access?) }
       end
 
-      def self.facility(user, facility_id)
+      def self.facility(user, facility_id, facility_name)
         cerner_facility_ids = user.cerner_facility_ids || []
         {
           facility_id: facility_id,
-          is_cerner: cerner_facility_ids.include?(facility_id)
+          is_cerner: cerner_facility_ids.include?(facility_id),
+          facility_name: facility_name.nil? ? '' : facility_name
         }
       end
     end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_09_13_194827) do
+ActiveRecord::Schema.define(version: 2021_11_03_172528) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -28,9 +28,13 @@ ActiveRecord::Schema.define(version: 2021_09_13_194827) do
     t.datetime "dslogon_at"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "current_verification"
+    t.datetime "logingov_at"
     t.index ["account_id"], name: "index_account_login_stats_on_account_id", unique: true
+    t.index ["current_verification"], name: "index_account_login_stats_on_current_verification"
     t.index ["dslogon_at"], name: "index_account_login_stats_on_dslogon_at"
     t.index ["idme_at"], name: "index_account_login_stats_on_idme_at"
+    t.index ["logingov_at"], name: "index_account_login_stats_on_logingov_at"
     t.index ["myhealthevet_at"], name: "index_account_login_stats_on_myhealthevet_at"
   end
 
@@ -93,9 +97,8 @@ ActiveRecord::Schema.define(version: 2021_09_13_194827) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.string "board_review_option"
-    t.string "encrypted_upload_metadata"
-    t.string "encrypted_upload_metadata_iv"
     t.text "upload_metadata_ciphertext"
+    t.text "encrypted_kms_key"
   end
 
   create_table "appeals_api_event_subscriptions", force: :cascade do |t|
@@ -111,12 +114,11 @@ ActiveRecord::Schema.define(version: 2021_09_13_194827) do
     t.string "supportable_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.string "encrypted_file_data"
-    t.string "encrypted_file_data_iv"
     t.string "source"
     t.uuid "guid", null: false
     t.integer "upload_submission_id", null: false
     t.text "file_data_ciphertext"
+    t.text "encrypted_kms_key"
     t.index ["guid"], name: "index_appeals_api_evidence_submissions_on_guid"
     t.index ["supportable_type", "supportable_id"], name: "evidence_submission_supportable_id_type_index"
     t.index ["upload_submission_id"], name: "index_appeals_api_evidence_submissions_on_upload_submission_id", unique: true
@@ -124,10 +126,6 @@ ActiveRecord::Schema.define(version: 2021_09_13_194827) do
 
   create_table "appeals_api_higher_level_reviews", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "status", default: "pending", null: false
-    t.string "encrypted_form_data"
-    t.string "encrypted_form_data_iv"
-    t.string "encrypted_auth_headers"
-    t.string "encrypted_auth_headers_iv"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "code"
@@ -137,13 +135,10 @@ ActiveRecord::Schema.define(version: 2021_09_13_194827) do
     t.string "api_version"
     t.text "form_data_ciphertext"
     t.text "auth_headers_ciphertext"
+    t.text "encrypted_kms_key"
   end
 
   create_table "appeals_api_notice_of_disagreements", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.string "encrypted_form_data"
-    t.string "encrypted_form_data_iv"
-    t.string "encrypted_auth_headers"
-    t.string "encrypted_auth_headers_iv"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.string "status", default: "pending", null: false
@@ -155,6 +150,7 @@ ActiveRecord::Schema.define(version: 2021_09_13_194827) do
     t.string "api_version"
     t.text "form_data_ciphertext"
     t.text "auth_headers_ciphertext"
+    t.text "encrypted_kms_key"
   end
 
   create_table "appeals_api_status_updates", force: :cascade do |t|
@@ -169,10 +165,6 @@ ActiveRecord::Schema.define(version: 2021_09_13_194827) do
   end
 
   create_table "appeals_api_supplemental_claims", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.string "encrypted_form_data"
-    t.string "encrypted_form_data_iv"
-    t.string "encrypted_auth_headers"
-    t.string "encrypted_auth_headers_iv"
     t.string "status", default: "pending"
     t.string "code"
     t.string "detail"
@@ -183,6 +175,8 @@ ActiveRecord::Schema.define(version: 2021_09_13_194827) do
     t.datetime "updated_at", precision: 6, null: false
     t.text "form_data_ciphertext"
     t.text "auth_headers_ciphertext"
+    t.text "encrypted_kms_key"
+    t.boolean "evidence_submission_indicated"
   end
 
   create_table "async_transactions", id: :serial, force: :cascade do |t|
@@ -195,10 +189,10 @@ ActiveRecord::Schema.define(version: 2021_09_13_194827) do
     t.string "transaction_status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "encrypted_metadata"
-    t.string "encrypted_metadata_iv"
     t.text "metadata_ciphertext"
+    t.text "encrypted_kms_key"
     t.index ["created_at"], name: "index_async_transactions_on_created_at"
+    t.index ["id", "type"], name: "index_async_transactions_on_id_and_type"
     t.index ["source_id"], name: "index_async_transactions_on_source_id"
     t.index ["transaction_id", "source"], name: "index_async_transactions_on_transaction_id_and_source", unique: true
     t.index ["transaction_id"], name: "index_async_transactions_on_transaction_id"
@@ -249,25 +243,13 @@ ActiveRecord::Schema.define(version: 2021_09_13_194827) do
 
   create_table "claims_api_auto_established_claims", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "status"
-    t.string "encrypted_form_data"
-    t.string "encrypted_form_data_iv"
-    t.string "encrypted_auth_headers"
-    t.string "encrypted_auth_headers_iv"
     t.integer "evss_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "md5"
     t.string "source"
-    t.string "encrypted_file_data"
-    t.string "encrypted_file_data_iv"
-    t.string "encrypted_evss_response"
-    t.string "encrypted_evss_response_iv"
-    t.string "encrypted_bgs_flash_responses"
-    t.string "encrypted_bgs_flash_responses_iv"
     t.string "flashes", default: [], array: true
     t.jsonb "special_issues", default: []
-    t.string "encrypted_bgs_special_issue_responses"
-    t.string "encrypted_bgs_special_issue_responses_iv"
     t.string "veteran_icn"
     t.text "form_data_ciphertext"
     t.text "auth_headers_ciphertext"
@@ -275,6 +257,7 @@ ActiveRecord::Schema.define(version: 2021_09_13_194827) do
     t.text "evss_response_ciphertext"
     t.text "bgs_flash_responses_ciphertext"
     t.text "bgs_special_issue_responses_ciphertext"
+    t.text "encrypted_kms_key"
     t.index ["evss_id"], name: "index_claims_api_auto_established_claims_on_evss_id"
     t.index ["md5"], name: "index_claims_api_auto_established_claims_on_md5"
     t.index ["source"], name: "index_claims_api_auto_established_claims_on_source"
@@ -283,12 +266,6 @@ ActiveRecord::Schema.define(version: 2021_09_13_194827) do
   create_table "claims_api_power_of_attorneys", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "status"
     t.string "current_poa"
-    t.string "encrypted_form_data"
-    t.string "encrypted_form_data_iv"
-    t.string "encrypted_auth_headers"
-    t.string "encrypted_auth_headers_iv"
-    t.string "encrypted_file_data"
-    t.string "encrypted_file_data_iv"
     t.string "md5"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -296,24 +273,22 @@ ActiveRecord::Schema.define(version: 2021_09_13_194827) do
     t.string "vbms_document_series_ref_id"
     t.string "vbms_error_message"
     t.integer "vbms_upload_failure_count", default: 0
-    t.string "encrypted_source_data"
-    t.string "encrypted_source_data_iv"
     t.string "header_md5"
     t.string "signature_errors", default: [], array: true
     t.text "form_data_ciphertext"
     t.text "auth_headers_ciphertext"
     t.text "file_data_ciphertext"
     t.text "source_data_ciphertext"
+    t.text "encrypted_kms_key"
     t.index ["header_md5"], name: "index_claims_api_power_of_attorneys_on_header_md5"
   end
 
   create_table "claims_api_supporting_documents", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.string "encrypted_file_data", null: false
-    t.string "encrypted_file_data_iv", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.uuid "auto_established_claim_id"
     t.text "file_data_ciphertext"
+    t.text "encrypted_kms_key"
   end
 
   create_table "covid_vaccine_expanded_registration_submissions", id: :serial, force: :cascade do |t|
@@ -324,21 +299,13 @@ ActiveRecord::Schema.define(version: 2021_09_13_194827) do
     t.string "email_confirmation_id"
     t.string "enrollment_id"
     t.string "batch_id"
-    t.string "encrypted_raw_form_data"
-    t.string "encrypted_raw_form_data_iv"
-    t.string "encrypted_eligibility_info"
-    t.string "encrypted_eligibility_info_iv"
-    t.string "encrypted_form_data"
-    t.string "encrypted_form_data_iv"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "raw_form_data_ciphertext"
     t.text "eligibility_info_ciphertext"
     t.text "form_data_ciphertext"
+    t.text "encrypted_kms_key"
     t.index ["batch_id"], name: "index_covid_vaccine_expanded_reg_submissions_on_batch_id"
-    t.index ["encrypted_eligibility_info_iv"], name: "index_covid_vaccine_expanded_on_el_iv", unique: true
-    t.index ["encrypted_form_data_iv"], name: "index_covid_vaccine_expanded_on_form_iv", unique: true
-    t.index ["encrypted_raw_form_data_iv"], name: "index_covid_vaccine_expanded_on_raw_iv", unique: true
     t.index ["state"], name: "index_covid_vaccine_expanded_registration_submissions_on_state"
     t.index ["submission_uuid"], name: "index_covid_vaccine_expanded_on_submission_id", unique: true
     t.index ["vetext_sid"], name: "index_covid_vaccine_expanded_on_vetext_sid", unique: true
@@ -347,21 +314,26 @@ ActiveRecord::Schema.define(version: 2021_09_13_194827) do
   create_table "covid_vaccine_registration_submissions", id: :serial, force: :cascade do |t|
     t.string "sid"
     t.uuid "account_id"
-    t.string "encrypted_form_data"
-    t.string "encrypted_form_data_iv"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "encrypted_raw_form_data"
-    t.string "encrypted_raw_form_data_iv"
     t.boolean "expanded", default: false, null: false
     t.boolean "sequestered", default: false, null: false
     t.string "email_confirmation_id"
     t.string "enrollment_id"
     t.text "form_data_ciphertext"
     t.text "raw_form_data_ciphertext"
+    t.text "encrypted_kms_key"
     t.index ["account_id", "created_at"], name: "index_covid_vaccine_registry_submissions_2"
-    t.index ["encrypted_form_data_iv"], name: "index_covid_vaccine_registry_submissions_on_iv", unique: true
     t.index ["sid"], name: "index_covid_vaccine_registry_submissions_on_sid", unique: true
+  end
+
+  create_table "deprecated_user_accounts", force: :cascade do |t|
+    t.uuid "user_account_id"
+    t.bigint "user_verification_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["user_account_id"], name: "index_deprecated_user_accounts_on_user_account_id", unique: true
+    t.index ["user_verification_id"], name: "index_deprecated_user_accounts_on_user_verification_id", unique: true
   end
 
   create_table "directory_applications", force: :cascade do |t|
@@ -408,12 +380,11 @@ ActiveRecord::Schema.define(version: 2021_09_13_194827) do
     t.datetime "processed_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "encrypted_form"
-    t.string "encrypted_form_iv"
     t.string "regional_processing_office", null: false
     t.string "form_type", default: "1990"
     t.integer "saved_claim_id", null: false
     t.text "form_ciphertext"
+    t.text "encrypted_kms_key"
     t.index ["created_at"], name: "index_education_benefits_claims_on_created_at"
     t.index ["saved_claim_id"], name: "index_education_benefits_claims_on_saved_claim_id"
     t.index ["submitted_at"], name: "index_education_benefits_claims_on_submitted_at"
@@ -447,12 +418,11 @@ ActiveRecord::Schema.define(version: 2021_09_13_194827) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.boolean "poa"
-    t.string "encrypted_auth_headers_json"
-    t.string "encrypted_auth_headers_json_iv"
     t.integer "remaining_entitlement"
     t.datetime "denial_email_sent_at"
     t.datetime "confirmation_email_sent_at"
     t.text "auth_headers_json_ciphertext"
+    t.text "encrypted_kms_key"
     t.index ["education_benefits_claim_id"], name: "index_education_stem_automated_decisions_on_claim_id"
     t.index ["user_uuid"], name: "index_education_stem_automated_decisions_on_user_uuid"
   end
@@ -515,6 +485,8 @@ ActiveRecord::Schema.define(version: 2021_09_13_194827) do
     t.string "error_class"
     t.string "error_message"
     t.datetime "updated_at", null: false
+    t.jsonb "bgjob_errors", default: {}
+    t.index ["bgjob_errors"], name: "index_form526_job_statuses_on_bgjob_errors", using: :gin
     t.index ["form526_submission_id"], name: "index_form526_job_statuses_on_form526_submission_id"
     t.index ["job_id"], name: "index_form526_job_statuses_on_job_id", unique: true
   end
@@ -523,19 +495,14 @@ ActiveRecord::Schema.define(version: 2021_09_13_194827) do
     t.string "user_uuid", null: false
     t.integer "saved_claim_id", null: false
     t.integer "submitted_claim_id"
-    t.string "encrypted_auth_headers_json", null: false
-    t.string "encrypted_auth_headers_json_iv", null: false
-    t.string "encrypted_form_json", null: false
-    t.string "encrypted_form_json_iv", null: false
     t.boolean "workflow_complete", default: false, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "multiple_birls", comment: "*After* a SubmitForm526 Job fails, a lookup is done to see if the veteran has multiple BIRLS IDs. This field gets set to true if that is the case. If the initial submit job succeeds, this field will remain false whether or not the veteran has multiple BIRLS IDs --so this field cannot technically be used to sum all Form526 veterans that have multiple BIRLS. This field /can/ give us an idea of how often having multiple BIRLS IDs is a problem."
-    t.string "encrypted_birls_ids_tried", comment: "This field keeps track of the BIRLS IDs used when trying to do a SubmitForm526 Job. If a submit job fails, a lookup is done to retrieve all of the veteran's BIRLS IDs. If a BIRLS ID hasn't been used it will be swapped into the auth_headers, and the BIRLS ID that had just been used (when the job had failed), will be added to this array. To know which Form526Submissions have tried (or are trying) reattempts with a different BIRLS ID, search for Submissions where `multiple_birls: true`"
-    t.string "encrypted_birls_ids_tried_iv"
     t.text "auth_headers_json_ciphertext"
     t.text "form_json_ciphertext"
     t.text "birls_ids_tried_ciphertext"
+    t.text "encrypted_kms_key"
     t.index ["saved_claim_id"], name: "index_form526_submissions_on_saved_claim_id", unique: true
     t.index ["submitted_claim_id"], name: "index_form526_submissions_on_submitted_claim_id", unique: true
     t.index ["user_uuid"], name: "index_form526_submissions_on_user_uuid"
@@ -545,23 +512,22 @@ ActiveRecord::Schema.define(version: 2021_09_13_194827) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.uuid "guid", null: false
-    t.string "encrypted_file_data", null: false
-    t.string "encrypted_file_data_iv", null: false
     t.string "type", null: false
     t.text "file_data_ciphertext"
+    t.text "encrypted_kms_key"
     t.index ["guid", "type"], name: "index_form_attachments_on_guid_and_type", unique: true
+    t.index ["id", "type"], name: "index_form_attachments_on_id_and_type"
   end
 
   create_table "gibs_not_found_users", id: :serial, force: :cascade do |t|
     t.string "edipi", null: false
     t.string "first_name", null: false
     t.string "last_name", null: false
-    t.string "encrypted_ssn", null: false
-    t.string "encrypted_ssn_iv", null: false
     t.datetime "dob", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "ssn_ciphertext"
+    t.text "encrypted_kms_key"
     t.index ["edipi"], name: "index_gibs_not_found_users_on_edipi"
   end
 
@@ -577,16 +543,11 @@ ActiveRecord::Schema.define(version: 2021_09_13_194827) do
     t.string "user_uuid"
     t.string "appointment_id"
     t.string "questionnaire_response_id"
-    t.string "encrypted_questionnaire_response_data"
-    t.string "encrypted_questionnaire_response_data_iv"
-    t.string "encrypted_user_demographics_data"
-    t.string "encrypted_user_demographics_data_iv"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.text "questionnaire_response_data_ciphertext"
     t.text "user_demographics_data_ciphertext"
-    t.index ["encrypted_questionnaire_response_data_iv"], name: "qr_key", unique: true
-    t.index ["encrypted_user_demographics_data_iv"], name: "user_demographics_key", unique: true
+    t.text "encrypted_kms_key"
     t.index ["user_uuid", "questionnaire_response_id"], name: "find_by_user_qr", unique: true
   end
 
@@ -600,13 +561,12 @@ ActiveRecord::Schema.define(version: 2021_09_13_194827) do
   create_table "in_progress_forms", id: :serial, force: :cascade do |t|
     t.string "user_uuid", null: false
     t.string "form_id", null: false
-    t.string "encrypted_form_data", null: false
-    t.string "encrypted_form_data_iv", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.json "metadata"
     t.datetime "expires_at"
     t.text "form_data_ciphertext"
+    t.text "encrypted_kms_key"
     t.index ["form_id", "user_uuid"], name: "index_in_progress_forms_on_form_id_and_user_uuid", unique: true
     t.index ["user_uuid"], name: "index_in_progress_forms_on_user_uuid"
   end
@@ -672,10 +632,10 @@ ActiveRecord::Schema.define(version: 2021_09_13_194827) do
     t.datetime "updated_at", null: false
     t.integer "saved_claim_id"
     t.datetime "completed_at"
-    t.string "encrypted_file_data", null: false
-    t.string "encrypted_file_data_iv", null: false
     t.text "file_data_ciphertext"
+    t.text "encrypted_kms_key"
     t.index ["guid"], name: "index_persistent_attachments_on_guid", unique: true
+    t.index ["id", "type"], name: "index_persistent_attachments_on_id_and_type"
     t.index ["saved_claim_id"], name: "index_persistent_attachments_on_saved_claim_id"
   end
 
@@ -721,14 +681,14 @@ ActiveRecord::Schema.define(version: 2021_09_13_194827) do
   create_table "saved_claims", id: :serial, force: :cascade do |t|
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string "encrypted_form", null: false
-    t.string "encrypted_form_iv", null: false
     t.string "form_id"
     t.uuid "guid", null: false
     t.string "type"
     t.text "form_ciphertext"
+    t.text "encrypted_kms_key"
     t.index ["created_at", "type"], name: "index_saved_claims_on_created_at_and_type"
     t.index ["guid"], name: "index_saved_claims_on_guid", unique: true
+    t.index ["id", "type"], name: "index_saved_claims_on_id_and_type"
   end
 
   create_table "session_activities", id: :serial, force: :cascade do |t|
@@ -807,6 +767,30 @@ ActiveRecord::Schema.define(version: 2021_09_13_194827) do
     t.text "notes"
   end
 
+  create_table "user_accounts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "icn"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["icn"], name: "index_user_accounts_on_icn", unique: true
+  end
+
+  create_table "user_verifications", force: :cascade do |t|
+    t.uuid "user_account_id"
+    t.string "idme_uuid"
+    t.string "logingov_uuid"
+    t.string "mhv_uuid"
+    t.string "dslogon_uuid"
+    t.datetime "verified_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["dslogon_uuid"], name: "index_user_verifications_on_dslogon_uuid", unique: true
+    t.index ["idme_uuid"], name: "index_user_verifications_on_idme_uuid", unique: true
+    t.index ["logingov_uuid"], name: "index_user_verifications_on_logingov_uuid", unique: true
+    t.index ["mhv_uuid"], name: "index_user_verifications_on_mhv_uuid", unique: true
+    t.index ["user_account_id"], name: "index_user_verifications_on_user_account_id"
+    t.index ["verified_at"], name: "index_user_verifications_on_verified_at"
+  end
+
   create_table "va_forms_forms", force: :cascade do |t|
     t.string "form_name"
     t.string "url"
@@ -858,7 +842,9 @@ ActiveRecord::Schema.define(version: 2021_09_13_194827) do
     t.json "uploaded_pdf"
     t.boolean "use_active_storage", default: false
     t.jsonb "metadata", default: {}
+    t.index ["created_at"], name: "index_vba_documents_upload_submissions_on_created_at"
     t.index ["guid"], name: "index_vba_documents_upload_submissions_on_guid"
+    t.index ["s3_deleted"], name: "index_vba_documents_upload_submissions_on_s3_deleted"
     t.index ["status"], name: "index_vba_documents_upload_submissions_on_status"
   end
 
@@ -891,14 +877,11 @@ ActiveRecord::Schema.define(version: 2021_09_13_194827) do
     t.string "phone"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "encrypted_ssn"
-    t.string "encrypted_ssn_iv"
-    t.string "encrypted_dob"
-    t.string "encrypted_dob_iv"
     t.string "poa_codes", default: [], array: true
     t.string "user_types", default: [], array: true
     t.text "ssn_ciphertext"
     t.text "dob_ciphertext"
+    t.text "encrypted_kms_key"
     t.index ["representative_id", "first_name", "last_name"], name: "index_vso_grp", unique: true
   end
 
@@ -955,4 +938,7 @@ ActiveRecord::Schema.define(version: 2021_09_13_194827) do
   add_foreign_key "account_login_stats", "accounts"
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "deprecated_user_accounts", "user_accounts"
+  add_foreign_key "deprecated_user_accounts", "user_verifications"
+  add_foreign_key "user_verifications", "user_accounts"
 end

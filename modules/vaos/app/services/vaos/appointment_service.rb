@@ -5,6 +5,8 @@ require 'common/client/errors'
 
 module VAOS
   class AppointmentService < VAOS::SessionService
+    DIRECT_SCHEDULE_ERROR_KEY = 'DirectScheduleError'
+
     def get_appointments(type, start_date, end_date, pagination_params = {})
       params = date_params(start_date, end_date).merge(page_params(pagination_params)).merge(other_params).compact
 
@@ -39,6 +41,7 @@ module VAOS
           meta: {}
         }
       rescue Common::Exceptions::BackendServiceException => e
+        log_direct_schedule_submission_errors(e)
         # TODO: Reevaluate the need to log clinic data three months after launch (6/15/20)
         log_clinic_details(:create, params.dig(:clinic, :clinic_id), site_code) if e.key == 'VAOS_400'
         raise e
@@ -63,6 +66,18 @@ module VAOS
     end
 
     private
+
+    def log_direct_schedule_submission_errors(e)
+      error_entry = { DIRECT_SCHEDULE_ERROR_KEY => ds_error_details(e) }
+      Rails.logger.warn('Direct schedule submission error', error_entry.to_json)
+    end
+
+    def ds_error_details(e)
+      {
+        status: e.status_code,
+        message: e.message
+      }
+    end
 
     def log_clinic_details(action, clinic_id, site_code)
       Rails.logger.warn(

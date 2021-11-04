@@ -138,8 +138,8 @@ class MPIData < Common::RedisStore
   end
 
   # @return [MPI::Responses::FindProfileResponse] the response returned from MVI
-  def mvi_response
-    @mvi_response ||= response_from_redis_or_service
+  def mvi_response(user_key: user_identity.uuid)
+    @mvi_response ||= response_from_redis_or_service(user_key: user_key)
   end
 
   # @return [String] Array representing the historical icn data for the user
@@ -191,8 +191,8 @@ class MPIData < Common::RedisStore
     cache(user_identity.uuid, mvi_response) if mvi_response.cache?
   end
 
-  def response_from_redis_or_service
-    do_cached_with(key: user_identity.uuid) do
+  def response_from_redis_or_service(user_key: user_identity.uuid)
+    do_cached_with(key: user_key) do
       if Flipper.enabled?(:mpi_gem)
         if user_identity.edipi.present? || user_identity.mhv_icn.present?
           mpi_v1_service.find_profile(user_identity)

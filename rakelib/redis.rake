@@ -4,13 +4,6 @@ require 'emis/responses/response'
 require 'emis/responses/get_veteran_status_response'
 
 namespace :redis do
-  desc 'Flush RedisStore: Account'
-  task flush_account_store: :environment do
-    # Account uses ActiveRecordCacheAside so we don't have #redis_namespace
-    namespace = 'user-account-details'
-    flush_keys(namespace)
-  end
-
   desc 'Flush Vets.gov User/Sessions'
   task flush_session: %i[flush_session_store flush_users_store]
 
@@ -72,9 +65,10 @@ namespace :redis do
         u = Oj.load(redis.get(key))
         count += 1
         loa = u[:loa][:highest]
-        if loa == 3
+        case loa
+        when 3
           loa3 += 1
-        elsif loa == 1
+        when 1
           loa1 += 1
         end
       rescue

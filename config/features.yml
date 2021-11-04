@@ -12,6 +12,10 @@
 # Sorted using http://yaml-sorter.herokuapp.com/
 
 features:
+  caregiver_sigi_enabled:
+    actor_type: user
+    description: Whether Self-Identifying Gender Identity is enabled for caregiver.
+    enable_in_development: true
   can_upload_10_10cg_poa:
     actor_type: cookie_id
     description: Allows users to upload POA documentation when completing the 10-10CG.
@@ -46,9 +50,17 @@ features:
     actor_type: user
     description: Enables the health care check-in experiences
     enable_in_development: true
+  check_in_experience_demographics_page_enabled:
+    actor_type: user
+    description: Enables the health care check-in experiences to show demographics page.
+    enable_in_development: true
   check_in_experience_low_authentication_enabled:
     actor_type: user
     description: Enables the health care check-in experiences to use the lowest tier of authentication, i.e. last 4 and last name
+    enable_in_development: true
+  check_in_experience_next_of_kin_enabled:
+    actor_type: user
+    description: Enables the health care check-in experiences to show the next of kin page.
     enable_in_development: true
   check_in_experience_update_information_page_enabled:
     actor_type: user
@@ -58,10 +70,17 @@ features:
     actor_type: user
     description: Enables the health care check-in experiences to show multiple appointments
     enable_in_development: true
+  check_in_experience_services_refactor:
+    actor_type: user
+    description: Refactor LoROTA and CHIP service objects and use clients
+    enable_in_development: true
   coe_access:
     actor_type: user
     description: Feature gates the certificate of eligibility application
     enable_in_development: true
+  communication_preferences:
+    actor_type: user
+    description: Allow user to access backend communication_preferences API
   contact_info_change_email:
     actor_type: user
     description: Send user a notification email when their contact info changes.
@@ -101,6 +120,9 @@ features:
   decision_review_hlr_email:
     actor_type: user
     description: Send email notification for successful HLR submission
+  decision_review_sc_email:
+    actor_type: user
+    description: Send email notification for successful SC submission
   dependency_verification:
     actor_type: user
     description: Feature gates the dependency verification modal for updating the diaries service.
@@ -150,13 +172,13 @@ features:
   facilities_ppms_suppress_pharmacies:
     actor_type: user
     description: Front End Flag to suppress the ability to search for pharmacies
-  facilities_vet_center_automate_nearby:
-    actor_type: user
-    description: Automatically fetch nearby Vet Centers on Vet Center locations pages
-    enable_in_development: true
   facility_locator_covid_vaccine_walk_in_availability_text_frontend:
     actor_type: user
     description: Enable covid vaccine walk-in availability text within covid vaccine related search results
+    enable_in_development: true
+  facility_locator_lat_long_only:
+    actor_type: user
+    description: Send only lat/long values (no bounding box or address) to the API when querying for facilities.
     enable_in_development: true
   facility_locator_lighthouse_covid_vaccine_query:
     actor_type: user
@@ -188,6 +210,10 @@ features:
   facility_locator_rails_engine:
     actor_type: user
     description: Use rails engine routes for all Facility Locator API calls
+    enable_in_development: true
+  facility_locator_restore_community_care_pagination:
+    actor_type: user
+    description: Restores pagination for community care providers, emergency care, and pharmacies. (urgent care is excluded)
     enable_in_development: true
   facility_locator_show_community_cares:
     actor_type: user
@@ -241,10 +267,6 @@ features:
     actor_type: user
     description: Enable/disable custom expiration dates for forms
     enable_in_development: true
-  language_support:
-    actor_type: user
-    description: Toggles the availability of language support links (spanish et al) in the footer
-    enable_in_development: true
   login_gov:
     actor_type: cookie
     description: Enables/disables the usage of the new service provider Login.gov (VSP Identity)
@@ -274,6 +296,10 @@ features:
     actor_type: user
     description: Turns on the Notification Settings section of the VA.gov Profile
     enable_in_development: true
+  profile_enhancements:
+    actor_type: user
+    description: Used to show any enhancement for the profile
+    enable_in_development: true
   profile_schema_forms:
     actor_type: user
     description: Enables SchemaForm-based contact info edit forms on the VA.gov Veteran profile page
@@ -289,6 +315,10 @@ features:
   search_representative:
     actor_type: user
     description: Enable frontend application and cta for Search Representative application
+    enable_in_development: true
+  search_dropdown_component_enabled:
+    actor_type: user
+    description: Enables typeahead 2.0 functionality
     enable_in_development: true
   search_typeahead_enabled:
     actor_type: user
@@ -330,6 +360,10 @@ features:
   show_financial_status_report_wizard:
     actor_type: user
     description: Enables the Wizard for VA Form 5655 (Financial Status Report)
+    enable_in_development: true
+  show_header_v2:
+    action_type: user
+    description: Enables the new header
     enable_in_development: true
   show_meb_mock_endpoints:
     actor_type: user

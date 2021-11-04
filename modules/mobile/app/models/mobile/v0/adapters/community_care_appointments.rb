@@ -61,7 +61,8 @@ module Mobile
             status_detail: nil, # not currently used by community care appointments
             time_zone: time_zone,
             vetext_id: nil,
-            reason: nil
+            reason: nil,
+            is_covid_vaccine: false
           }
         end
         # rubocop:enable Metrics/MethodLength
@@ -77,6 +78,7 @@ module Mobile
           # and extension (until the end of the string) (\S*)\z
           phone_captures = phone.match(/\((\d{3})\)\s(\d{3}-\d{4})(\S*)\z/)
           {
+            id: nil,
             name: name,
             address: {
               street: address[:street],

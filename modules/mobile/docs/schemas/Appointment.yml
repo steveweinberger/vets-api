@@ -30,6 +30,7 @@ properties:
       - timeZone
       - vetextId
       - reason
+      - isCovidVaccine
     properties:
       appointmentType:
         type: string
@@ -56,6 +57,9 @@ properties:
           - url
           - code
         properties:
+          id:
+            type: string
+            example: 442
           name:
             type: string
             example: VA Long Beach Healthcare System
@@ -140,3 +144,6 @@ properties:
       reason:
         type: string
         example: "Follow-up/Routine: Reason 1"
+      isCovidVaccine:
+        type: boolean
+        example: false

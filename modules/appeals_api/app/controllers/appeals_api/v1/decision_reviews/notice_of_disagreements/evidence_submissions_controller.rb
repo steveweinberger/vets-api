@@ -60,7 +60,7 @@ module AppealsApi::V1
         end
 
         def nod_uuid_missing_error
-          error = { title: 'bad_request', detail: I18n.t('appeals_api.errors.missing_nod_uuid') }
+          error = { title: 'bad_request', detail: I18n.t('appeals_api.errors.missing_uuid', appeal_type: 'NOD') }
           log_error(error)
 
           render json: { errors: [error] }, status: :bad_request
