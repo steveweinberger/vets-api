@@ -299,10 +299,10 @@ describe MPI::V1::Service do
         let(:body) { File.read('spec/support/mpi/find_candidate_ar_code_database_error_response.xml') }
 
         it 'raises a invalid request error', :aggregate_failures do
-          expect(subject).to receive(:log_exception_to_sentry)
+          expect(service).to receive(:log_exception_to_sentry)
 
           stub_request(:post, Settings.mvi.url).to_return(status: 200, body: body)
-          response = subject.find_profile(user)
+          response = service.find_profile(user)
           server_error_502_expectations_for(response)
         end
       end
