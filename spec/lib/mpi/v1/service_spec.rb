@@ -221,6 +221,7 @@ describe MPI::V1::Service do
       context 'valid request' do
         before do
           expect(MasterPersonIndex::Messages::FindProfileMessage).to receive(:new).once.and_call_original
+          allow(user).to receive(:edipi).and_return(nil)
         end
 
         it 'calls the find_profile endpoint with a find candidate message' do
