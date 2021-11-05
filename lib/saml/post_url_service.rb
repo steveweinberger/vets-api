@@ -46,7 +46,10 @@ module SAML
       if auth == 'success'
         # if the original auth request specified a redirect, use that
         redirect_target = @tracker.payload_attr(:redirect)
-        return redirect_target if redirect_target.present?
+        if redirect_target.present?
+          redirect_target += '&postLogin=true' if @tracker.payload_attr(:post_login) == 'true'
+          return redirect_target
+        end
       end
 
       # if the original auth request was an inbound ssoe autologin (type custom)
@@ -78,23 +81,10 @@ module SAML
 
     # Builds the urls to trigger various SSO policies: mhv, dslogon, idme, logingov, mfa, or verify flows.
     # link_authn_context is the new proposed authn_context
-    def build_sso_url(link_authn_context)
+    def build_sso_url(link_authn_context, authn_con_compare = 'exact')
       new_url_settings = url_settings
       new_url_settings.authn_context = link_authn_context
-      saml_auth_request = OneLogin::RubySaml::Authrequest.new
-      save_saml_request_tracker(saml_auth_request.uuid, link_authn_context)
-      post_params = saml_auth_request.create_params(new_url_settings, 'RelayState' => relay_state_params)
-      login_url = new_url_settings.idp_sso_service_url
-      [login_url, post_params]
-    end
-
-    # Temporary Login.gov/ISAM integration sso_url method
-    # will be removed when all IDPs are using 'minimum' authn_context_comparison
-    def build_logingov_sso_url(link_authn_context)
-      new_url_settings = saml_settings.dup
-      new_url_settings.name_identifier_value = session&.uuid
-      new_url_settings.authn_context = link_authn_context
-      new_url_settings.authn_context_comparison = 'minimum'
+      new_url_settings.authn_context_comparison = authn_con_compare
       saml_auth_request = OneLogin::RubySaml::Authrequest.new
       save_saml_request_tracker(saml_auth_request.uuid, link_authn_context)
       post_params = saml_auth_request.create_params(new_url_settings, 'RelayState' => relay_state_params)

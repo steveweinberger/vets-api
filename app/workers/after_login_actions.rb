@@ -11,9 +11,12 @@ class AfterLoginActions
     return unless @current_user
 
     evss_create_account
-    create_user_account
     update_account_login_stats
-    TestUserDashboard::UpdateUser.new(@current_user).call(Time.current) if Settings.test_user_dashboard.env == 'staging'
+
+    if Settings.test_user_dashboard.env == 'staging'
+      TestUserDashboard::UpdateUser.new(@current_user).call(Time.current)
+      TestUserDashboard::AccountMetrics.new(@current_user).checkout
+    end
   end
 
   private

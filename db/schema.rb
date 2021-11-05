@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_10_11_201540) do
+ActiveRecord::Schema.define(version: 2021_11_03_172528) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -29,10 +29,12 @@ ActiveRecord::Schema.define(version: 2021_10_11_201540) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.string "current_verification"
+    t.datetime "logingov_at"
     t.index ["account_id"], name: "index_account_login_stats_on_account_id", unique: true
     t.index ["current_verification"], name: "index_account_login_stats_on_current_verification"
     t.index ["dslogon_at"], name: "index_account_login_stats_on_dslogon_at"
     t.index ["idme_at"], name: "index_account_login_stats_on_idme_at"
+    t.index ["logingov_at"], name: "index_account_login_stats_on_logingov_at"
     t.index ["myhealthevet_at"], name: "index_account_login_stats_on_myhealthevet_at"
   end
 
@@ -174,6 +176,7 @@ ActiveRecord::Schema.define(version: 2021_10_11_201540) do
     t.text "form_data_ciphertext"
     t.text "auth_headers_ciphertext"
     t.text "encrypted_kms_key"
+    t.boolean "evidence_submission_indicated"
   end
 
   create_table "async_transactions", id: :serial, force: :cascade do |t|
@@ -189,6 +192,7 @@ ActiveRecord::Schema.define(version: 2021_10_11_201540) do
     t.text "metadata_ciphertext"
     t.text "encrypted_kms_key"
     t.index ["created_at"], name: "index_async_transactions_on_created_at"
+    t.index ["id", "type"], name: "index_async_transactions_on_id_and_type"
     t.index ["source_id"], name: "index_async_transactions_on_source_id"
     t.index ["transaction_id", "source"], name: "index_async_transactions_on_transaction_id_and_source", unique: true
     t.index ["transaction_id"], name: "index_async_transactions_on_transaction_id"
@@ -321,6 +325,15 @@ ActiveRecord::Schema.define(version: 2021_10_11_201540) do
     t.text "encrypted_kms_key"
     t.index ["account_id", "created_at"], name: "index_covid_vaccine_registry_submissions_2"
     t.index ["sid"], name: "index_covid_vaccine_registry_submissions_on_sid", unique: true
+  end
+
+  create_table "deprecated_user_accounts", force: :cascade do |t|
+    t.uuid "user_account_id"
+    t.bigint "user_verification_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["user_account_id"], name: "index_deprecated_user_accounts_on_user_account_id", unique: true
+    t.index ["user_verification_id"], name: "index_deprecated_user_accounts_on_user_verification_id", unique: true
   end
 
   create_table "directory_applications", force: :cascade do |t|
@@ -472,6 +485,8 @@ ActiveRecord::Schema.define(version: 2021_10_11_201540) do
     t.string "error_class"
     t.string "error_message"
     t.datetime "updated_at", null: false
+    t.jsonb "bgjob_errors", default: {}
+    t.index ["bgjob_errors"], name: "index_form526_job_statuses_on_bgjob_errors", using: :gin
     t.index ["form526_submission_id"], name: "index_form526_job_statuses_on_form526_submission_id"
     t.index ["job_id"], name: "index_form526_job_statuses_on_job_id", unique: true
   end
@@ -501,6 +516,7 @@ ActiveRecord::Schema.define(version: 2021_10_11_201540) do
     t.text "file_data_ciphertext"
     t.text "encrypted_kms_key"
     t.index ["guid", "type"], name: "index_form_attachments_on_guid_and_type", unique: true
+    t.index ["id", "type"], name: "index_form_attachments_on_id_and_type"
   end
 
   create_table "gibs_not_found_users", id: :serial, force: :cascade do |t|
@@ -619,6 +635,7 @@ ActiveRecord::Schema.define(version: 2021_10_11_201540) do
     t.text "file_data_ciphertext"
     t.text "encrypted_kms_key"
     t.index ["guid"], name: "index_persistent_attachments_on_guid", unique: true
+    t.index ["id", "type"], name: "index_persistent_attachments_on_id_and_type"
     t.index ["saved_claim_id"], name: "index_persistent_attachments_on_saved_claim_id"
   end
 
@@ -671,6 +688,7 @@ ActiveRecord::Schema.define(version: 2021_10_11_201540) do
     t.text "encrypted_kms_key"
     t.index ["created_at", "type"], name: "index_saved_claims_on_created_at_and_type"
     t.index ["guid"], name: "index_saved_claims_on_guid", unique: true
+    t.index ["id", "type"], name: "index_saved_claims_on_id_and_type"
   end
 
   create_table "session_activities", id: :serial, force: :cascade do |t|
@@ -741,12 +759,36 @@ ActiveRecord::Schema.define(version: 2021_10_11_201540) do
     t.datetime "checkout_time"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.text "services"
     t.string "id_type"
     t.string "loa"
     t.string "account_type"
+    t.text "services"
     t.uuid "idme_uuid"
     t.text "notes"
+  end
+
+  create_table "user_accounts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "icn"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["icn"], name: "index_user_accounts_on_icn", unique: true
+  end
+
+  create_table "user_verifications", force: :cascade do |t|
+    t.uuid "user_account_id"
+    t.string "idme_uuid"
+    t.string "logingov_uuid"
+    t.string "mhv_uuid"
+    t.string "dslogon_uuid"
+    t.datetime "verified_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["dslogon_uuid"], name: "index_user_verifications_on_dslogon_uuid", unique: true
+    t.index ["idme_uuid"], name: "index_user_verifications_on_idme_uuid", unique: true
+    t.index ["logingov_uuid"], name: "index_user_verifications_on_logingov_uuid", unique: true
+    t.index ["mhv_uuid"], name: "index_user_verifications_on_mhv_uuid", unique: true
+    t.index ["user_account_id"], name: "index_user_verifications_on_user_account_id"
+    t.index ["verified_at"], name: "index_user_verifications_on_verified_at"
   end
 
   create_table "va_forms_forms", force: :cascade do |t|
@@ -800,7 +842,9 @@ ActiveRecord::Schema.define(version: 2021_10_11_201540) do
     t.json "uploaded_pdf"
     t.boolean "use_active_storage", default: false
     t.jsonb "metadata", default: {}
+    t.index ["created_at"], name: "index_vba_documents_upload_submissions_on_created_at"
     t.index ["guid"], name: "index_vba_documents_upload_submissions_on_guid"
+    t.index ["s3_deleted"], name: "index_vba_documents_upload_submissions_on_s3_deleted"
     t.index ["status"], name: "index_vba_documents_upload_submissions_on_status"
   end
 
@@ -894,4 +938,7 @@ ActiveRecord::Schema.define(version: 2021_10_11_201540) do
   add_foreign_key "account_login_stats", "accounts"
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "deprecated_user_accounts", "user_accounts"
+  add_foreign_key "deprecated_user_accounts", "user_verifications"
+  add_foreign_key "user_verifications", "user_accounts"
 end
