@@ -3,8 +3,9 @@
 module Authentication
   module OutboundSharedExamples
     def expect_logged_in_home_screen
-      expect(page).to have_content('My Health')
       expect(page).not_to have_content('Sign in')
+      visit 'https://staging-api.va.gov/v0/user'
+      expect(page).to have_content('account_uuid')
     end
 
     RSpec.shared_examples 'logs in outbound ID.me user' do |email, password|
