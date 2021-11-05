@@ -18,4 +18,12 @@ WORKDIR /app
 
 EXPOSE 3000
 
+ADD Gemfile.base* .
+
+RUN bundle install --gemfile=Gemfile.base
+
+ADD . .
+
+RUN bundle install
+
 CMD ["rails", "server", "-b", "0.0.0.0"]

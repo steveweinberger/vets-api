@@ -13,9 +13,10 @@ services:
       - 54320:5432
     volumes:
       - ./data:/var/lib/postgresql/data:cached
-  vets-api:
+  web:
     build:
       context: .
+    command: bundle exec puma -p 3000 -C ./config/puma.rb
     environment:
       BUNDLE_ENTERPRISE__CONTRIBSYS__COM: "${BUNDLE_ENTERPRISE__CONTRIBSYS__COM}"
       "Settings.database_url": "postgis://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@${POSTGRES_HOST:-postgres}:${POSTGRES_PORT:-5432}/${POSTGRES_DATABASE:-vets_api_development}?pool=4"
@@ -26,9 +27,9 @@ services:
     ports:
       - 3000:3000
     volumes:
-      - .:/app:cached
+#     - .:/app:cached
       - "../vets-api-mockdata:/cache"
-      - ./.bundle:/usr/local/bundle
+      - bundle_cache:/.bundle
     working_dir: /app
     depends_on:
       - postgres
@@ -36,3 +37,27 @@ services:
     links:
       - postgres
       - redis
+  worker:
+    build:
+      context: .
+    command: bundle exec sidekiq -q critical,4 -q tasker,3 -q default,2 -q low,1
+    environment:
+      BUNDLE_ENTERPRISE__CONTRIBSYS__COM: "${BUNDLE_ENTERPRISE__CONTRIBSYS__COM}"
+      "Settings.database_url": "postgis://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@${POSTGRES_HOST:-postgres}:${POSTGRES_PORT:-5432}/${POSTGRES_DATABASE:-vets_api_development}?pool=4"
+      "Settings.test_database_url": "postgis://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@${POSTGRES_HOST:-postgres}:${POSTGRES_PORT:-5432}/${POSTGRES_DATABASE:-vets_api_test}"
+      "Settings.redis.app_data.url": "redis://redis:6379"
+      "Settings.redis.sidekiq.url": "redis://redis:6379"
+    image: vets-api_development:latest
+    volumes:
+#     - .:/app:cached
+      - "../vets-api-mockdata:/cache"
+      - bundle_cache:/.bundle
+    working_dir: /app
+    depends_on:
+      - postgres
+      - redis
+    links:
+      - postgres
+      - redis
+volumes:
+  bundle_cache:
