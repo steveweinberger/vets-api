@@ -2,12 +2,6 @@
 
 module Authentication
   module InboundSharedExamples
-    def expect_logged_in_home_screen
-      expect(page).not_to have_content('Sign in')
-      visit 'https://staging-api.va.gov/v0/user'
-      expect(page).to have_content('account_uuid')
-    end
-
     RSpec.shared_examples 'logs in inbound ID.me user from eauth' do |email, password|
       it 'logs in inbound idme user from eauth' do
         visit 'https://sqa.eauth.va.gov/accessva/'
@@ -28,7 +22,7 @@ module Authentication
         find('a', text: 'Veteran Health Identification Card (VHIC)')
 
         visit '/'
-        expect_logged_in_home_screen
+        expect_user_logged_in
       end
     end
   end

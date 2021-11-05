@@ -4,6 +4,11 @@ require 'rails_helper'
 require 'support/authentication/outbound_shared_examples'
 require 'support/authentication/inbound_shared_examples'
 
+def expect_user_logged_in
+  expect(page).to have_content('My Health')
+  expect(page).not_to have_content('Sign in')
+end
+
 Capybara.register_driver :chrome_headless do |app|
   options = ::Selenium::WebDriver::Chrome::Options.new
 
@@ -17,11 +22,11 @@ end
 
 RSpec.configure do |config|
   config.before do
-    driven_by :selenium_chrome
+    driven_by :chrome_headless
     Capybara.server = :puma
     Capybara.app_host = 'https://staging.va.gov'
     Capybara.run_server = false # don't start Rack
-    Capybara.default_max_wait_time = 15
+    Capybara.default_max_wait_time = 25
     VCR.turn_off!
 
     # Fixes issue with WebMock and Ruby 2.7

@@ -2,12 +2,6 @@
 
 module Authentication
   module OutboundSharedExamples
-    def expect_logged_in_home_screen
-      expect(page).not_to have_content('Sign in')
-      visit 'https://staging-api.va.gov/v0/user'
-      expect(page).to have_content('account_uuid')
-    end
-
     RSpec.shared_examples 'logs in outbound ID.me user' do |email, password|
       it 'logs in outbound idme user' do
         visit '/'
@@ -21,7 +15,7 @@ module Authentication
         click_button 'Continue' if has_content?('COMPLETE YOUR SIGN IN')
         click_button 'Continue' if has_content?('COMPLETE YOUR SIGN IN')
 
-        expect_logged_in_home_screen
+        expect_user_logged_in
       end
     end
 
@@ -46,7 +40,7 @@ module Authentication
         # Confirm email address page
         click_link 'Complete confirmation' if has_link?('Complete confirmation')
 
-        expect_logged_in_home_screen
+        expect_user_logged_in
       end
     end
 
@@ -63,7 +57,7 @@ module Authentication
         click_button 'Continue' if has_content?('Complete your sign in')
         click_button 'Continue' if has_content?('Complete your sign in')
 
-        expect_logged_in_home_screen
+        expect_user_logged_in
       end
     end
   end
