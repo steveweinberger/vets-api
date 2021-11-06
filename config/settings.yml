@@ -904,10 +904,13 @@ hqva_mobile:
     host: "sandbox-api.va.gov"
     pgd_aud_claim_url: "https://deptva-eval.okta.com/oauth2/aus8x27nv4g4BS01v2p7"
     health_aud_claim_url: "https://deptva-eval.okta.com/oauth2/aus8nm1q0f7VQ0a482p7"
+    condition_aud_claim_url: "https://deptva-eval.okta.com/oauth2/aus8nm1q0f7VQ0a482p7/v1/token"
     claim_common_id: "0oabja2lpllERXWxo2p7"
+    condition_client_id: "0oaaxkp0aeXEJkMFw2p7"
     grant_type: "client_credentials"
     client_assertion_type: "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"
     redis_session_prefix: "healthquest_lighthouse"
+
     health_api: "health_api"
     pgd_api: "pgd_api"
     mock: false
@@ -926,12 +929,30 @@ hqva_mobile:
       - "patient/Location.read"
       - "patient/Organization.read"
       - "patient/Patient.read"
+      - "patient/Condition.read"
+      - "patient/Observation.read"
+      - "patient/Practitioner.read"
+      - "patient/Medication.read"
+      - "system/Endpoint.read"
 
 # settings va.gov uses related to lighthouse api's
 lighthouse:
-  api_key: fake_key
+  api_key: ~/private.pem
   clinical_health:
+    client_assertion_type: "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"
+    condition_api_scope:
+      - "launch launch/patient"
+      - "patient/Patient.read"
+      - "patient/Condition.read"
+      - "patient/Observation.read"
+      - "patient/Practitioner.read"
+      - "patient/Medication.read"
+      - "system/Endpoint.read"
+    condition_aud_claim_url: "https://deptva-eval.okta.com/oauth2/aus8nm1q0f7VQ0a482p7/v1/token"
+    condition_client_id: "0oaaxkp0aeXEJkMFw2p7"
+    grant_type: "client_credentials"
     url: https://sandbox-api.va.gov
+    api_key: ~/private.pem
   facilities:
     url: https://sandbox-api.va.gov
     api_key: fake_key

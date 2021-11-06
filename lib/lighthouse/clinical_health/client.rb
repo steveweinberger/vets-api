@@ -11,15 +11,30 @@ module Lighthouse
     class Client < Common::Client::Base
       include Common::Client::Concerns::Monitoring
       configuration Lighthouse::ClinicalHealth::Configuration
-      def get_condition(icn)
+      def get_conditions(icn)
         bearer = bearer_token(icn)
-        connection.headers = Configuration.base_request_headers.merge({ "Authorization": "Bearer ${bearer}"} )
+        # connection.headers = Configuration.base_request_headers.merge({ "Authorization": "Bearer ${bearer}"} )
         params =
           { 'patient' => icn,
             'clinical-status' => 'http://terminology.hl7.org/CodeSystem/condition-clinical|active',
             'page' => 1,
             '_count' => 30 }
-        perform(:get, '/services/fhir/v0/r4/Condition', params)
+
+        perform(:get, '/services/fhir/v0/r4/Condition', params, headers = Configuration.base_request_headers.merge({ "Authorization": "Bearer " + bearer }))
+      end
+
+      def get_observations(icn)
+        bearer = bearer_token(icn)
+
+        params = {
+                    'patient': icn,
+                    'category': 'vital-signs',
+                    'code': '85354-9'
+                  }
+        perform(:get, 'services/fhir/v0/r4/Observation', params, headers = Configuration.base_request_headers.merge({ "Authorization": "Bearer " + bearer }))
+      end
+
+      def get_medications(icn)
       end
 
       def authenticate(params)
