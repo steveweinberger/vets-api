@@ -22,7 +22,8 @@ end
 
 RSpec.configure do |config|
   config.before do
-    driven_by :chrome_headless
+    # driven_by :chrome_headless
+    driven_by :selenium_chrome
     Capybara.server = :puma
     Capybara.app_host = 'https://staging.va.gov'
     Capybara.run_server = false # don't start Rack
