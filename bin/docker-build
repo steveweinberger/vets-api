@@ -12,7 +12,7 @@ ensure_git_root() {
 docker_build() {
   tag_name="$(basename $(pwd))"
 
-  docker build -t $tag_name .
+  docker build --build-arg BUNDLE_ENTERPRISE__CONTRIBSYS__COM=$BUNDLE_ENTERPRISE__CONTRIBSYS__COM -t $tag_name .
 }
 
 ensure_git_root && docker_build
