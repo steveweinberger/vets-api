@@ -11,3 +11,7 @@
 git - Needed for bundle installing from git repositoriies
 curl - Typheous? Rails wouldn't boot; something about libcurl
 file - Needed for Shrine (file command-line tool not found)
+
+## Running Docker Stuff
+
+- To build the docker image, run `docker build --tag vets-api .`.

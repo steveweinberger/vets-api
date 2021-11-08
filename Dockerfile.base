@@ -2,7 +2,7 @@
 # stage, run `docker build --tag vets-api --target development .` To build the
 # full file, run `docker build --tag vets-api .`.
 
-FROM ruby:2.7-slim AS development
+FROM ruby:2.7-slim
 
 RUN apt-get update && \
   apt-get install -y build-essential libpq-dev git imagemagick curl wget pdftk poppler-utils file vim
@@ -22,20 +22,8 @@ COPY config/clamd.conf /etc/clamav/clamd.conf
 
 WORKDIR /app
 
-EXPOSE 3000
-
-CMD ["rails", "server", "-b", "0.0.0.0"]
-
-### Production Stage - if `docker build` is ran without a target, this section will be built.
-
-# FROM development AS production
-# ENV RAILS_ENV=production
-ADD tmp/bundle_cache.tar.bz2 /app/vendor/cache/
-COPY modules /app/modules
-COPY Gemfile /app/Gemfile
-COPY Gemfile.lock /app/Gemfile.lock
-RUN bundle install  \
-  && rm -rf /usr/local/bundle/cache/*.gem \
-  && find /usr/local/bundle/gems/ -name "*.c" -delete \
-  && find /usr/local/bundle/gems/ -name "*.o" -delete
 COPY . .
+RUN bundle install
+
+EXPOSE 3000
+CMD ["rails", "server", "-b", "0.0.0.0"]

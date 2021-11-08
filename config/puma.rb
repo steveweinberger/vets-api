@@ -10,3 +10,4 @@ on_worker_boot do
   SemanticLogger.reopen
   ActiveRecord::Base.establish_connection
 end
+

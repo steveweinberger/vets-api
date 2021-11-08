@@ -28,9 +28,6 @@ web_run() {
     --env Settings.saml.key_path=/app/config/certs/vetsgov-localhost.key \
     --env RAILS_ENV=development \
     --publish $PORT:3000 \
-    --volume $PWD:/app \
-    --volume $PWD/../vets-api-mockdata:/cache \
-    --volume $PWD/.bundle:/usr/local/bundle \
     --rm \
     --interactive \
     --tty \
