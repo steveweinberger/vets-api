@@ -91,7 +91,7 @@ FactoryBot.define do
       status { 'proposed' }
       location_id { '983' }
       service_type { 'primaryCare' }
-      comment { 'test' }
+      comment { 'testa' }
       contact do
         {
           'telecom' => [
