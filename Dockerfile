@@ -24,15 +24,14 @@ WORKDIR /app
 
 EXPOSE 3000
 
-CMD ["rails", "server", "-b", "0.0.0.0"]
+CMD ["bundle", "exec", "rails", "server", "-b", "0.0.0.0"]
 
 ### Production Stage - if `docker build` is ran without a target, this section will be built.
 
 # FROM development AS production
 # ENV RAILS_ENV=production
 # ADD tmp/bundle_cache.tar.bz2 /app/vendor/cache/
-COPY modules /app/modules
-COPY Gemfile /app/Gemfile
-COPY Gemfile.lock /app/Gemfile.lock
-RUN bundle install --without modules
-RUN bundle install
+# COPY modules /app/modules
+# COPY Gemfile /app/Gemfile
+# COPY Gemfile.lock /app/Gemfile.lock
+# RUN bundle install

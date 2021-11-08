@@ -14,7 +14,7 @@ compose_build() {
 }
 
 compose_up() {
-  # docker-compose run vets-api bundle install
+  docker-compose run vets-api bundle install
   # docker-compose up --force-recreate --remove-orphans
   docker-compose up --remove-orphans
 }

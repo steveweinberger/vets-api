@@ -13,7 +13,7 @@ services:
       - 54320:5432
     volumes:
       - ./data:/var/lib/postgresql/data:cached
-  vets-api:
+  web:
     build:
       context: .
       target: development
@@ -27,6 +27,7 @@ services:
     ports:
       - 3000:3000
     volumes:
+      - bundle_cache:/usr/local/bundle
       - .:/app:cached
     working_dir: /app
     depends_on:
@@ -35,3 +36,5 @@ services:
     links:
       - postgres
       - redis
+volumes:
+  bundle_cache:
