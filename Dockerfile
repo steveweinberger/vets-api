@@ -30,12 +30,9 @@ CMD ["rails", "server", "-b", "0.0.0.0"]
 
 # FROM development AS production
 # ENV RAILS_ENV=production
-ADD tmp/bundle_cache.tar.bz2 /app/vendor/cache/
+# ADD tmp/bundle_cache.tar.bz2 /app/vendor/cache/
 COPY modules /app/modules
 COPY Gemfile /app/Gemfile
 COPY Gemfile.lock /app/Gemfile.lock
-RUN bundle install  \
-  && rm -rf /usr/local/bundle/cache/*.gem \
-  && find /usr/local/bundle/gems/ -name "*.c" -delete \
-  && find /usr/local/bundle/gems/ -name "*.o" -delete
-COPY . .
+RUN bundle install --without modules
+RUN bundle install

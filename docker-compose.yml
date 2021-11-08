@@ -23,11 +23,11 @@ services:
       "Settings.test_database_url": "postgis://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@${POSTGRES_HOST:-postgres}:${POSTGRES_PORT:-5432}/${POSTGRES_DATABASE:-vets_api_test}"
       "Settings.redis.app_data.url": "redis://redis:6379"
       "Settings.redis.sidekiq.url": "redis://redis:6379"
-    image: vets-api_development:latest
+    image: vets-api:latest
     ports:
       - 3000:3000
     volumes:
-      - bundle_cache:/usr/local/bundle
+      - .:/app:cached
     working_dir: /app
     depends_on:
       - postgres
@@ -35,5 +35,3 @@ services:
     links:
       - postgres
       - redis
-volumes:
-  bundle_cache:
