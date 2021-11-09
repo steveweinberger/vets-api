@@ -49,6 +49,21 @@ if ENV['LOGIN_SYSTEM_TESTS']
           visit '/'
           expect_user_logged_in
         end
+
+        it 'logs in inbound ds logon user from unified login' do
+          visit 'https://mhv-syst.myhealth.va.gov/mhv-portal-web/home'
+          click_on 'Sign in'
+          click_on 'Try the new Unified VA Login'
+          click_on 'Sign in with DS Logon'
+
+          dslogon_login_steps('ace.a.mcghee1', ENV['DSLOGON_LOA2_PASSWORD'])
+
+          # Finding this element ensures that we wait for redirect before visiting staging.va.gov
+          find('a', text: 'Go to My HealtheVet')
+
+          visit '/'
+          expect_user_logged_in
+        end
       end
     end
   end
