@@ -14,31 +14,6 @@ module Authentication
       end
     end
 
-    RSpec.shared_examples 'logs in outbound DS Logon user' do |username, password|
-      it 'logs in outbound dslogon user' do
-        visit '/'
-        click_button 'Sign in'
-        click_button 'Sign in with DS Logon'
-
-        fill_in 'userName', with: username
-        find_field('password-clear').click
-        fill_in 'password', with: password
-        click_button 'Login'
-
-        find(:xpath, "//img[@alt='tiger-relaxing.png']").click
-        click_button 'Continue'
-
-        click_button 'Continue' if has_content?('Contact Information Verification')
-
-        click_button 'Continue' if has_content?('Enter a code from your device')
-
-        # Confirm email address page
-        click_link 'Complete confirmation' if has_link?('Complete confirmation')
-
-        expect_user_logged_in
-      end
-    end
-
     RSpec.shared_examples 'logs in outbound My HealtheVet user' do |username, password|
       it 'logs in outbound mhv user' do
         visit '/'

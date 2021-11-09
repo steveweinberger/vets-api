@@ -24,6 +24,20 @@ def idme_login_steps(email, password)
   click_button 'Continue' if has_content?('COMPLETE YOUR SIGN IN')
 end
 
+def dslogon_login_steps(username, password)
+  fill_in 'userName', with: username
+  find_field('password-clear').click
+  fill_in 'password', with: password
+  click_button 'Login'
+
+  find(:xpath, "//img[@alt='tiger-relaxing.png']").click
+  click_button 'Continue'
+
+  click_button 'Continue' if has_content?('Contact Information Verification')
+  click_button 'Continue' if has_content?('Enter a code from your device')
+  click_link 'Complete confirmation' if has_link?('Complete confirmation')
+end
+
 Capybara.register_driver :chrome_headless do |app|
   options = ::Selenium::WebDriver::Chrome::Options.new
 
