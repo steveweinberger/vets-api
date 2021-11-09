@@ -16,7 +16,20 @@ if ENV['LOGIN_SYSTEM_TESTS']
 
     context 'inbound' do
       context 'LOA3 premium' do
-        include_examples 'logs in inbound MHV user from eauth', 'vets250', ENV['MHV_LOA3_PASSWORD']
+        it 'logs in inbound mhv user from eauth' do
+          navigate_through_eauth
+
+          click_on 'Sign in with My HealtheVet'
+          click_on 'Accept'
+
+          mhv_login_steps('vets250', ENV['MHV_LOA3_PASSWORD'])
+
+          # Finding this element ensures that we wait for redirect before visiting staging.va.gov
+          find('a', text: 'Veteran Health Identification Card (VHIC)')
+
+          visit '/'
+          expect_user_logged_in
+        end
       end
     end
   end

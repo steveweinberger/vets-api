@@ -20,12 +20,7 @@ module Authentication
         click_button 'Sign in'
         click_button 'Sign in with My HealtheVet'
 
-        fill_in 'My HealtheVet User ID', with: username
-        fill_in 'My HealtheVet Password', with: password
-        click_button 'Sign in'
-
-        click_button 'Continue' if has_content?('Complete your sign in')
-        click_button 'Continue' if has_content?('Complete your sign in')
+        mhv_login_steps(username, password)
 
         expect_user_logged_in
       end
