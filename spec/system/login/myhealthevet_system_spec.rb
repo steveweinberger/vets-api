@@ -13,5 +13,11 @@ if ENV['LOGIN_SYSTEM_TESTS']
         include_examples 'logs in outbound My HealtheVet user', 'vets250', ENV['MHV_LOA3_PASSWORD']
       end
     end
+
+    context 'inbound' do
+      context 'LOA3 premium' do
+        include_examples 'logs in inbound MHV user from eauth', 'vets250', ENV['MHV_LOA3_PASSWORD']
+      end
+    end
   end
 end
