@@ -13,6 +13,7 @@ if ENV['LOGIN_SYSTEM_TESTS']
     context 'inbound' do
       context 'LOA2 premium' do
         include_examples 'logs in inbound DS Logon user from eauth', 'ace.a.mcghee1', ENV['DSLOGON_LOA2_PASSWORD']
+        include_examples 'logs in inbound DS Logon user from ebenefits', 'ace.a.mcghee1', ENV['DSLOGON_LOA2_PASSWORD']
       end
     end
   end
