@@ -10,8 +10,8 @@ if ENV['LOGIN_SYSTEM_TESTS']
       end
 
       context 'LOA3' do
-        include_examples 'logs in outbound ID.me user', 'ssoissoetesting+SPO1@gmail.com', ENV['IDME_LOA3_CERNER_PASSWORD']
         include_examples 'logs in outbound ID.me user', 'vets.gov.user+24@gmail.com', ENV['IDME_LOA3_PASSWORD']
+        include_examples 'logs in outbound ID.me user', 'ssoissoetesting+SPO1@gmail.com', ENV['IDME_LOA3_CERNER_PASSWORD']
       end
     end
 
