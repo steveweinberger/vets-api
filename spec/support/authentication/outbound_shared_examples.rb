@@ -8,12 +8,7 @@ module Authentication
         click_button 'Sign in'
         click_button 'Sign in with ID.me'
 
-        fill_in 'Email', with: email
-        fill_in 'Password', with: password
-        click_button 'Sign in to ID.me'
-
-        click_button 'Continue' if has_content?('COMPLETE YOUR SIGN IN')
-        click_button 'Continue' if has_content?('COMPLETE YOUR SIGN IN')
+        idme_login_steps(email, password)
 
         expect_user_logged_in
       end

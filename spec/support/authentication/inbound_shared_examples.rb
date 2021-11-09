@@ -2,12 +2,6 @@
 
 module Authentication
   module InboundSharedExamples
-    def navigate_through_eauth
-      visit 'https://sqa.eauth.va.gov/accessva/'
-      find('h4', text: 'I am a Veteran').click
-      find(:xpath, "//img[@alt='VHIC Self-Service logo']").click
-    end
-
     RSpec.shared_examples 'logs in inbound DS Logon user from eauth' do |username, password|
       it 'logs in inbound dslogon user from eauth' do
         navigate_through_eauth

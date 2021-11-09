@@ -23,12 +23,7 @@ if ENV['LOGIN_SYSTEM_TESTS']
           click_on 'Sign in with ID.me'
           click_on 'Accept'
 
-          fill_in 'Email', with: 'vets.gov.user+24@gmail.com'
-          fill_in 'Password', with: ENV['IDME_LOA3_PASSWORD']
-          click_button 'Sign in to ID.me'
-
-          click_button 'Continue' if has_content?('COMPLETE YOUR SIGN IN')
-          click_button 'Continue' if has_content?('COMPLETE YOUR SIGN IN')
+          idme_login_steps('vets.gov.user+24@gmail.com', ENV['IDME_LOA3_PASSWORD'])
 
           # Finding this element ensures that we wait for redirect before visiting staging.va.gov
           find('a', text: 'Veteran Health Identification Card (VHIC)')

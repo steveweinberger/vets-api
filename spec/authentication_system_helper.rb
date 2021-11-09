@@ -9,6 +9,21 @@ def expect_user_logged_in
   expect(page).not_to have_content('Sign in')
 end
 
+def navigate_through_eauth
+  visit 'https://sqa.eauth.va.gov/accessva/'
+  find('h4', text: 'I am a Veteran').click
+  find(:xpath, "//img[@alt='VHIC Self-Service logo']").click
+end
+
+def idme_login_steps(email, password)
+  fill_in 'Email', with: email
+  fill_in 'Password', with: password
+  click_button 'Sign in to ID.me'
+
+  click_button 'Continue' if has_content?('COMPLETE YOUR SIGN IN')
+  click_button 'Continue' if has_content?('COMPLETE YOUR SIGN IN')
+end
+
 Capybara.register_driver :chrome_headless do |app|
   options = ::Selenium::WebDriver::Chrome::Options.new
 
