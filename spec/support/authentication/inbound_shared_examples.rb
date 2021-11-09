@@ -59,5 +59,19 @@ module Authentication
         expect_user_logged_in
       end
     end
+
+    RSpec.shared_examples 'logs in inbound DS Logon user from ebenefits' do |username, password|
+      it 'logs in inbound dslogon user from ebenefits' do
+        visit 'https://pint.ebenefits.va.gov'
+        click_on 'Log in'
+
+        page.check('#consent-checkbox')
+
+        fill_in 'userName', with: username
+        find_field('password-clear').click
+        fill_in 'password', with: password
+        click_button 'Login'
+      end
+    end
   end
 end
