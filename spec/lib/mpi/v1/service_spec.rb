@@ -354,8 +354,8 @@ describe MPI::V1::Service do
 
         it 'returns not found, does not log sentry', :aggregate_failures do
           VCR.use_cassette('mpi/find_candidate/no_subject') do
-            expect(subject).not_to receive(:log_exception_to_sentry)
-            response = subject.find_profile(user)
+            expect(service).not_to receive(:log_exception_to_sentry)
+            response = service.find_profile(user)
 
             record_not_found_404_expectations_for(response)
           end
