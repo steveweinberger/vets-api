@@ -376,8 +376,8 @@ describe MPI::V1::Service do
             allow(SecureRandom).to receive(:uuid).and_return('5e819d17-ce9b-4860-929e-f9062836ebd0')
 
             VCR.use_cassette('mpi/find_candidate/historical_icns_user_not_found', VCR::MATCH_EVERYTHING) do
-              expect(subject).not_to receive(:log_exception_to_sentry)
-              response = subject.find_profile(user, MasterPersonIndex::Constants::CORRELATION_WITH_ICN_HISTORY)
+              expect(service).not_to receive(:log_exception_to_sentry)
+              response = service.find_profile(user, MasterPersonIndex::Constants::CORRELATION_WITH_ICN_HISTORY)
 
               record_not_found_404_expectations_for(response)
             end
