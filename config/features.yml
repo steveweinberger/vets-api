@@ -16,6 +16,10 @@ features:
     actor_type: user
     description: Whether Self-Identifying Gender Identity is enabled for caregiver.
     enable_in_development: true
+  hca_american_indian_enabled:
+    actor_type: user
+    description: Enables American Indian SIGI question page.
+    enable_in_development: true
   can_upload_10_10cg_poa:
     actor_type: cookie_id
     description: Allows users to upload POA documentation when completing the 10-10CG.
@@ -54,10 +58,6 @@ features:
     actor_type: user
     description: Enables the health care check-in experiences to show demographics page.
     enable_in_development: true
-  check_in_experience_low_authentication_enabled:
-    actor_type: user
-    description: Enables the health care check-in experiences to use the lowest tier of authentication, i.e. last 4 and last name
-    enable_in_development: true
   check_in_experience_next_of_kin_enabled:
     actor_type: user
     description: Enables the health care check-in experiences to show the next of kin page.
@@ -69,10 +69,6 @@ features:
   check_in_experience_multiple_appointment_support:
     actor_type: user
     description: Enables the health care check-in experiences to show multiple appointments
-    enable_in_development: true
-  check_in_experience_services_refactor:
-    actor_type: user
-    description: Refactor LoROTA and CHIP service objects and use clients
     enable_in_development: true
   coe_access:
     actor_type: user
@@ -271,6 +267,14 @@ features:
     actor_type: cookie
     description: Enables/disables the usage of the new service provider Login.gov (VSP Identity)
     enable_in_development: true
+  login_gov_create_account:
+    actor_type: cookie
+    description: Enables/disables the usage of the new service provider Login.gov to create an account (VSP Identity)
+    enable_in_development: true
+  loop_pages:
+    actor_type: user
+    description: Enable new list loop pattern
+    enable_in_development: true
   mega_menu_mobile_v2:
     actor_type: user
     description: Separates mobile mega menu from desktop mega menu
@@ -353,6 +357,9 @@ features:
   show_edu_benefits_5495_wizard:
     actor_type: user
     description: This determines when the wizard should show up on the 5495 introduction page
+  show_events_v2:
+    actor_type: user
+    description: Enables the events v2 page
   show_financial_status_report:
     actor_type: user
     description: Enables VA Form 5655 (Financial Status Report)
@@ -490,4 +497,8 @@ features:
   yellow_ribbon_mvp_enhancement:
     actor_type: user
     description: Enhances Yellow Ribbon MVP.
+    enable_in_development: true
+  show_edu_benefits_1990EZ_Wizard:
+    actor_type: user
+    description: Navigates user to 1990EZ or 1990 depending on form questions.
     enable_in_development: true

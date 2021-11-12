@@ -22,14 +22,6 @@ saml_ssoe:
   response_signing: false
   response_encryption: false
   authn_context_comparison: 'exact'
-  redirect_urls:
-    mhv:
-      base: 'https://int.eauth.va.gov/mhv-portal-web/eauth'
-      mhv_download_my_data: '?deeplinking=download_my_data'
-      mhv_prescription_refill: '?deeplinking=prescription_refill'
-      mhv_secure_messaging: '?deeplinking=secure_messaging'
-      mhv_appointments: '?deeplinking=appointments'
-      mhv_home: ''
 
 ssoe_eauth_cookie:
   name: vagov_saml_request_localhost
@@ -76,6 +68,7 @@ mcp:
     service_name: VBS
     mock: false
     mock_vista: false
+    api_key: abcd1234abcd1234abcd1234abcd1234abcd1234
 
 fsr:
   prefill: true
@@ -513,6 +506,8 @@ claims_api:
     environment_name: ~
   v2_docs:
     enabled: false
+  token_validation:
+    api_key: 
 
 redis:
   host: localhost
@@ -953,6 +948,8 @@ covid_vaccine:
 virtual_agent:
   webchat_secret_a: fake_secret_a
   webchat_secret_b: fake_secret_b
+  lighthouse_api_uri: https://sandbox-api.va.gov/services/appeals/v0/appeals
+  lighthouse_api_key: fake_api_key
 
 # Settings for notifications client
 vanotify:
@@ -994,6 +991,15 @@ genisis:
   service_path: /COVID19Service
   user: TestUser
   pass: bogus
+
+# Settings for connecting AFS Veteran Services
+dgi:
+  jwt:
+    public_key_path: modules/meb_api/spec/fixtures/dgi_public_test.pem
+    private_key_path: modules/meb_api/spec/fixtures/dgi_private_test.pem
+  veteran-services:
+    url: "http://localhost:8070/vets/v1" # Docker setup for microservice
+    mock: false
 
 # Settings for the VEText integration (mobile push notifications)
 vetext_push:
@@ -1109,29 +1115,6 @@ check_in:
     key_path: fake_api_path
     redis_session_prefix: check_in
     timeout: 30
-  chip_api_v1:
-    url: https://vpce-06399548ef94bdb41-lk4qp2nd.execute-api.us-gov-west-1.vpce.amazonaws.com
-    base_path: dev
-    host: vpce-06399548ef94bdb41-lk4qp2nd.execute-api.us-gov-west-1.vpce.amazonaws.com
-    tmp_api_user: TzY6DFrnjPE8dwxUMbFf9HjbFqRim2MgXpMpMciXJFVohyURUJAc7W99rpFzhfh2B3sVnn4
-    tmp_api_id: 2dcdrrn5zc
-    tmp_api_username: vetsapiTempUser
-    service_name: CHIP-API
-    mock: false
-    key_path: fake_api_path
-    redis_session_prefix: check_in_chip_v1
-    timeout: 30
-  lorota_v1:
-    url: https://vpce-06399548ef94bdb41-lk4qp2nd.execute-api.us-gov-west-1.vpce.amazonaws.com
-    host: vpce-06399548ef94bdb41-lk4qp2nd.execute-api.us-gov-west-1.vpce.amazonaws.com
-    base_path: dev
-    api_id: 22t00c6f97
-    api_key: Xc7k35oE2H9aDeUEpeGa38PzAHyLT9jb5HiKeBfs
-    service_name: LoROTA-API
-    mock: false
-    key_path: fake_api_path
-    redis_session_prefix: check_in_lorota_v1
-    redis_token_expiry: 43200 # 12 Hours
   chip_api_v2:
     url: https://vpce-06399548ef94bdb41-lk4qp2nd.execute-api.us-gov-west-1.vpce.amazonaws.com
     base_path: dev
