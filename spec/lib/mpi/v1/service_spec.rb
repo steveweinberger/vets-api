@@ -402,12 +402,12 @@ describe MPI::V1::Service do
 
         %w[internal_server_error internal_server_error_2].each do |cassette|
           it 'raises an Common::Client::Errors::HTTPError', :aggregate_failures do
-            expect(subject).to receive(:log_message_to_sentry).with(
+            expect(service).to receive(:log_message_to_sentry).with(
               'MVI find_profile error: SOAP service returned internal server error',
               :warn
             )
             VCR.use_cassette("mpi/find_candidate/#{cassette}") do
-              response = subject.find_profile(user)
+              response = service.find_profile(user)
 
               server_error_504_expectations_for(response)
             end
