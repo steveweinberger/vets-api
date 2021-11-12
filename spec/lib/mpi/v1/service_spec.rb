@@ -449,7 +449,7 @@ describe MPI::V1::Service do
             VCR.use_cassette('mpi/find_candidate/valid') do
               subject.find_profile(user)
             end
-          end.to change { PersonalInformationLog.count }.by(1)
+          end.to change(PersonalInformationLog, :count).by(1)
         end
       end
 
