@@ -18,7 +18,7 @@ module Mobile
               dose_series: dose_series(immunization[:protocol_applied]),
               group_name: Mobile::CDC_CVX_CODE_MAP[cvx_code],
               location_id: location_id(immunization.dig(:location, :reference)),
-              manufacturer: nil,
+              manufacturer: Mobile::CDC_CVX_MANUFACTURER_MAP[cvx_code],
               note: immunization[:note].first[:text],
               reaction: reaction(immunization[:reaction]),
               short_description: vaccine_code[:text]
