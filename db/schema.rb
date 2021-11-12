@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_11_03_172528) do
+ActiveRecord::Schema.define(version: 2021_11_12_213456) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -816,6 +816,14 @@ ActiveRecord::Schema.define(version: 2021_11_03_172528) do
     t.float "ranking"
     t.string "tags"
     t.index ["valid_pdf"], name: "index_va_forms_forms_on_valid_pdf"
+  end
+
+  create_table "vaccines", force: :cascade do |t|
+    t.integer "cvx_number", null: false
+    t.string "group_name", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["cvx_number"], name: "index_vaccines_on_cvx_number", unique: true
   end
 
   create_table "vba_documents_git_items", force: :cascade do |t|
