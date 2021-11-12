@@ -9,6 +9,7 @@ module Mobile
             immunization = i[:resource]
             vaccine_code = immunization[:vaccine_code]
             cvx_code = vaccine_code[:coding].first[:code].to_i
+            vaccine = Mobile::V0::Vaccine.find_by(cvx_code: cvx_code)
 
             Mobile::V0::Immunization.new(
               id: immunization[:id],
@@ -16,9 +17,9 @@ module Mobile
               date: immunization[:occurrence_date_time],
               dose_number: dose_number(immunization[:protocol_applied]),
               dose_series: dose_series(immunization[:protocol_applied]),
-              group_name: Mobile::CDC_CVX_CODE_MAP[cvx_code],
+              group_name: vaccine&.group_name,
               location_id: location_id(immunization.dig(:location, :reference)),
-              manufacturer: nil,
+              manufacturer: vaccine&.manufacturer,
               note: note(immunization[:note]),
               reaction: reaction(immunization[:reaction]),
               short_description: vaccine_code[:text]
