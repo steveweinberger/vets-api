@@ -26,17 +26,20 @@ RSpec.describe 'immunizations', type: :request do
   after { Timecop.return }
 
   describe 'GET /mobile/v0/health/immunizations' do
-    before do
+    let(:immunizations_request) do
       VCR.use_cassette('lighthouse_health/get_immunizations', match_requests_on: %i[method uri]) do
         get '/mobile/v0/health/immunizations', headers: iam_headers, params: nil
       end
     end
 
     it 'returns a 200' do
+      immunizations_request
       expect(response).to have_http_status(:ok)
     end
 
     it 'matches the expected schema' do
+      immunizations_request
+
       # TODO: this should use the matcher helper instead (was throwing an Oj::ParseError)
       # expect().to match_json_schema('immunizations')
       expect(response.parsed_body).to eq(
@@ -332,6 +335,8 @@ RSpec.describe 'immunizations', type: :request do
 
     context 'for items that do not have locations' do
       it 'matches the expected attributes' do
+        immunizations_request
+
         expect(response.parsed_body['data'].first['attributes']).to eq(
           {
             'cvxCode' => 140,
@@ -348,6 +353,8 @@ RSpec.describe 'immunizations', type: :request do
       end
 
       it 'has a blank relationship' do
+        immunizations_request
+
         expect(response.parsed_body['data'].first['relationships']).to eq(
           {
             'location' => {
@@ -363,6 +370,8 @@ RSpec.describe 'immunizations', type: :request do
 
     context 'for items that do have a location' do
       it 'matches the expected attributes' do
+        immunizations_request
+
         expect(response.parsed_body['data'][2]['attributes']).to eq(
           {
             'cvxCode' => 140,
@@ -379,6 +388,8 @@ RSpec.describe 'immunizations', type: :request do
       end
 
       it 'has a relationship' do
+        immunizations_request
+
         expect(response.parsed_body['data'][2]['relationships']).to eq(
           {
             'location' => {
@@ -390,6 +401,46 @@ RSpec.describe 'immunizations', type: :request do
                 'related' => 'www.example.com/mobile/v0/health/locations/I2-4KG3N5YUSPTWD3DAFMLMRL5V5U000000'
               }
             }
+          }
+        )
+      end
+    end
+
+    describe 'vaccines' do
+        it 'uses the vaccine group name and manufacturer in the response when vaccine record exists' do
+          create(:vaccine, cvx_code: 140, group_name: 'COVID-19', manufacturer: 'Moderna')
+          immunizations_request
+
+          expect(response.parsed_body['data'][2]['attributes']).to eq(
+            {
+              'cvxCode' => 140,
+              'date' => '2011-03-31T12:24:55Z',
+              'doseNumber' => 'Series 1',
+              'doseSeries' => 1,
+              'groupName' => vaccine.group_name,
+              'manufacturer' => vaccine.manufacturer,
+              'note' => 'Dose #47 of 101 of Influenza  seasonal  injectable  preservative free vaccine administered.',
+              'reaction' => 'Other',
+              'shortDescription' => 'Influenza  seasonal  injectable  preservative free'
+            }
+          )
+        end
+      end
+
+      it 'sets group name and manufacturer to nil when no vaccine record exists' do
+        immunizations_request
+
+        expect(response.parsed_body['data'][2]['attributes']).to eq(
+          {
+            'cvxCode' => 140,
+            'date' => '2011-03-31T12:24:55Z',
+            'doseNumber' => 'Series 1',
+            'doseSeries' => 1,
+            'groupName' => nil,
+            'manufacturer' => nil,
+            'note' => 'Dose #47 of 101 of Influenza  seasonal  injectable  preservative free vaccine administered.',
+            'reaction' => 'Other',
+            'shortDescription' => 'Influenza  seasonal  injectable  preservative free'
           }
         )
       end
