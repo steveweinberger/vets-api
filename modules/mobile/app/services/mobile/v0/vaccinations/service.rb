@@ -15,11 +15,16 @@ module Mobile
         }
 
         doc.root.children.each do |node|
-          ary = node.children.to_a
-          index = ary.find_index {|c| c.name == "Name" && c.text == "CVX for Vaccine Group" }
-          cvx_code = ary[index + 1].text.strip
-          group_name_index = ary.find_index {|c| c.name == "Name" && c.text == "Vaccine Group Name" }
-          group_name = ary[group_name_index + 1].text.strip
+          cvx_code = nil
+          group_name = nil
+          node.children.each_slice(2) do |(name, value)|
+            case name.text
+            when "CVX for Vaccine Group"
+              cvx_code = value.text.strip
+            when "Vaccine Group Name"
+              group_name = value.text.strip
+            end
+          end
           if Mobile::CDC_CVX_CODE_MAP.keys.include?(cvx_code.to_i)
             matches[:current][cvx_code.to_i] = group_name
           else
