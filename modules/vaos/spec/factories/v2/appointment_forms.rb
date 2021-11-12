@@ -18,7 +18,7 @@ FactoryBot.define do
           'telecom' => [
             {
               'type': 'phone',
-              'value': '2125688889'
+              'value': '2125688888'
             },
             {
               'type': 'email',
