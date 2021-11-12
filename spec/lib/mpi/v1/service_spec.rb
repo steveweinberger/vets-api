@@ -421,10 +421,10 @@ describe MPI::V1::Service do
         end
 
         it 'raises MasterPersonIndex::Errors::RecordNotFound', :aggregate_failures do
-          expect(subject).to receive(:log_exception_to_sentry)
+          expect(service).to receive(:log_exception_to_sentry)
 
           VCR.use_cassette('mpi/find_candidate/failure_multiple_matches') do
-            response = subject.find_profile(user)
+            response = service.find_profile(user)
 
             record_not_found_404_expectations_for(response)
           end
