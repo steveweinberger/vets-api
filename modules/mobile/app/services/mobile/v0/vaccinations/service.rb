@@ -9,15 +9,11 @@ module Mobile
           config.strict.noblanks
         end
 
-        matches = {
-          current: {},
-          new: {}
-        }
-
         doc.root.children.each do |node|
           cvx_code = nil
           group_name = nil
           node.children.each_slice(2) do |(name, value)|
+            break if cvx_code && group_name
             case name.text
             when "CVX for Vaccine Group"
               cvx_code = value.text.strip
@@ -25,22 +21,11 @@ module Mobile
               group_name = value.text.strip
             end
           end
-          if Mobile::CDC_CVX_CODE_MAP.keys.include?(cvx_code.to_i)
-            matches[:current][cvx_code.to_i] = group_name
-          else
-            matches[:new][cvx_code.to_i] = group_name
-          end
+
+          vaccine = Vaccine.find_or_create_by(cvx_code: cvx_code)
+          vaccine.group_name = group_name
+          vaccine.save! if vaccine.changed?
         end
-        existing = matches[:current].sort.to_h
-        incoming = matches[:new].sort.to_h
-
-        puts "EXISTING"
-        pp existing
-        puts "INCOMING"
-        pp incoming
-
-        puts "UNIQUES"
-        pp (existing.values + incoming.values).uniq.sort
       end
     end
   end
