@@ -295,7 +295,7 @@ RSpec.describe 'immunizations', type: :request do
                  'doseNumber' => nil,
                  'doseSeries' => nil,
                  'groupName' => 'COVID-19',
-                 'manufacturer' => nil,
+                 'manufacturer' => 'Moderna US, Inc.',
                  'note' =>
                    'Dose #1 of 2 of COVID-19, mRNA, LNP-S, PF, 100 mcg/ 0.5 mL dose vaccine administered.',
                  'reaction' => nil,
@@ -315,7 +315,7 @@ RSpec.describe 'immunizations', type: :request do
                  'doseNumber' => nil,
                  'doseSeries' => nil,
                  'groupName' => 'COVID-19',
-                 'manufacturer' => nil,
+                 'manufacturer' => 'Moderna US, Inc.',
                  'note' =>
                    'Dose #2 of 2 of COVID-19, mRNA, LNP-S, PF, 100 mcg/ 0.5 mL dose vaccine administered.',
                  'reaction' => nil,
