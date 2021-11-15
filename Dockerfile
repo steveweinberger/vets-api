@@ -2,12 +2,18 @@ FROM ruby:2.7-slim
 
 # Allow for setting ENV vars via --build-arg
 ARG BUNDLE_ENTERPRISE__CONTRIBSYS__COM \
-  RAILS_ENV=development
+  RAILS_ENV=development \
+  USER_ID=1000
 ENV RAILS_ENV=$RAILS_ENV \
-  BUNDLE_ENTERPRISE__CONTRIBSYS__COM=${BUNDLE_ENTERPRISE__CONTRIBSYS__COM} \
+  BUNDLE_ENTERPRISE__CONTRIBSYS__COM=$BUNDLE_ENTERPRISE__CONTRIBSYS__COM \
   BUNDLER_VERSION=2.1.4
 
+RUN groupadd --gid $USER_ID nonroot \
+  && useradd --uid $USER_ID --gid nonroot --shell /bin/bash --create-home nonroot --home-dir /app
+
 WORKDIR /app
+
+RUN mkdir data && chown -R nonroot:nonroot /app/data
 
 RUN apt-get update \
   && apt-get install -y build-essential libpq-dev git imagemagick curl wget pdftk poppler-utils file \
@@ -28,9 +34,7 @@ ENV LANG=C.UTF-8 \
    BUNDLE_JOBS=4 \
    BUNDLE_RETRY=3
 
-RUN gem install bundler:${BUNDLER_VERSION} --no-document \
-  && bundle config set --without 'development test' \
-  && bundle config set deployment 'true'
+RUN gem install bundler:${BUNDLER_VERSION} --no-document
 
 COPY modules ./modules
 COPY Gemfile Gemfile.lock ./
@@ -38,9 +42,11 @@ RUN bundle install \
   && rm -rf /usr/local/bundle/cache/*.gem \
   && find /usr/local/bundle/gems/ -name "*.c" -delete \
   && find /usr/local/bundle/gems/ -name "*.o" -delete \
-  && find /usr/local/bundle/gems/ -name ".git"  -type d -prune -execdir rm -rf {} +
-COPY . .
+  && find /usr/local/bundle/gems/ -name ".git" -type d -prune -execdir rm -rf {} +
+COPY --chown=nonroot:nonroot . .
 
 EXPOSE 3000
+
+USER nonroot
 
 CMD ["bundle", "exec", "rails", "server", "-b", "0.0.0.0"]
