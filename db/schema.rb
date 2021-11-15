@@ -819,11 +819,11 @@ ActiveRecord::Schema.define(version: 2021_11_12_213456) do
   end
 
   create_table "vaccines", force: :cascade do |t|
-    t.integer "cvx_number", null: false
+    t.integer "cvx_code", null: false
     t.string "group_name", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["cvx_number"], name: "index_vaccines_on_cvx_number", unique: true
+    t.index ["cvx_code"], name: "index_vaccines_on_cvx_code", unique: true
   end
 
   create_table "vba_documents_git_items", force: :cascade do |t|

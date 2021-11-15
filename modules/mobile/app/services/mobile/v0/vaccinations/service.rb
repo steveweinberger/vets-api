@@ -10,19 +10,19 @@ module Mobile
         end
 
         doc.root.children.each do |node|
-          cvx_number = nil
+          cvx_code = nil
           group_name = nil
           node.children.each_slice(2) do |(name, value)|
-            break if cvx_number && group_name
+            break if cvx_code && group_name
             case name.text
             when "CVXCode"
-              cvx_number = value.text.strip
+              cvx_code = value.text.strip
             when "Vaccine Group Name"
               group_name = value.text.strip
             end
           end
 
-          vaccine = Vaccine.find_or_create_by(cvx_number: cvx_number)
+          vaccine = Vaccine.find_or_create_by(cvx_code: cvx_code)
           vaccine.update(group_name: group_name) unless vaccine.group_name == group_name
         end
       end
