@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Mobile
   module V0
     module Vaccinations
@@ -14,10 +16,11 @@ module Mobile
           group_name = nil
           node.children.each_slice(2) do |(name, value)|
             break if cvx_code && group_name
+
             case name.text
-            when "CVXCode"
+            when 'CVXCode'
               cvx_code = value.text.strip
-            when "Vaccine Group Name"
+            when 'Vaccine Group Name'
               group_name = value.text.strip
             end
           end

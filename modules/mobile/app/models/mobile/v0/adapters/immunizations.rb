@@ -62,6 +62,7 @@ module Mobile
             # log error
             return nil
           end
+
           vaccine.group_name
         end
       end
