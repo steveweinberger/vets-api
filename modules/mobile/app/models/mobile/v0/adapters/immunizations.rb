@@ -16,7 +16,7 @@ module Mobile
               date: immunization[:occurrence_date_time],
               dose_number: dose_number(immunization[:protocol_applied]),
               dose_series: dose_series(immunization[:protocol_applied]),
-              group_name: Mobile::CDC_CVX_CODE_MAP[cvx_code],
+              group_name: group_name(cvx_code),
               location_id: location_id(immunization.dig(:location, :reference)),
               manufacturer: nil,
               note: immunization[:note].first[:text],
@@ -54,6 +54,15 @@ module Mobile
           return nil unless reaction
 
           reaction.map { |r| r[:detail][:display] }.join(',')
+        end
+
+        def group_name(cvx_code)
+          vaccine = Vaccine.find_by(cvx_code: cvx_code)
+          unless vaccine
+            # log error
+            return nil
+          end
+          vaccine.group_name
         end
       end
     end
