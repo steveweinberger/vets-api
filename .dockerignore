@@ -1,6 +1,5 @@
-.bundle
-.git
-coverage/
-data/
-log/*
-tmp/
+*
+!config/clamd.conf
+!Gemfile
+!Gemfile.lock
+!modules/
