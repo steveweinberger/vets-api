@@ -18,16 +18,27 @@ module TestUserDashboard
       log_exception_to_sentry(e)
     end
 
+    def select_all(table_name:, where: nil, order_by: nil, limit: nil)
+      clauses = [where, order_by, limit]
+                .reject(&:nil?)
+                .join(' ')
+
+      sql = if clauses.empty?
+              "SELECT * FROM `#{PROJECT}.#{DATASET}.#{table_name}`"
+            else
+              "SELECT * FROM `#{PROJECT}.#{DATASET}.#{table_name}` " \
+                "#{clauses}"
+            end
+
+      query(sql)
+    end
+
     # BigQuery requires a row indentifier in DELETE FROM statements
     def delete_from(table_name:, row_identifier: 'account_uuid')
       sql = "DELETE FROM `#{PROJECT}.#{DATASET}.#{table_name}` " \
             "WHERE #{row_identifier} IS NOT NULL"
 
-      bigquery.query sql do |config|
-        config.location = 'US'
-      end
-    rescue => e
-      log_exception_to_sentry(e)
+      query(sql)
     end
 
     def insert_into(table_name:, rows:)
@@ -46,6 +57,14 @@ module TestUserDashboard
 
     def table(table_name:)
       dataset.table table_name, skip_lookup: true
+    end
+
+    def query(sql)
+      bigquery.query sql do |config|
+        config.location = 'US'
+      end
+    rescue => e
+      log_exception_to_sentry(e)
     end
   end
 end
