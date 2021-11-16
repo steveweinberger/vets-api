@@ -25,13 +25,17 @@ module TestUserDashboard
 
       tuple = bigquery.select_all(
         table_name: TABLE,
-        where: "WHERE account_uuid=#{tud_account.account_uuid}",
-        order: 'ORDER BY created_at',
+        where: "WHERE account_uuid='#{tud_account.account_uuid}'",
+        order_by: 'ORDER BY created_at DESC',
         limit: 'LIMIT 1'
       )[0]
 
-      if tuple.present? && tuple.checkin_time.nil?
-        # set tuple.has_checkin_error to true
+      if tuple.present? && tuple[:checkin_time].nil?
+        bigquery.update(
+          table_name: TABLE,
+          set: 'SET has_checkin_error=TRUE',
+          where: "WHERE account_uuid='#{tuple[:account_uuid]}' AND UNIX_MILLIS(created_at)=#{(tuple[:created_at].to_f * 1000).to_i}"
+        )
       end
 
       now = Time.now.utc
