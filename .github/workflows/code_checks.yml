@@ -68,13 +68,13 @@ jobs:
 
       - name: Setup Database
         run: |
-             docker-compose -p ${{ env.DOCKER_IMAGE}} \
+             docker-compose --project-name vets-api:${{ env.DOCKER_IMAGE}} \
              run --rm --service-ports web bash \
              -c "RAILS_ENV=test bundle exec rails db:reset"
 
       - name: Run Specs
         run: |
-             docker-compose -p ${{ env.DOCKER_IMAGE}} \
+             docker-compose --project-name vets-api:${{ env.DOCKER_IMAGE}} \
              run --rm --service-ports web bash \
              -c "RAILS_ENV=test bundle exec rspec spec/ modules/"
 

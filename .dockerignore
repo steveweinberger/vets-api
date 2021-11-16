@@ -3,3 +3,4 @@
 !Gemfile
 !Gemfile.lock
 !modules/
+!tmp/bundle_cache.tar.bz2
