@@ -3,66 +3,56 @@
 module Mobile
   module V0
     module Vaccinations
-      # Service that connects to CDC's vaccinations XML table
+      # Service that connects to CDC's vaccinations XML tables
       # https://www2.cdc.gov/vaccines/iis/iisstandards/XML.asp?rpt=vax2vg
+      # https://www2a.cdc.gov/vaccines/iis/iisstandards/XML.asp?rpt=tradename
       #
       class Service
-        doc = Nokogiri::XML(URI.open('https://www2.cdc.gov/vaccines/iis/iisstandards/XML.asp?rpt=vax2vg')) do |config|
-          config.strict.noblanks
-        end
-        manufacturer_doc = Nokogiri::XML(URI.open('https://www2a.cdc.gov/vaccines/iis/iisstandards/XML.asp?rpt=tradename')) do |config|
-          config.strict.noblanks
+        GROUP_NAME_XML = 'https://www2.cdc.gov/vaccines/iis/iisstandards/XML.asp?rpt=vax2vg'
+        MANUFACTURER_XML = 'https://www2a.cdc.gov/vaccines/iis/iisstandards/XML.asp?rpt=tradename'
+
+        def call
+          group_name_data.root.children.each do |node|
+            cvx_code = find_value_from(node, 'CVXCode')
+            group_name = find_value_from(node, 'Vaccine Group Name')
+            manufacturer = (group_name == "COVID-19") ? find_manufacturer(cvx_code) : nil
+
+            vaccine = Vaccine.find_or_create_by(cvx_code: cvx_code)
+            if vaccine.group_name != group_name || vaccine.manufacturer != manufacturer
+              vaccine.update(group_name: group_name, manufacturer: manufacturer)
+            end
+          end
         end
 
-        doc.root.children.each do |node|
-          cvx_code = nil
-          group_name = nil
+        private
+
+        def group_name_data
+          @group_name_data ||= Nokogiri::XML(URI.open(GROUP_NAME_XML)) do |config|
+            config.strict.noblanks
+          end
+        end
+
+        def manufacturer_data
+          @manufacturer_data ||= Nokogiri::XML(URI.open(MANUFACTURER_XML)) do |config|
+            config.strict.noblanks
+          end
+        end
+
+        def find_value_from(node, property_name)
           node.children.each_slice(2) do |(name, value)|
-            break if cvx_code && group_name
-
-            case name.text.strip
-            when 'CVXCode'
-              cvx_code = value.text.strip
-            when 'Vaccine Group Name'
-              group_name = value.text.strip
-            end
+            return value.text.strip if name.text.strip == property_name
           end
+          nil
+        end
 
-          manufacturer = nil
-          if group_name == "COVID-19"
-            manufacturer_doc.root.children.each do |manufacturer_node|
-              break if manufacturer
+        def find_manufacturer(cvx_code)
+          manufacturer_data.root.children.each do |node|
+            current_node_cvx = find_value_from(node, 'CVXCode')
+            next unless current_node_cvx == cvx_code
 
-              _manufacturer = nil
-              match = nil
-              manufacturer_node.children.each_slice(2) do |(manufacturer_name_row, manufacturer_value_row)|
-                break if match == false
-
-                # this logic needs to move
-                if _manufacturer && match
-                  manufacturer = _manufacturer
-                  break
-                end
-
-                if manufacturer_name_row.text.strip == "Manufacturer"
-                  _manufacturer = manufacturer_value_row.text.strip
-                  puts _manufacturer
-                end
-                if manufacturer_name_row.text.strip == "CVXCode"
-                  if manufacturer_value_row.text.strip == cvx_code
-                    match = true
-                  else
-                    match = false
-                  end
-                end
-              end
-            end
+            return find_value_from(node, 'Manufacturer')
           end
-
-          vaccine = Vaccine.find_or_create_by(cvx_code: cvx_code)
-          if vaccine.group_name != group_name || vaccine.manufacturer != manufacturer
-            vaccine.update(group_name: group_name, manufacturer: manufacturer)
-          end
+          nil
         end
       end
     end
