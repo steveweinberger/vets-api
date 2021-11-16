@@ -26,10 +26,12 @@ module TestUserDashboard
     def checkout
       return unless tud_account
 
+      now = Time.now.utc
+
       row = {
         account_uuid: tud_account.account_uuid,
-        event: 'checkout',
-        timestamp: tud_account.checkout_time
+        checkout_time: now,
+        created_at: now,
       }
 
       TestUserDashboard::BigQuery.new.insert_into(table_name: TABLE, rows: [row])
