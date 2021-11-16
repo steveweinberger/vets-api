@@ -13,8 +13,6 @@ RUN groupadd --gid $USER_ID nonroot \
 
 WORKDIR /app
 
-RUN mkdir data && chown -R nonroot:nonroot /app/data
-
 RUN apt-get update \
   && apt-get install -y build-essential libpq-dev git imagemagick curl wget pdftk poppler-utils file \
   && apt-get clean \
