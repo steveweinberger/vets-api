@@ -1,5 +1,6 @@
 name: Pact Contract Tests
-on: [workflow_dispatch]
+on: [push]
+  # [workflow_dispatch]
 jobs:
   tests:
     name: Pact Contract Tests
@@ -64,3 +65,29 @@ jobs:
         env:
           PACT_BROKER_BASIC_AUTH_USERNAME: pact-broker
           PACT_BROKER_BASE_URL: https://dev.va.gov/_vfs/pact-broker/
+
+      - name: Configure AWS credentials
+        if: ${{ failure() }}
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-gov-west-1
+
+      - name: Get Slack bot token
+        if: ${{ failure() }}
+        uses: marvinpinto/action-inject-ssm-secrets@v1.2.1
+        with:
+          ssm_parameter: /devops/github_actions_slack_bot_user_token
+          env_variable_name: SLACK_BOT_TOKEN
+
+      - name: Notify Slack
+        if: ${{ failure() }}
+        uses: slackapi/slack-github-action@v1.15.0
+        continue-on-error: true
+        env:
+          SSL_CERT_DIR: /etc/ssl/certs
+          SLACK_BOT_TOKEN: ${{ env.SLACK_BOT_TOKEN }}
+        with:
+          slack-message: 'Contract tests in `vets-api`have failed on run: <https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}|${{github.run_id}}>'
+          channel-id: C026PD47Z19
