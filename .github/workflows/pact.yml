@@ -89,5 +89,5 @@ jobs:
           SSL_CERT_DIR: /etc/ssl/certs
           SLACK_BOT_TOKEN: ${{ env.SLACK_BOT_TOKEN }}
         with:
-          slack-message: 'Contract tests in `vets-api`have failed on run: <https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}|${{github.run_id}}>'
+          slack-message: '<!here> Contract tests in `vets-api` have failed on run: <https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}|${{github.run_id}}>'
           channel-id: C026PD47Z19
