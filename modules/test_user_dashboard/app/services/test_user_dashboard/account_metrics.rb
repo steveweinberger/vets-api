@@ -2,7 +2,7 @@
 
 module TestUserDashboard
   class AccountMetrics
-    TABLE = 'tud_account_events'
+    TABLE = 'tud_accounts_usage'
 
     attr_reader :tud_account
 
