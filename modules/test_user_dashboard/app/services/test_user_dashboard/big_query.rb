@@ -33,6 +33,14 @@ module TestUserDashboard
       query(sql)
     end
 
+    def update(table_name:, set:, where: nil)
+      clauses = [set, where].reject(&:nil?).join(' ')
+
+      sql = "UPDATE `#{PROJECT}.#{DATASET}.#{table_name}` #{clauses}"
+
+      query(sql)
+    end
+
     # BigQuery requires a row indentifier in DELETE FROM statements
     def delete_from(table_name:, row_identifier: 'account_uuid')
       sql = "DELETE FROM `#{PROJECT}.#{DATASET}.#{table_name}` " \
