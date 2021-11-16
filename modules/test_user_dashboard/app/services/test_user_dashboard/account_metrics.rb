@@ -13,12 +13,7 @@ module TestUserDashboard
     def checkin(checkin_time:, maintenance_update: false)
       return unless tud_account
 
-      row = {
-        account_uuid: tud_account.account_uuid,
-        event: 'checkin',
-        maintenance_update: maintenance_update,
-        timestamp: checkin_time
-      }
+      row = { checkin_time: checkin_time }
 
       TestUserDashboard::BigQuery.new.insert_into(table_name: TABLE, rows: [row])
     end
