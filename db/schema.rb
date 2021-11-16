@@ -821,6 +821,7 @@ ActiveRecord::Schema.define(version: 2021_11_12_213456) do
   create_table "vaccines", force: :cascade do |t|
     t.integer "cvx_code", null: false
     t.string "group_name", null: false
+    t.string "manufacturer"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["cvx_code"], name: "index_vaccines_on_cvx_code", unique: true
