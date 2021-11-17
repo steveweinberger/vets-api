@@ -78,10 +78,15 @@ jobs:
           rm -rf /tmp/.buildx-cache
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
-      - name: Setup Database and Run Specs
+      - name: Setup Database
         run: |
              docker-compose run --rm --service-ports web bash \
-             -c "bundle exec rails db:reset && bundle exec rspec spec modules --color --tty"
+             -c "bundle exec rails db:reset"
+
+      - name: Run Specs
+        run: |
+             docker-compose run --rm --service-ports web bash \
+             -c "bundle exec rspec spec/ modules/ --color --tty"
 
       - name: Upload Coverage Report
         uses: actions/upload-artifact@v2
