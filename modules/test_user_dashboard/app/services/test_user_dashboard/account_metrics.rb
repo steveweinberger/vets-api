@@ -31,10 +31,14 @@ module TestUserDashboard
       )[0]
 
       if tuple.present? && tuple[:checkin_time].nil?
-        bigquery.update(
+        bigquery.delete_from(
           table_name: TABLE,
-          set: 'SET has_checkin_error=TRUE',
           where: "WHERE account_uuid='#{tuple[:account_uuid]}' AND UNIX_MILLIS(created_at)=#{(tuple[:created_at].to_f * 1000).to_i}"
+        )
+
+        bigquery.insert_into(
+          table_name: TABLE,
+          rows: [tuple.merge({ has_checkin_error: true })]
         )
       end
 
