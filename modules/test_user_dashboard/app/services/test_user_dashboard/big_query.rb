@@ -42,12 +42,19 @@ module TestUserDashboard
     end
 
     # BigQuery requires a row indentifier in DELETE FROM statements
-    def delete_from(table_name:, row_identifier: 'account_uuid')
-      sql = "DELETE FROM `#{PROJECT}.#{DATASET}.#{table_name}` " \
-            "WHERE #{row_identifier} IS NOT NULL"
+    def delete_from(table_name:, where:)
+      sql = "DELETE FROM `#{PROJECT}.#{DATASET}.#{table_name}` #{where}"
 
       query(sql)
     end
+
+    # # BigQuery requires a row indentifier in DELETE FROM statements
+    # def delete_from(table_name:, row_identifier: 'account_uuid')
+    #   sql = "DELETE FROM `#{PROJECT}.#{DATASET}.#{table_name}` " \
+    #         "WHERE #{row_identifier} IS NOT NULL"
+
+    #   query(sql)
+    # end
 
     def insert_into(table_name:, rows:)
       # rubocop:disable Rails/SkipsModelValidations
