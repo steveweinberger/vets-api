@@ -9,6 +9,7 @@ module Mobile
             immunization = i[:resource]
             vaccine_code = immunization[:vaccine_code]
             cvx_code = vaccine_code[:coding].first[:code].to_i
+            vaccine = Mobile::V0::Vaccine.find_by(cvx_code: cvx_code)
 
             Mobile::V0::Immunization.new(
               id: immunization[:id],
@@ -16,9 +17,9 @@ module Mobile
               date: immunization[:occurrence_date_time],
               dose_number: dose_number(immunization[:protocol_applied]),
               dose_series: dose_series(immunization[:protocol_applied]),
-              group_name: group_name(cvx_code),
+              group_name: vaccine&.group_name,
               location_id: location_id(immunization.dig(:location, :reference)),
-              manufacturer: nil,
+              manufacturer: vaccine&.manufacturer,
               note: immunization[:note].first[:text],
               reaction: reaction(immunization[:reaction]),
               short_description: vaccine_code[:text]
@@ -54,16 +55,6 @@ module Mobile
           return nil unless reaction
 
           reaction.map { |r| r[:detail][:display] }.join(',')
-        end
-
-        def group_name(cvx_code)
-          vaccine = Mobile::V0::Vaccine.find_by(cvx_code: cvx_code)
-          unless vaccine
-            # log error
-            return nil
-          end
-
-          vaccine.group_name
         end
       end
     end
