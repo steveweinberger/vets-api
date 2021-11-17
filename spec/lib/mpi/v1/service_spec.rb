@@ -72,7 +72,7 @@ describe MPI::V1::Service do
 
   describe '.add_person' do
     before do
-      expect(MPI::Messages::AddPersonMessage).to receive(:new).once.and_call_original
+      expect(MasterPersonIndex::Messages::AddPersonMessage).to receive(:new).once.and_call_original
     end
 
     context 'valid_request when user has no ids' do
