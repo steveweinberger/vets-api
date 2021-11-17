@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_11_17_150005) do
+ActiveRecord::Schema.define(version: 2021_11_17_192215) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -747,18 +747,10 @@ ActiveRecord::Schema.define(version: 2021_11_17_150005) do
 
   create_table "test_user_dashboard_tud_account_checkouts", force: :cascade do |t|
     t.string "account_uuid"
-    t.string "first_name"
-    t.string "middle_name"
-    t.string "last_name"
-    t.string "gender"
-    t.datetime "birth_date"
-    t.integer "ssn"
-    t.string "phone"
-    t.string "email"
-    t.string "password"
-    t.boolean "standard"
-    t.boolean "available"
     t.datetime "checkout_time"
+    t.datetime "checkin_time"
+    t.boolean "has_checkin_error"
+    t.boolean "is_manual_checkin"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
