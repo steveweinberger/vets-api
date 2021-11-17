@@ -14,6 +14,10 @@ module MPI
         @service = MasterPersonIndex::Service.new
       end
 
+      def add_person(user_identity)
+        @service.add_person(convert_add_user(user_identity))
+      end
+
       def find_profile(user_identity, search_type = MasterPersonIndex::Constants::CORRELATION_WITH_RELATIONSHIP_DATA)
         tag_search_type(user_identity)
 
@@ -76,6 +80,29 @@ module MPI
           { source: self.class },
           nil,
           error.try(:body)
+        )
+      end
+
+      def convert_add_user(user_identity)
+        attributes = {}
+
+        %w[
+          first_name
+          middle_name
+          last_name
+          birth_date
+          ssn
+          gender
+          mhv_icn
+          edipi
+          icn_with_aaid
+          search_token
+        ].each do |attr|
+          attributes[attr] = user_identity.public_send(attr)
+        end
+
+        MasterPersonIndex::Models::UserToCreate.new(
+          attributes
         )
       end
 
