@@ -26,17 +26,31 @@ RSpec.describe 'immunizations', type: :request do
   after { Timecop.return }
 
   describe 'GET /mobile/v0/health/immunizations' do
-    before do
+    let(:vaccine_33) { create(:mobile_vaccine, cvx_code: 33, manufacturer: nil, group_name: 'PneumoPPV') }
+    let(:vaccine_113) { create(:mobile_vaccine, cvx_code: 113, manufacturer: nil, group_name: 'Td') }
+    let(:vaccine_133) { create(:mobile_vaccine, cvx_code: 133, manufacturer: nil, group_name: 'PneumoPCV') }
+    let(:vaccine_140) { create(:mobile_vaccine, cvx_code: 140, manufacturer: nil, group_name: 'FLU') }
+    let(:vaccine_207) { create(:mobile_vaccine, cvx_code: 207, manufacturer: nil, group_name: 'COVID-19') }
+
+    let(:immunizations_request) do
       VCR.use_cassette('lighthouse_health/get_immunizations', match_requests_on: %i[method uri]) do
         get '/mobile/v0/health/immunizations', headers: iam_headers, params: nil
       end
     end
 
     it 'returns a 200' do
+      immunizations_request
       expect(response).to have_http_status(:ok)
     end
 
     it 'matches the expected schema' do
+      vaccine_33
+      vaccine_113
+      vaccine_133
+      vaccine_140
+      vaccine_207
+      immunizations_request
+
       # TODO: this should use the matcher helper instead (was throwing an Oj::ParseError)
       # expect().to match_json_schema('immunizations')
       expect(response.parsed_body).to eq(
@@ -332,6 +346,8 @@ RSpec.describe 'immunizations', type: :request do
 
     context 'for items that do not have locations' do
       it 'matches the expected attributes' do
+        vaccine_140
+        immunizations_request
         expect(response.parsed_body['data'].first['attributes']).to eq(
           {
             'cvxCode' => 140,
@@ -348,6 +364,7 @@ RSpec.describe 'immunizations', type: :request do
       end
 
       it 'has a blank relationship' do
+        immunizations_request
         expect(response.parsed_body['data'].first['relationships']).to eq(
           {
             'location' => {
@@ -363,6 +380,8 @@ RSpec.describe 'immunizations', type: :request do
 
     context 'for items that do have a location' do
       it 'matches the expected attributes' do
+        vaccine_140
+        immunizations_request
         expect(response.parsed_body['data'][2]['attributes']).to eq(
           {
             'cvxCode' => 140,
@@ -379,6 +398,7 @@ RSpec.describe 'immunizations', type: :request do
       end
 
       it 'has a relationship' do
+        immunizations_request
         expect(response.parsed_body['data'][2]['relationships']).to eq(
           {
             'location' => {
