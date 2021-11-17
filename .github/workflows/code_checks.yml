@@ -84,7 +84,9 @@ jobs:
       - name: Setup Database and Run Specs
         run: |
              docker-compose run --rm --service-ports web bash \
-             -c "RAILS_ENV=test; bundle exec rails db:reset && bundle exec rspec spec modules --color --tty"
+             -c "RAILS_ENV=test DISABLE_BOOTSNAP=true; \
+             bundle exec parallel_test -n 4 -e 'bundle exec rails db:reset' \
+             && bundle exec parallel_rspec spec/ modules/ -n 4 -o '--color --tty'"
 
       - name: Upload Coverage Report
         uses: actions/upload-artifact@v2
