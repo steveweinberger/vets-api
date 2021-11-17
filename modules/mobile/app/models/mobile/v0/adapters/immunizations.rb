@@ -57,7 +57,7 @@ module Mobile
         end
 
         def group_name(cvx_code)
-          vaccine = Vaccine.find_by(cvx_code: cvx_code)
+          vaccine = Mobile::V0::Vaccine.find_by(cvx_code: cvx_code)
           unless vaccine
             # log error
             return nil

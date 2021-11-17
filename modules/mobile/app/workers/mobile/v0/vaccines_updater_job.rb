@@ -14,7 +14,7 @@ module Mobile
           group_name = find_value_from(node, 'Vaccine Group Name')
           manufacturer = (group_name == "COVID-19") ? find_manufacturer(cvx_code) : nil
 
-          vaccine = Vaccine.find_or_create_by(cvx_code: cvx_code)
+          vaccine = Mobile::V0::Vaccine.find_or_create_by(cvx_code: cvx_code)
           if vaccine.group_name != group_name || vaccine.manufacturer != manufacturer
             vaccine.update(group_name: group_name, manufacturer: manufacturer)
           end

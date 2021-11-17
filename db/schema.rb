@@ -610,6 +610,15 @@ ActiveRecord::Schema.define(version: 2021_11_12_213456) do
     t.index ["icn"], name: "index_mobile_users_on_icn", unique: true
   end
 
+  create_table "mobile_vaccines", force: :cascade do |t|
+    t.integer "cvx_code", null: false
+    t.string "group_name", null: false
+    t.string "manufacturer"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["cvx_code"], name: "index_mobile_vaccines_on_cvx_code", unique: true
+  end
+
   create_table "notifications", id: :serial, force: :cascade do |t|
     t.integer "account_id", null: false
     t.integer "subject", null: false
@@ -816,15 +825,6 @@ ActiveRecord::Schema.define(version: 2021_11_12_213456) do
     t.float "ranking"
     t.string "tags"
     t.index ["valid_pdf"], name: "index_va_forms_forms_on_valid_pdf"
-  end
-
-  create_table "vaccines", force: :cascade do |t|
-    t.integer "cvx_code", null: false
-    t.string "group_name", null: false
-    t.string "manufacturer"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.index ["cvx_code"], name: "index_vaccines_on_cvx_code", unique: true
   end
 
   create_table "vba_documents_git_items", force: :cascade do |t|
