@@ -21,36 +21,18 @@ module TestUserDashboard
     def checkout
       return unless tud_account
 
-      bigquery = TestUserDashboard::BigQuery.new
+      record = TestUserDashboard::TudAccountCheckout
+        .where(account_uuid: tud_account.account_uuid)
+        .last
 
-      tuple = bigquery.select_all(
-        table_name: TABLE,
-        where: "WHERE account_uuid='#{tud_account.account_uuid}'",
-        order_by: 'ORDER BY created_at DESC',
-        limit: 'LIMIT 1'
-      )[0]
+      binding.pry
 
-      if tuple.present? && tuple[:checkin_time].nil?
-        bigquery.delete_from(
-          table_name: TABLE,
-          where: "WHERE account_uuid='#{tuple[:account_uuid]}' AND UNIX_MILLIS(created_at)=#{(tuple[:created_at].to_f * 1000).to_i}"
-        )
+      record.update(has_checkin_error: true) if record.present? && record.checkin_time.nil?
 
-        bigquery.insert_into(
-          table_name: TABLE,
-          rows: [tuple.merge({ has_checkin_error: true })]
-        )
-      end
-
-      now = Time.now.utc
-
-      row = {
+      TestUserDashboard::TudAccountCheckout.create(
         account_uuid: tud_account.account_uuid,
-        checkout_time: now,
-        created_at: now
-      }
-
-      bigquery.insert_into(table_name: TABLE, rows: [row])
+        checkout_time: Time.now.utc
+      )
     end
   end
 end
