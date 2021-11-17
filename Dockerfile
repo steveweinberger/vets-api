@@ -31,12 +31,12 @@ RUN wget -q -r -np -nH -nd -a .cer -P /usr/local/share/ca-certificates http://ai
 
 ENV LANG=C.UTF-8 \
    BUNDLE_JOBS=4 \
-   BUNDLE_PATH=/app/vendor/cache \
+   BUNDLE_PATH=/usr/local/bundle/cache \
    BUNDLE_RETRY=3
 
 RUN gem install bundler:${BUNDLER_VERSION} --no-document
 
-ADD tmp/bundle_cache.tar.bz2 vendor/
+ADD tmp/bundle_cache.tar.bz2 /usr/local/bundle
 COPY modules ./modules
 COPY Gemfile Gemfile.lock ./
 RUN bundle install \
