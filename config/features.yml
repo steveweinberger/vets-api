@@ -287,6 +287,10 @@ features:
     actor_type: cookie
     description: Enables/disables the new Sign in design (VSP Identity)
     enable_in_development: true
+  login_new_design:
+    actor_type: cookie
+    description: Enables/disables the new Sign in design (VSP Identity)
+    enable_in_development: true
   loop_pages:
     actor_type: user
     description: Enable new list loop pattern
