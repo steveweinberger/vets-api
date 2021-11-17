@@ -131,6 +131,8 @@ describe MPI::V1::Service do
     end
 
     context 'invalid requests' do
+      let(:user) { build(:user, :loa3) }
+
       it 'responds with a SERVER_ERROR if request is invalid', :aggregate_failures do
         expect(subject).to receive(:log_exception_to_sentry)
 
@@ -190,6 +192,8 @@ describe MPI::V1::Service do
     end
 
     context 'with an ongoing breakers outage' do
+      let(:user) { build(:user, :loa3) }
+
       it 'returns the correct thing', :aggregate_failures do
         MPI::Configuration.instance.breakers_service.begin_forced_outage!
         expect(Raven).to receive(:extra_context).once

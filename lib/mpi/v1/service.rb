@@ -15,7 +15,27 @@ module MPI
       end
 
       def add_person(user_identity)
-        @service.add_person(convert_add_user(user_identity))
+        return_val =
+          begin
+            with_monitoring do
+              @service.add_person(convert_add_user(user_identity))
+            end
+          rescue Breakers::OutageException => e
+            Raven.extra_context(breakers_error_message: e.message)
+            log_message_to_sentry('MVI add_person connection failed.', :warn)
+            @service.mvi_profile_exception_response_for(MasterPersonIndex::Constants::OUTAGE_EXCEPTION, e)
+          end
+
+        if return_val.error.present?
+          original_error = return_val.error
+          increment_failure('add_person', original_error)
+          log_message_to_sentry("MVI add_person error: #{original_error.message}", :warn)
+          mvi_error_handler(user_identity, original_error)
+
+          return_val.error = build_exception(return_val.error_code, original_error)
+        end
+
+        return_val
       end
 
       def find_profile(user_identity, search_type = MasterPersonIndex::Constants::CORRELATION_WITH_RELATIONSHIP_DATA)
