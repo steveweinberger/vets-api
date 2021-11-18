@@ -2,7 +2,7 @@
 
 module TestUserDashboard
   class AccountMetrics
-    attr_reader :tud_account, :record
+    attr_reader :tud_account, :last_record
 
     def initialize(user)
       @tud_account = TudAccount.find_by(account_uuid: user.account_uuid)
