@@ -23,7 +23,7 @@ module MPI
           rescue Breakers::OutageException => e
             Raven.extra_context(breakers_error_message: e.message)
             log_message_to_sentry('MVI add_person connection failed.', :warn)
-            @service.mvi_profile_exception_response_for(MasterPersonIndex::Constants::OUTAGE_EXCEPTION, e)
+            @service.mvi_add_exception_response_for(MasterPersonIndex::Constants::OUTAGE_EXCEPTION, e)
           end
 
         if return_val.error.present?

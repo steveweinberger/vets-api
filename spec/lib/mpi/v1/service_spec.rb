@@ -201,13 +201,13 @@ describe MPI::V1::Service do
 
         exception = response.error.errors.first
 
-        expect(response.class).to eq MPI::Responses::AddPersonResponse
+        expect(response.class).to eq MasterPersonIndex::Responses::AddPersonResponse
         expect(response.status).to eq server_error
         expect(response.mvi_codes).to be_nil
         expect(exception.title).to eq 'Service unavailable'
         expect(exception.code).to eq 'MVI_503'
         expect(exception.status).to eq '503'
-        expect(exception.source).to eq MPI::Service
+        expect(exception.source).to eq MPI::V1::Service
       end
     end
   end
