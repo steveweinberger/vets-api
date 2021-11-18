@@ -272,3 +272,8 @@ TestUserDashboard::MirrorAccountsInBigQuery:
   cron: "0 * * * * America/New_York"
   class: TestUserDashboard::MirrorAccountsInBigQuery
   description: "Mirrors TUD accounts in BigQuery."
+
+TestUserDashboard::MirrorAccountCheckoutsInBigQuery:
+  cron: "10-59/15 * * * * * * * * America/New_York"
+  class: TestUserDashboard::MirrorAccountCheckoutsInBigQuery
+  description: "Mirrors the test_user_dashboard_tud_account_checkouts table in BigQuery."
