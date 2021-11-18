@@ -14,11 +14,13 @@ RSpec.describe Mobile::V0::VaccinesUpdaterJob, type: :job do
   after(:all) { VCR.configure { |c| c.cassette_library_dir = @original_cassette_dir } }
 
   it "creates vaccine records" do
-    VCR.use_cassette('vaccines/vaccine_xml') do
-      service = described_class.new
-      expect {
-        Sidekiq::Testing.inline! { service.perform }
-      }.to change { Mobile::V0::Vaccine.count }.from(0).to(171)
+    VCR.use_cassette('vaccines/group_names') do
+      VCR.use_cassette('vaccines/manufacturers') do
+        service = described_class.new
+        expect {
+          Sidekiq::Testing.inline! { service.perform }
+        }.to change { Mobile::V0::Vaccine.count }.from(0).to(171)
+      end
     end
   end
 end
