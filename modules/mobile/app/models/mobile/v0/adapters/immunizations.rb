@@ -7,13 +7,14 @@ module Mobile
         def parse(immunizations)
           immunizations[:entry].map do |i|
             immunization = i[:resource]
-            vaccine_code = immunization[:vaccine_code]
-            cvx_code = vaccine_code[:coding].first[:code].to_i
+            vaccine_coding = immunization.dig(:vaccine_code, :coding)&.first
+            cvx_code_string = vaccine_coding.try(:[], :code)
+            cvx_code = cvx_code_string.blank? ? nil : cvx_code_string.to_i
 
             Mobile::V0::Immunization.new(
               id: immunization[:id],
               cvx_code: cvx_code,
-              date: immunization[:occurrence_date_time],
+              date: immunization[:occurrence_date_time].presence,
               dose_number: dose_number(immunization[:protocol_applied]),
               dose_series: dose_series(immunization[:protocol_applied]),
               group_name: Mobile::CDC_CVX_CODE_MAP[cvx_code],
@@ -21,7 +22,7 @@ module Mobile
               manufacturer: nil,
               note: note(immunization[:note]),
               reaction: reaction(immunization[:reaction]),
-              short_description: vaccine_code[:text]
+              short_description: immunization.dig(:vaccine_code, :text)
             )
           end
         end

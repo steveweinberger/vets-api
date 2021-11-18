@@ -422,5 +422,66 @@ RSpec.describe 'immunizations', type: :request do
         )
       end
     end
+
+    context 'when occurrenceDateTime is blank from lighthouse' do
+      before do
+        VCR.use_cassette('lighthouse_health/get_immunizations_missing_date', match_requests_on: %i[method uri]) do
+          get '/mobile/v0/health/immunizations', headers: iam_headers, params: nil
+        end
+      end
+
+      it 'returns a 200' do
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'returns nil for missing date' do
+        expect(response.parsed_body['data'][0]['attributes']['date']).to be_nil
+      end
+
+      it 'returns nil for empty date' do
+        expect(response.parsed_body['data'][1]['attributes']['date']).to be_nil
+      end
+
+      it 'returns date for non-blank date' do
+        expect(response.parsed_body['data'][2]['attributes']['date']).not_to be_nil
+      end
+    end
+
+    context 'when any variation of VaccineCode is blank from lighthouse' do
+      before do
+        VCR.use_cassette('lighthouse_health/get_immunizations_missing_cvx', match_requests_on: %i[method uri]) do
+          get '/mobile/v0/health/immunizations', headers: iam_headers, params: nil
+        end
+      end
+
+      it 'returns a 200' do
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'returns nil cvx and group name for missing VaccineCode' do
+        expect(response.parsed_body['data'][0]['attributes']['cvxCode']).to be_nil
+        expect(response.parsed_body['data'][0]['attributes']['groupName']).to be_nil
+      end
+
+      it 'returns nil cvx and group name for empty VaccineCode.coding' do
+        expect(response.parsed_body['data'][1]['attributes']['cvxCode']).to be_nil
+        expect(response.parsed_body['data'][1]['attributes']['groupName']).to be_nil
+      end
+
+      it 'returns nil cvx and group name for missing VaccineCode.coding.code' do
+        expect(response.parsed_body['data'][2]['attributes']['cvxCode']).to be_nil
+        expect(response.parsed_body['data'][2]['attributes']['groupName']).to be_nil
+      end
+
+      it 'returns nil cvx and group name for empty VaccineCode.coding.code' do
+        expect(response.parsed_body['data'][3]['attributes']['cvxCode']).to be_nil
+        expect(response.parsed_body['data'][3]['attributes']['groupName']).to be_nil
+      end
+
+      it 'returns cvx and group name for intact VaccineCode' do
+        expect(response.parsed_body['data'][4]['attributes']['cvxCode']).not_to be_nil
+        expect(response.parsed_body['data'][4]['attributes']['groupName']).not_to be_nil
+      end
+    end
   end
 end
