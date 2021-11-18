@@ -8,7 +8,6 @@ module Veteran
     class Representative < ApplicationRecord
       BASE_URL = 'https://www.va.gov/ogc/apps/accreditation/'
 
-      self.primary_key = :representative_id
       has_kms_key
       encrypts :dob, :ssn, key: :kms_key
 
@@ -17,6 +16,7 @@ module Veteran
       scope :claim_agents, -> { where(user_types: ['claim_agents']) }
 
       validates :poa_codes, presence: true
+      validates_uniqueness_of :representative_id
 
       #
       # Find all representatives that matches the provided search criteria
