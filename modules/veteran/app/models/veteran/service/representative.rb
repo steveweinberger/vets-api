@@ -16,7 +16,7 @@ module Veteran
       scope :claim_agents, -> { where(user_types: ['claim_agents']) }
 
       validates :poa_codes, presence: true
-      validates_uniqueness_of :representative_id
+      validates_uniqueness_of :representative_id, allow_nil: false
 
       #
       # Find all representatives that matches the provided search criteria
