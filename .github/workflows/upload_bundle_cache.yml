@@ -47,7 +47,7 @@ jobs:
 
       - name: Copy cache out of container
         run: |
-          docker-compose run web
+          docker-compose run --service-ports web
           echo "DOCKER_CONTAINER_ID=$(docker ps --filter "ancestor=vets-api:latest " -q)" >> $GITHUB_ENV
           docker cp ${{ env.DOCKER_CONTAINER_ID }}:/usr/local/bundle/cache - | bzip2 > tmp/bundle_cache.tar.bz2
 
