@@ -9,18 +9,20 @@ module TestUserDashboard
       @record = last_tud_account_checkout_record
     end
 
-    def checkin(checkin_time:, is_manual_checkin: false)
+    def checkin(is_manual_checkin: false)
       return unless tud_account
 
-      if record.present? && record.checkin_time.nil?
-        record.update(checkin_time: checkin_time, is_manual_checkin: is_manual_checkin)
+      if last_checkin_time_nil?
+        record.update(checkin_time: Time.now.utc, is_manual_checkin: is_manual_checkin)
       end
     end
 
     def checkout
       return unless tud_account
 
-      record.update(has_checkin_error: true) if record.present? && record.checkin_time.nil?
+      if last_checkin_time_nil?
+        record.update(has_checkin_error: true)
+      end
 
       TestUserDashboard::TudAccountCheckout.create(
         account_uuid: tud_account.account_uuid,
@@ -32,6 +34,10 @@ module TestUserDashboard
 
     def last_tud_account_checkout_record
       TestUserDashboard::TudAccountCheckout.where(account_uuid: tud_account.account_uuid).last
+    end
+
+    def last_checkin_time_nil?
+      record.present? && record.checkin_time.nil?
     end
   end
 end
