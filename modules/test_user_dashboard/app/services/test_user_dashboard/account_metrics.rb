@@ -33,7 +33,9 @@ module TestUserDashboard
     private
 
     def last_tud_account_checkout_record
-      TestUserDashboard::TudAccountCheckout.where(account_uuid: tud_account.account_uuid).last
+      if tud_account
+        TestUserDashboard::TudAccountCheckout.where(account_uuid: tud_account.account_uuid).last
+      end
     end
 
     def last_checkin_time_nil?
