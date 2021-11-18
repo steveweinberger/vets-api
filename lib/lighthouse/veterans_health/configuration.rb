@@ -4,15 +4,15 @@ require 'common/client/configuration/rest'
 require 'common/client/middleware/response/raise_error'
 
 module Lighthouse
-  module ClinicalHealth
+  module VeteransHealth
     class Configuration < Common::Client::Configuration::REST
 
       def base_path
-        Settings.lighthouse.clinical_health.url
+        Settings.lighthouse.veterans_health.url
       end
 
       def service_name
-        'Lighthouse_ClinicalHealth'
+        'Lighthouse_VeteransHealth'
       end
 
       # def self.base_request_headers
@@ -20,7 +20,7 @@ module Lighthouse
       # end
 
       def rsa_key
-        @key ||= OpenSSL::PKey::RSA.new(File.read(Dir.home + Settings.lighthouse.clinical_health.api_key))
+        @key ||= OpenSSL::PKey::RSA.new(File.read(Dir.home + Settings.lighthouse.veterans_health.api_key))
       end
 
       def connection

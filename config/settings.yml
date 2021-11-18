@@ -938,7 +938,8 @@ hqva_mobile:
 # settings va.gov uses related to lighthouse api's
 lighthouse:
   api_key: ~/private.pem
-  clinical_health:
+  veterans_health:
+    #TODO: change this to be namespaced more specifically for the hypertension fast-tracker pilot
     client_assertion_type: "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"
     condition_api_scope:
       - "launch launch/patient"
