@@ -81,12 +81,12 @@ jobs:
       - name: Setup Database
         run: |
              docker-compose run --rm --service-ports web bash \
-             -c "bundle exec rails db:reset"
+             -c "bundle exec parallel_test -n 14 -e 'bundle exec rake db:reset'"
 
       - name: Run Specs
         run: |
              docker-compose run --rm --service-ports web bash \
-             -c "bundle exec rspec spec/ modules/ --color --tty"
+             -c "bundle exec parallel_rspec spec/ modules/ -n 14 -o '--color --tty'"
 
       - name: Upload Coverage Report
         uses: actions/upload-artifact@v2
