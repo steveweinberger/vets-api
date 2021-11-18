@@ -40,7 +40,7 @@ describe TestUserDashboard::AccountMetrics do
       end
 
       it 'returns nil' do
-        expect(TestUserDashboard::AccountMetrics.new(user).checkin()).to be_nil
+        expect(TestUserDashboard::AccountMetrics.new(user).checkin).to be_nil
       end
     end
 
@@ -65,36 +65,41 @@ describe TestUserDashboard::AccountMetrics do
     end
   end
 
-  # describe '#checkout' do
-  #   let!(:timestamp) { Time.now.getlocal }
-  #   let!(:user) { create(:user) }
+  describe '#checkout' do
+    let!(:user) { create(:user) }
+    let!(:tud_account) { nil }
 
-  #   context 'TUD account does not exist' do
-  #     before do
-  #       allow(TestUserDashboard::TudAccount).to receive(:find_by).and_return(nil)
-  #     end
+    context 'TUD account does not exist' do
+      before do
+        allow(TestUserDashboard::TudAccount).to receive(:find_by).and_return(nil)
+        # rubocop:disable RSpec/MessageChain
+        allow(TestUserDashboard::TudAccountCheckout).to receive_message_chain(:where, :last).and_return(nil)
+        # rubocop:enable RSpec/MessageChain
+      end
 
-  #     it 'returns nil' do
-  #       expect(TestUserDashboard::AccountMetrics.new(user).checkout).to be_nil
-  #     end
-  #   end
+      it 'returns nil' do
+        expect(TestUserDashboard::AccountMetrics.new(user).checkout).to be_nil
+      end
+    end
 
-  #   context 'TUD account does exist' do
-  #     let(:tud_account) { create(:tud_account, account_uuid: user.account_uuid, checkout_time: timestamp) }
-  #     let!(:bigquery) { instance_double('TestUserDashboard::BigQuery', insert_into: true) }
-  #     let(:table) { TestUserDashboard::AccountMetrics::TABLE }
-  #     let(:row) { { event: 'checkout', uuid: tud_account.account_uuid, timestamp: tud_account.checkout_time } }
+    context 'TUD account does exist' do
+      let!(:user) { create(:user) }
+      let(:tud_account) { create(:tud_account, account_uuid: user.account_uuid) }
+      let(:last_record) { create(:tud_account_checkout, account_uuid: user.account_uuid) }
 
-  #     before do
-  #       allow(TestUserDashboard::TudAccount).to receive(:find_by).and_return(tud_account)
-  #       allow(TestUserDashboard::BigQuery).to receive(:new).and_return(bigquery)
-  #       allow_any_instance_of(TestUserDashboard::BigQuery)
-  #         .to receive(:insert_into).with(table: table, rows: [row]).and_return(true)
-  #     end
+      before do
+        allow(TestUserDashboard::TudAccount).to receive(:find_by).and_return(tud_account)
+        # rubocop:disable RSpec/MessageChain
+        allow(TestUserDashboard::TudAccountCheckout).to receive_message_chain(:where, :last).and_return(last_record)
+        # rubocop:enable RSpec/MessageChain
+      end
 
-  #     it 'pushes the event data to BigQuery' do
-  #       expect(TestUserDashboard::AccountMetrics.new(user).checkout).to be_truthy
-  #     end
-  #   end
-  # end
+      it 'pushes the event data to BigQuery' do
+        checkout_return_value = described_class.new(user).checkout
+        expect(checkout_return_value.is_a?(TestUserDashboard::TudAccountCheckout)).to be(true)
+        expect(checkout_return_value.checkin_time).to be_nil
+        expect(checkout_return_value.has_checkin_error).to be_nil
+      end
+    end
+  end
 end
