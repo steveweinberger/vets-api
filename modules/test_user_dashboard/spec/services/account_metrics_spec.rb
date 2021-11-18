@@ -56,7 +56,7 @@ describe TestUserDashboard::AccountMetrics do
         # rubocop:enable RSpec/MessageChain
       end
 
-      it 'pushes the event data to BigQuery' do
+      it 'saves the checkin time' do
         metrics = described_class.new(user)
         metrics.checkin
         expect(metrics.last_record.checkin_time).not_to be_nil
@@ -94,7 +94,7 @@ describe TestUserDashboard::AccountMetrics do
         # rubocop:enable RSpec/MessageChain
       end
 
-      it 'pushes the event data to BigQuery' do
+      it 'saves the checkout time' do
         checkout_return_value = described_class.new(user).checkout
         expect(checkout_return_value.is_a?(TestUserDashboard::TudAccountCheckout)).to be(true)
         expect(checkout_return_value.checkin_time).to be_nil
