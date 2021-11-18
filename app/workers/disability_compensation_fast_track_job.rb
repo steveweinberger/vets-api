@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'prawn'
-require 'lighthouse/clinical_health/client'
+require 'lighthouse/veterans_health/client'
 
 class DisabilityCompensationFastTrackJob
   include Sidekiq::Worker
@@ -9,20 +9,20 @@ class DisabilityCompensationFastTrackJob
   sidekiq_options retry: 14
 
   def perform(form526_submission_id)
-    submission = Form526Submission.find(form526_submission_id)
-    icn = Account.where(idme_uuid: submission.user_uuid).first.icn
+    # submission = Form526Submission.find(form526_submission_id)
+    # icn = Account.where(idme_uuid: submission.user_uuid).first.icn
     #temporary below
-    # icn = 2000163
-    client = Lighthouse::ClinicalHealth::Client.new
+    icn = 2000163
+    client = Lighthouse::VeteransHealth::Client.new
     # TODO: rescue !=200 responses with an appropriate action
-    condition_response = client.get_conditions(icn)
+    condition_response = client.get_request('conditions', icn)
     return unless is_hypertension?(condition_response)
     # TODO: rescue !=200 responses with an appropriate action
-    observations_response = client.get_observations(icn)
-    pdf_body = generate_pdf(condition_response)
 
-    client = EVSS::DocumentsService.new(submission.auth_headers)
-    client.upload(pdf_body, create_document_data(upload_data))
+    observations_response = client.get_request('observations', icn)
+    # pdf_body = generate_pdf(condition_response)
+    # client = EVSS::DocumentsService.new(submission.auth_headers)
+    # client.upload(pdf_body, create_document_data(upload_data))
   end
 
   def is_hypertension?(condition_response)
