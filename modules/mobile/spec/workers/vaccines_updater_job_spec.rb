@@ -49,9 +49,9 @@ RSpec.describe Mobile::V0::VaccinesUpdaterJob, type: :job do
   it 'updates records that have changed' do
     VCR.use_cassette('vaccines/group_names') do
       VCR.use_cassette('vaccines/manufacturers') do
-        no_manufacturer = create(:mobile_vaccine, cvx_code: 1, group_name: 'CANDY BARS', manufacturer: 'Hershey')
-        covid_vaccine = create(:mobile_vaccine, cvx_code: 207, group_name: 'CANDY BARS', manufacturer: nil)
-        non_covid_vaccine = create(:mobile_vaccine, cvx_code: 2, group_name: 'CANDY BARS', manufacturer: 'Mars')
+        no_manufacturer = create(:vaccine, cvx_code: 1, group_name: 'CANDY BARS', manufacturer: 'Hershey')
+        covid_vaccine = create(:vaccine, cvx_code: 207, group_name: 'CANDY BARS', manufacturer: nil)
+        non_covid_vaccine = create(:vaccine, cvx_code: 2, group_name: 'CANDY BARS', manufacturer: 'Mars')
 
         service = described_class.new
         expect do

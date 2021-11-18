@@ -26,11 +26,11 @@ RSpec.describe 'immunizations', type: :request do
   after { Timecop.return }
 
   describe 'GET /mobile/v0/health/immunizations' do
-    let(:vaccine_33) { create(:mobile_vaccine, cvx_code: 33, manufacturer: nil, group_name: 'PneumoPPV') }
-    let(:vaccine_113) { create(:mobile_vaccine, cvx_code: 113, manufacturer: nil, group_name: 'Td') }
-    let(:vaccine_133) { create(:mobile_vaccine, cvx_code: 133, manufacturer: nil, group_name: 'PneumoPCV') }
-    let(:vaccine_140) { create(:mobile_vaccine, cvx_code: 140, manufacturer: nil, group_name: 'FLU') }
-    let(:vaccine_207) { create(:mobile_vaccine, cvx_code: 207, manufacturer: nil, group_name: 'COVID-19') }
+    let(:vaccine_33) { create(:vaccine, cvx_code: 33, manufacturer: nil, group_name: 'PneumoPPV') }
+    let(:vaccine_113) { create(:vaccine, cvx_code: 113, manufacturer: nil, group_name: 'Td') }
+    let(:vaccine_133) { create(:vaccine, cvx_code: 133, manufacturer: nil, group_name: 'PneumoPCV') }
+    let(:vaccine_140) { create(:vaccine, cvx_code: 140, manufacturer: nil, group_name: 'FLU') }
+    let(:vaccine_207) { create(:vaccine, cvx_code: 207, manufacturer: nil, group_name: 'COVID-19') }
 
     let(:immunizations_request) do
       VCR.use_cassette('lighthouse_health/get_immunizations', match_requests_on: %i[method uri]) do
