@@ -31,7 +31,7 @@ RSpec.describe Veteran::VSOReloader, type: :job do
     it 'loads a claim agent with the poa code' do
       VCR.use_cassette('veteran/ogc_claim_agent_data') do
         Veteran::VSOReloader.new.reload_claim_agents
-        expect(Veteran::Service::Representative.last.poa_codes).to include('FDN')
+        expect(Veteran::Service::Representative.last.poa_codes).to include('ELC')
       end
     end
 
