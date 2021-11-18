@@ -65,7 +65,7 @@ class HypertensionObservationData
   attr_accessor :response
 
   def initialize(response)
-    response = @response
+    @response = response
   end
 
   def transform
@@ -108,56 +108,6 @@ class HypertensionObservationData
     # Each component should contain a BP pair, so after filtering there should only be one reading of each type:
     systolic = filter_components_by_code("8480-6", entry["component"]).first
     diastolic = filter_components_by_code("8462-4", entry["component"]).first
-
-    # systolic = nil
-    # diastolic = nil
-    # for component in entry["component"]
-
-      # for coding in component["code"]["coding"]
-#        if ["8480-6", "8462-4"].include? coding["code"]
-#          reading = {
-#            "code": coding["code"],
-#            "unit": component["valueQuantity"]["unit"],
-#            "value": component["valueQuantity"]["value"],
-#            "display": coding["display"]
-#          }
-#          if coding["code"] == "8480-6"
-#            systolic = reading
-#          elsif coding["code"] == "8462-4"
-#            diastolic = reading
-#          end
-#        else
-#          # TODO: not clear that we need this, because there could conceivably
-#          # be codes--like codes from other systems--that are present in
-#          # addition to the ones we want, and we probably don't need to error
-#          # on that.
-#          raise "not systolic or diastolic"
-#        end
-
-#        if coding["code"] == "8480-6"
-#          systolic = {
-#            "code": coding["code"],
-#            "unit": component["valueQuantity"]["unit"],
-#            "value": component["valueQuantity"]["value"],
-#            "display": coding["display"]
-#          }
-#        elsif coding["code"] == "8462-4"
-#          diastolic = {
-#            "code": coding["code"],
-#            "unit": component["valueQuantity"]["unit"],
-#            "value": component["valueQuantity"]["value"],
-#            "display": coding["display"]
-#          }
-#        else
-#          # note: not clear that we need this, because there could conceivably
-#          # be codes--like codes from other systems--that are present in
-#          # addition to the ones we want, and we probably don't need to error
-#          # on that.
-#          raise "not systolic or diastolic"
-#        end
-      # end
-    # end
-
 
     if systolic.blank? || diastolic.blank?
       # TODO: unlike the above error, I do think we need this one, because if
