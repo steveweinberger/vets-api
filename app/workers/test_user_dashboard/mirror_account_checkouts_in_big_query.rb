@@ -16,6 +16,7 @@ module TestUserDashboard
       client = TestUserDashboard::BigQuery.new
       client.delete_from(table_name: TUD_ACCOUNTS_USAGE_TABLE)
       client.insert_into(table_name: TUD_ACCOUNTS_USAGE_TABLE, rows: checkouts)
+      puts "Mirrored TUD_ACCOUNTS_USAGE_TABLE"
     end
 
     def checkouts
