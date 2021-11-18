@@ -26,12 +26,6 @@ RSpec.describe 'immunizations', type: :request do
   after { Timecop.return }
 
   describe 'GET /mobile/v0/health/immunizations' do
-    let(:vaccine_33) { create(:vaccine, cvx_code: 33, manufacturer: nil, group_name: 'PneumoPPV') }
-    let(:vaccine_113) { create(:vaccine, cvx_code: 113, manufacturer: nil, group_name: 'Td') }
-    let(:vaccine_133) { create(:vaccine, cvx_code: 133, manufacturer: nil, group_name: 'PneumoPCV') }
-    let(:vaccine_140) { create(:vaccine, cvx_code: 140, manufacturer: nil, group_name: 'FLU') }
-    let(:vaccine_207) { create(:vaccine, cvx_code: 207, manufacturer: nil, group_name: 'COVID-19') }
-
     let(:immunizations_request) do
       VCR.use_cassette('lighthouse_health/get_immunizations', match_requests_on: %i[method uri]) do
         get '/mobile/v0/health/immunizations', headers: iam_headers, params: nil
@@ -44,11 +38,6 @@ RSpec.describe 'immunizations', type: :request do
     end
 
     it 'matches the expected schema' do
-      vaccine_33
-      vaccine_113
-      vaccine_133
-      vaccine_140
-      vaccine_207
       immunizations_request
 
       # TODO: this should use the matcher helper instead (was throwing an Oj::ParseError)
@@ -346,8 +335,8 @@ RSpec.describe 'immunizations', type: :request do
 
     context 'for items that do not have locations' do
       it 'matches the expected attributes' do
-        vaccine_140
         immunizations_request
+
         expect(response.parsed_body['data'].first['attributes']).to eq(
           {
             'cvxCode' => 140,
@@ -365,6 +354,7 @@ RSpec.describe 'immunizations', type: :request do
 
       it 'has a blank relationship' do
         immunizations_request
+
         expect(response.parsed_body['data'].first['relationships']).to eq(
           {
             'location' => {
@@ -380,8 +370,8 @@ RSpec.describe 'immunizations', type: :request do
 
     context 'for items that do have a location' do
       it 'matches the expected attributes' do
-        vaccine_140
         immunizations_request
+
         expect(response.parsed_body['data'][2]['attributes']).to eq(
           {
             'cvxCode' => 140,
@@ -399,6 +389,7 @@ RSpec.describe 'immunizations', type: :request do
 
       it 'has a relationship' do
         immunizations_request
+
         expect(response.parsed_body['data'][2]['relationships']).to eq(
           {
             'location' => {
@@ -410,6 +401,46 @@ RSpec.describe 'immunizations', type: :request do
                 'related' => 'www.example.com/mobile/v0/health/locations/I2-4KG3N5YUSPTWD3DAFMLMRL5V5U000000'
               }
             }
+          }
+        )
+      end
+    end
+
+    describe 'vaccines' do
+        it 'uses the vaccine group name and manufacturer in the response when vaccine record exists' do
+          create(:vaccine, cvx_code: 140, group_name: 'COVID-19', manufacturer: 'Moderna')
+          immunizations_request
+
+          expect(response.parsed_body['data'][2]['attributes']).to eq(
+            {
+              'cvxCode' => 140,
+              'date' => '2011-03-31T12:24:55Z',
+              'doseNumber' => 'Series 1',
+              'doseSeries' => 1,
+              'groupName' => vaccine.group_name,
+              'manufacturer' => vaccine.manufacturer,
+              'note' => 'Dose #47 of 101 of Influenza  seasonal  injectable  preservative free vaccine administered.',
+              'reaction' => 'Other',
+              'shortDescription' => 'Influenza  seasonal  injectable  preservative free'
+            }
+          )
+        end
+      end
+
+      it 'sets group name and manufacturer to nil when no vaccine record exists' do
+        immunizations_request
+
+        expect(response.parsed_body['data'][2]['attributes']).to eq(
+          {
+            'cvxCode' => 140,
+            'date' => '2011-03-31T12:24:55Z',
+            'doseNumber' => 'Series 1',
+            'doseSeries' => 1,
+            'groupName' => nil,
+            'manufacturer' => nil,
+            'note' => 'Dose #47 of 101 of Influenza  seasonal  injectable  preservative free vaccine administered.',
+            'reaction' => 'Other',
+            'shortDescription' => 'Influenza  seasonal  injectable  preservative free'
           }
         )
       end
