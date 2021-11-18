@@ -12,7 +12,7 @@ module Mobile
         group_name_data.root.children.each do |node|
           cvx_code = find_value_from(node, 'CVXCode')
           group_name = find_value_from(node, 'Vaccine Group Name')
-          manufacturer = (group_name == "COVID-19") ? find_manufacturer(cvx_code) : nil
+          manufacturer = group_name == 'COVID-19' ? find_manufacturer(cvx_code) : nil
 
           vaccine = Mobile::V0::Vaccine.find_or_create_by(cvx_code: cvx_code)
           if vaccine.group_name != group_name || vaccine.manufacturer != manufacturer
@@ -24,13 +24,13 @@ module Mobile
       private
 
       def group_name_data
-        @group_name_data ||= Nokogiri::XML(URI.open(GROUP_NAME_XML)) do |config|
+        @group_name_data ||= Nokogiri::XML(URI.parse(GROUP_NAME_XML).open) do |config|
           config.strict.noblanks
         end
       end
 
       def manufacturer_data
-        @manufacturer_data ||= Nokogiri::XML(URI.open(MANUFACTURER_XML)) do |config|
+        @manufacturer_data ||= Nokogiri::XML(URI.parse(MANUFACTURER_XML).open) do |config|
           config.strict.noblanks
         end
       end

@@ -14,9 +14,9 @@ RSpec.describe Mobile::V0::VaccinesUpdaterJob, type: :job do
     VCR.use_cassette('vaccines/group_names') do
       VCR.use_cassette('vaccines/manufacturers') do
         service = described_class.new
-        expect {
+        expect do
           service.perform
-        }.to change { Mobile::V0::Vaccine.count }.from(0).to(3)
+        end.to change { Mobile::V0::Vaccine.count }.from(0).to(3)
 
         no_manufacturer = Mobile::V0::Vaccine.find_by(cvx_code: 1)
         expect(no_manufacturer.group_name).to eq('DTAP')
@@ -54,9 +54,9 @@ RSpec.describe Mobile::V0::VaccinesUpdaterJob, type: :job do
         non_covid_vaccine = create(:mobile_vaccine, cvx_code: 2, group_name: 'CANDY BARS', manufacturer: 'Mars')
 
         service = described_class.new
-        expect {
+        expect do
           service.perform
-        }.not_to change { Mobile::V0::Vaccine.count }
+        end.not_to(change { Mobile::V0::Vaccine.count })
 
         expect(no_manufacturer.reload.group_name).to eq('DTAP')
         expect(no_manufacturer.manufacturer).to be_nil
