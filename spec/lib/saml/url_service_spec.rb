@@ -44,6 +44,8 @@ RSpec.describe SAML::URLService do
         end
 
         it 'has sign in url: idme_url' do
+          expect_any_instance_of(OneLogin::RubySaml::Settings)
+            .to receive(:authn_context_comparison=).with('minimum')
           expect(subject.idme_url)
             .to be_a_saml_url(expected_saml_url)
             .with_relay_state('originating_request_id' => '123', 'type' => 'idme')
@@ -56,7 +58,52 @@ RSpec.describe SAML::URLService do
             .with_params('op' => 'signup')
         end
 
+        it 'has sign up url: idme_signup_url' do
+          expect(subject.idme_signup_url)
+            .to be_a_saml_url(expected_saml_url)
+            .with_relay_state('originating_request_id' => '123', 'type' => 'signup')
+            .with_params('op' => 'signup')
+        end
+
         context 'verify_url' do
+          context 'from a login callback' do
+            context 'with ID.me as CSP' do
+              let(:params) { { action: 'saml_callback', RelayState: '{"type":"idme"}' } }
+
+              it 'has uplevel url with ID.me' do
+                expect_any_instance_of(OneLogin::RubySaml::Settings)
+                  .to receive(:authn_context=).with([LOA::IDME_LOA3_VETS, AuthnContext::ID_ME])
+                expect(subject.verify_url)
+                  .to be_a_saml_url(expected_saml_url)
+                  .with_relay_state('originating_request_id' => '123', 'type' => 'idme')
+              end
+            end
+
+            context 'with MHV as CSP' do
+              let(:params) { { action: 'saml_callback', RelayState: '{"type":"mhv"}' } }
+
+              it 'has uplevel url with MHV' do
+                expect_any_instance_of(OneLogin::RubySaml::Settings)
+                  .to receive(:authn_context=).with(['myhealthevet_loa3', AuthnContext::ID_ME])
+                expect(subject.verify_url)
+                  .to be_a_saml_url(expected_saml_url)
+                  .with_relay_state('originating_request_id' => '123', 'type' => 'mhv')
+              end
+            end
+
+            context 'with DSLogon as CSP' do
+              let(:params) { { action: 'saml_callback', RelayState: '{"type":"dslogon"}' } }
+
+              it 'has uplevel url with DSLogon' do
+                expect_any_instance_of(OneLogin::RubySaml::Settings)
+                  .to receive(:authn_context=).with(['dslogon_loa3', AuthnContext::ID_ME])
+                expect(subject.verify_url)
+                  .to be_a_saml_url(expected_saml_url)
+                  .with_relay_state('originating_request_id' => '123', 'type' => 'dslogon')
+              end
+            end
+          end
+
           it 'has sign in url: with (default authn_context)' do
             expect(user.authn_context).to eq('http://idmanagement.gov/ns/assurance/loa/1/vets')
             expect_any_instance_of(OneLogin::RubySaml::Settings)
@@ -188,13 +235,12 @@ RSpec.describe SAML::URLService do
 
             it 'has a login redirect url with success' do
               expect(subject.login_redirect_url)
-                .to eq(values[:base_redirect] + SAML::URLService::LOGIN_REDIRECT_PARTIAL + '?type=idme')
+                .to eq("#{values[:base_redirect]}#{SAML::URLService::LOGIN_REDIRECT_PARTIAL}?type=idme")
             end
 
             it 'has a login redirect url with fail' do
               expect(subject.login_redirect_url(auth: 'fail', code: SAML::Responses::Base::CLICKED_DENY_ERROR_CODE))
-                .to eq(values[:base_redirect] +
-                       SAML::URLService::LOGIN_REDIRECT_PARTIAL +
+                .to eq("#{values[:base_redirect]}#{SAML::URLService::LOGIN_REDIRECT_PARTIAL}"\
                        '?auth=fail&code=001&type=idme')
             end
           end
@@ -214,13 +260,12 @@ RSpec.describe SAML::URLService do
 
             it 'is successful' do
               expect(subject.login_redirect_url)
-                .to eq(values[:base_redirect] + SAML::URLService::LOGIN_REDIRECT_PARTIAL + '?type=custom')
+                .to eq("#{values[:base_redirect]}#{SAML::URLService::LOGIN_REDIRECT_PARTIAL}?type=custom")
             end
 
             it 'is a failure' do
               expect(subject.login_redirect_url(auth: 'fail', code: SAML::Responses::Base::CLICKED_DENY_ERROR_CODE))
-                .to eq(values[:base_redirect] +
-                       SAML::URLService::LOGIN_REDIRECT_PARTIAL +
+                .to eq("#{values[:base_redirect]}#{SAML::URLService::LOGIN_REDIRECT_PARTIAL}"\
                        '?auth=force-needed&code=001&type=custom')
             end
           end
@@ -277,6 +322,8 @@ RSpec.describe SAML::URLService do
         end
 
         it 'has sign in url: idme_url' do
+          expect_any_instance_of(OneLogin::RubySaml::Settings)
+            .to receive(:authn_context_comparison=).with('minimum')
           expect(subject.idme_url)
             .to be_a_saml_url(expected_saml_url)
             .with_relay_state('originating_request_id' => '123', 'type' => 'idme')
@@ -293,6 +340,13 @@ RSpec.describe SAML::URLService do
 
         it 'has sign up url: signup_url' do
           expect(subject.signup_url)
+            .to be_a_saml_url(expected_saml_url)
+            .with_relay_state('originating_request_id' => '123', 'type' => 'signup')
+            .with_params('op' => 'signup')
+        end
+
+        it 'has sign up url: idme_signup_url' do
+          expect(subject.idme_signup_url)
             .to be_a_saml_url(expected_saml_url)
             .with_relay_state('originating_request_id' => '123', 'type' => 'signup')
             .with_params('op' => 'signup')
@@ -450,13 +504,12 @@ RSpec.describe SAML::URLService do
 
             it 'has a login redirect url with success' do
               expect(subject.login_redirect_url)
-                .to eq(values[:base_redirect] + SAML::URLService::LOGIN_REDIRECT_PARTIAL + '?type=idme')
+                .to eq("#{values[:base_redirect]}#{SAML::URLService::LOGIN_REDIRECT_PARTIAL}?type=idme")
             end
 
             it 'has a login redirect url with fail' do
               expect(subject.login_redirect_url(auth: 'fail', code: SAML::Responses::Base::CLICKED_DENY_ERROR_CODE))
-                .to eq(values[:base_redirect] +
-                       SAML::URLService::LOGIN_REDIRECT_PARTIAL +
+                .to eq("#{values[:base_redirect]}#{SAML::URLService::LOGIN_REDIRECT_PARTIAL}"\
                        '?auth=fail&code=001&type=idme')
             end
           end

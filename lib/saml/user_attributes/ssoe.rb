@@ -9,8 +9,9 @@ module SAML
     class SSOe
       include SentryLogging
       include Identity::Parsers::GCIds
-      SERIALIZABLE_ATTRIBUTES = %i[email first_name middle_name last_name common_name zip gender ssn birth_date
-                                   uuid idme_uuid sec_id mhv_icn mhv_correlation_id mhv_account_type
+      SERIALIZABLE_ATTRIBUTES = %i[email first_name middle_name last_name common_name zip gender ssn
+                                   birth_date uuid idme_uuid logingov_uuid verified_at sec_id
+                                   mhv_icn mhv_correlation_id mhv_account_type
                                    edipi loa sign_in multifactor participant_id birls_id icn
                                    person_types].freeze
       INBOUND_AUTHN_CONTEXT = 'urn:oasis:names:tc:SAML:2.0:ac:classes:Password'
@@ -89,6 +90,7 @@ module SAML
       ### Identifiers
       def uuid
         return idme_uuid if idme_uuid
+        return logingov_uuid if logingov_uuid
         # The sec_id is not a UUID, and while unique this has a potential to cause issues
         # in downstream processes that are expecting a user UUID to be 32 bytes. For
         # example, if there is a log filtering process that was striping out any 32 byte
@@ -103,9 +105,17 @@ module SAML
       def idme_uuid
         return safe_attr('va_eauth_uid') if csid == 'idme'
 
-        # the gcIds are a pipe-delimited concatenation of the MVI correlation IDs
-        # (minus the weird "base/extension" cruft)
         mvi_ids[:idme_id]
+      end
+
+      def logingov_uuid
+        return safe_attr('va_eauth_uid') if csid == 'logingov'
+      end
+
+      # only applies to Login.gov IAL2 verification
+      # used to automatically upcert IAL1 users without additional service calls
+      def verified_at
+        safe_attr('va_eauth_verifiedAt')
       end
 
       def sec_id
@@ -141,7 +151,12 @@ module SAML
       # It is currently returning a value of "2" for DSLogon level 2
       # so we are interpreting any value greater than 1 as "LOA 3".
       def loa_current
-        assurance = safe_attr('va_eauth_credentialassurancelevel')&.to_i
+        assurance =
+          if csid == 'logingov'
+            safe_attr('va_eauth_ial')&.to_i
+          else
+            safe_attr('va_eauth_credentialassurancelevel')&.to_i
+          end
         @loa_current ||= assurance.present? && assurance > 1 ? 3 : 1
       rescue NoMethodError, KeyError => e
         @warnings << "loa_current error: #{e.message}"
@@ -238,7 +253,7 @@ module SAML
       end
 
       def should_raise_idme_uuid_error
-        return false if idme_uuid
+        return false if idme_uuid || logingov_uuid
 
         if auth_context_is_inbound
           Rails.logger.info('Inbound Authentication without ID.me UUID', sec_id_identifier: uuid)
@@ -255,6 +270,8 @@ module SAML
       def mvi_ids
         return @mvi_ids if @mvi_ids
 
+        # the gcIds are a pipe-delimited concatenation of the MVI correlation IDs
+        # (minus the weird "base/extension" cruft)
         gcids = safe_attr('va_eauth_gcIds')
         return {} unless gcids
 

@@ -7,6 +7,16 @@ module AppealsApi
   class SupplementalClaim < ApplicationRecord
     include ScStatus
 
+    EVIDENCE = Struct.new(:type, :attributes) do
+      def location
+        attributes['locationAndName']
+      end
+
+      def dates
+        attributes['evidenceDates']
+      end
+    end
+
     def self.past?(date)
       date < Time.zone.today
     end
@@ -24,7 +34,7 @@ module AppealsApi
     serialize :auth_headers, JsonMarshal::Marshaller
     serialize :form_data, JsonMarshal::Marshaller
     has_kms_key
-    encrypts :auth_headers, :form_data, key: :kms_key, **lockbox_options
+    encrypts :auth_headers, :form_data, key: :kms_key
 
     has_many :evidence_submissions, as: :supportable, dependent: :destroy
     has_many :status_updates, as: :statusable, dependent: :destroy
@@ -159,24 +169,16 @@ module AppealsApi
       data_attributes&.dig('socOptIn')
     end
 
-    def new_evidence_locations
+    def new_evidence
       evidence_submissions = evidence_submission['retrieveFrom'] || []
 
-      @evidence_locations ||= evidence_submissions.map do |retrieve_from|
-        retrieve_from['attributes']['locationAndName']
-      end
-    end
-
-    def new_evidence_dates
-      evidence_submissions = evidence_submission['retrieveFrom'] || []
-
-      @new_evidence_dates ||= evidence_submissions.map do |retrieve_from|
-        retrieve_from['attributes']['evidenceDates']
+      evidence_submissions.map do |evidence|
+        EVIDENCE.new(evidence['type'], evidence['attributes'])
       end
     end
 
     def notice_acknowledgement
-      data_attributes['notice_acknowledgement']
+      data_attributes['noticeAcknowledgement']
     end
 
     def date_signed

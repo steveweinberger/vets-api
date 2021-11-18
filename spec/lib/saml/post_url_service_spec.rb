@@ -12,7 +12,7 @@ RSpec.describe SAML::PostURLService do
       described_class.new(saml_settings, session: session, user: user, params: params)
     end
 
-    let(:user) { build(:user) }
+    let(:user) { build(:logingov_ial1_user) }
     let(:session) { Session.create(uuid: user.uuid, token: 'abracadabra') }
 
     around do |example|
@@ -29,14 +29,89 @@ RSpec.describe SAML::PostURLService do
           callback_path = URI.parse(Settings.saml_ssoe.callback_url).path
           build(:settings_no_context, assertion_consumer_service_url: "#{vhost_url}#{callback_path}")
         end
-
         let(:params) { { action: 'new' } }
 
         it 'has sign in url: logingov_url' do
+          expect_any_instance_of(OneLogin::RubySaml::Settings)
+            .to receive(:authn_context=).with(
+              [IAL::LOGIN_GOV_IAL1,
+               AAL::LOGIN_GOV_AAL2,
+               AuthnContext::LOGIN_GOV]
+            )
+          expect_any_instance_of(OneLogin::RubySaml::Settings)
+            .to receive(:authn_context_comparison=).with('minimum')
           url, params = subject.logingov_url
           expect(url).to eq('https://pint.eauth.va.gov/isam/sps/saml20idp/saml20/login')
           expect_saml_form_parameters(params,
                                       'originating_request_id' => '123', 'type' => 'logingov')
+        end
+
+        it 'has sign up url: logingov_signup_url' do
+          url, params = subject.logingov_signup_url
+          expect(url).to eq('https://pint.eauth.va.gov/isam/sps/saml20idp/saml20/login')
+          expect_saml_form_parameters(params,
+                                      'originating_request_id' => '123', 'type' => 'signup')
+        end
+      end
+    end
+  end
+
+  context 'using ial/2 context' do
+    subject do
+      described_class.new(saml_settings, session: session, user: user, params: params)
+    end
+
+    let(:user) { build(:logingov_ial1_user) }
+    let(:session) { Session.create(uuid: user.uuid, token: 'abracadabra') }
+
+    around do |example|
+      User.create(user)
+      Timecop.freeze('2018-04-09T17:52:03Z')
+      RequestStore.store['request_id'] = '123'
+      example.run
+      Timecop.return
+    end
+
+    SAML::URLService::VIRTUAL_HOST_MAPPINGS.each do |vhost_url, _values|
+      context "virtual host: #{vhost_url}" do
+        let(:saml_settings) do
+          callback_path = URI.parse(Settings.saml_ssoe.callback_url).path
+          build(:settings_no_context, assertion_consumer_service_url: "#{vhost_url}#{callback_path}")
+        end
+        let(:expected_saml_url) { 'https://pint.eauth.va.gov/isam/sps/saml20idp/saml20/login' }
+
+        context 'saml_callback upleveling' do
+          let(:params) do
+            { action: 'saml_callback',
+              RelayState: '{"type":"logingov","originating_request_id":"c76b2bfe-c27d-4ca1-96c6-4d2c58ab7f35"}' }
+          end
+
+          it 'goes to verify URL before login redirect' do
+            expect_any_instance_of(OneLogin::RubySaml::Settings)
+              .to receive(:authn_context=)
+              .with([IAL::LOGIN_GOV_IAL2, AAL::LOGIN_GOV_AAL2, AuthnContext::LOGIN_GOV])
+            expect(subject.should_uplevel?).to be(true)
+            url, params = subject.verify_url
+            expect(url).to eq(expected_saml_url)
+            expect_saml_form_parameters(params,
+                                        'originating_request_id' => '123', 'type' => 'logingov')
+          end
+        end
+
+        context 'user-initiated upleveling' do
+          let(:params) { { action: 'new' } }
+
+          it 'has sign in url: with (logingov authn_context)' do
+            allow(user).to receive(:authn_context)
+              .and_return(SAML::UserAttributes::SSOe::INBOUND_AUTHN_CONTEXT)
+            expect_any_instance_of(OneLogin::RubySaml::Settings)
+              .to receive(:authn_context=)
+              .with([IAL::LOGIN_GOV_IAL2, AAL::LOGIN_GOV_AAL2, AuthnContext::LOGIN_GOV])
+            url, params = subject.verify_url
+            expect(url).to eq(expected_saml_url)
+            expect_saml_form_parameters(params,
+                                        'originating_request_id' => '123', 'type' => 'verify')
+          end
         end
       end
     end
@@ -82,6 +157,8 @@ RSpec.describe SAML::PostURLService do
         end
 
         it 'has sign in url: idme_url' do
+          expect_any_instance_of(OneLogin::RubySaml::Settings)
+            .to receive(:authn_context_comparison=).with('minimum')
           url, params = subject.idme_url
           expect(url).to eq('https://pint.eauth.va.gov/isam/sps/saml20idp/saml20/login')
           expect_saml_form_parameters(params,
@@ -90,6 +167,13 @@ RSpec.describe SAML::PostURLService do
 
         it 'has sign up url: signup_url' do
           url, params = subject.signup_url
+          expect(url).to eq('https://pint.eauth.va.gov/isam/sps/saml20idp/saml20/login')
+          expect_saml_form_parameters(params,
+                                      'originating_request_id' => '123', 'type' => 'signup')
+        end
+
+        it 'has sign up url: idme_signup_url' do
+          url, params = subject.idme_signup_url
           expect(url).to eq('https://pint.eauth.va.gov/isam/sps/saml20idp/saml20/login')
           expect_saml_form_parameters(params,
                                       'originating_request_id' => '123', 'type' => 'signup')
@@ -257,13 +341,12 @@ RSpec.describe SAML::PostURLService do
 
             it 'has a login redirect url with success' do
               expect(subject.login_redirect_url)
-                .to eq(values[:base_redirect] + SAML::URLService::LOGIN_REDIRECT_PARTIAL + '?type=idme')
+                .to eq("#{values[:base_redirect]}#{SAML::URLService::LOGIN_REDIRECT_PARTIAL}?type=idme")
             end
 
             it 'has a login redirect url with fail' do
               expect(subject.login_redirect_url(auth: 'fail', code: SAML::Responses::Base::CLICKED_DENY_ERROR_CODE))
-                .to eq(values[:base_redirect] +
-                       SAML::URLService::LOGIN_REDIRECT_PARTIAL +
+                .to eq("#{values[:base_redirect]}#{SAML::URLService::LOGIN_REDIRECT_PARTIAL}"\
                        '?auth=fail&code=001&type=idme')
             end
           end
@@ -283,13 +366,12 @@ RSpec.describe SAML::PostURLService do
 
             it 'is successful' do
               expect(subject.login_redirect_url)
-                .to eq(values[:base_redirect] + SAML::URLService::LOGIN_REDIRECT_PARTIAL + '?type=custom')
+                .to eq("#{values[:base_redirect]}#{SAML::URLService::LOGIN_REDIRECT_PARTIAL}?type=custom")
             end
 
             it 'is a failure' do
               expect(subject.login_redirect_url(auth: 'fail', code: SAML::Responses::Base::CLICKED_DENY_ERROR_CODE))
-                .to eq(values[:base_redirect] +
-                       SAML::URLService::LOGIN_REDIRECT_PARTIAL +
+                .to eq("#{values[:base_redirect]}#{SAML::URLService::LOGIN_REDIRECT_PARTIAL}"\
                        '?auth=force-needed&code=001&type=custom')
             end
           end
@@ -347,6 +429,8 @@ RSpec.describe SAML::PostURLService do
         end
 
         it 'has sign in url: idme_url' do
+          expect_any_instance_of(OneLogin::RubySaml::Settings)
+            .to receive(:authn_context_comparison=).with('minimum')
           url, params = subject.idme_url
           expect(url).to eq('https://pint.eauth.va.gov/isam/sps/saml20idp/saml20/login')
           expect_saml_form_parameters(params,
@@ -365,6 +449,13 @@ RSpec.describe SAML::PostURLService do
 
         it 'has sign up url: signup_url' do
           url, params = subject.signup_url
+          expect(url).to eq('https://pint.eauth.va.gov/isam/sps/saml20idp/saml20/login')
+          expect_saml_form_parameters(params,
+                                      'originating_request_id' => '123', 'type' => 'signup')
+        end
+
+        it 'has sign up url: idme_signup_url' do
+          url, params = subject.idme_signup_url
           expect(url).to eq('https://pint.eauth.va.gov/isam/sps/saml20idp/saml20/login')
           expect_saml_form_parameters(params,
                                       'originating_request_id' => '123', 'type' => 'signup')
@@ -531,13 +622,12 @@ RSpec.describe SAML::PostURLService do
 
             it 'has a login redirect url with success' do
               expect(subject.login_redirect_url)
-                .to eq(values[:base_redirect] + SAML::URLService::LOGIN_REDIRECT_PARTIAL + '?type=idme')
+                .to eq("#{values[:base_redirect]}#{SAML::URLService::LOGIN_REDIRECT_PARTIAL}?type=idme")
             end
 
             it 'has a login redirect url with fail' do
               expect(subject.login_redirect_url(auth: 'fail', code: SAML::Responses::Base::CLICKED_DENY_ERROR_CODE))
-                .to eq(values[:base_redirect] +
-                       SAML::URLService::LOGIN_REDIRECT_PARTIAL +
+                .to eq("#{values[:base_redirect]}#{SAML::URLService::LOGIN_REDIRECT_PARTIAL}"\
                        '?auth=fail&code=001&type=idme')
             end
           end
