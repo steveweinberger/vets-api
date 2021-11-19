@@ -169,7 +169,8 @@ describe MPI::V1::Service do
     end
 
     context 'with an MVI timeout' do
-      let(:base_path) { MPI::Configuration.instance.base_path }
+      let(:user) { build(:user, :loa3) }
+      let(:base_path) { MasterPersonIndex::Configuration.instance.base_path }
 
       it 'raises a service error', :aggregate_failures do
         allow_any_instance_of(Faraday::Connection).to receive(:post).and_raise(Faraday::TimeoutError)
@@ -181,13 +182,13 @@ describe MPI::V1::Service do
 
         exception = response.error.errors.first
 
-        expect(response.class).to eq MPI::Responses::AddPersonResponse
+        expect(response.class).to eq MasterPersonIndex::Responses::AddPersonResponse
         expect(response.status).to eq server_error
         expect(response.mvi_codes).to be_nil
         expect(exception.title).to eq 'Gateway timeout'
         expect(exception.code).to eq 'MVI_504'
         expect(exception.status).to eq '504'
-        expect(exception.source).to eq MPI::Service
+        expect(exception.source).to eq MPI::V1::Service
       end
     end
 
