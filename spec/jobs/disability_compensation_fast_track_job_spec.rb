@@ -66,7 +66,7 @@ RSpec.describe DisabilityCompensationFastTrackJob, type: :job do
 
     context 'failure' do
       it 'raises a helpful error' do
-        allow(Lighthouse::ClinicalHealth::Client).to receive(:new).and_return nil
+        allow(Lighthouse::VeteransHealth::Client).to receive(:new).and_return nil
         subject.perform_async(submission.id)
         raise "not implemented"
       end
@@ -78,9 +78,9 @@ RSpec.describe HypertensionObservationData do
   subject { described_class }
 
   let(:response) do
-    client = Lighthouse::ClinicalHealth::Client.new
+    client = Lighthouse::VeteransHealth::Client.new
     # Using specific test ICN below:
-    client.get_observations(2000163)
+    client.get_request('observations', 2000163)
   end
 
   before(:all) do
