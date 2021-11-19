@@ -67,4 +67,13 @@ RSpec.describe Mobile::V0::VaccinesUpdaterJob, type: :job do
       end
     end
   end
+
+  it 'raises an error when the xml is not structured as expected' do
+    VCR.use_cassette('vaccines/malformed') do
+      service = described_class.new
+      expect do
+        service.perform
+      end.to raise_error(Mobile::V0::VaccinesUpdaterJob::VaccinesUpdaterError, "Property name CVXCode not found")
+    end
+  end
 end
