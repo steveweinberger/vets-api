@@ -146,7 +146,7 @@ describe MPI::V1::Service do
           expect(exception.title).to eq 'Bad Gateway'
           expect(exception.code).to eq 'MVI_502'
           expect(exception.status).to eq '502'
-          expect(exception.source).to eq MPI::Service
+          expect(exception.source).to eq MPI::V1::Service
         end
       end
 
