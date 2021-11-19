@@ -13,7 +13,7 @@
   - :method: :post
     :path: "/services/data/v47.0/composite/tree/ContentVersion"
     :file_path: "carma/attachment"
-
+      
 - :name: 'DMC'
   :base_uri: <%= "#{URI(Settings.dmc.url).host}:#{URI(Settings.dmc.url).port}" %>
   :endpoints:

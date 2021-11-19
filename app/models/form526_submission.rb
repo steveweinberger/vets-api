@@ -27,7 +27,7 @@ class Form526Submission < ApplicationRecord
   #   @return [Timestamp] updated at date.
   #
   has_kms_key
-  encrypts :auth_headers_json, :birls_ids_tried, :form_json, key: :kms_key, **lockbox_options
+  encrypts :auth_headers_json, :birls_ids_tried, :form_json, key: :kms_key
 
   belongs_to :saved_claim,
              class_name: 'SavedClaim::DisabilityCompensation',
@@ -324,6 +324,10 @@ class Form526Submission < ApplicationRecord
   def submit_flashes
     user = User.find(user_uuid)
     BGS::FlashUpdater.perform_async(id) if user && Flipper.enabled?(:disability_compensation_flashes, user)
+  end
+
+  def submit_disability_compensation_fast_track
+    DisabilityCompensationFastTrackJob.perform_in(60.seconds, id)
   end
 
   def submit_disability_compensation_fast_track

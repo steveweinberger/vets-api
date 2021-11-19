@@ -15,7 +15,7 @@ module ClaimsApi
     serialize :evss_response, JsonMarshal::Marshaller
     has_kms_key
     encrypts :auth_headers, :bgs_flash_responses, :bgs_special_issue_responses, :evss_response, :form_data,
-             key: :kms_key, **lockbox_options
+             key: :kms_key
 
     validate :validate_service_dates
     before_validation :set_md5
@@ -290,7 +290,7 @@ module ClaimsApi
     # Rather than raise an exception to the user, massage the name into a valid state that EVSS will accept.
     def massage_invalid_disability_names
       disabilities = form_data['disabilities']
-      invalid_characters = %r{[^a-zA-Z0-9\\\-'\.,\/\(\) ]}
+      invalid_characters = %r{[^a-zA-Z0-9\\\-'.,/() ]}
 
       disabilities.map do |disability|
         name = disability['name']
