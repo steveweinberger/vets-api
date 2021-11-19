@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require 'ostruct'
 
 RSpec.describe DisabilityCompensationFastTrackJob, type: :job do
   subject { described_class }
@@ -101,5 +102,62 @@ RSpec.describe HypertensionObservationData do
           )
       end
     end
+      it "returns the expected hash" do
+        res = OpenStruct.new
+        res.body = {"entry" => []}
+        expect(described_class.new(res).transform)
+          .to eq( [] )
+      end
+      it "returns the expected hash" do
+        res = OpenStruct.new
+        res.body = {"entry" => [{"resource" => {
+          "issued" => "whatever",
+      "performer"=>
+       [{"reference"=>
+          "https://sandbox-api.va.gov/services/fhir/v0/r4/Organization/I2-AKOTGEFSVKFJOPUKHIVJAH5VQU000000",
+         "display"=>"NEW AMSTERDAM CBOC"}],
+      "component"=>
+       [{"code"=>
+          {"coding"=>
+            [{"system"=>"http://loinc.org",
+              "code"=>"8480-6",
+              "display"=>"Systolic blood pressure"}],
+           "text"=>"Systolic blood pressure"},
+         "valueQuantity"=>
+          {"value"=>153.0,
+           "unit"=>"mm[Hg]",
+           "system"=>"http://unitsofmeasure.org",
+           "code"=>"mm[Hg]"}},
+        {"code"=>
+          {"coding"=>
+            [{"system"=>"http://loinc.org",
+              "code"=>"8462-4",
+              "display"=>"Diastolic blood pressure"}],
+           "text"=>"Diastolic blood pressure"},
+         "valueQuantity"=>
+          {"value"=>99.0,
+           "unit"=>"mm[Hg]",
+           "system"=>"http://unitsofmeasure.org",
+           "code"=>"mm[Hg]"}}],
+ 
+        }}]}
+        expect(described_class.new(res).transform)
+          .to eq( [{
+            "issued": "whatever",
+            "organization": "NEW AMSTERDAM CBOC",
+              "systolic": {
+                "code" => "8480-6",
+                "display" => "Systolic blood pressure",
+                "value" => 153.0,
+                "unit" => "mm[Hg]"
+              },
+              "diastolic": {
+                "code" => "8462-4",
+                "display" => "Diastolic blood pressure",
+                "value" => 99.0,
+                "unit" => "mm[Hg]"
+              },
+          }] )
+      end
   end
 end
