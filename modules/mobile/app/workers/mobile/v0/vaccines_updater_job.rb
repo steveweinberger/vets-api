@@ -24,8 +24,12 @@ module Mobile
 
           vaccine = Mobile::V0::Vaccine.find_by(cvx_code: cvx_code)
           if vaccine
-            if vaccine.group_name != group_name || vaccine.manufacturer != manufacturer
-              vaccine.update(group_name: group_name, manufacturer: manufacturer)
+            vaccine.add_group_name(group_name)
+            # at this time, we only store manufacturers for covid-19 vaccines
+            # and no covid-19 vaccines have multiple manufacturers
+            vaccine.manufacturer = manufacturer
+            if vaccine.changed?
+              vaccine.save!
               updated += 1
             else
               pre_existing += 1
