@@ -36,9 +36,8 @@ ENV LANG=C.UTF-8 \
 
 RUN gem install bundler:${BUNDLER_VERSION} --no-document
 
-RUN wget https://vets-api-build-artificats.s3-us-gov-west-1.amazonaws.com/bundle_cache.tar.bz2 -P /usr/local/bundle \
-  && tar -xvf /usr/local/bundle/bundle_cache.tar.bz2 -C /usr/local/bundle/ \
-  && rm /usr/local/bundle/bundle_cache.tar.bz2
+RUN wget -q https://vets-api-build-artificats.s3-us-gov-west-1.amazonaws.com/bundle_cache.tar.bz2 -O - \
+  | tar -xjvf - -C /usr/local/bundle/
 COPY modules ./modules
 COPY Gemfile Gemfile.lock ./
 RUN bundle install \
