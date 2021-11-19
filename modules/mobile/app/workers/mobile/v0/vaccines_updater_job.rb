@@ -10,6 +10,7 @@ module Mobile
 
       class VaccinesUpdaterError < StandardError; end
 
+      # fetches group name and manufacturer data from the CDC and stores them in the vaccines table
       def perform
         logger.info('BEGIN --- Updating vaccine records from CDC')
         created = 0
