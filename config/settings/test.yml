@@ -161,7 +161,7 @@ hqva_mobile:
 # settings va.gov uses related to lighthouse api's
 lighthouse:
   api_key: fake_key
-  clinical_health:
+  veterans_health:
     client_assertion_type: "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"
     condition_api_scope:
       - "launch launch/patient"
@@ -179,7 +179,7 @@ lighthouse:
 
 sidekiq:
   github_organization: "organization"
-  github_team: 0000000
+  github_team: 00000009
   github_oauth_key: xxx000
   github_oauth_secret: 000xxx
 
@@ -227,7 +227,13 @@ mcp:
     base_path: /base/path
     service_name: VBS
     mock: true
-
+dgi:
+  jwt:
+    public_key_path: modules/meb_api/spec/fixtures/dgi_public_test.pem
+    private_key_path: modules/meb_api/spec/fixtures/dgi_private_test.pem
+  vets:
+    url: "http://localhost:8070/vets-service/v1/"
+    mock: false
 rack:
   cookie_secret: "xxxxx"
 

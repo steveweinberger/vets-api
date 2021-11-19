@@ -21,7 +21,6 @@ saml_ssoe:
   relay: ~
   response_signing: false
   response_encryption: false
-  authn_context_comparison: 'exact'
 
 ssoe_eauth_cookie:
   name: vagov_saml_request_localhost
@@ -68,6 +67,7 @@ mcp:
     service_name: VBS
     mock: false
     mock_vista: false
+    api_key: abcd1234abcd1234abcd1234abcd1234abcd1234
 
 fsr:
   prefill: true
@@ -205,6 +205,35 @@ modules_appeals_api:
   notice_of_disagreement_pii_expunge_enabled: true
   notice_of_disagreement_updater_enabled: true
   supplemental_claim_updater_enabled: true
+  job_schedules:
+    appeals_api_daily_report:
+      class: AppealsApi::DecisionReviewReportDaily
+      description: "Daily report of appeals submissions"
+      cron: "0 23 * * MON-FRI America/New_York"
+    appeals_api_weekly_report:
+      class: AppealsApi::DecisionReviewReportWeekly
+      description: "Weekly report of appeals submissions"
+      cron: "0 23 * * SUN America/New_York"
+    appeals_api_daily_error_report:
+      class: AppealsApi::DailyErrorReport
+      description: "Daily report of appeals errors"
+      cron: "0 23 * * MON-FRI America/New_York"
+    appeals_api_hlr_cleanup_pii:
+      class: AppealsApi::HigherLevelReviewCleanUpWeekOldPii
+      description: "Remove PII of HigherLevelReviews"
+      every: ['24h', first_in: '45m']
+    appeals_api_hlr_status_batch:
+      class: AppealsApi::HigherLevelReviewUploadStatusBatch
+      description: "Update HigherLevelReview statuses with their Central Mail status"
+      every: "60m"
+    appeals_api_nod_cleanup_pii:
+      class: AppealsApi::NoticeOfDisagreementCleanUpWeekOldPii
+      description: "Remove PII of NoticeOfDisagreements"
+      every: ['24h', first_in: '45m']
+    appeals_api_nod_status_batch:
+      class: AppealsApi::NoticeOfDisagreementUploadStatusBatch
+      description: "Update NoticeOfDisagreement statuses with their Central Mail status"
+      every: "60m"
   reports:
     daily_decision_review:
       enabled: false
@@ -505,6 +534,8 @@ claims_api:
     environment_name: ~
   v2_docs:
     enabled: false
+  token_validation:
+    api_key:
 
 redis:
   host: localhost
@@ -775,6 +806,7 @@ flipper:
     - kenneth.santiago2010@gmail.com
     - kevin.musiorski@gcio.com # Kevin Musiorski (GCIO), Engineer
     - kmircovich@governmentcio.com
+    - kyle.woolley@oddball.io # VSP Identity Engineer
     - lauren.alexanderson@va.gov
     - lauren.ernest@adhocteam.us
     - lihan@adhocteam.us
@@ -826,6 +858,7 @@ flipper:
     - david.rowley@accenturefederal.com
     - nick.barthelemy@accenturefederal.com
     - bradley.bergeron@accenturefederal.com
+    - adam.whitlock@adhocteam.us
 
 bgs:
   application: ~
@@ -905,7 +938,8 @@ hqva_mobile:
 # settings va.gov uses related to lighthouse api's
 lighthouse:
   api_key: ~/private.pem
-  clinical_health:
+  veterans_health:
+    #TODO: change this to be namespaced more specifically for the hypertension fast-tracker pilot
     client_assertion_type: "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"
     condition_api_scope:
       - "launch launch/patient"
@@ -968,6 +1002,8 @@ covid_vaccine:
 virtual_agent:
   webchat_secret_a: fake_secret_a
   webchat_secret_b: fake_secret_b
+  lighthouse_api_uri: https://sandbox-api.va.gov/services/appeals/v0/appeals
+  lighthouse_api_key: fake_api_key
 
 # Settings for notifications client
 vanotify:
@@ -1009,6 +1045,15 @@ genisis:
   service_path: /COVID19Service
   user: TestUser
   pass: bogus
+
+# Settings for connecting AFS Veteran Services
+dgi:
+  jwt:
+    public_key_path: modules/meb_api/spec/fixtures/dgi_public_test.pem
+    private_key_path: modules/meb_api/spec/fixtures/dgi_private_test.pem
+  vets:
+    url: "https://dgi-afs002-apigw.np.afsp.io/vets-service/v1/" # Docker setup for microservice
+    mock: false
 
 # Settings for the VEText integration (mobile push notifications)
 vetext_push:
@@ -1085,6 +1130,8 @@ veteran_readiness_and_employment:
       - VRE.VBAPIT@va.gov
       - VRE-CMS.VBAVACO@va.gov
       - Jason.Wolf@va.gov
+      - Kathleen.Crawford@va.gov
+      - Kevin.Musiorski@va.gov
     staging_emails:
       - kcrawford@governmentcio.com
 
