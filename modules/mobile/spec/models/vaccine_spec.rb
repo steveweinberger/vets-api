@@ -21,5 +21,12 @@ RSpec.describe Mobile::V0::Vaccine, type: :model do
       vaccine.add_group_name('FLU')
       expect(vaccine.group_name).to eq('FLU')
     end
+
+    it 'returns the group name and does not save the record' do
+      vaccine = build(:vaccine, group_name: 'Flu')
+      group_name = vaccine.add_group_name('ebola')
+      expect(group_name).to eq('Flu, ebola')
+      expect(vaccine.persisted?).to eq(false)
+    end
   end
 end
