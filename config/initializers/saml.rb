@@ -19,6 +19,6 @@ end
 Settings.saml_ssoe.certificate = saml_ssoe_cert_exists? ? File.read(File.expand_path(Settings.saml_ssoe.cert_path)) : nil
 Settings.saml_ssoe.key = saml_ssoe_key_exists? ? File.read(File.expand_path(Settings.saml_ssoe.key_path)) : nil
 Settings.saml_ssoe.certificate_new = new_saml_ssoe_cert_exists? ? File.read(File.expand_path(Settings.saml_ssoe.cert_new_path)) : nil
-Settings.saml_ssoe.idp_metadata = SAML::SSOeSettingsService.parse_idp_metadata_file
+Settings.saml_ssoe.idp_metadata = SAML::SSOeSettingsService.parse_idp_metadata
 
 # rubocop:enable Layout/LineLength
