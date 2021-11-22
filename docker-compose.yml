@@ -44,7 +44,7 @@ services:
     ports:
       - 54320:5432
     volumes:
-      - ./data:/var/lib/postgresql/data:cached
+      - ./data:/var/lib/postgresql/data:rw
   web:
     <<: *common
     ports:
