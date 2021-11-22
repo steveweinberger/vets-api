@@ -13,44 +13,44 @@ module Mobile
       # fetches group name and manufacturer data from the CDC and stores them in the vaccines table
       def perform
         logger.info('BEGIN --- Updating vaccine records from CDC')
-        created = 0
-        updated = 0
-        pre_existing = 0
+        results = { created: 0, updated: 0, persisted: 0 }
 
         group_name_xml.root.children.each do |node|
-          cvx_code = find_value(node, 'CVXCode')
-          group_name = find_value(node, 'Vaccine Group Name')
-          manufacturer = group_name == 'COVID-19' ? find_manufacturer(cvx_code) : nil
-
-          vaccine = Mobile::V0::Vaccine.find_by(cvx_code: cvx_code)
-          if vaccine
-            vaccine.add_group_name(group_name)
-            # at this time, we only store manufacturers for covid-19 vaccines
-            # and no covid-19 vaccines have multiple manufacturers
-            vaccine.manufacturer = manufacturer
-            if vaccine.changed?
-              vaccine.save!
-              updated += 1
-            else
-              pre_existing += 1
-            end
-          else
-            Mobile::V0::Vaccine.create!(cvx_code: cvx_code, group_name: group_name, manufacturer: manufacturer)
-            created += 1
-          end
+          process_vaccine(node, results)
         end
 
-        if (created + updated + pre_existing).zero?
-          raise VaccinesUpdaterError, "Property name #{property_name} not found"
+        if (results[:created] + results[:updated] + results[:persisted]).zero?
+          raise VaccinesUpdaterError, 'No records processed'
         end
 
-        logger.info("Created #{created} new vaccine records")
-        logger.info("Updated #{updated} vaccine records")
-        logger.info("Skipped #{pre_existing} vaccine records that have not changed")
+        results.each_pair { |k, v| logger.info("#{k.capitalize} vaccine records: #{v}") }
         logger.info('END --- Updating vaccine records from CDC')
       end
 
       private
+
+      def process_vaccine(node, results)
+        cvx_code = find_value(node, 'CVXCode')
+        group_name = find_value(node, 'Vaccine Group Name')
+        manufacturer = group_name == 'COVID-19' ? find_manufacturer(cvx_code) : nil
+
+        vaccine = Mobile::V0::Vaccine.find_by(cvx_code: cvx_code)
+        if vaccine
+          vaccine.add_group_name(group_name)
+          # at this time, we only store manufacturers for covid-19 vaccines
+          # and no covid-19 vaccines have multiple manufacturers
+          vaccine.manufacturer = manufacturer
+          if vaccine.changed?
+            vaccine.save!
+            results[:updated] += 1
+          else
+            results[:persisted] += 1
+          end
+        else
+          Mobile::V0::Vaccine.create!(cvx_code: cvx_code, group_name: group_name, manufacturer: manufacturer)
+          results[:created] += 1
+        end
+      end
 
       def group_name_xml
         @group_name_xml ||= Nokogiri::XML(URI.parse(GROUP_NAME_URL).open) do |config|
