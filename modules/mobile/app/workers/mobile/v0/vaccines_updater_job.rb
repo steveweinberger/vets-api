@@ -16,7 +16,8 @@ module Mobile
         results = { created: 0, updated: 0, persisted: 0 }
 
         group_name_xml.root.children.each do |node|
-          process_vaccine(node, results)
+          result = process_vaccine(node)
+          results[result] += 1
         end
 
         if (results[:created] + results[:updated] + results[:persisted]).zero?
@@ -29,7 +30,7 @@ module Mobile
 
       private
 
-      def process_vaccine(node, results)
+      def process_vaccine(node)
         cvx_code = find_value(node, 'CVXCode')
         group_name = find_value(node, 'Vaccine Group Name')
         manufacturer = group_name == 'COVID-19' ? find_manufacturer(cvx_code) : nil
@@ -42,13 +43,13 @@ module Mobile
           vaccine.manufacturer = manufacturer
           if vaccine.changed?
             vaccine.save!
-            results[:updated] += 1
+            :updated
           else
-            results[:persisted] += 1
+            :persisted
           end
         else
           Mobile::V0::Vaccine.create!(cvx_code: cvx_code, group_name: group_name, manufacturer: manufacturer)
-          results[:created] += 1
+          :created
         end
       end
 
