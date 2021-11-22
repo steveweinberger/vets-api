@@ -140,7 +140,7 @@ describe MPI::V1::Service do
           response = subject.add_person(user)
           exception = response.error.errors.first
 
-          expect(response.class).to eq MPI::Responses::AddPersonResponse
+          expect(response.class).to eq MasterPersonIndex::Responses::AddPersonResponse
           expect(response.status).to eq server_error
           expect(response.mvi_codes).to be_nil
           expect(exception.title).to eq 'Bad Gateway'
