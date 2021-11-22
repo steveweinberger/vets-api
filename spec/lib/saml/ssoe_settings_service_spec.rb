@@ -5,7 +5,10 @@ require 'saml/ssoe_settings_service'
 require 'lib/sentry_logging_spec_helper'
 
 RSpec.describe SAML::SSOeSettingsService do
-  before { Settings.saml_ssoe.idp_metadata_file = Rails.root.join('spec', 'support', 'saml', 'test_idp_metadata.xml') }
+  before do
+    Settings.saml_ssoe.idp_metadata_file = Rails.root.join('spec', 'support', 'saml', 'test_idp_metadata.xml')
+    Settings.vsp_environment = 'development'
+  end
 
   describe '.saml_settings' do
     it 'returns a settings instance' do
@@ -63,13 +66,15 @@ RSpec.describe SAML::SSOeSettingsService do
     end
 
     context 'mismatch between file & url metadata' do
-      it 'returns parsed metadata from url' do
+      it 'returns parsed metadata from url and notifies the #vsp-identity Slack channel' do
         VCR.use_cassette('saml/updated_idp_int_metadata_isam.yml', match_requests_on: %i[path query]) do
           with_settings(Settings.saml_ssoe,
+                        slack_webhook_url: 'https://hooks.slack.com/workflows/exampleABC',
                         idp_metadata_url: 'https://int.eauth.va.gov/isam/saml/metadata/saml20idp') do
             # expect_any_instance_of(OneLogin::RubySaml::IdpMetadataParser).to receive(:parse_remote)
             parsed_metadata = SAML::SSOeSettingsService.parse_idp_metadata
             expect(parsed_metadata).to be_an_instance_of(OneLogin::RubySaml::Settings)
+            # expect_any_instance_of(SlackNotify::Client).to receive(:notify)
           end
         end
       end

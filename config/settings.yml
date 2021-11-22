@@ -23,9 +23,7 @@ saml_ssoe:
   relay: ~
   response_signing: false
   response_encryption: false
-  slack:
-    webhook_url: https://example.com
-
+  slack_webhook_url: ~
 ssoe_eauth_cookie:
   name: vagov_saml_request_localhost
   domain: localhost

@@ -66,12 +66,13 @@ module SAML
 
       def notify_slack(hash_diff)
         client = SlackNotify::Client.new(
-          webhook_url: Settings.saml_ssoe.slack.webhook_url,
+          webhook_url: Settings.saml_ssoe.slack_webhook_url,
           channel: '#vsp-identity',
           username: "Identity - #{Settings.vsp_environment}"
         )
-        message = 'Discrepancy detected between local and remote SAML IDP metadata settings.'
-        message += "Detected differences: #{hash_diff}"
+        hash_diff[:test] = 'test discrepancy'
+        message = 'Discrepancy detected between local and remote SAML IDP metadata settings. '
+        message += "Detected differences: `#{hash_diff}`"
         client.notify(message)
       end
     end
