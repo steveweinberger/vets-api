@@ -2,6 +2,7 @@
 
 module Mobile
   module V0
+    # This job is run daily and pulls data from the CDC to create vaccine records
     class VaccinesUpdaterJob
       include Sidekiq::Worker
 
