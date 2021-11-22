@@ -4,7 +4,6 @@ x-app: &common
   build:
     args:
       BUNDLE_ENTERPRISE__CONTRIBSYS__COM: "${BUNDLE_ENTERPRISE__CONTRIBSYS__COM}"
-      USER_ID: "${USER_ID}"
     context: .
   environment:
     BUNDLE_ENTERPRISE__CONTRIBSYS__COM: "${BUNDLE_ENTERPRISE__CONTRIBSYS__COM}"
