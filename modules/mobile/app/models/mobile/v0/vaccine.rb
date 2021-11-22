@@ -16,9 +16,7 @@ module Mobile
       # @return [String] the group name
       def add_group_name(name)
         if group_name
-          unless group_name.split(',').map(&:strip).include?(name)
-            self.group_name += ", #{name}"
-          end
+          self.group_name += ", #{name}" unless group_name.split(',').map(&:strip).include?(name)
         else
           self.group_name = name
         end

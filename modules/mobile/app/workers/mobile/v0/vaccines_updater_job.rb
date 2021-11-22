@@ -40,8 +40,8 @@ module Mobile
           end
         end
 
-        if created + updated + pre_existing == 0
-          raise VaccinesUpdaterError.new "Property name #{property_name} not found"
+        if (created + updated + pre_existing).zero?
+          raise VaccinesUpdaterError, "Property name #{property_name} not found"
         end
 
         logger.info("Created #{created} new vaccine records")
@@ -68,7 +68,7 @@ module Mobile
         node.children.each_slice(2) do |(name, value)|
           return value.text.strip if name.text.strip == property_name
         end
-        raise VaccinesUpdaterError.new "Property name #{property_name} not found"
+        raise VaccinesUpdaterError, "Property name #{property_name} not found"
       end
 
       def find_manufacturer(cvx_code)

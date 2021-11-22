@@ -83,7 +83,7 @@ RSpec.describe Mobile::V0::VaccinesUpdaterJob, type: :job do
       service = described_class.new
       expect do
         service.perform
-      end.to raise_error(Mobile::V0::VaccinesUpdaterJob::VaccinesUpdaterError, "Property name CVXCode not found")
+      end.to raise_error(Mobile::V0::VaccinesUpdaterJob::VaccinesUpdaterError, 'Property name CVXCode not found')
     end
   end
 end
