@@ -62,7 +62,7 @@ jobs:
 
       - name: Setup Environment
         run: |
-          echo "DOCKER_USER_ID=$(id -u)" >> $GITHUB_ENV
+          echo "USER_ID=$(id -u)" >> $GITHUB_ENV
           echo "BUILDX_CONTAINER_ID=$(docker ps | grep ${{ steps.buildx.outputs.name }} | cut -f1 -d' ' | tr -d '[:space:]')" >> $GITHUB_ENV
 
       - name: Setup Docker
@@ -76,7 +76,7 @@ jobs:
         with:
           build-args: |
             BUNDLE_ENTERPRISE__CONTRIBSYS__COM=${{ env.BUNDLE_ENTERPRISE__CONTRIBSYS__COM }}
-            USER_ID=${{ env.DOCKER_USER_ID }}
+            USER_ID=${{ env.USER_ID }}
           context: .
           push: false
           load: true
@@ -116,6 +116,8 @@ jobs:
         run: |
           docker rmi -f vets-api:${{ env.DOCKER_IMAGE }} 2> /dev/null || true
           docker rm -f ${{ env.DOCKER_IMAGE }}-postgres-1 2> /dev/null || true
+          docker rm -f ${{ env.DOCKER_IMAGE }}-clamav-1  2> /dev/null || true
+          docker rm -f ${{ env.DOCKER_IMAGE }}-redis-1 2> /dev/null || true
 
   publish_results:
     name: Publish Results
