@@ -31,6 +31,8 @@ module MedicalCopays
     def list
       return default if data.blank?
 
+      Rails.logger.debug("User facility hash: #{data.inspect}")
+
       data.each_with_object([]) do |(key, values), accumulator|
         next if values.blank?
 
