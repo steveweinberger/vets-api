@@ -8,9 +8,9 @@ RSpec.describe HypertensionObservationData do
   subject { described_class }
 
   let(:response) do
-    client = Lighthouse::VeteransHealth::Client.new
     # Using specific test ICN below:
-    client.get_request('observations', 2_000_163)
+    client = Lighthouse::VeteransHealth::Client.new(2000163)
+    client.get_resource('observations')
   end
 
   before(:all) do
@@ -149,7 +149,7 @@ RSpec.describe HypertensionObservationData do
     end
     it 'returns the expected hash from an empty list' do
       res = OpenStruct.new
-      res.body = { 'entry': [] }
+      res.body = { 'entry': [] }.with_indifferent_access
       expect(described_class.new(res).transform)
         .to eq([])
     end
@@ -208,9 +208,9 @@ RSpec.describe HypertensionObservationData do
             }
           }
         ]
-      }
+      }.with_indifferent_access
       expect(described_class.new(res).transform)
-        .to eq(
+        .to match(
           [
             {
               'issued': 'whatever',
