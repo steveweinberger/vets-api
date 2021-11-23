@@ -14,44 +14,55 @@ module Mobile
       # fetches group name and manufacturer data from the CDC and stores them in the vaccines table
       def perform
         logger.info('Updating vaccine records from CDC start')
+        aggregate = {}
         results = { created: 0, updated: 0, persisted: 0 }
 
         group_name_xml.root.children.each do |node|
-          result = process_vaccine(node)
-          results[result] += 1
+          aggregate_source_data(aggregate, node)
         end
+
+        update_vaccine_records(aggregate, results)
 
         if (results[:created] + results[:updated] + results[:persisted]).zero?
           raise VaccinesUpdaterError, 'No records processed'
         end
 
         results.each_pair { |k, v| logger.info("#{k.capitalize} vaccine records: #{v}") }
+
         logger.info('Updating vaccine records from CDC end')
       end
 
       private
 
-      def process_vaccine(node)
+      def aggregate_source_data(aggregate, node)
         cvx_code = find_value(node, 'CVXCode')
         group_name = find_value(node, 'Vaccine Group Name')
-        manufacturer = group_name == 'COVID-19' ? find_manufacturer(cvx_code) : nil
 
-        vaccine = Mobile::V0::Vaccine.find_by(cvx_code: cvx_code)
+        aggregate[cvx_code] = { group_names: [], manufacturer: nil } unless aggregate[cvx_code]
+        aggregate[cvx_code][:group_names] << group_name
+        aggregate[cvx_code][:manufacturer] = find_manufacturer(cvx_code) if group_name == 'COVID-19'
+      end
 
-        unless vaccine
-          Mobile::V0::Vaccine.create!(cvx_code: cvx_code, group_name: group_name, manufacturer: manufacturer)
-          return :created
-        end
+      def update_vaccine_records(aggregate, results)
+        aggregate.each_pair do |cvx_code, vaccine_data|
+          vaccine = Mobile::V0::Vaccine.find_by(cvx_code: cvx_code)
 
-        vaccine.add_group_name(group_name)
-        # at this time, we only store manufacturers for covid-19 vaccines
-        # and no covid-19 vaccines have multiple manufacturers
-        vaccine.manufacturer = manufacturer
-        if vaccine.changed?
-          vaccine.save!
-          :updated
-        else
-          :persisted
+          unless vaccine
+            group_names = vaccine_data[:group_names].join(', ')
+            Mobile::V0::Vaccine.create!(cvx_code: cvx_code, group_name: group_names,
+                                        manufacturer: vaccine_data[:manufacturer])
+            results[:created] += 1
+            next
+          end
+
+          vaccine.group_name = vaccine_data[:group_names].join(', ')
+          vaccine.manufacturer = vaccine_data[:manufacturer]
+          if vaccine.changed?
+            vaccine.save!
+            results[:updated] += 1
+          else
+            results[:persisted] += 1
+          end
         end
       end
 
