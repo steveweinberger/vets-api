@@ -37,10 +37,13 @@ module V0
     def submit_all_claim
       form_content = JSON.parse(request.body.string)
       # Check for and assign special issue to single issue increase only hypertension claim
-      add_ht_special_issue(form) if Flipper.enabled?(:disability_hypertension_compensation_fast_track, current_user) &&
-                                    ht_special_issue_claim?(form)
+      add_ht_special_issue(form_content) if Flipper.enabled?(:disability_hypertension_compensation_fast_track, current_user) &&
+                                            ht_special_issue_claim?(form_content)
+      puts form_content.to_json
       saved_claim = SavedClaim::DisabilityCompensation::Form526AllClaim.from_hash(form_content)
-      saved_claim.save ? log_success(saved_claim) : log_failure(saved_claim)
+      saved_claim.save! ? log_success(saved_claim) : log_failure(saved_claim)
+      puts "saved claim saved id: #{saved_claim.id}"
+      puts "saved claim saved : #{saved_claim.type}"
       submission = create_submission(saved_claim)
 
       jid = submission.start
@@ -84,35 +87,32 @@ module V0
     end
 
     def ht_special_issue_claim?(form)
-      begin 
-        # Must have only 1 actionable issue, and its gots to be hypertension(7101) increase only
-        rd = form.dig('form526', 'ratedDisabilities')&.select { |dis| dis['disabilityActionType'] != 'NONE' }
-        return false unless rd&.length.to_i == 1
-        return false unless rd[0]['diagnosticCode'] == 7101
-        return false unless rd[0]['disabilityActionType'] == 'INCREASE'
+      # Must have only 1 actionable issue, and its gots to be hypertension(7101) increase only
+      rd = form.dig('form526', 'ratedDisabilities')&.select { |dis| dis['disabilityActionType'] != 'NONE' }
+      return false unless rd&.length.to_i == 1
+      return false unless rd[0]['diagnosticCode'] == 7101
+      return false unless rd[0]['disabilityActionType'] == 'INCREASE'
 
-        # No new issues
-        return false unless form.dig('form526', 'newDisabilities')&.length.to_i.zero?
+      # No new issues
+      return false unless form.dig('form526', 'newDisabilities')&.length.to_i.zero?
 
-        true
-      rescue => e
-        Rails.logger.error "Form 526 Hypertension check failed. Form=#{claim.class::FORM} user uuid=#{@current_user&.uuid} ex=#{e.message}"
-        false
-      end
+      true
+    rescue => e
+      Rails.logger.error "Form 526 Hypertension check failed. Form=#{claim.class::FORM} user uuid=#{@current_user&.uuid} ex=#{e.message}"
+      false
     end
 
     def add_ht_special_issue(form)
-      begin
-        # find hypertension issue and add RDD SI
-        form['form526']['ratedDisabilities'].map! do |dis|
-          if dis['diagnosticCode'] == 7101
-            dis['specialIssues'] ||= []
-            dis['specialIssues'] << 'RRD' if dis['specialIssues'].exclude? 'RRD'
-          end
-          dis
-      rescue => e
-        Rails.logger.error "Form 526 Hypertension add SI failed. Form=#{claim.class::FORM} user uuid=#{@current_user&.uuid} ex=#{e.message}"
+      # find hypertension issue and add RDD SI
+      form['form526']['ratedDisabilities'].map! do |dis|
+        if dis['diagnosticCode'] == 7101
+          dis['specialIssues'] ||= []
+          dis['specialIssues'] << 'RRD' if dis['specialIssues'].exclude? 'RRD'
+        end
+        dis
       end
+    rescue => e
+      Rails.logger.error "Form 526 Hypertension add SI failed. Form=#{claim.class::FORM} user uuid=#{@current_user&.uuid} ex=#{e.message}"
     end
 
     def log_failure(claim)
