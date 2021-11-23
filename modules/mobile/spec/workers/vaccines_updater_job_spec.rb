@@ -22,8 +22,8 @@ RSpec.describe Mobile::V0::VaccinesUpdaterJob, type: :job do
         expect(no_manufacturer.group_name).to eq('DTAP')
         covid_vaccine = Mobile::V0::Vaccine.find_by(cvx_code: 207)
         expect(covid_vaccine.group_name).to eq('COVID-19')
-        non_covid_vaccine = Mobile::V0::Vaccine.find_by(cvx_code: 2)
-        expect(non_covid_vaccine.group_name).to eq('POLIO')
+        non_covid_vaccine = Mobile::V0::Vaccine.find_by(cvx_code: 110)
+        expect(non_covid_vaccine.group_name).to eq('DTAP, HepB')
       end
     end
   end
@@ -40,41 +40,29 @@ RSpec.describe Mobile::V0::VaccinesUpdaterJob, type: :job do
         covid_vaccine = Mobile::V0::Vaccine.find_by(cvx_code: 207)
         expect(covid_vaccine.manufacturer).to eq('Moderna US, Inc.')
         # manufacturer data is present but it is not a covid-19 vaccine
-        non_covid_vaccine = Mobile::V0::Vaccine.find_by(cvx_code: 2)
+        non_covid_vaccine = Mobile::V0::Vaccine.find_by(cvx_code: 110)
         expect(non_covid_vaccine.manufacturer).to be_nil
       end
     end
   end
 
   context 'when vaccine record exists' do
-    it 'updates the manufacturer' do
+    it 'updates the vaccine' do
       VCR.use_cassette('vaccines/group_names') do
         VCR.use_cassette('vaccines/manufacturers') do
-          no_manufacturer = create(:vaccine, cvx_code: 1, group_name: 'DTAP', manufacturer: nil)
-          covid_vaccine = create(:vaccine, cvx_code: 207, group_name: 'COVID-19', manufacturer: nil)
-          non_covid_vaccine = create(:vaccine, cvx_code: 2, group_name: 'POLIO', manufacturer: nil)
+          no_manufacturer = create(:vaccine, cvx_code: 1, group_name: 'FLU', manufacturer: 'Bayer')
+          covid_vaccine = create(:vaccine, cvx_code: 207, group_name: 'COVID-19', manufacturer: 'Bayer')
+          multiple_groups = create(:vaccine, cvx_code: 110, group_name: 'POLIO', manufacturer: 'Bayer')
 
           service = described_class.new
           service.perform
 
           expect(no_manufacturer.reload.manufacturer).to be_nil
+          expect(no_manufacturer.group_name).to eq('DTAP')
           expect(covid_vaccine.reload.manufacturer).to eq('Moderna US, Inc.')
-          expect(non_covid_vaccine.reload.manufacturer).to be_nil
-        end
-      end
-    end
-
-    it 'adds the group name' do
-      VCR.use_cassette('vaccines/group_names') do
-        VCR.use_cassette('vaccines/manufacturers') do
-          group_name_not_included = create(:vaccine, cvx_code: 207, group_name: 'FLU')
-          group_name_included = create(:vaccine, cvx_code: 2, group_name: 'POLIO')
-
-          service = described_class.new
-          service.perform
-
-          expect(group_name_not_included.reload.group_name).to eq('FLU, COVID-19')
-          expect(group_name_included.reload.group_name).to eq('POLIO')
+          expect(covid_vaccine.group_name).to eq('COVID-19')
+          expect(multiple_groups.reload.manufacturer).to be_nil
+          expect(multiple_groups.group_name).to eq('DTAP, HepB')
         end
       end
     end

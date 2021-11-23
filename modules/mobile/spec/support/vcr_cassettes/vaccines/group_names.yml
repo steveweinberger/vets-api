@@ -39,10 +39,14 @@ http_interactions:
         <Name>Status</Name>\r\n <Value>Inactive</Value>\r\n <Name>Vaccine Group Name</Name>\r\n
         <Value>DTAP</Value>\r\n <Name>CVX for Vaccine Group</Name>\r\n <Value>107</Value>\r\n
         </CVXVGInfo>\r\n
-        <CVXVGInfo>\r\n <Name>ShortDescription</Name>\r\n <Value>OPV</Value>\r\n
-        <Name>CVXCode</Name>\r\n <Value>02        </Value>\r\n <Name>Status</Name>\r\n
-        <Value>Inactive</Value>\r\n <Name>Vaccine Group Name</Name>\r\n <Value>POLIO</Value>\r\n
-        <Name>CVX for Vaccine Group</Name>\r\n <Value>89</Value>\r\n </CVXVGInfo>\r\n
+        <CVXVGInfo>\r\n <Name>ShortDescription</Name>\r\n <Value>DTaP-Hep B-IPV</Value>\r\n
+        <Name>CVXCode</Name>\r\n <Value>110        </Value>\r\n <Name>Status</Name>\r\n
+        <Value>Active</Value>\r\n <Name>Vaccine Group Name</Name>\r\n <Value>DTAP</Value>\r\n
+        <Name>CVX for Vaccine Group</Name>\r\n <Value>107</Value>\r\n </CVXVGInfo>\r\n
+        <CVXVGInfo>\r\n <Name>ShortDescription</Name>\r\n <Value>DTaP-Hep B-IPV</Value>\r\n
+        <Name>CVXCode</Name>\r\n <Value>110        </Value>\r\n <Name>Status</Name>\r\n
+        <Value>Active</Value>\r\n <Name>Vaccine Group Name</Name>\r\n <Value>HepB</Value>\r\n
+        <Name>CVX for Vaccine Group</Name>\r\n <Value>45</Value>\r\n </CVXVGInfo>\r\n
         <CVXVGInfo>\r\n <Name>ShortDescription</Name>\r\n <Value>COVID-19, mRNA, LNP-S, PF, 100 mcg
         or 50 mcg dose</Value>\r\n <Name>CVXCode</Name>\r\n <Value>207       </Value>\r\n
         <Name>Status</Name>\r\n <Value>Active</Value>\r\n <Name>Vaccine Group Name</Name>\r\n
