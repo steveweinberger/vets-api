@@ -11,8 +11,7 @@ ENV RAILS_ENV=$RAILS_ENV \
 RUN groupadd --gid $USER_ID nonroot \
   && useradd --uid $USER_ID --gid nonroot --shell /bin/bash --create-home nonroot --home-dir /app
 
-RUN mkdir -p /app/data && chown nonroot:nonroot /app/data
-
+RUN mkdir /app/data && chown nonroot /app/data
 WORKDIR /app
 
 RUN apt-get update \
