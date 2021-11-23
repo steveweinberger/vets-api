@@ -47,13 +47,36 @@ class Form526Submission < ApplicationRecord
   BIRLS_KEY = 'va_eauth_birlsfilenumber'
   SUBMIT_FORM_526_JOB_CLASSES = %w[SubmitForm526AllClaim SubmitForm526].freeze
 
+
+  def start
+    if single_issue_hypertension_claim? && Flipper.enabled?(:disability_hypertension_compensation_fast_track)
+      workflow_batch = Sidekiq::Batch.new
+      workflow_batch.on(
+        :complete,
+        'Form526Submission#start_evss_submission',
+        'submission_id' => id,
+      )
+      jids = workflow_batch.jobs do
+        # EVSS::DisabilityCompensationForm::SubmitForm526AllClaim.perform_async(id)
+        submit_disability_compensation_fast_track
+      end
+
+      jids.first
+    else
+      start_evss_submission(nil, 'submission_id' => id)
+    end
+  end
+
   # Kicks off a 526 submit workflow batch. The first step in a submission workflow is to submit
   # an increase only or all claims form. Once the first job succeeds the batch will callback and run
   # one (cleanup job) or more ancillary jobs such as uploading supporting evidence or submitting ancillary forms.
   #
   # @return [String] the job id of the first job in the batch, i.e the 526 submit job
   #
-  def start
+  def start_evss_submission(_status, options)
+  # def start
+    submission = Form526Submission.find(options['submission_id'])
+    id = submission.id
     workflow_batch = Sidekiq::Batch.new
     workflow_batch.on(
       :success,
@@ -101,6 +124,11 @@ class Form526Submission < ApplicationRecord
   def get_first_name
     user = User.find(user_uuid)
     user&.first_name&.upcase
+  end
+
+  def get_full_name
+    user = User.find(user_uuid)
+    user&.full_name
   end
 
   # @return [Hash] parsed version of the form json
@@ -328,6 +356,10 @@ class Form526Submission < ApplicationRecord
 
   def submit_disability_compensation_fast_track
     DisabilityCompensationFastTrackJob.perform_in(60.seconds, id)
+  end
+
+  def submit_disability_compensation_fast_track
+    DisabilityCompensationFastTrackJob.perform_in(60.seconds, id, get_full_name)
   end
 
   def cleanup
