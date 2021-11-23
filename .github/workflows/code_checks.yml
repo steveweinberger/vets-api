@@ -119,8 +119,6 @@ jobs:
           docker rm -f ${{ env.DOCKER_IMAGE }}-postgres-1 2> /dev/null || true
           docker rm -f ${{ env.DOCKER_IMAGE }}-clamav-1  2> /dev/null || true
           docker rm -f ${{ env.DOCKER_IMAGE }}-redis-1 2> /dev/null || true
-          ls
-          sudo chown ${{ env.USER_ID }} data
 
   publish_results:
     name: Publish Results
