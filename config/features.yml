@@ -16,6 +16,10 @@ features:
     actor_type: user
     description: Whether Self-Identifying Gender Identity is enabled for caregiver.
     enable_in_development: true
+  hca_american_indian_enabled:
+    actor_type: user
+    description: Enables American Indian SIGI question page.
+    enable_in_development: true
   can_upload_10_10cg_poa:
     actor_type: cookie_id
     description: Allows users to upload POA documentation when completing the 10-10CG.
@@ -58,6 +62,10 @@ features:
     actor_type: user
     description: Enables the health care check-in experiences to show the next of kin page.
     enable_in_development: true
+  check_in_experience_pre_check_in_enabled:
+    actor_type: user
+    description: Enables the health care check-in experiences to show the pre-check-in experience.
+    enable_in_development: true
   check_in_experience_update_information_page_enabled:
     actor_type: user
     description: Enables the Update Information question in the health care check-in experience application
@@ -65,10 +73,6 @@ features:
   check_in_experience_multiple_appointment_support:
     actor_type: user
     description: Enables the health care check-in experiences to show multiple appointments
-    enable_in_development: true
-  check_in_experience_services_refactor:
-    actor_type: user
-    description: Refactor LoROTA and CHIP service objects and use clients
     enable_in_development: true
   coe_access:
     actor_type: user
@@ -217,6 +221,11 @@ features:
       On https://www.va.gov/find-locations/ enable veterans to search for Community care by showing that option
       in the "Search for" box.
     enable_in_development: true
+  facility_locator_show_health_connect_number:
+    actor_type: user
+    description: >
+      On https://www.va.gov/find-locations/ enable the health connect phone number display
+    enable_in_development: true
   facility_locator_show_operational_hours_special_instructions:
     actor_type: user
     description: Display new field operationalHoursSpecialInstructions for VA facilities
@@ -256,6 +265,10 @@ features:
   gibct_school_ratings:
     actor_type: user
     description: Show/Hide the school ratings section of the Comparison Tool School Profile Page.
+  gi_sandbox_comparision_tool_toggle:
+    actor_type: user
+    description: Shows gi-bill-comparison-tool-sandbox CT if active else shows the gi-bill-comparison-tool CT.
+    enable_in_development: true
   hlr_v2:
     actor_type: user
     description: Enable showing Higher-Level Review v2
@@ -266,6 +279,26 @@ features:
   login_gov:
     actor_type: cookie
     description: Enables/disables the usage of the new service provider Login.gov (VSP Identity)
+    enable_in_development: true
+  login_gov_create_account:
+    actor_type: cookie
+    description: Enables/disables the usage of the new service provider Login.gov to create an account (VSP Identity)
+    enable_in_development: true
+  login_gov_mhv:
+    actor_type: cookie
+    description: Enables/disables the Login.gov button for MHV (VSP Identity)
+    enable_in_development: true
+  login_gov_myvahealth:
+    actor_type: cookie
+    description: Enables/disables the Login.gov button for MyVAHealth (VSP Identity)
+    enable_in_development: true
+  login_old_design:
+    actor_type: cookie
+    description: Enables/disables the new Sign in design (VSP Identity)
+    enable_in_development: true
+  loop_pages:
+    actor_type: user
+    description: Enable new list loop pattern
     enable_in_development: true
   mega_menu_mobile_v2:
     actor_type: user
@@ -279,6 +312,10 @@ features:
     description: >
       [Front-end only] When enabled, the 10-10EZ will collect a home and mailing address for the veteran
       vs only collecting a single, "permanent" address.
+  omni_channel_link:
+    actor_type: user
+    description: This determines the visibility of the OmniChannel link in the claim status tool
+    enable_in_development: true
   pre_entry_covid19_screener:
     actor_type: user
     description: >
@@ -346,6 +383,9 @@ features:
   show_edu_benefits_5495_wizard:
     actor_type: user
     description: This determines when the wizard should show up on the 5495 introduction page
+  show_events_v2:
+    actor_type: user
+    description: Enables the events v2 page
   show_financial_status_report:
     actor_type: user
     description: Enables VA Form 5655 (Financial Status Report)
@@ -353,6 +393,10 @@ features:
   show_financial_status_report_wizard:
     actor_type: user
     description: Enables the Wizard for VA Form 5655 (Financial Status Report)
+    enable_in_development: true
+  show_form_i18n:
+    actor_type: user
+    description: Enables the internationalization features for forms
     enable_in_development: true
   show_header_v2:
     action_type: user
@@ -483,4 +527,8 @@ features:
   yellow_ribbon_mvp_enhancement:
     actor_type: user
     description: Enhances Yellow Ribbon MVP.
+    enable_in_development: true
+  show_edu_benefits_1990EZ_Wizard:
+    actor_type: user
+    description: Navigates user to 1990EZ or 1990 depending on form questions.
     enable_in_development: true

@@ -13,6 +13,7 @@ RSpec.describe V1::SessionsController, type: :controller do
   let(:token) { 'abracadabra-open-sesame' }
   let(:loa1_user) { build(:user, :loa1, uuid: uuid, idme_uuid: uuid) }
   let(:loa3_user) { build(:user, :loa3, uuid: uuid, idme_uuid: uuid) }
+  let(:ial1_user) { build(:user, :ial1, uuid: uuid, logingov_uuid: uuid) }
   let(:saml_user_attributes) { loa3_user.attributes.merge(loa3_user.identity.attributes) }
   let(:user_attributes) { double('user_attributes', saml_user_attributes) }
   let(:saml_user) do
@@ -94,7 +95,9 @@ RSpec.describe V1::SessionsController, type: :controller do
               when 'dslogon'
                 ['dslogon', AuthnContext::ID_ME]
               when 'logingov'
-                [IAL::LOGIN_GOV_IAL1, AAL::LOGIN_GOV_AAL2, AuthnContext::LOGIN_GOV]
+                [IAL::LOGIN_GOV_IAL1,
+                 AAL::LOGIN_GOV_AAL2,
+                 AuthnContext::LOGIN_GOV]
               end
             end
 
@@ -174,6 +177,28 @@ RSpec.describe V1::SessionsController, type: :controller do
           end
         end
 
+        context 'routes /sessions/idme_signup/new to SessionsController#new' do
+          it 'redirects' do
+            expect { get(:new, params: { type: :idme_signup, client_id: '123123' }) }
+              .to trigger_statsd_increment(described_class::STATSD_SSO_NEW_KEY,
+                                           tags: ['context:idme_signup', 'version:v1'], **once)
+            expect(response).to have_http_status(:ok)
+            expect_saml_post_form(response.body, 'https://pint.eauth.va.gov/isam/sps/saml20idp/saml20/login',
+                                  'originating_request_id' => nil, 'type' => 'signup')
+          end
+        end
+
+        context 'routes /sessions/logingov_signup/new to SessionsController#new' do
+          it 'redirects' do
+            expect { get(:new, params: { type: :logingov_signup, client_id: '123123' }) }
+              .to trigger_statsd_increment(described_class::STATSD_SSO_NEW_KEY,
+                                           tags: ['context:logingov_signup', 'version:v1'], **once)
+            expect(response).to have_http_status(:ok)
+            expect_saml_post_form(response.body, 'https://pint.eauth.va.gov/isam/sps/saml20idp/saml20/login',
+                                  'originating_request_id' => nil, 'type' => 'signup')
+          end
+        end
+
         context 'routes /v1/sessions/slo/new to SessionController#new' do
           it 'redirects' do
             expect(get(:new, params: { type: :slo }))
@@ -216,7 +241,7 @@ RSpec.describe V1::SessionsController, type: :controller do
 
         it 'makes a call to AfterLoginActions' do
           allow(SAML::User).to receive(:new).and_return(saml_user)
-          expect_any_instance_of(AfterLoginActions).to receive(:perform)
+          expect_any_instance_of(Login::AfterLoginActions).to receive(:perform)
           post :saml_callback
         end
       end
@@ -362,7 +387,7 @@ RSpec.describe V1::SessionsController, type: :controller do
       end
 
       context 'verifying' do
-        let(:authn_context) { LOA::IDME_LOA3 }
+        let(:authn_context) { IAL::LOGIN_GOV_IAL1 }
         let(:version) { 'v1' }
         let(:expected_ssn_log) do
           "SessionsController version:#{version} message:SSN from MPI Lookup does not match UserIdentity cache"
@@ -376,7 +401,7 @@ RSpec.describe V1::SessionsController, type: :controller do
           existing_user = User.find(uuid)
           expect(existing_user.last_signed_in).to be_a(Time)
           expect(existing_user.multifactor).to be_falsey
-          expect(existing_user.loa).to eq(highest: LOA::ONE, current: LOA::ONE)
+          expect(existing_user.loa).to eq(highest: IAL::ONE, current: IAL::ONE)
           expect(existing_user.ssn).to eq('796111863')
           allow(StringHelpers).to receive(:levenshtein_distance).and_return(8)
           expect(controller).to receive(:log_message_to_sentry).with(
@@ -391,7 +416,7 @@ RSpec.describe V1::SessionsController, type: :controller do
           )
           expect(Raven).to receive(:tags_context).once
 
-          callback_tags = ['status:success', "context:#{LOA::IDME_LOA3}", 'version:v1']
+          callback_tags = ['status:success', "context:#{IAL::LOGIN_GOV_IAL1}", 'version:v1']
 
           new_user_sign_in = Time.current + 30.minutes
           Timecop.freeze(new_user_sign_in)
@@ -453,14 +478,15 @@ RSpec.describe V1::SessionsController, type: :controller do
         end
       end
 
-      context 'when user has LOA current 1 and highest 3' do
+      context 'when user has IAL current 1 and verified_at attribute' do
         let(:saml_user_attributes) do
-          loa1_user.attributes.merge(loa1_user.identity.attributes).merge(
-            loa: { current: LOA::ONE, highest: LOA::THREE }
+          ial1_user.attributes.merge(ial1_user.identity.attributes).merge(
+            loa: { current: IAL::ONE, highest: IAL::ONE },
+            verified_at: Time.current
           )
         end
 
-        it 'responds with form for idme for up-level' do
+        it 'responds with form for Login.gov for up-level' do
           expect(post(:saml_callback)).to have_http_status(:ok)
         end
 

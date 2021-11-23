@@ -1,0 +1,37 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: http://localhost:8070/vets-service/v1/claimType/Chapter33/claimants
+    body:
+      encoding: UTF-8
+      string: '{"ssn":"539139735"}'
+    headers:
+      Accept:
+      - application/json
+      Content-Type:
+      - application/json
+      User-Agent:
+      - Vets.gov Agent
+      Authorization:
+      - Bearer eyJraWQiOiJ2YW5vdGlmeSIsInR5cCI6IkpXVCIsImFsZyI6IlJTMjU2In0.eyJpYXQiOjE2MzY1NjkyMDUsImV4cCI6MTYzNjU2OTUwNX0.aKPPITFYId582BH5FenTdQKkrmkTSRmEcuiX_G3gDSdSESueHnwCnv0-18qYR5dMricJOD2TgjtaouV8oVDC-G9bYus_LnJrzFoMkzd9AJSg2DVlEMyiVm4uM3-KVbDFSlBwcuvhWNn3LTQnDIO2VkHkhBLYCcQl5WgWOttjpMdeLDl_vIhVHNnyD8Qh0Z2f8LYeSEzYhP2fqzpim02Rv0ZOoeW5G6-_woZVIa0uN_XMCHOOheyrxxI_eaxu4iAavg13p63vRB6SGy0q4preUpLJb7vOCdV6Z8E-8uG5VhjPg1NIsikGJLGcLl5TZuB_Hr6WNEYDj-sOyCHeNVLh9Q
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+  response:
+    status:
+      code: 201
+      message: ''
+    headers:
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Date:
+      - Wed, 10 Nov 2021 18:33:25 GMT
+    body:
+      encoding: UTF-8
+      string: '{"claimant":{"claimantId":1000000000000261,"suffix":null,"dateOfBirth":"1970-01-01","firstName":"Herbert","lastName":"Hoover","middleName":null,"notificationMethod":"NONE","contactInfo":{"addressLine1":"123
+        Martin Luther King Blvd","addressLine2":null,"city":"New Orleans","zipcode":"70115","emailAddress":"test@test.com","addressType":"MILITARY_OVERSEAS","mobilePhoneNumber":null,"homePhoneNumber":null,"countryCode":"US","stateCode":"ME"},"preferredContact":null},"serviceData":[{"branchOfService":"Army","beginDate":"2015-08-01","endDate":"2019-08-01","characterOfService":"Honorable","reasonForSeperation":"Expiration
+        Term Of Service","exclusionPeriods":[],"trainingPeriods":[]}]}'
+  recorded_at: Wed, 10 Nov 2021 18:33:25 GMT
+recorded_with: VCR 6.0.0

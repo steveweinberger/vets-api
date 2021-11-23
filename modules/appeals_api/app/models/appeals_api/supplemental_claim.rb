@@ -159,24 +159,16 @@ module AppealsApi
       data_attributes&.dig('socOptIn')
     end
 
-    def new_evidence_locations
+    def new_evidence
       evidence_submissions = evidence_submission['retrieveFrom'] || []
 
-      @evidence_locations ||= evidence_submissions.map do |retrieve_from|
-        retrieve_from['attributes']['locationAndName']
-      end
-    end
-
-    def new_evidence_dates
-      evidence_submissions = evidence_submission['retrieveFrom'] || []
-
-      @new_evidence_dates ||= evidence_submissions.map do |retrieve_from|
-        retrieve_from['attributes']['evidenceDates']
+      evidence_submissions.map do |evidence|
+        ScEvidence.new(evidence['type'], evidence['attributes'])
       end
     end
 
     def notice_acknowledgement
-      data_attributes['notice_acknowledgement']
+      data_attributes['noticeAcknowledgement']
     end
 
     def date_signed

@@ -89,20 +89,7 @@ module SAML
 
     def idme_url
       @type = 'idme'
-      build_sso_url(build_authn_context(LOA::IDME_LOA1_VETS))
-    end
-
-    def logingov_url
-      @type = 'logingov'
-      build_sso_url(
-        build_authn_context([IAL::LOGIN_GOV_IAL1, AAL::LOGIN_GOV_AAL2], AuthnContext::LOGIN_GOV),
-        'minimum'
-      )
-    end
-
-    def custom_url(authn)
-      @type = 'custom'
-      build_sso_url(authn)
+      build_sso_url(build_authn_context(LOA::IDME_LOA1_VETS), AuthnContext::MINIMUM)
     end
 
     def signup_url
@@ -111,21 +98,68 @@ module SAML
       build_sso_url(build_authn_context(LOA::IDME_LOA1_VETS))
     end
 
+    def idme_signup_url
+      @type = 'signup'
+      @query_params[:op] = 'signup'
+      build_sso_url(build_authn_context(LOA::IDME_LOA1_VETS))
+    end
+
+    def logingov_url
+      @type = 'logingov'
+      build_sso_url(
+        build_authn_context(
+          [IAL::LOGIN_GOV_IAL1, AAL::LOGIN_GOV_AAL2],
+          AuthnContext::LOGIN_GOV
+        ),
+        AuthnContext::MINIMUM
+      )
+    end
+
+    def logingov_signup_url
+      @type = 'signup'
+      build_sso_url(
+        build_authn_context([IAL::LOGIN_GOV_IAL1, AAL::LOGIN_GOV_AAL2], AuthnContext::LOGIN_GOV)
+      )
+    end
+
+    def custom_url(authn)
+      @type = 'custom'
+      build_sso_url(authn)
+    end
+
     def verify_url
       # For verification from a login callback, type should be the initial login policy.
       # In that case, it will have been set to the type from RelayState.
       @type ||= 'verify'
+      return callback_verify_url if %w[logingov mhv dslogon].include?(type)
 
       link_authn_context =
         case authn_context
         when LOA::IDME_LOA1_VETS, 'multifactor'
           build_authn_context(@loa3_context)
+        # broken on localhost, ISAM sends back SAML::UserAttributes::SSOe::INBOUND_AUTHN_CONTEXT
+        when IAL::LOGIN_GOV_IAL1
+          build_authn_context([IAL::LOGIN_GOV_IAL2, AAL::LOGIN_GOV_AAL2], AuthnContext::LOGIN_GOV)
         when 'myhealthevet', 'myhealthevet_multifactor'
           build_authn_context('myhealthevet_loa3')
         when 'dslogon', 'dslogon_multifactor'
           build_authn_context('dslogon_loa3')
         when SAML::UserAttributes::SSOe::INBOUND_AUTHN_CONTEXT
           "#{@user.identity.sign_in[:service_name]}_loa3"
+        end
+
+      build_sso_url(link_authn_context)
+    end
+
+    def callback_verify_url
+      link_authn_context =
+        case type
+        when 'logingov'
+          build_authn_context([IAL::LOGIN_GOV_IAL2, AAL::LOGIN_GOV_AAL2], AuthnContext::LOGIN_GOV)
+        when 'mhv'
+          build_authn_context('myhealthevet_loa3')
+        when 'dslogon'
+          build_authn_context('dslogon_loa3')
         end
 
       build_sso_url(link_authn_context)
@@ -166,22 +200,19 @@ module SAML
 
     # Builds the urls to trigger various SSO policies: mhv, dslogon, idme, mfa, or verify flows.
     # link_authn_context is the new proposed authn_context
-    def build_sso_url(link_authn_context)
+    def build_sso_url(link_authn_context, authn_con_compare = AuthnContext::EXACT)
       @query_params[:RelayState] = relay_state_params
       new_url_settings = url_settings
       new_url_settings.authn_context = link_authn_context
+      new_url_settings.authn_context_comparison = authn_con_compare
       saml_auth_request = OneLogin::RubySaml::Authrequest.new
       save_saml_request_tracker(saml_auth_request.uuid, link_authn_context)
       saml_auth_request.create(new_url_settings, query_params)
     end
 
     def build_authn_context(assurance_level_url, identity_provider = AuthnContext::ID_ME)
-      if identity_provider
-        assurance_level_url = [assurance_level_url] unless assurance_level_url.is_a?(Array)
-        assurance_level_url.push(identity_provider)
-      else
-        assurance_level_url
-      end
+      assurance_level_url = [assurance_level_url] unless assurance_level_url.is_a?(Array)
+      assurance_level_url.push(identity_provider)
     end
 
     def relay_state_params

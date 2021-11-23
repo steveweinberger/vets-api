@@ -14,7 +14,7 @@ module Common
           def validate_body(env)
             json_body = Oj.load(env.body)
             if BaseFacility.validate_on_load
-              path_test = env.url.path.match(%r(\/(\w{3}_(Facilities|VetCenters))\/))
+              path_test = env.url.path.match(%r(/(\w{3}_(Facilities|VetCenters))/))
               path_test = env.url.path.match(/(FacilitySitePoint_\w{3})/) if path_test.nil?
               path_part = path_test[1]
 
@@ -52,7 +52,7 @@ module Common
           end
 
           def facility_klass(path_part)
-            BaseFacility::PATHMAP[path_part]
+            Facilities::Mappings::PATHMAP[path_part]
           end
         end
       end

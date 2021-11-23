@@ -35,32 +35,10 @@ Lint/NonDeterministicRequireOrder:
     - 'spec/requests/v1/apidoc/apidoc_spec.rb'
     - 'spec/service_consumers/pact_helper.rb'
 
-# Offense count: 5
-# Cop supports --auto-correct.
-Lint/RedundantCopDisableDirective:
-  Exclude:
-    - 'app/models/emis_redis/military_information_v2.rb'
-    - 'app/models/saved_claim/education_benefits/va_10203.rb'
-    - 'app/policies/evss_policy.rb'
-    - 'spec/jobs/facilities/pssg_download_spec.rb'
-    - 'spec/support/saml/response_builder.rb'
-
 # Offense count: 1
 Lint/StructNewOverride:
   Exclude:
     - 'spec/requests/authentication/standard_authentication_spec.rb'
-
-# Offense count: 6
-# Cop supports --auto-correct.
-# Configuration parameters: AllowComments.
-Lint/UselessMethodDefinition:
-  Exclude:
-    - 'lib/common/client/middleware/request/camelcase.rb'
-    - 'lib/common/client/middleware/request/multipart_request.rb'
-    - 'lib/evss/gi_bill_status/external_service_unavailable.rb'
-    - 'lib/evss/gi_bill_status/outside_working_hours.rb'
-    - 'modules/health_quest/app/services/health_quest/middleware/health_quest_logging.rb'
-    - 'modules/vaos/app/services/vaos/middleware/vaos_logging.rb'
 
 # Offense count: 505
 # Configuration parameters: IgnoredMethods, CountRepeatedAttributes.
@@ -148,18 +126,6 @@ Rails/MatchRoute:
     - 'modules/va_forms/config/routes.rb'
     - 'modules/vba_documents/config/routes.rb'
 
-# Offense count: 7
-# Cop supports --auto-correct.
-Rails/Pluck:
-  Exclude:
-    - 'app/serializers/evss_claim_detail_serializer.rb'
-    - 'app/workers/pager_duty/poll_maintenance_windows.rb'
-    - 'lib/bb/client.rb'
-    - 'modules/appeals_api/spec/services/appeals_api/central_mail_updater_spec.rb'
-    - 'modules/claims_api/app/workers/claims_api/special_issue_updater.rb'
-    - 'modules/vaos/spec/services/systems_service_spec.rb'
-    - 'spec/lib/common/exceptions/detailed_schema_errors_spec.rb'
-
 # Offense count: 1
 # Cop supports --auto-correct.
 Rails/RedundantForeignKey:
@@ -174,13 +140,6 @@ Rails/SkipsModelValidations:
     - 'app/workers/evss/disability_compensation_form/job_status.rb'
     - 'spec/jobs/evss/disability_compensation_form/submit_form526_all_claim_spec.rb'
     - 'spec/models/form526_job_status_spec.rb'
-
-# Offense count: 2
-# Cop supports --auto-correct.
-Rails/SquishedSQLHeredocs:
-  Exclude:
-    - 'app/models/facilities_query/radial_query.rb'
-    - 'modules/vba_documents/app/workers/vba_documents/upload_remover.rb'
 
 # Offense count: 6
 # Configuration parameters: Include.
@@ -243,20 +202,6 @@ Style/ExplicitBlockArgument:
     - 'lib/mpi/service.rb'
     - 'spec/lib/debt_management_center/debt_letter_downloader_spec.rb'
 
-# Offense count: 16
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: braces, no_braces
-Style/HashAsLastArrayItem:
-  Exclude:
-    - 'app/controllers/v0/financial_status_reports_controller.rb'
-    - 'app/models/preneeds/applicant.rb'
-    - 'app/models/preneeds/claimant.rb'
-    - 'app/models/preneeds/currently_buried_person.rb'
-    - 'app/models/preneeds/service_record.rb'
-    - 'app/models/preneeds/veteran.rb'
-    - 'modules/vaos/app/controllers/vaos/v0/appointment_requests_controller.rb'
-
 # Offense count: 1
 # Cop supports --auto-correct.
 # Configuration parameters: AllowedReceivers.
@@ -272,15 +217,6 @@ Style/HashLikeCase:
     - 'app/workers/education_form/forms/base.rb'
     - 'lib/identity/parsers/gc_ids.rb'
     - 'spec/controllers/v1/sessions_controller_spec.rb'
-
-# Offense count: 8
-# Cop supports --auto-correct.
-Style/KeywordParametersOrder:
-  Exclude:
-    - 'lib/emis/messages/edipi_or_icn_message.rb'
-    - 'lib/emis/service.rb'
-    - 'modules/appeals_api/spec/support/shared_examples_contestable_issues.rb'
-    - 'modules/vaos/app/models/vaos/v1/operation_outcome.rb'
 
 # Offense count: 13
 # Configuration parameters: AllowedMethods.
@@ -298,30 +234,6 @@ Style/OptionalBooleanParameter:
     - 'modules/vaos/app/services/vaos/appointment_service.rb'
     - 'spec/support/authenticated_session_helper.rb'
 
-# Offense count: 59
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: same_as_string_literals, single_quotes, double_quotes
-Style/QuotedSymbols:
-  Exclude:
-    - 'app/uploaders/evss_claim_document_uploader_base.rb'
-    - 'lib/vso_pdf/vso_appointment_form.rb'
-    - 'modules/appeals_api/spec/swagger/appeals_api/json_schema_to_swagger_converter_spec.rb'
-    - 'modules/mobile/spec/request/push_send_request_spec.rb'
-    - 'modules/openid_auth/app/controllers/openid_auth/v0/okta_controller.rb'
-    - 'spec/controllers/v0/profile/ch33_bank_accounts_controller_spec.rb'
-    - 'spec/factories/in_progress_forms/hca_forms.rb'
-    - 'spec/lib/vetext/service_spec.rb'
-    - 'spec/models/form_profile_spec.rb'
-    - 'spec/models/preneeds/attachment_spec.rb'
-    - 'spec/requests/swagger_spec.rb'
-
-# Offense count: 63
-# Cop supports --auto-correct.
-# NOTE: These should not be auto-corrected because it will incorrectly remove escaped forward slashes
-Style/RedundantRegexpEscape:
-  Enabled: false
-
 # Offense count: 4
 # Cop supports --auto-correct.
 Style/RedundantSelfAssignmentBranch:
@@ -330,12 +242,6 @@ Style/RedundantSelfAssignmentBranch:
     - 'app/controllers/v0/prescriptions_controller.rb'
     - 'modules/mobile/app/controllers/mobile/v0/messages_controller.rb'
     - 'spec/support/authenticated_session_helper.rb'
-
-# Offense count: 135
-# Cop supports --auto-correct.
-# Configuration parameters: Mode.
-Style/StringConcatenation:
-  Enabled: false
 
 # Offense count: 55
 ThreadSafety/InstanceVariableInClassMethod:

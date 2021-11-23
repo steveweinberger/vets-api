@@ -56,6 +56,20 @@ describe AppealsApi::V2::DecisionReviews::SupplementalClaimsController, type: :r
       end
     end
 
+    context 'when contestable issue text is too long' do
+      it 'responds with status :unprocessable_entity ' do
+        mod_data = JSON.parse(data)
+        mod_data['included'][0]['attributes']['issue'] =
+          'Powder chocolate bar shortbread jelly beans brownie. Jujubes gummies sweet tart dragée halvah fruitcake. '\
+          'Cake tart I love apple pie candy canes tiramisu. Lemon drops muffin marzipan apple pie.'
+
+        post(path, params: mod_data.to_json, headers: headers)
+        expect(response.status).to eq(422)
+        expect(response.body).to include('Invalid length')
+        expect(response.body).to include('attributes/issue')
+      end
+    end
+
     context 'when invalid headers supplied' do
       it 'returns an error' do
         invalid_headers = headers.merge!(
@@ -79,6 +93,30 @@ describe AppealsApi::V2::DecisionReviews::SupplementalClaimsController, type: :r
         expect(parsed['errors']).to be_an Array
         expect(response.body).to include('/data/attributes/noticeAcknowledgement')
         expect(response.body).to include('https://www.va.gov/disability/how-to-file-claim/evidence-needed')
+      end
+    end
+
+    context 'evidenceType' do
+      it 'with upload' do
+        post(path, params: data, headers: headers)
+
+        sc_guid = JSON.parse(response.body)['data']['id']
+        sc = AppealsApi::SupplementalClaim.find(sc_guid)
+
+        expect(sc.evidence_submission_indicated).to be_truthy
+      end
+
+      it 'without upload' do
+        mod_data = JSON.parse(fixture_to_s('valid_200995_extra.json'))
+        # manually setting this to simulate a submission without upload indicated
+        mod_data['data']['attributes']['evidenceSubmission']['evidenceType'] = ['retrieval']
+
+        post(path, params: mod_data.to_json, headers: headers)
+
+        sc_guid = JSON.parse(response.body)['data']['id']
+        sc = AppealsApi::SupplementalClaim.find(sc_guid)
+
+        expect(sc.evidence_submission_indicated).to be_falsey
       end
     end
 

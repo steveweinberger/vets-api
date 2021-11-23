@@ -1,10 +1,14 @@
 # frozen_string_literal: true
 
+require 'appeals_api/sc_evidence'
+
 module AppealsApi
   module PdfConstruction
     module SupplementalClaim
       module V2
         class FormData
+          UPLOAD_INDICATED = 'Veteran indicated they will send evidence documents to VA.'
+
           def initialize(supplemental_claim)
             @supplemental_claim = supplemental_claim
           end
@@ -14,7 +18,7 @@ module AppealsApi
                    :insurance_policy_number, :mailing_address_number_and_street,
                    :mailing_address_apartment_or_unit_number, :mailing_address_city_and_box, :mailing_address_state,
                    :mailing_address_country, :zip_code_5, :phone, :email, :contestable_issues, :soc_opt_in,
-                   :new_evidence_locations, :new_evidence_dates, :notice_acknowledgement, :date_signed,
+                   :new_evidence_locations, :new_evidence_dates, :date_signed,
                    to: :supplemental_claim
 
           def ssn_first_three
@@ -45,6 +49,10 @@ module AppealsApi
             "SOC/SSOC Date: #{date}"
           end
 
+          def notice_acknowledgement
+            supplemental_claim.notice_acknowledgement ? 1 : 'Off'
+          end
+
           def signature_of_veteran_claimant_or_rep
             "#{full_name[0...180]} - Signed by digital authentication to api.va.gov"
           end
@@ -57,9 +65,34 @@ module AppealsApi
             "#{veteran_last_name.truncate(35)} - #{ssn_last_four}"
           end
 
+          def new_evidence_locations
+            evidence_records.map(&:location)
+          end
+
+          def new_evidence_dates
+            evidence_records.map(&:dates)
+          end
+
           private
 
           attr_accessor :supplemental_claim
+
+          def evidence_records
+            return @evidence_records if @evidence_records
+
+            @evidence_records = supplemental_claim.new_evidence
+            if evidence_submission_indicated?
+              upload = AppealsApi::ScEvidence.new(:upload,
+                                                  { 'locationAndName' => UPLOAD_INDICATED,
+                                                    'evidenceDates' => nil })
+              @evidence_records.append(upload)
+            end
+            @evidence_records
+          end
+
+          def evidence_submission_indicated?
+            supplemental_claim.evidence_submission_indicated?
+          end
 
           def benefit_type_form_codes
             {
