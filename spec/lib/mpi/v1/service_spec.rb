@@ -134,10 +134,10 @@ describe MPI::V1::Service do
       let(:user) { build(:user, :loa3) }
 
       it 'responds with a SERVER_ERROR if request is invalid', :aggregate_failures do
-        expect(subject).to receive(:log_exception_to_sentry)
+        expect(service).to receive(:log_exception_to_sentry)
 
         VCR.use_cassette('mpi/add_person/add_person_invalid_request') do
-          response = subject.add_person(user)
+          response = service.add_person(user)
           exception = response.error.errors.first
 
           expect(response.class).to eq MasterPersonIndex::Responses::AddPersonResponse
