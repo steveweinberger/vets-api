@@ -13,7 +13,7 @@ module Mobile
 
       # fetches group name and manufacturer data from the CDC and stores them in the vaccines table
       def perform
-        logger.info('BEGIN --- Updating vaccine records from CDC')
+        logger.info('Updating vaccine records from CDC start')
         results = { created: 0, updated: 0, persisted: 0 }
 
         group_name_xml.root.children.each do |node|
@@ -26,7 +26,7 @@ module Mobile
         end
 
         results.each_pair { |k, v| logger.info("#{k.capitalize} vaccine records: #{v}") }
-        logger.info('END --- Updating vaccine records from CDC')
+        logger.info('Updating vaccine records from CDC end')
       end
 
       private
@@ -37,20 +37,21 @@ module Mobile
         manufacturer = group_name == 'COVID-19' ? find_manufacturer(cvx_code) : nil
 
         vaccine = Mobile::V0::Vaccine.find_by(cvx_code: cvx_code)
-        if vaccine
-          vaccine.add_group_name(group_name)
-          # at this time, we only store manufacturers for covid-19 vaccines
-          # and no covid-19 vaccines have multiple manufacturers
-          vaccine.manufacturer = manufacturer
-          if vaccine.changed?
-            vaccine.save!
-            :updated
-          else
-            :persisted
-          end
-        else
+
+        unless vaccine
           Mobile::V0::Vaccine.create!(cvx_code: cvx_code, group_name: group_name, manufacturer: manufacturer)
-          :created
+          return :created
+        end
+
+        vaccine.add_group_name(group_name)
+        # at this time, we only store manufacturers for covid-19 vaccines
+        # and no covid-19 vaccines have multiple manufacturers
+        vaccine.manufacturer = manufacturer
+        if vaccine.changed?
+          vaccine.save!
+          :updated
+        else
+          :persisted
         end
       end
 

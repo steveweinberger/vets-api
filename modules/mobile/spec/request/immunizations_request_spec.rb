@@ -423,48 +423,53 @@ RSpec.describe 'immunizations', type: :request do
       end
     end
 
-    describe 'vaccines' do
+    describe 'vaccine group name and manufacturer population' do
       let(:immunizations_request) do
         VCR.use_cassette('lighthouse_health/get_immunizations', match_requests_on: %i[method uri]) do
           get '/mobile/v0/health/immunizations', headers: iam_headers, params: nil
         end
       end
 
-      it 'uses the vaccine group name and manufacturer in the response when vaccine record exists' do
-        vaccine = create(:vaccine, cvx_code: 140, group_name: 'COVID-19', manufacturer: 'Moderna')
-        immunizations_request
+      context 'when the vaccine record exists' do
+        let!(:vaccine) { create(:vaccine, cvx_code: 140, group_name: 'COVID-19', manufacturer: 'Moderna') }
 
-        expect(response.parsed_body['data'][2]['attributes']).to eq(
-          {
-            'cvxCode' => 140,
-            'date' => '2011-03-31T12:24:55Z',
-            'doseNumber' => 'Series 1',
-            'doseSeries' => 1,
-            'groupName' => vaccine.group_name,
-            'manufacturer' => vaccine.manufacturer,
-            'note' => 'Dose #47 of 101 of Influenza  seasonal  injectable  preservative free vaccine administered.',
-            'reaction' => 'Other',
-            'shortDescription' => 'Influenza  seasonal  injectable  preservative free'
-          }
-        )
+        it 'uses the vaccine group name and manufacturer in the response' do
+          immunizations_request
+
+          expect(response.parsed_body['data'][2]['attributes']).to eq(
+            {
+              'cvxCode' => 140,
+              'date' => '2011-03-31T12:24:55Z',
+              'doseNumber' => 'Series 1',
+              'doseSeries' => 1,
+              'groupName' => vaccine.group_name,
+              'manufacturer' => vaccine.manufacturer,
+              'note' => 'Dose #47 of 101 of Influenza  seasonal  injectable  preservative free vaccine administered.',
+              'reaction' => 'Other',
+              'shortDescription' => 'Influenza  seasonal  injectable  preservative free'
+            }
+          )
+        end
       end
 
-      it 'sets group name and manufacturer to nil when no vaccine record exists' do
-        immunizations_request
+      context 'when the vaccine record does not exist' do
+        it 'sets group name and manufacturer to nil' do
+          immunizations_request
 
-        expect(response.parsed_body['data'][2]['attributes']).to eq(
-          {
-            'cvxCode' => 140,
-            'date' => '2011-03-31T12:24:55Z',
-            'doseNumber' => 'Series 1',
-            'doseSeries' => 1,
-            'groupName' => nil,
-            'manufacturer' => nil,
-            'note' => 'Dose #47 of 101 of Influenza  seasonal  injectable  preservative free vaccine administered.',
-            'reaction' => 'Other',
-            'shortDescription' => 'Influenza  seasonal  injectable  preservative free'
-          }
-        )
+          expect(response.parsed_body['data'][2]['attributes']).to eq(
+            {
+              'cvxCode' => 140,
+              'date' => '2011-03-31T12:24:55Z',
+              'doseNumber' => 'Series 1',
+              'doseSeries' => 1,
+              'groupName' => nil,
+              'manufacturer' => nil,
+              'note' => 'Dose #47 of 101 of Influenza  seasonal  injectable  preservative free vaccine administered.',
+              'reaction' => 'Other',
+              'shortDescription' => 'Influenza  seasonal  injectable  preservative free'
+            }
+          )
+        end
       end
     end
   end

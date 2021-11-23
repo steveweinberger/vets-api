@@ -5,11 +5,13 @@ module Mobile
     module Adapters
       class Immunizations
         def parse(immunizations)
+          vaccines = vaccines(immunizations)
+
           immunizations[:entry].map do |i|
             immunization = i[:resource]
             vaccine_code = immunization[:vaccine_code]
             cvx_code = vaccine_code[:coding].first[:code].to_i
-            vaccine = Mobile::V0::Vaccine.find_by(cvx_code: cvx_code)
+            vaccine = vaccines&.find_by(cvx_code: cvx_code)
 
             Mobile::V0::Immunization.new(
               id: immunization[:id],
@@ -61,6 +63,11 @@ module Mobile
           return nil unless reaction
 
           reaction.map { |r| r[:detail][:display] }.join(',')
+        end
+
+        def vaccines(immunizations)
+          cvx_codes = immunizations[:entry].collect { |i| i.dig(:resource, :vaccine_code, :coding, 0, :code) }.uniq
+          Mobile::V0::Vaccine.where(cvx_code: cvx_codes)
         end
       end
     end
