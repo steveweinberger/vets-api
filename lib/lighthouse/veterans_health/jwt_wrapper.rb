@@ -2,12 +2,11 @@
 
 module Lighthouse::VeteransHealth
   class JwtWrapper
-    VERSION = 2.1
     def payload
       {
-        iss: Settings.lighthouse.veterans_health.condition_client_id,
-        sub: Settings.lighthouse.veterans_health.condition_client_id,
-        aud: Settings.lighthouse.veterans_health.condition_aud_claim_url,
+        iss: Settings.lighthouse.veterans_health.fast_tracker.client_id,
+        sub: Settings.lighthouse.veterans_health.fast_tracker.client_id,
+        aud: Settings.lighthouse.veterans_health.fast_tracker.aud_claim_url,
         exp: 15.minutes.from_now.to_i
       }
     end

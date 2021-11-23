@@ -906,7 +906,6 @@ hqva_mobile:
     health_aud_claim_url: "https://deptva-eval.okta.com/oauth2/aus8nm1q0f7VQ0a482p7"
     condition_aud_claim_url: "https://deptva-eval.okta.com/oauth2/aus8nm1q0f7VQ0a482p7/v1/token"
     claim_common_id: "0oabja2lpllERXWxo2p7"
-    condition_client_id: "0oaaxkp0aeXEJkMFw2p7"
     grant_type: "client_credentials"
     client_assertion_type: "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"
     redis_session_prefix: "healthquest_lighthouse"
@@ -937,23 +936,23 @@ hqva_mobile:
 
 # settings va.gov uses related to lighthouse api's
 lighthouse:
-  api_key: ~/private.pem
+  api_key: fake_key
   veterans_health:
-    #TODO: change this to be namespaced more specifically for the hypertension fast-tracker pilot
-    client_assertion_type: "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"
-    condition_api_scope:
-      - "launch launch/patient"
-      - "patient/Patient.read"
-      - "patient/Condition.read"
-      - "patient/Observation.read"
-      - "patient/Practitioner.read"
-      - "patient/Medication.read"
-      - "system/Endpoint.read"
-    condition_aud_claim_url: "https://deptva-eval.okta.com/oauth2/aus8nm1q0f7VQ0a482p7/v1/token"
-    condition_client_id: "0oaaxkp0aeXEJkMFw2p7"
-    grant_type: "client_credentials"
     url: https://sandbox-api.va.gov
-    api_key: ~/private.pem
+    fast_tracker:
+      client_assertion_type: "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"
+      api_scope:
+        - "launch launch/patient"
+        - "patient/Patient.read"
+        - "patient/Condition.read"
+        - "patient/Observation.read"
+        - "patient/Practitioner.read"
+        - "patient/Medication.read"
+        - "system/Endpoint.read"
+      aud_claim_url: "https://deptva-eval.okta.com/oauth2/aus8nm1q0f7VQ0a482p7/v1/token"
+      client_id: "0oaaxkp0aeXEJkMFw2p7"
+      grant_type: "client_credentials"
+      api_key: ~/private.pem
   facilities:
     url: https://sandbox-api.va.gov
     api_key: fake_key
