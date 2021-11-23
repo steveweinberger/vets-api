@@ -40,6 +40,7 @@ services:
     environment:
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-password}"
       POSTGRES_USER: "${POSTGRES_USER:-postgres}"
+      PGDATA: /tmp
     image: mdillon/postgis:11-alpine
     ports:
       - 54320:5432
