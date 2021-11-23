@@ -6,12 +6,13 @@ require 'saml/post_url_service'
 require 'saml/responses/login'
 require 'saml/responses/logout'
 require 'saml/ssoe_settings_service'
+require 'login/after_login_actions'
 
 module V1
   class SessionsController < ApplicationController
     skip_before_action :verify_authenticity_token
 
-    REDIRECT_URLS = %w[signup mhv dslogon idme logingov custom mfa verify slo].freeze
+    REDIRECT_URLS = %w[signup mhv dslogon idme idme_signup logingov logingov_signup custom mfa verify slo].freeze
     STATSD_SSO_NEW_KEY = 'api.auth.new'
     STATSD_SSO_SAMLREQUEST_KEY = 'api.auth.saml_request'
     STATSD_SSO_SAMLRESPONSE_KEY = 'api.auth.saml_response'
@@ -181,6 +182,7 @@ module V1
       }
     end
 
+    # rubocop:disable Metrics/MethodLength
     def login_params(type)
       raise Common::Exceptions::RoutingError, type unless REDIRECT_URLS.include?(type)
 
@@ -193,8 +195,12 @@ module V1
         url_service.dslogon_url
       when 'idme'
         url_service.idme_url
+      when 'idme_signup'
+        url_service.idme_signup_url
       when 'logingov'
         url_service.logingov_url
+      when 'logingov_signup'
+        url_service.logingov_signup_url
       when 'mfa'
         url_service.mfa_url
       when 'verify'
@@ -205,6 +211,7 @@ module V1
         url_service(false).custom_url params[:authn]
       end
     end
+    # rubocop:enable Metrics/MethodLength
 
     def saml_request_stats
       tracker = url_service.tracker
@@ -266,9 +273,10 @@ module V1
         Rails.logger.info("SessionsController version:v1 login complete, user_uuid=#{@current_user&.uuid}")
         StatsD.measure(STATSD_LOGIN_LATENCY, url_service.tracker.age, tags: tags)
       when :failure
-        tags_and_error_code = tags << "error:#{error&.code || SAML::Responses::Base::UNKNOWN_OR_BLANK_ERROR_CODE}"
+        tags_and_error_code = tags << "error:#{error.try(:code) || SAML::Responses::Base::UNKNOWN_OR_BLANK_ERROR_CODE}"
+        error_message = error.try(:message) || 'Unknown'
         StatsD.increment(STATSD_LOGIN_STATUS_FAILURE, tags: tags_and_error_code)
-        Rails.logger.info("LOGIN_STATUS_FAILURE, tags: #{tags_and_error_code}")
+        Rails.logger.info("LOGIN_STATUS_FAILURE, tags: #{tags_and_error_code}, message: #{error_message}")
         Rails.logger.info("SessionsController version:v1 login failure, user_uuid=#{@current_user&.uuid}")
       end
     end
@@ -344,7 +352,7 @@ module V1
     end
 
     def after_login_actions
-      AfterLoginActions.new(@current_user).perform
+      Login::AfterLoginActions.new(@current_user).perform
       log_persisted_session_and_warnings
     end
 

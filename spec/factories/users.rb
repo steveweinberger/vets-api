@@ -16,15 +16,16 @@ FactoryBot.define do
       ssn { '796111863' }
       idme_uuid { 'b2fab2b5-6af0-45e1-a9e2-394347af91ef' }
       logingov_uuid { nil }
-      sec_id { nil }
+      verified_at { nil }
+      sec_id { '123498767' }
       participant_id { nil }
       birls_id { nil }
-      icn { nil }
+      icn { '123498767V234859' }
       mhv_icn { nil }
       multifactor { false }
       mhv_correlation_id { nil }
       mhv_account_type { nil }
-      edipi { nil }
+      edipi { '384759483' }
       va_patient { nil }
       search_token { nil }
       icn_with_aaid { nil }
@@ -56,6 +57,7 @@ FactoryBot.define do
                              ssn: t.ssn,
                              idme_uuid: t.idme_uuid,
                              logingov_uuid: t.logingov_uuid,
+                             verified_at: t.verified_at,
                              sec_id: t.sec_id,
                              participant_id: t.participant_id,
                              birls_id: t.birls_id,
@@ -87,6 +89,8 @@ FactoryBot.define do
       ssn { nil }
       multifactor { nil }
       idme_uuid { nil }
+      logingov_uuid { nil }
+      verified_at { nil }
       mhv_account_type { nil }
       va_patient { nil }
       loa { nil }
@@ -180,6 +184,25 @@ FactoryBot.define do
       end
     end
 
+    trait :ial1 do
+      uuid { '42fc7a21-c05f-4e6b-9985-67d11e2fbf76' }
+      logingov_uuid { '42fc7a21-c05f-4e6b-9985-67d11e2fbf76' }
+      verified_at { '2021-11-09T16:46:27Z' }
+      authn_context { IAL::LOGIN_GOV_IAL1 }
+      sign_in do
+        {
+          service_name: SAML::User::AUTHN_CONTEXTS[authn_context][:sign_in][:service_name]
+        }
+      end
+
+      loa do
+        { current: LOA::ONE, highest: LOA::ONE }
+      end
+    end
+
+    factory :logingov_ial1_user, traits: [:ial1] do
+    end
+
     factory :user_with_no_ids, traits: [:loa3] do
       after(:build) do
         stub_mpi(
@@ -239,6 +262,7 @@ FactoryBot.define do
     factory :evss_user, traits: [:loa3] do
       first_name { 'WESLEY' }
       last_name { 'FORD' }
+      edipi { nil }
       last_signed_in { Time.zone.parse('2017-12-07T00:55:09Z') }
       ssn { '796043735' }
 
@@ -277,6 +301,7 @@ FactoryBot.define do
     factory :unauthorized_evss_user, traits: [:loa3] do
       first_name { 'WESLEY' }
       last_name { 'FORD' }
+      edipi { nil }
       last_signed_in { Time.zone.parse('2017-12-07T00:55:09Z') }
       ssn { '796043735' }
 
@@ -367,6 +392,7 @@ FactoryBot.define do
 
     factory :ch33_dd_user, traits: [:loa3] do
       ssn { '796104437' }
+      icn { nil }
 
       after(:build) do
         stub_mpi(
@@ -447,6 +473,7 @@ FactoryBot.define do
       email { Faker::Internet.email }
       first_name { Faker::Name.first_name }
       last_name { Faker::Name.last_name }
+      icn { nil }
       gender { 'M' }
       zip { Faker::Address.postcode }
       birth_date { Faker::Time.between(from: 40.years.ago, to: 10.years.ago) }

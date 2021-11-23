@@ -7,12 +7,36 @@ module V0
     class VirtualAgentAppealController < AppealsBaseController
       def index
         # @appeal_status_description
-        appeals_response = appeals_service.get_appeals(current_user)
-        appeals_data_array = appeals_response.body['data']
+
+        if Settings.vsp_environment == 'staging'
+          @user_ssan, @user_name = set_user_credentials
+          appeals_response = get_appeal_from_lighthouse(@user_ssan, @user_name)
+          appeals_data_array = appeals_response['data']
+        else
+          appeals_response = appeals_service.get_appeals(current_user)
+          appeals_data_array = appeals_response.body['data']
+        end
         data = data_for_first_comp_appeal(appeals_data_array)
         render json: {
           data: data
         }
+      end
+
+      def get_appeal_from_lighthouse(ssan, user_name)
+        uri = URI(Settings.virtual_agent.lighthouse_api_uri)
+
+        req = Net::HTTP::Get.new(uri)
+        req['apikey'] = Settings.virtual_agent.lighthouse_api_key
+        req['X-VA-SSN'] = ssan
+        req['X-VA-User'] = user_name
+
+        http = Net::HTTP.new(uri.hostname, uri.port)
+
+        http.use_ssl = true
+
+        response = http.request(req)
+
+        JSON.parse(response.body)
       end
 
       def data_for_first_comp_appeal(appeals)
@@ -132,6 +156,19 @@ module V0
           appeal_status_description.gsub('{aoj_desc}', AOJ_DESCRIPTIONS[aoj])
         else
           appeal_status_description
+        end
+      end
+
+      def set_user_credentials
+        case @current_user.email
+        when 'vets.gov.user+228@gmail.com'
+          ['796104437', 'vets.gov.user+228@gmail.com']
+        when 'vets.gov.user+54@gmail.com'
+          ['796378881', 'vets.gov.user+54@gmail.com']
+        when 'vets.gov.user+36@gmail.com'
+          ['796043735', 'vets.gov.user+36@gmail.com']
+        else
+          ['796378881', 'vets.gov.user+54@gmail.com']
         end
       end
     end

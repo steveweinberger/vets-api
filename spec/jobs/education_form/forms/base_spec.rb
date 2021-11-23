@@ -57,9 +57,11 @@ RSpec.describe EducationForm::Forms::Base, type: :model, form: :education_benefi
     it 'returns N/A for nil values' do
       expect(renderer.yesno(nil)).to eq('N/A')
     end
+
     it 'returns NO for falsey values' do
       expect(renderer.yesno(false)).to eq('NO')
     end
+
     it 'returns YES for truthy values' do
       expect(renderer.yesno(true)).to eq('YES')
       expect(renderer.yesno('true')).to eq('YES')
@@ -78,7 +80,7 @@ RSpec.describe EducationForm::Forms::Base, type: :model, form: :education_benefi
     end
   end
 
-  context '#full_name' do
+  describe '#full_name' do
     subject { renderer.full_name(name) }
 
     let(:name) { OpenStruct.new(first: 'Mark', last: 'Olson') }
@@ -97,7 +99,7 @@ RSpec.describe EducationForm::Forms::Base, type: :model, form: :education_benefi
     end
   end
 
-  context '#full_address' do
+  describe '#full_address' do
     subject { renderer.full_address(address) }
 
     let(:address) { application.open_struct_form.veteranAddress }
@@ -148,10 +150,11 @@ RSpec.describe EducationForm::Forms::Base, type: :model, form: :education_benefi
     end
   end
 
-  context '#value_or_na' do
+  describe '#value_or_na' do
     it 'returns value' do
       expect(renderer.value_or_na('Value')).to eq('Value')
     end
+
     it 'returns N/A' do
       expect(renderer.value_or_na(nil)).to eq('N/A')
     end

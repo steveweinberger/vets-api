@@ -7,15 +7,14 @@ RSpec.describe CypressViewportUpdater::Viewports do
     # the following filter is used on requests to
     # https://analyticsreporting.googleapis.com/v4/reports:batchGet
     c.filter_sensitive_data('removed') do |interaction|
-      if interaction.request.headers['Authorization']
-        if (match = interaction.request.headers['Authorization'].first.match(/^Bearer.+/))
-          match[0]
-        end
+      if interaction.request.headers['Authorization'] &&
+         (match = interaction.request.headers['Authorization'].first.match(/^Bearer.+/))
+        match[0]
       end
     end
 
     c.filter_sensitive_data('{"access_token":"removed","expires_in":3599,"token_type":"Bearer"}') do |interaction|
-      if (match = interaction.response.body.match(/^{\"access_token.+/))
+      if (match = interaction.response.body.match(/^{"access_token.+/))
         match[0]
       end
     end

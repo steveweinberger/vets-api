@@ -17,7 +17,11 @@ module AppealsApi
     end
 
     def faulty_hlr
-      @faulty_hlr ||= HigherLevelReview.where(created_at: from..to, status: FAULTY_STATUSES)
+      @faulty_hlr ||= HigherLevelReview.where(created_at: from..to, status: FAULTY_STATUSES).order(created_at: :desc)
+    end
+
+    def total_hlr_successes
+      @total_hlr_successes ||= total_success_count(HigherLevelReview)
     end
 
     # NOD
@@ -26,7 +30,11 @@ module AppealsApi
     end
 
     def faulty_nod
-      @faulty_nod ||= NoticeOfDisagreement.where(created_at: from..to, status: FAULTY_STATUSES)
+      @faulty_nod ||= NoticeOfDisagreement.where(created_at: from..to, status: FAULTY_STATUSES).order(created_at: :desc)
+    end
+
+    def total_nod_successes
+      @total_nod_successes ||= total_success_count(NoticeOfDisagreement)
     end
 
     # SC
@@ -35,7 +43,11 @@ module AppealsApi
     end
 
     def faulty_sc
-      @faulty_sc ||= SupplementalClaim.where(created_at: from..to, status: FAULTY_STATUSES)
+      @faulty_sc ||= SupplementalClaim.where(created_at: from..to, status: FAULTY_STATUSES).order(created_at: :desc)
+    end
+
+    def total_sc_successes
+      @total_sc_successes ||= total_success_count(SupplementalClaim)
     end
 
     # Evidence submissions - NOD
@@ -80,6 +92,10 @@ module AppealsApi
         .each { |status, record_list| statuses[status] = record_list.size }
 
       statuses
+    end
+
+    def total_success_count(record_type)
+      record_type.where(status: 'success').count
     end
   end
 end

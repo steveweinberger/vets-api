@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'rack/mime.rb'
+require 'rack/mime'
 
 module Common
   module Client
@@ -8,10 +8,6 @@ module Common
       module Request
         class MultipartRequest < Faraday::Middleware
           include Rack::Mime
-
-          def initialize(app)
-            super(app)
-          end
 
           def call(env)
             return @app.call(env) unless env[:body].is_a?(Hash)

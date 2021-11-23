@@ -2,8 +2,7 @@
 
 require 'common/client/configuration/rest'
 require 'common/client/middleware/response/raise_error'
-require 'common/client/middleware/response/ppms_parser'
-require 'facilities/ppms/do_not_encoder'
+require_relative 'middleware/ppms_parser'
 
 module FacilitiesApi
   module V1
@@ -23,7 +22,7 @@ module FacilitiesApi
           'PPMS'
         end
 
-        def self.base_request_header
+        def base_request_header
           if Flipper.enabled?(:facility_locator_ppms_use_secure_api)
             super.merge(Settings.ppms.api_keys.to_h.stringify_keys)
           else
@@ -41,7 +40,7 @@ module FacilitiesApi
             # conn.response(:logger, ::Logger.new(STDOUT), bodies: true) unless Rails.env.production?
 
             conn.response :raise_error, error_prefix: service_name
-            conn.response :ppms_parser
+            conn.use FacilitiesApi::V1::PPMS::Middleware::PPMSParser
 
             conn.adapter Faraday.default_adapter
           end

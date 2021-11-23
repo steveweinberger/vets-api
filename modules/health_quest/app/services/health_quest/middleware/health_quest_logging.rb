@@ -8,10 +8,6 @@ module HealthQuest
     class HealthQuestLogging < Faraday::Middleware
       JTI_ERROR_MSG = 'unknown jti'
 
-      def initialize(app)
-        super(app)
-      end
-
       # #call
       #
       # Logs all outbound token request / responses to the lighthouse as :info when success and :warn when fail
@@ -67,7 +63,7 @@ module HealthQuest
       #
       # @return [Boolean] true if user session request, false otherwise
       def user_session_request?(env)
-        env.url.to_s.match?(%r{(health\/system\/v1\/token|pgd\/v1\/token)})
+        env.url.to_s.match?(%r{(health/system/v1/token|pgd/v1/token)})
       end
 
       # #jti is the value from the JWT key value pair in the response and needed for logging and audit purposes

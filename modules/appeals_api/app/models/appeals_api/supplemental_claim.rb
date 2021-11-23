@@ -5,6 +5,8 @@ require 'json_marshal/marshaller'
 
 module AppealsApi
   class SupplementalClaim < ApplicationRecord
+    include ScStatus
+
     def self.past?(date)
       date < Time.zone.today
     end
@@ -15,11 +17,14 @@ module AppealsApi
       nil
     end
 
-    STATUSES = %w[pending success error].freeze
+    scope :pii_expunge_policy, lambda {
+      where('updated_at < ? AND status IN (?)', 7.days.ago, COMPLETE_STATUSES)
+    }
 
     serialize :auth_headers, JsonMarshal::Marshaller
     serialize :form_data, JsonMarshal::Marshaller
-    encrypts :auth_headers, :form_data, **lockbox_options
+    has_kms_key
+    encrypts :auth_headers, :form_data, key: :kms_key, **lockbox_options
 
     has_many :evidence_submissions, as: :supportable, dependent: :destroy
     has_many :status_updates, as: :statusable, dependent: :destroy
@@ -39,15 +44,15 @@ module AppealsApi
     end
 
     def veteran_first_name
-      auth_headers.dig('X-VA-First-Name')
+      auth_headers['X-VA-First-Name']
     end
 
     def veteran_middle_initial
-      auth_headers.dig('X-VA-Middle-Initial')
+      auth_headers['X-VA-Middle-Initial']
     end
 
     def veteran_last_name
-      auth_headers.dig('X-VA-Last-Name')
+      auth_headers['X-VA-Last-Name']
     end
 
     def full_name
@@ -55,11 +60,11 @@ module AppealsApi
     end
 
     def ssn
-      auth_headers.dig('X-VA-SSN')
+      auth_headers['X-VA-SSN']
     end
 
     def file_number
-      auth_headers.dig('X-VA-File-Number')
+      auth_headers['X-VA-File-Number']
     end
 
     def veteran_dob_month
@@ -75,11 +80,11 @@ module AppealsApi
     end
 
     def veteran_service_number
-      auth_headers.dig('X-VA-Service-Number')
+      auth_headers['X-VA-Service-Number']
     end
 
     def insurance_policy_number
-      auth_headers.dig('X-VA-Insurance-Policy-Number')
+      auth_headers['X-VA-Insurance-Policy-Number']
     end
 
     def mailing_address_number_and_street
@@ -135,7 +140,7 @@ module AppealsApi
     end
 
     def contestable_issues
-      issues = form_data.dig('included') || []
+      issues = form_data['included'] || []
 
       @contestable_issues ||= issues.map do |issue|
         AppealsApi::ContestableIssue.new(issue)
@@ -154,27 +159,75 @@ module AppealsApi
       data_attributes&.dig('socOptIn')
     end
 
-    def new_evidence_locations
+    def new_evidence
       evidence_submissions = evidence_submission['retrieveFrom'] || []
 
-      @evidence_locations ||= evidence_submissions.map do |retrieve_from|
-        retrieve_from['attributes']['locationAndName']
+      evidence_submissions.map do |evidence|
+        ScEvidence.new(evidence['type'], evidence['attributes'])
       end
     end
 
-    def new_evidence_dates
-      evidence_submissions = evidence_submission['retrieveFrom'] || []
-
-      @new_evidence_dates ||= evidence_submissions.map do |retrieve_from|
-        retrieve_from['attributes']['evidenceDates']
-      end
+    def notice_acknowledgement
+      data_attributes['noticeAcknowledgement']
     end
 
     def date_signed
       veterans_local_time.strftime('%m/%d/%Y')
     end
 
+    def update_status!(status:, code: nil, detail: nil)
+      handler = Events::Handler.new(event_type: :sc_status_updated, opts: {
+                                      from: self.status,
+                                      to: status,
+                                      status_update_time: Time.zone.now.iso8601,
+                                      statusable_id: id
+                                    })
+
+      email_handler = Events::Handler.new(event_type: :sc_received, opts: {
+                                            email_identifier: email_identifier,
+                                            first_name: veteran_first_name,
+                                            date_submitted: veterans_local_time.iso8601,
+                                            guid: id
+                                          })
+
+      update!(status: status, code: code, detail: detail)
+
+      handler.handle!
+      email_handler.handle! if status == 'submitted' && email_identifier.present?
+    end
+
+    def lob
+      {
+        'compensation' => 'CMP',
+        'pensionSurvivorsBenefits' => 'PMC',
+        'fiduciary' => 'FID',
+        'lifeInsurance' => 'INS',
+        'veteransHealthAdministration' => 'OTH',
+        'veteranReadinessAndEmployment' => 'VRE',
+        'loanGuaranty' => 'OTH',
+        'education' => 'EDU',
+        'nationalCemeteryAdministration' => 'OTH'
+      }[benefit_type]
+    end
+
     private
+
+    def mpi_veteran
+      AppealsApi::Veteran.new(
+        ssn: ssn,
+        first_name: veteran_first_name,
+        last_name: veteran_last_name,
+        birth_date: birth_date.iso8601
+      )
+    end
+
+    def email_identifier
+      return { id_type: 'email', id_value: email } if email.present?
+
+      icn = mpi_veteran.mpi_icn
+
+      return { id_type: 'ICN', id_value: icn } if icn.present?
+    end
 
     def data_attributes
       form_data&.dig('data', 'attributes')

@@ -74,7 +74,8 @@ module BGSDependents
         death_dt: format_date(payload['death_date']),
         ever_maried_ind: payload['ever_married_ind'],
         vet_ind: payload['vet_ind'],
-        martl_status_type_cd: payload['martl_status_type_cd']
+        martl_status_type_cd: payload['martl_status_type_cd'],
+        vnp_srusly_dsabld_ind: payload['not_self_sufficient']
       }
     end
 
@@ -85,7 +86,7 @@ module BGSDependents
     def format_date(date)
       return nil if date.nil?
 
-      DateTime.parse(date + ' 12:00:00').to_time.iso8601
+      DateTime.parse("#{date} 12:00:00").to_time.iso8601
     end
 
     def generate_address(address)

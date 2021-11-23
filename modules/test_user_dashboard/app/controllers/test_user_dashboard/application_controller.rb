@@ -29,5 +29,10 @@ module TestUserDashboard
       end
       false
     end
+
+    def set_tags_and_extra_context
+      RequestStore.store['additional_request_attributes'] = { 'source' => 'test-user-dashboard' }
+      Raven.tags_context(source: 'test-user-dashboard')
+    end
   end
 end

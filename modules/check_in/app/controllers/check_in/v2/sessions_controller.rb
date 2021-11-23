@@ -16,18 +16,13 @@ module CheckIn
         check_in_session = CheckIn::V2::Session.build(data: session_params, jwt: session[:jwt])
 
         render json: check_in_session.client_error, status: :bad_request and return unless check_in_session.valid?
+        render json: check_in_session.success_message and return if check_in_session.authorized?
 
-        resp =
-          if check_in_session.authorized?
-            check_in_session.success_message
-          else
-            token_data = ::V2::Lorota::Service.build(check_in: check_in_session).token_with_permissions
-            session[:jwt] = token_data[:jwt]
+        token_data = ::V2::Lorota::Service.build(check_in: check_in_session).token
 
-            token_data[:permission_data]
-          end
+        session[:jwt] = token_data[:jwt]
 
-        render json: resp
+        render json: token_data[:permission_data]
       end
 
       private

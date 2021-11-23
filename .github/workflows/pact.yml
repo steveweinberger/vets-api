@@ -3,7 +3,7 @@ on: [workflow_dispatch]
 jobs:
   tests:
     name: Pact Contract Tests
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-20.04
     env:
       BUNDLE_ENTERPRISE__CONTRIBSYS__COM: ${{ secrets.BUNDLE_ENTERPRISE__CONTRIBSYS__COM }}
       DATABASE_URL: "postgis://vets-api:postgres@127.0.0.1:5432/vets-api-test"
@@ -44,7 +44,7 @@ jobs:
           aws-region: "us-gov-west-1"
 
       - name: Get bot token from Parameter Store
-        uses: marvinpinto/action-inject-ssm-secrets@v1.1.1
+        uses: marvinpinto/action-inject-ssm-secrets@v1.2.1
         with:
           ssm_parameter: /dsva-vagov/pact-broker/utility/PACT_BROKER_BASIC_AUTH_PASSWORD
           env_variable_name: PACT_BROKER_BASIC_AUTH_PASSWORD

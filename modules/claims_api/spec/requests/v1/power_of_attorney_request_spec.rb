@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require 'token'
+require 'token_validation/v2/client'
 
 RSpec.describe 'Power of Attorney ', type: :request do
   let(:headers) do
@@ -11,7 +13,7 @@ RSpec.describe 'Power of Attorney ', type: :request do
       'X-VA-Birth-Date': '1986-05-06T00:00:00+00:00',
       'X-VA-Gender': 'M' }
   end
-  let(:scopes) { %w[claim.write] }
+  let(:scopes) { %w[claim.read claim.write] }
 
   before do
     stub_poa_verification
@@ -32,12 +34,13 @@ RSpec.describe 'Power of Attorney ', type: :request do
 
     context 'when poa code is valid' do
       before do
-        Veteran::Service::Representative.new(poa_codes: ['074']).save!
+        Veteran::Service::Representative.new(representative_id: '01234', poa_codes: ['074']).save!
       end
 
       context 'when poa code is associated with current user' do
         before do
-          Veteran::Service::Representative.new(poa_codes: ['074'], first_name: 'Abraham', last_name: 'Lincoln').save!
+          Veteran::Service::Representative.new(representative_id: '56789', poa_codes: ['074'],
+                                               first_name: 'Abraham', last_name: 'Lincoln').save!
         end
 
         context 'when Veteran has all necessary identifiers' do
@@ -266,7 +269,8 @@ RSpec.describe 'Power of Attorney ', type: :request do
 
       context 'when there is no BGS active power of attorney' do
         before do
-          Veteran::Service::Representative.new(poa_codes: ['074'], first_name: 'Abraham', last_name: 'Lincoln').save!
+          Veteran::Service::Representative.new(representative_id: '00000', poa_codes: ['074'], first_name: 'Abraham',
+                                               last_name: 'Lincoln').save!
         end
 
         it 'returns a 404' do
@@ -282,7 +286,8 @@ RSpec.describe 'Power of Attorney ', type: :request do
 
       context 'when there is a BGS active power of attorney' do
         before do
-          Veteran::Service::Representative.new(poa_codes: ['074'], first_name: 'Abraham', last_name: 'Lincoln').save!
+          Veteran::Service::Representative.new(representative_id: '11111', poa_codes: ['074'], first_name: 'Abraham',
+                                               last_name: 'Lincoln').save!
         end
 
         let(:representative_info) do
@@ -309,6 +314,44 @@ RSpec.describe 'Power of Attorney ', type: :request do
               .to eq('HelloWorld')
           end
         end
+
+        context 'when a request uses the client credentials grant (CCG) auth flow' do
+          context 'when a client is authorized for the scope they are attempting to access' do
+            it 'returns a 200' do
+              with_okta_user(scopes) do |auth_header|
+                allow_any_instance_of(Token).to receive(:client_credentials_token?).and_return(true)
+                allow_any_instance_of(TokenValidation::V2::Client).to receive(:token_valid?).and_return(true)
+
+                with_settings(Settings.claims_api.token_validation, api_key: 'some_value') do
+                  allow(BGS::PowerOfAttorneyVerifier).to receive(:new).and_return(bgs_poa_verifier)
+                  expect(bgs_poa_verifier).to receive(:current_poa).and_return(Struct.new(:code).new('HelloWorld'))
+                  expect(bgs_poa_verifier).to receive(:previous_poa_code).and_return(nil)
+                  expect_any_instance_of(
+                    ClaimsApi::V1::Forms::PowerOfAttorneyController
+                  ).to receive(:build_representative_info).and_return(representative_info)
+                  get '/services/claims/v1/forms/2122/active', params: nil, headers: headers.merge(auth_header)
+                  expect(response.status).to eq(200)
+                end
+              end
+            end
+          end
+
+          context 'when a client is not authorized to access a particular claims OAuth scope' do
+            it 'returns a 403' do
+              with_okta_user(scopes) do |auth_header|
+                VCR.use_cassette('evss/claims/claims') do
+                  allow_any_instance_of(Token).to receive(:client_credentials_token?).and_return(true)
+                  allow_any_instance_of(TokenValidation::V2::Client).to receive(:token_valid?).and_return(false)
+
+                  with_settings(Settings.claims_api.token_validation, api_key: 'some_value') do
+                    get '/services/claims/v1/forms/2122/active', params: nil, headers: headers.merge(auth_header)
+                    expect(response.status).to eq(403)
+                  end
+                end
+              end
+            end
+          end
+        end
       end
 
       context 'when a non-accredited representative and non-veteran request active power of attorney' do
@@ -323,7 +366,8 @@ RSpec.describe 'Power of Attorney ', type: :request do
 
       describe 'additional POA info' do
         before do
-          Veteran::Service::Representative.new(poa_codes: ['074'], first_name: 'Abraham', last_name: 'Lincoln').save!
+          Veteran::Service::Representative.new(representative_id: '22222',
+                                               poa_codes: ['074'], first_name: 'Abraham', last_name: 'Lincoln').save!
         end
 
         context 'when representative is part of an organization' do

@@ -1,59 +1,65 @@
 # frozen_string_literal: true
 
+require 'dgi/eligibility/service'
+require 'dgi/automation/service'
+
 module MebApi
   module V0
     class EducationBenefitsController < MebApi::V0::BaseController
+      # disabling checks while we serve big mock JSON objects. Check will be reinstated when we integrate with DGIB
       def claimant_info
-        render json:
-          { data: {
-            "claimant": {
-              "claimantId": 0, "firstName": 'Hector', "middleName": 'Oliver', "lastName": 'Stanley',
-              "dateOfBirth": '1992-07-23',
-              "contactInfos": [{ "addressLine1": '2222 Avon Street', "addressLine2": 'Apt 6',
-                                 "addressLine3": 'string', "city": 'Arlington', "zipcode": '22205',
-                                 "effectiveDate": '2021-09-17', "emailAddress": 'vets.gov.user+1@gmail.com',
-                                 "addressType": 'DOMESTIC' }],
-              "personComments": [{ "personCommentKey": 0, "commentDate": '2021-09-23', "comments": 'string' }],
-              "dobChanged": true,
-              "firstAndLastNameChanged": true
-            }
-          } }
+        response = automation_service.get_claimant_info
+
+        render json: response, serializer: AutomationSerializer
       end
 
       def service_history
         render json:
         { data: {
-          "beginDate": '2021-09-23',
-          "endDate": '2021-09-23',
-          "branchOfService": 'ArmyActiveDuty',
-          "trainingPeriods": [
+          'beginDate': '2010-10-26T18:00:54.302Z',
+          'endDate': '2021-10-26T18:00:54.302Z',
+          'branchOfService': 'ArmyActiveDuty',
+          'trainingPeriods': [
             {
-              "beginDate": '2021-09-23',
-              "endDate": '2021-09-23'
+              'beginDate': '2018-10-26T18:00:54.302Z',
+              'endDate': '2019-10-26T18:00:54.302Z'
             }
           ],
-          "exclusionPeriods": [{ "beginDate": '2021-09-23', "endDate": '2021-09-23' }],
-          "characterOfService": 'string',
-          "separationReason": 'string',
-          "serviceStatus": 'Veteran',
-          "disagreeWithServicePeriod": true
+          'exclusionPeriods': [{ 'beginDate': '2012-10-26T18:00:54.302Z', 'endDate': '2013-10-26T18:00:54.302Z' }],
+          'characterOfService': 'Honorable',
+          'reasonForSeparation': 'ExpirationTimeOfService'
         } }
       end
 
       def eligibility
-        render json:
-        { data: {
-          "veteranIsEligible": true,
-          "chapter": 'chapter33'
-        } }
+        response = eligibility_service.get_eligibility
+
+        render json: response, serializer: EligibilitySerializer
       end
 
       def claim_status
         render json:
         { data: {
-          "claimId": 0,
-          "status": 'InProgress'
+          'claimId': 0,
+          'status': 'InProgress'
         } }
+      end
+
+      def submit_claim
+        render json:
+               { data: {
+                 'status': 'received'
+               } }
+      end
+
+      private
+
+      def eligibility_service
+        MebApi::DGI::Eligibility::Service.new @current_user
+      end
+
+      def automation_service
+        MebApi::DGI::Automation::Service.new(@current_user)
       end
     end
   end

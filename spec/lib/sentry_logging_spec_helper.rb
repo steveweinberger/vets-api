@@ -19,6 +19,7 @@ shared_examples 'a sentry logger' do
         expect(Rails.logger).to receive(:error).with(/blah/).with(/context/)
         subject.log_message_to_sentry('blah', :error, { extra: 'context' }, tags: 'tagging')
       end
+
       it 'logs to Sentry' do
         expect(Raven).to receive(:tags_context)
         expect(Raven).to receive(:extra_context)
@@ -29,9 +30,10 @@ shared_examples 'a sentry logger' do
 
     describe '#log_exception_to_sentry' do
       it 'warn logs to Rails logger' do
-        expect(Rails.logger).to receive(:error).with(exception.message + '.')
+        expect(Rails.logger).to receive(:error).with("#{exception.message}.")
         subject.log_exception_to_sentry(exception)
       end
+
       it 'logs to Sentry' do
         expect(Raven).to receive(:capture_exception).with(exception, level: 'error').once
         subject.log_exception_to_sentry(exception)
@@ -45,6 +47,7 @@ shared_examples 'a sentry logger' do
         expect(Rails.logger).to receive(:warn).with(/blah/).with(/context/)
         subject.log_message_to_sentry('blah', :warn, { extra: 'context' }, tags: 'tagging')
       end
+
       it 'does not log to Sentry' do
         expect(Raven).to receive(:capture_exception).exactly(0).times
         subject.log_message_to_sentry('blah', :warn, { extra: 'context' }, tags: 'tagging')
@@ -53,9 +56,10 @@ shared_examples 'a sentry logger' do
 
     describe '#log_exception_to_sentry' do
       it 'error logs to Rails logger' do
-        expect(Rails.logger).to receive(:error).with(exception.message + '.')
+        expect(Rails.logger).to receive(:error).with("#{exception.message}.")
         subject.log_exception_to_sentry(exception)
       end
+
       it 'does not log to Sentry' do
         expect(Raven).to receive(:capture_exception).exactly(0).times
         subject.log_exception_to_sentry(exception)

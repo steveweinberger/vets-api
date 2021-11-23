@@ -12,6 +12,14 @@
 # Sorted using http://yaml-sorter.herokuapp.com/
 
 features:
+  caregiver_sigi_enabled:
+    actor_type: user
+    description: Whether Self-Identifying Gender Identity is enabled for caregiver.
+    enable_in_development: true
+  hca_american_indian_enabled:
+    actor_type: user
+    description: Enables American Indian SIGI question page.
+    enable_in_development: true
   can_upload_10_10cg_poa:
     actor_type: cookie_id
     description: Allows users to upload POA documentation when completing the 10-10CG.
@@ -50,9 +58,13 @@ features:
     actor_type: user
     description: Enables the health care check-in experiences to show demographics page.
     enable_in_development: true
-  check_in_experience_low_authentication_enabled:
+  check_in_experience_next_of_kin_enabled:
     actor_type: user
-    description: Enables the health care check-in experiences to use the lowest tier of authentication, i.e. last 4 and last name
+    description: Enables the health care check-in experiences to show the next of kin page.
+    enable_in_development: true
+  check_in_experience_pre_check_in_enabled:
+    actor_type: user
+    description: Enables the health care check-in experiences to show the pre-check-in experience.
     enable_in_development: true
   check_in_experience_update_information_page_enabled:
     actor_type: user
@@ -66,6 +78,9 @@ features:
     actor_type: user
     description: Feature gates the certificate of eligibility application
     enable_in_development: true
+  communication_preferences:
+    actor_type: user
+    description: Allow user to access backend communication_preferences API
   contact_info_change_email:
     actor_type: user
     description: Send user a notification email when their contact info changes.
@@ -105,6 +120,9 @@ features:
   decision_review_hlr_email:
     actor_type: user
     description: Send email notification for successful HLR submission
+  decision_review_sc_email:
+    actor_type: user
+    description: Send email notification for successful SC submission
   dependency_verification:
     actor_type: user
     description: Feature gates the dependency verification modal for updating the diaries service.
@@ -154,13 +172,13 @@ features:
   facilities_ppms_suppress_pharmacies:
     actor_type: user
     description: Front End Flag to suppress the ability to search for pharmacies
-  facilities_vet_center_automate_nearby:
-    actor_type: user
-    description: Automatically fetch nearby Vet Centers on Vet Center locations pages
-    enable_in_development: true
   facility_locator_covid_vaccine_walk_in_availability_text_frontend:
     actor_type: user
     description: Enable covid vaccine walk-in availability text within covid vaccine related search results
+    enable_in_development: true
+  facility_locator_lat_long_only:
+    actor_type: user
+    description: Send only lat/long values (no bounding box or address) to the API when querying for facilities.
     enable_in_development: true
   facility_locator_lighthouse_covid_vaccine_query:
     actor_type: user
@@ -193,11 +211,20 @@ features:
     actor_type: user
     description: Use rails engine routes for all Facility Locator API calls
     enable_in_development: true
+  facility_locator_restore_community_care_pagination:
+    actor_type: user
+    description: Restores pagination for community care providers, emergency care, and pharmacies. (urgent care is excluded)
+    enable_in_development: true
   facility_locator_show_community_cares:
     actor_type: user
     description: >
       On https://www.va.gov/find-locations/ enable veterans to search for Community care by showing that option
       in the "Search for" box.
+    enable_in_development: true
+  facility_locator_show_health_connect_number:
+    actor_type: user
+    description: >
+      On https://www.va.gov/find-locations/ enable the health connect phone number display
     enable_in_development: true
   facility_locator_show_operational_hours_special_instructions:
     actor_type: user
@@ -238,6 +265,10 @@ features:
   gibct_school_ratings:
     actor_type: user
     description: Show/Hide the school ratings section of the Comparison Tool School Profile Page.
+  gi_sandbox_comparision_tool_toggle:
+    actor_type: user
+    description: Shows gi-bill-comparison-tool-sandbox CT if active else shows the gi-bill-comparison-tool CT.
+    enable_in_development: true
   hlr_v2:
     actor_type: user
     description: Enable showing Higher-Level Review v2
@@ -248,6 +279,26 @@ features:
   login_gov:
     actor_type: cookie
     description: Enables/disables the usage of the new service provider Login.gov (VSP Identity)
+    enable_in_development: true
+  login_gov_create_account:
+    actor_type: cookie
+    description: Enables/disables the usage of the new service provider Login.gov to create an account (VSP Identity)
+    enable_in_development: true
+  login_gov_mhv:
+    actor_type: cookie
+    description: Enables/disables the Login.gov button for MHV (VSP Identity)
+    enable_in_development: true
+  login_gov_myvahealth:
+    actor_type: cookie
+    description: Enables/disables the Login.gov button for MyVAHealth (VSP Identity)
+    enable_in_development: true
+  login_old_design:
+    actor_type: cookie
+    description: Enables/disables the new Sign in design (VSP Identity)
+    enable_in_development: true
+  loop_pages:
+    actor_type: user
+    description: Enable new list loop pattern
     enable_in_development: true
   mega_menu_mobile_v2:
     actor_type: user
@@ -261,6 +312,10 @@ features:
     description: >
       [Front-end only] When enabled, the 10-10EZ will collect a home and mailing address for the veteran
       vs only collecting a single, "permanent" address.
+  omni_channel_link:
+    actor_type: user
+    description: This determines the visibility of the OmniChannel link in the claim status tool
+    enable_in_development: true
   pre_entry_covid19_screener:
     actor_type: user
     description: >
@@ -270,6 +325,10 @@ features:
   profile_notification_settings:
     actor_type: user
     description: Turns on the Notification Settings section of the VA.gov Profile
+    enable_in_development: true
+  profile_enhancements:
+    actor_type: user
+    description: Used to show any enhancement for the profile
     enable_in_development: true
   profile_schema_forms:
     actor_type: user
@@ -324,6 +383,9 @@ features:
   show_edu_benefits_5495_wizard:
     actor_type: user
     description: This determines when the wizard should show up on the 5495 introduction page
+  show_events_v2:
+    actor_type: user
+    description: Enables the events v2 page
   show_financial_status_report:
     actor_type: user
     description: Enables VA Form 5655 (Financial Status Report)
@@ -331,6 +393,14 @@ features:
   show_financial_status_report_wizard:
     actor_type: user
     description: Enables the Wizard for VA Form 5655 (Financial Status Report)
+    enable_in_development: true
+  show_form_i18n:
+    actor_type: user
+    description: Enables the internationalization features for forms
+    enable_in_development: true
+  show_header_v2:
+    action_type: user
+    description: Enables the new header
     enable_in_development: true
   show_meb_mock_endpoints:
     actor_type: user
@@ -457,4 +527,8 @@ features:
   yellow_ribbon_mvp_enhancement:
     actor_type: user
     description: Enhances Yellow Ribbon MVP.
+    enable_in_development: true
+  show_edu_benefits_1990EZ_Wizard:
+    actor_type: user
+    description: Navigates user to 1990EZ or 1990 depending on form questions.
     enable_in_development: true

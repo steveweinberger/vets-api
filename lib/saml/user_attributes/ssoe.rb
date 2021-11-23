@@ -9,17 +9,19 @@ module SAML
     class SSOe
       include SentryLogging
       include Identity::Parsers::GCIds
-      SERIALIZABLE_ATTRIBUTES = %i[email first_name middle_name last_name common_name zip gender ssn birth_date
-                                   uuid idme_uuid sec_id mhv_icn mhv_correlation_id mhv_account_type
+      SERIALIZABLE_ATTRIBUTES = %i[email first_name middle_name last_name common_name zip gender ssn
+                                   birth_date uuid idme_uuid logingov_uuid verified_at sec_id
+                                   mhv_icn mhv_correlation_id mhv_account_type
                                    edipi loa sign_in multifactor participant_id birls_id icn
                                    person_types].freeze
       INBOUND_AUTHN_CONTEXT = 'urn:oasis:names:tc:SAML:2.0:ac:classes:Password'
 
-      attr_reader :attributes, :authn_context, :warnings
+      attr_reader :attributes, :authn_context, :tracker_uuid, :warnings
 
-      def initialize(saml_attributes, authn_context)
+      def initialize(saml_attributes, authn_context, tracker_uuid)
         @attributes = saml_attributes # never default this to {}
         @authn_context = authn_context
+        @tracker_uuid = tracker_uuid
         @warnings = []
       end
 
@@ -88,6 +90,7 @@ module SAML
       ### Identifiers
       def uuid
         return idme_uuid if idme_uuid
+        return logingov_uuid if logingov_uuid
         # The sec_id is not a UUID, and while unique this has a potential to cause issues
         # in downstream processes that are expecting a user UUID to be 32 bytes. For
         # example, if there is a log filtering process that was striping out any 32 byte
@@ -100,11 +103,21 @@ module SAML
       end
 
       def idme_uuid
-        return safe_attr('va_eauth_uid') if csid == 'idme'
+        return safe_attr('va_eauth_uid') if csid == SAML::User::IDME_CSID
 
-        # the gcIds are a pipe-delimited concatenation of the MVI correlation IDs
-        # (minus the weird "base/extension" cruft)
         mvi_ids[:idme_id]
+      end
+
+      def logingov_uuid
+        return safe_attr('va_eauth_uid') if csid == SAML::User::LOGINGOV_CSID
+
+        mvi_ids[:logingov_id]
+      end
+
+      # only applies to Login.gov IAL2 verification
+      # used to automatically upcert IAL1 users without additional service calls
+      def verified_at
+        safe_attr('va_eauth_verifiedAt')
       end
 
       def sec_id
@@ -140,7 +153,12 @@ module SAML
       # It is currently returning a value of "2" for DSLogon level 2
       # so we are interpreting any value greater than 1 as "LOA 3".
       def loa_current
-        assurance = safe_attr('va_eauth_credentialassurancelevel')&.to_i
+        assurance =
+          if csid == 'logingov'
+            safe_attr('va_eauth_ial')&.to_i
+          else
+            safe_attr('va_eauth_credentialassurancelevel')&.to_i
+          end
         @loa_current ||= assurance.present? && assurance > 1 ? 3 : 1
       rescue NoMethodError, KeyError => e
         @warnings << "loa_current error: #{e.message}"
@@ -186,7 +204,7 @@ module SAML
 
       def sign_in
         sign_in = if @authn_context == INBOUND_AUTHN_CONTEXT
-                    { service_name: csid == 'mhv' ? 'myhealthevet' : csid }
+                    { service_name: csid == SAML::User::MHV_ORIGINAL_CSID ? SAML::User::MHV_MAPPED_CSID : csid }
                   else
                     SAML::User::AUTHN_CONTEXTS.fetch(@authn_context).fetch(:sign_in)
                   end
@@ -199,16 +217,26 @@ module SAML
 
       # Raise any fatal exceptions due to validation issues
       def validate!
-        if should_raise_idme_uuid_error
-          data = SAML::UserAttributeError::ERRORS[:idme_uuid_missing].merge({ identifier: mhv_icn })
+        if should_raise_missing_uuid_error
+          data = SAML::UserAttributeError::ERRORS[:uuid_missing].merge({ identifier: mhv_icn })
           raise SAML::UserAttributeError, data
         end
-        raise SAML::UserAttributeError, SAML::UserAttributeError::ERRORS[:multiple_mhv_ids] if mhv_id_mismatch?
+
+        multiple_id_validations
+      end
+
+      private
+
+      def multiple_id_validations
+        # EDIPI, ICN, and CORP ID all trigger errors if multiple unique IDs are found
         raise SAML::UserAttributeError, SAML::UserAttributeError::ERRORS[:multiple_edipis] if edipi_mismatch?
         raise SAML::UserAttributeError, SAML::UserAttributeError::ERRORS[:mhv_icn_mismatch] if mhv_icn_mismatch?
         raise SAML::UserAttributeError, SAML::UserAttributeError::ERRORS[:multiple_corp_ids] if corp_id_mismatch?
 
-        # Collecting information on users with multiple sec_ids (e.g. '123456789,098765432')
+        # temporary conditional validation for MHV, can be only a warning if user is MHV inbound-outbound
+        conditional_validate_mhv_ids
+
+        # SEC & BIRLS multiple IDs are more common, only log a warning
         if sec_id_mismatch?
           log_message_to_sentry(
             'User attributes contains multiple sec_id values',
@@ -217,33 +245,24 @@ module SAML
           )
         end
 
-        # Multiple BIRLS IDs are more common, only raise a warning
         if birls_id_mismatch?
-          log_message_to_sentry('User attributes contain multiple distinct BIRLS ID values.', 'warn',
-                                birls_ids: @attributes['va_eauth_birlsfilenumber'])
+          log_message_to_sentry(
+            'User attributes contain multiple distinct BIRLS ID values.',
+            'warn',
+            { birls_ids: @attributes['va_eauth_birlsfilenumber'] }
+          )
         end
       end
 
-      private
-
-      def should_raise_idme_uuid_error
-        return false if idme_uuid
-
-        if auth_context_is_inbound
-          Rails.logger.info('Inbound Authentication without ID.me UUID', sec_id_identifier: uuid)
-          return false
-        end
-
-        true
-      end
-
-      def auth_context_is_inbound
-        @authn_context == INBOUND_AUTHN_CONTEXT
+      def should_raise_missing_uuid_error
+        idme_uuid.blank? && logingov_uuid.blank?
       end
 
       def mvi_ids
         return @mvi_ids if @mvi_ids
 
+        # the gcIds are a pipe-delimited concatenation of the MVI correlation IDs
+        # (minus the weird "base/extension" cruft)
         gcids = safe_attr('va_eauth_gcIds')
         return {} unless gcids
 
@@ -254,11 +273,35 @@ module SAML
         @attributes[key] == 'NOT_FOUND' ? nil : @attributes[key]
       end
 
-      # Gather all available MHV IDs, de-duplicate, and see if n > 1
-      def mhv_id_mismatch?
+      def conditional_validate_mhv_ids
+        if mhv_id_mismatch?
+          if mhv_inbound_outbound
+            log_message_to_sentry(
+              'User attributes contain multiple distinct MHV ID values.',
+              'warn',
+              { mhv_ids: mhv_ids }
+            )
+          else
+            raise SAML::UserAttributeError, SAML::UserAttributeError::ERRORS[:multiple_mhv_ids]
+          end
+        end
+      end
+
+      def mhv_ids
+        return @mhv_ids if @mhv_ids
+
         uuid = safe_attr('va_eauth_mhvuuid')
         iens = safe_attr('va_eauth_mhvien')&.split(',') || []
-        iens.append(uuid).reject(&:nil?).uniq.size > 1
+        @mhvs_ids = iens.append(uuid).reject(&:nil?).uniq
+      end
+
+      def mhv_id_mismatch?
+        mhv_ids.size > 1
+      end
+
+      def mhv_inbound_outbound
+        tracker = SAMLRequestTracker.find(@tracker_uuid)
+        tracker&.payload_attr(:skip_dupe) == 'mhv'
       end
 
       def mhv_icn_mismatch?

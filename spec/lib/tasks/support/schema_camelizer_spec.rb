@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-require './lib/tasks/support/schema_camelizer.rb'
+require './lib/tasks/support/schema_camelizer'
 
 describe SchemaCamelizer do
   TEST_DIRECTORY = 'tmp/camel_schema_tests'
-  TEST_SCHEMA_DIRECTORY = TEST_DIRECTORY + '/schemas'
-  TEST_RESULT_DIRECTORY = TEST_DIRECTORY + '/schemas_camelized'
+  TEST_SCHEMA_DIRECTORY = "#{TEST_DIRECTORY}/schemas"
+  TEST_RESULT_DIRECTORY = "#{TEST_DIRECTORY}/schemas_camelized"
 
   before(:context) do
     # create directories for source and result schemas
@@ -42,12 +42,14 @@ describe SchemaCamelizer do
       subject = SchemaCamelizer.new(filename)
       expect(subject.camel_schema.keys).to match %w[catSound dogSound]
     end
+
     it 'camel-inflects nested keys' do
       schema = { 'cat' => { 'mouth_sound' => 'meow', 'leg_count' => 4 } }
       filename = create_source_schema('nested_keys', schema)
       subject = SchemaCamelizer.new(filename)
       expect(subject.camel_schema['cat'].keys).to match %w[mouthSound legCount]
     end
+
     it 'camel-inflects values in "required" keys' do
       schema = { 'required' => %w[animal_sounds animal_names animal_outfits] }
       filename = create_source_schema('required_keys', schema)
@@ -61,12 +63,13 @@ describe SchemaCamelizer do
       subject = SchemaCamelizer.new(snake_key_file)
       expect(subject.referenced_schemas).to be_empty
     end
+
     it 'is an Array of SchemaCamelizers for referenced schemas' do
       referenced_schema = { 'refer_to' => 'me' }
       referenced_schema_name = 'refer_to_me'
       referenced_filename = create_source_schema(referenced_schema_name, referenced_schema)
 
-      schema = { 'refer_to' => 'something', '$ref' => referenced_filename.gsub(TEST_SCHEMA_DIRECTORY + '/', '') }
+      schema = { 'refer_to' => 'something', '$ref' => referenced_filename.gsub("#{TEST_SCHEMA_DIRECTORY}/", '') }
       filename = create_source_schema('references', schema)
       subject = SchemaCamelizer.new(filename)
 
@@ -81,6 +84,7 @@ describe SchemaCamelizer do
       subject = SchemaCamelizer.new(snake_key_file)
       expect(subject.already_camelized).to be false
     end
+
     it 'when the source schema has camel keys will be true' do
       subject = SchemaCamelizer.new(camel_key_file)
       expect(subject.already_camelized).to be true
@@ -94,9 +98,10 @@ describe SchemaCamelizer do
       subject = SchemaCamelizer.new(filename)
       expect(subject.camel_path).to include('schemas_camelized')
     end
+
     it 'can be set in the initializer' do
       filename = create_source_schema('manual_camel_path', { 'who' => 'cares' })
-      camel_output = TEST_DIRECTORY + '/other/schemas/camel_destination.json'
+      camel_output = "#{TEST_DIRECTORY}/other/schemas/camel_destination.json"
       subject = SchemaCamelizer.new(filename, camel_output)
       expect(subject.camel_path).to include(camel_output)
     end
@@ -108,6 +113,7 @@ describe SchemaCamelizer do
       expect(subject.unchanged_schemas.any?).to be true
       expect(subject.unchanged_schemas).to include(subject.name)
     end
+
     it 'is empty if the original schema was snake case' do
       subject = SchemaCamelizer.new(snake_key_file)
       expect(subject.unchanged_schemas).to be_empty
@@ -121,9 +127,9 @@ describe SchemaCamelizer do
 
       schema = {
         'refer_to' => 'something',
-        '$ref' => referenced_filename1.gsub(TEST_SCHEMA_DIRECTORY + '/', ''),
+        '$ref' => referenced_filename1.gsub("#{TEST_SCHEMA_DIRECTORY}/", ''),
         'deep_reference' => {
-          '$ref' => referenced_filename2.gsub(TEST_SCHEMA_DIRECTORY + '/', '')
+          '$ref' => referenced_filename2.gsub("#{TEST_SCHEMA_DIRECTORY}/", '')
         }
       }
       filename = create_source_schema('references', schema)
@@ -133,6 +139,7 @@ describe SchemaCamelizer do
       expect(saved_files.count).to be > 1
       expect(saved_files).to include(*subject.referenced_schemas.collect(&:camel_path))
     end
+
     it 'writes files to the disk' do
       subject = SchemaCamelizer.new(snake_key_file)
       result = subject.save!
@@ -141,6 +148,7 @@ describe SchemaCamelizer do
         expect(File.exist?(filename)).to be true
       end
     end
+
     it 'raises an exception when it is not in a schemas directory' do
       schema_file_in_weird_location = "#{TEST_DIRECTORY}/bad_location.json"
       schema = { 'signficant_data' => 'no' }
@@ -151,6 +159,7 @@ describe SchemaCamelizer do
                        'to be different from the given path'
       expect { subject.save! }.to raise_error(exception_text)
     end
+
     it 'creates directories for camel_path output' do
       subject = SchemaCamelizer.new(snake_key_file, "#{TEST_DIRECTORY}/new_directory/snake_in_camel.json")
       result = subject.save!

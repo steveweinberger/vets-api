@@ -19,6 +19,7 @@ RSpec.shared_examples 'V1 Facility Locator' do
     end
 
     it { is_expected.to validate(:get, '/v1/facilities/va', 200, params) }
+
     it {
       expect(subject).to validate(:get, '/v1/facilities/va', 400,
                                   '_query_string' => 'bbox[]=-122&bbox[]=45&bbox[]=-123')
@@ -31,7 +32,7 @@ RSpec.shared_examples 'V1 Facility Locator' do
   end
 
   describe 'facilities/ccp lat/long', team: :facilities,
-                                      vcr: vcr_options.merge(cassette_name: 'facilities/ppms/ppms') do
+                                      vcr: vcr_options.merge(cassette_name: 'facilities/ppms/ppms_old') do
     let(:params) do
       {
         '_query_string' => {
@@ -47,7 +48,8 @@ RSpec.shared_examples 'V1 Facility Locator' do
     it { is_expected.to validate(:get, '/v1/facilities/ccp', 200, params) }
   end
 
-  describe 'facilities/ccp/{id}', team: :facilities, vcr: vcr_options.merge(cassette_name: 'facilities/ppms/ppms') do
+  describe 'facilities/ccp/{id}', team: :facilities,
+                                  vcr: vcr_options.merge(cassette_name: 'facilities/ppms/ppms_old') do
     it { is_expected.to validate(:get, '/v1/facilities/ccp/{id}', 200, 'id' => '1154383230') }
   end
 

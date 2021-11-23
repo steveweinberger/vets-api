@@ -22,6 +22,7 @@ RSpec.describe 'Disability compensation form' do
           expect(response).to match_response_schema('rated_disabilities')
         end
       end
+
       it 'matches the rated disabilities schema when camel-inflected' do
         VCR.use_cassette('evss/disability_compensation_form/rated_disabilities') do
           get '/v0/disability_compensation_form/rated_disabilities', params: nil, headers: headers_with_camel
@@ -39,6 +40,7 @@ RSpec.describe 'Disability compensation form' do
           expect(response).to match_response_schema('evss_errors', strict: false)
         end
       end
+
       it 'returns a bad gateway response with camel-inflection' do
         VCR.use_cassette('evss/disability_compensation_form/rated_disabilities_500') do
           get '/v0/disability_compensation_form/rated_disabilities', params: nil, headers: headers_with_camel
@@ -56,6 +58,7 @@ RSpec.describe 'Disability compensation form' do
           expect(response).to match_response_schema('evss_errors', strict: false)
         end
       end
+
       it 'returns a bad gateway response with camel-inflection' do
         VCR.use_cassette('evss/disability_compensation_form/rated_disabilities_401') do
           get '/v0/disability_compensation_form/submit_all_claim', params: nil, headers: headers_with_camel
@@ -73,6 +76,7 @@ RSpec.describe 'Disability compensation form' do
           expect(response).to match_response_schema('evss_errors', strict: false)
         end
       end
+
       it 'returns a not authorized response with camel-inflection' do
         VCR.use_cassette('evss/disability_compensation_form/rated_disabilities_403') do
           get '/v0/disability_compensation_form/rated_disabilities', params: nil, headers: headers_with_camel
@@ -90,6 +94,7 @@ RSpec.describe 'Disability compensation form' do
           expect(response).to match_response_schema('evss_errors', strict: false)
         end
       end
+
       it 'returns a bad request response with camel-inflection' do
         VCR.use_cassette('evss/disability_compensation_form/rated_disabilities_400') do
           get '/v0/disability_compensation_form/rated_disabilities', params: nil, headers: headers_with_camel
@@ -218,7 +223,7 @@ RSpec.describe 'Disability compensation form' do
       it 'returns the job status and response', :aggregate_failures do
         get "/v0/disability_compensation_form/submission_status/#{job_status.job_id}", params: nil, headers: headers
         expect(response).to have_http_status(:ok)
-        expect(JSON.parse(response.body)).to have_deep_attributes(
+        expect(JSON.parse(response.body)).to match(
           'data' => {
             'id' => '',
             'type' => 'form526_job_statuses',
@@ -227,15 +232,15 @@ RSpec.describe 'Disability compensation form' do
               'job_id' => job_status.job_id,
               'submission_id' => submission.id,
               'status' => 'success',
-              'ancillary_item_statuses' => [{
-                'id' => ancillary_job_status.id,
-                'job_id' => ancillary_job_status.job_id,
-                'job_class' => 'AncillaryForm',
-                'status' => 'success',
-                'error_class' => nil,
-                'error_message' => nil,
-                'updated_at' => ancillary_job_status.updated_at
-              }]
+              'ancillary_item_statuses' => [
+                a_hash_including('id' => ancillary_job_status.id,
+                                 'job_id' => ancillary_job_status.job_id,
+                                 'job_class' => 'AncillaryForm',
+                                 'status' => 'success',
+                                 'error_class' => nil,
+                                 'error_message' => nil,
+                                 'updated_at' => ancillary_job_status.updated_at.iso8601(3))
+              ]
             }
           }
         )

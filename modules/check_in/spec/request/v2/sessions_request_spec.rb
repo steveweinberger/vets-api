@@ -149,10 +149,12 @@ RSpec.describe 'V2::SessionsController', type: :request do
         }
       end
 
-      it 'returns a success response' do
-        allow_any_instance_of(::V2::Lorota::Service).to receive(:token_with_permissions).and_return(service_resp)
-        expect_any_instance_of(::V2::Lorota::Service).to receive(:token_with_permissions).once
+      before do
+        allow_any_instance_of(::V2::Lorota::Service).to receive(:token).and_return(service_resp)
+        expect_any_instance_of(::V2::Lorota::Service).to receive(:token).once
+      end
 
+      it 'returns a success response' do
         post '/check_in/v2/sessions', session_params
 
         expect(response.status).to eq(200)

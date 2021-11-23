@@ -35,38 +35,10 @@ Lint/NonDeterministicRequireOrder:
     - 'spec/requests/v1/apidoc/apidoc_spec.rb'
     - 'spec/service_consumers/pact_helper.rb'
 
-# Offense count: 5
-# Cop supports --auto-correct.
-Lint/RedundantCopDisableDirective:
-  Exclude:
-    - 'app/models/emis_redis/military_information_v2.rb'
-    - 'app/models/saved_claim/education_benefits/va_10203.rb'
-    - 'app/policies/evss_policy.rb'
-    - 'spec/jobs/facilities/pssg_download_spec.rb'
-    - 'spec/support/saml/response_builder.rb'
-
 # Offense count: 1
 Lint/StructNewOverride:
   Exclude:
     - 'spec/requests/authentication/standard_authentication_spec.rb'
-
-# Offense count: 6
-# Cop supports --auto-correct.
-# Configuration parameters: AllowComments.
-Lint/UselessMethodDefinition:
-  Exclude:
-    - 'lib/common/client/middleware/request/camelcase.rb'
-    - 'lib/common/client/middleware/request/multipart_request.rb'
-    - 'lib/evss/gi_bill_status/external_service_unavailable.rb'
-    - 'lib/evss/gi_bill_status/outside_working_hours.rb'
-    - 'modules/health_quest/app/services/health_quest/middleware/health_quest_logging.rb'
-    - 'modules/vaos/app/services/vaos/middleware/vaos_logging.rb'
-
-# Offense count: 1
-# Cop supports --auto-correct.
-Lint/UselessTimes:
-  Exclude:
-    - 'spec/requests/user_request_spec.rb'
 
 # Offense count: 505
 # Configuration parameters: IgnoredMethods, CountRepeatedAttributes.
@@ -108,36 +80,6 @@ Naming/InclusiveLanguage:
     - 'lib/statsd_middleware.rb'
     - 'modules/vaos/app/controllers/vaos/v0/appointment_requests_controller.rb'
 
-# Offense count: 29
-# Cop supports --auto-correct.
-RSpec/ContextMethod:
-  Exclude:
-    - 'spec/controllers/application_controller_spec.rb'
-    - 'spec/jobs/education_form/create_daily_spool_files_spec.rb'
-    - 'spec/jobs/education_form/forms/base_spec.rb'
-    - 'spec/jobs/education_form/forms/va0993_spec.rb'
-    - 'spec/jobs/education_form/forms/va1990_spec.rb'
-    - 'spec/jobs/education_form/forms/va1995_spec.rb'
-    - 'spec/lib/common/client/configuration/base_spec.rb'
-    - 'spec/lib/pension_burial/processing_office_spec.rb'
-    - 'spec/models/mhv_account_spec.rb'
-    - 'spec/requests/address_request_spec.rb'
-    - 'spec/requests/evss_claims_async_spec.rb'
-    - 'spec/services/users/profile_spec.rb'
-
-# Offense count: 155
-# Cop supports --auto-correct.
-# Configuration parameters: AllowConsecutiveOneLiners.
-RSpec/EmptyLineAfterExample:
-  Enabled: false
-
-# Offense count: 135
-# Cop supports --auto-correct.
-# Configuration parameters: Include.
-# Include: spec/factories.rb, spec/factories/**/*.rb, features/support/factories/**/*.rb
-RSpec/FactoryBot/FactoryClassName:
-  Enabled: false
-
 # Offense count: 3
 RSpec/IdenticalEqualityAssertion:
   Exclude:
@@ -172,33 +114,6 @@ RSpec/RepeatedExampleGroupDescription:
 RSpec/StubbedMock:
   Enabled: false
 
-# Offense count: 2
-# Cop supports --auto-correct.
-# Configuration parameters: Include.
-# Include: app/models/**/*.rb
-Rails/ActiveRecordCallbacksOrder:
-  Exclude:
-    - 'modules/claims_api/app/models/claims_api/auto_established_claim.rb'
-    - 'modules/vba_documents/app/models/vba_documents/upload_submission.rb'
-
-# Offense count: 7
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: numeric, symbolic
-Rails/HttpStatus:
-  Exclude:
-    - 'app/controllers/v0/search_click_tracking_controller.rb'
-    - 'modules/appeals_api/app/controllers/appeals_api/v1/decision_reviews/notice_of_disagreements_controller.rb'
-    - 'modules/covid_research/app/controllers/covid_research/volunteer/submissions_controller.rb'
-    - 'modules/vaos/app/controllers/vaos/v0/appointments_controller.rb'
-    - 'modules/veteran/app/controllers/veteran/v0/representatives_controller.rb'
-
-# Offense count: 1
-# Cop supports --auto-correct.
-Rails/IndexBy:
-  Exclude:
-    - 'config/initializers/zcta.rb'
-
 # Offense count: 23
 # Cop supports --auto-correct.
 # Configuration parameters: Include.
@@ -210,32 +125,6 @@ Rails/MatchRoute:
     - 'modules/claims_api/config/routes.rb'
     - 'modules/va_forms/config/routes.rb'
     - 'modules/vba_documents/config/routes.rb'
-
-# Offense count: 9
-# Cop supports --auto-correct.
-Rails/NegateInclude:
-  Exclude:
-    - 'app/workers/education_form/create_daily_fiscal_year_to_date_report.rb'
-    - 'app/workers/education_form/create_daily_year_to_date_report.rb'
-    - 'lib/common/client/base.rb'
-    - 'lib/common/models/collection.rb'
-    - 'lib/sentry/processor/pii_sanitizer.rb'
-    - 'modules/claims_api/app/controllers/claims_api/v0/forms/intent_to_file_controller.rb'
-    - 'modules/claims_api/app/controllers/claims_api/v1/forms/intent_to_file_controller.rb'
-    - 'modules/veteran_confirmation/app/controllers/veteran_confirmation/v0/veteran_status_controller.rb'
-    - 'rakelib/form526.rake'
-
-# Offense count: 7
-# Cop supports --auto-correct.
-Rails/Pluck:
-  Exclude:
-    - 'app/serializers/evss_claim_detail_serializer.rb'
-    - 'app/workers/pager_duty/poll_maintenance_windows.rb'
-    - 'lib/bb/client.rb'
-    - 'modules/appeals_api/spec/services/appeals_api/central_mail_updater_spec.rb'
-    - 'modules/claims_api/app/workers/claims_api/special_issue_updater.rb'
-    - 'modules/vaos/spec/services/systems_service_spec.rb'
-    - 'spec/lib/common/exceptions/detailed_schema_errors_spec.rb'
 
 # Offense count: 1
 # Cop supports --auto-correct.
@@ -251,13 +140,6 @@ Rails/SkipsModelValidations:
     - 'app/workers/evss/disability_compensation_form/job_status.rb'
     - 'spec/jobs/evss/disability_compensation_form/submit_form526_all_claim_spec.rb'
     - 'spec/models/form526_job_status_spec.rb'
-
-# Offense count: 2
-# Cop supports --auto-correct.
-Rails/SquishedSQLHeredocs:
-  Exclude:
-    - 'app/models/facilities_query/radial_query.rb'
-    - 'modules/vba_documents/app/workers/vba_documents/upload_remover.rb'
 
 # Offense count: 6
 # Configuration parameters: Include.
@@ -276,41 +158,6 @@ Rails/WhereNot:
   Exclude:
     - 'modules/claims_api/lib/tasks/claims_tasks.rake'
 
-# Offense count: 24
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: separated, grouped
-Style/AccessorGrouping:
-  Exclude:
-    - 'app/models/health_care_application.rb'
-    - 'lib/central_mail/upload_error.rb'
-    - 'lib/common/client/errors.rb'
-    - 'lib/common/exceptions/open_id_service_error.rb'
-    - 'lib/evss/error_middleware.rb'
-    - 'lib/json_schema/json_api_missing_attribute.rb'
-    - 'lib/search/pagination.rb'
-    - 'lib/search/service.rb'
-    - 'lib/search_click_tracking/service.rb'
-
-# Offense count: 17
-# Cop supports --auto-correct.
-Style/CaseLikeIf:
-  Exclude:
-    - 'app/models/form_profile.rb'
-    - 'app/services/form1010cg/auditor.rb'
-    - 'lib/common/client/configuration/base.rb'
-    - 'lib/common/hash_helpers.rb'
-    - 'lib/debt_management_center/payments_service.rb'
-    - 'lib/evss/dependents/service.rb'
-    - 'lib/hca/enrollment_system.rb'
-    - 'lib/pdf_fill/forms/va21p527ez.rb'
-    - 'lib/pdf_fill/forms/va288832.rb'
-    - 'lib/pdf_fill/hash_converter.rb'
-    - 'modules/covid_research/app/serializers/covid_research/genisis_serializer.rb'
-    - 'modules/vba_documents/lib/vba_documents/multipart_parser.rb'
-    - 'rakelib/redis.rake'
-    - 'spec/models/form_profile_spec.rb'
-
 # Offense count: 10
 # Cop supports --auto-correct.
 # Configuration parameters: IgnoredMethods.
@@ -327,23 +174,6 @@ Style/ClassEqualityComparison:
     - 'modules/claims_api/app/controllers/concerns/claims_api/json_format_validation.rb'
     - 'modules/covid_research/app/serializers/covid_research/genisis_serializer.rb'
     - 'modules/va_forms/app/workers/va_forms/form_reloader.rb'
-
-# Offense count: 2
-Style/CombinableLoops:
-  Exclude:
-    - 'modules/vba_documents/spec/mailers/unsuccessful_report_mailer_spec.rb'
-
-# Offense count: 5
-# Cop supports --auto-correct.
-# Configuration parameters: Keywords, RequireColon.
-# Keywords: TODO, FIXME, OPTIMIZE, HACK, REVIEW, NOTE
-Style/CommentAnnotation:
-  Exclude:
-    - 'app/controllers/v0/backend_statuses_controller.rb'
-    - 'modules/claims_api/app/workers/claims_api/flash_updater.rb'
-    - 'spec/controllers/v0/evss_claims_async_controller_spec.rb'
-    - 'spec/controllers/v0/evss_claims_controller_spec.rb'
-    - 'spec/models/form_profile_spec.rb'
 
 # Offense count: 1
 # Cop supports --auto-correct.
@@ -372,40 +202,6 @@ Style/ExplicitBlockArgument:
     - 'lib/mpi/service.rb'
     - 'spec/lib/debt_management_center/debt_letter_downloader_spec.rb'
 
-# Offense count: 2
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: always, always_true, never
-Style/FrozenStringLiteralComment:
-  Exclude:
-    - 'app/workers/education_form/forms/base.rb'
-    - 'spec/support/spec_builders.rb'
-
-# Offense count: 12
-# Cop supports --auto-correct.
-Style/GlobalStdStream:
-  Exclude:
-    - 'config/environments/production.rb'
-    - 'modules/covid_vaccine/app/services/covid_vaccine/v0/vetext_configuration.rb'
-    - 'modules/vaos/app/services/vaos/configuration.rb'
-    - 'modules/vaos/app/services/vaos/v1/fhir_configuration.rb'
-    - 'rakelib/connectivity.rake'
-    - 'spec/support/silence_stream.rb'
-
-# Offense count: 16
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: braces, no_braces
-Style/HashAsLastArrayItem:
-  Exclude:
-    - 'app/controllers/v0/financial_status_reports_controller.rb'
-    - 'app/models/preneeds/applicant.rb'
-    - 'app/models/preneeds/claimant.rb'
-    - 'app/models/preneeds/currently_buried_person.rb'
-    - 'app/models/preneeds/service_record.rb'
-    - 'app/models/preneeds/veteran.rb'
-    - 'modules/vaos/app/controllers/vaos/v0/appointment_requests_controller.rb'
-
 # Offense count: 1
 # Cop supports --auto-correct.
 # Configuration parameters: AllowedReceivers.
@@ -421,15 +217,6 @@ Style/HashLikeCase:
     - 'app/workers/education_form/forms/base.rb'
     - 'lib/identity/parsers/gc_ids.rb'
     - 'spec/controllers/v1/sessions_controller_spec.rb'
-
-# Offense count: 8
-# Cop supports --auto-correct.
-Style/KeywordParametersOrder:
-  Exclude:
-    - 'lib/emis/messages/edipi_or_icn_message.rb'
-    - 'lib/emis/service.rb'
-    - 'modules/appeals_api/spec/support/shared_examples_contestable_issues.rb'
-    - 'modules/vaos/app/models/vaos/v1/operation_outcome.rb'
 
 # Offense count: 13
 # Configuration parameters: AllowedMethods.
@@ -447,70 +234,6 @@ Style/OptionalBooleanParameter:
     - 'modules/vaos/app/services/vaos/appointment_service.rb'
     - 'spec/support/authenticated_session_helper.rb'
 
-# Offense count: 59
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: same_as_string_literals, single_quotes, double_quotes
-Style/QuotedSymbols:
-  Exclude:
-    - 'app/uploaders/evss_claim_document_uploader_base.rb'
-    - 'lib/vso_pdf/vso_appointment_form.rb'
-    - 'modules/appeals_api/spec/swagger/appeals_api/json_schema_to_swagger_converter_spec.rb'
-    - 'modules/mobile/spec/request/push_send_request_spec.rb'
-    - 'modules/openid_auth/app/controllers/openid_auth/v0/okta_controller.rb'
-    - 'spec/controllers/v0/profile/ch33_bank_accounts_controller_spec.rb'
-    - 'spec/factories/in_progress_forms/hca_forms.rb'
-    - 'spec/lib/vetext/service_spec.rb'
-    - 'spec/models/form_profile_spec.rb'
-    - 'spec/models/preneeds/attachment_spec.rb'
-    - 'spec/requests/swagger_spec.rb'
-
-# Offense count: 4
-# Cop supports --auto-correct.
-Style/RedundantAssignment:
-  Exclude:
-    - 'app/models/facilities_query/base.rb'
-    - 'lib/central_mail/service.rb'
-    - 'lib/pdf_fill/forms/form_helper.rb'
-    - 'lib/va_profile/service.rb'
-
-# Offense count: 5
-# Cop supports --auto-correct.
-Style/RedundantBegin:
-  Exclude:
-    - 'app/models/emis_redis/military_information.rb'
-    - 'lib/common/models/base.rb'
-    - 'modules/health_quest/app/services/health_quest/questionnaire_manager/factory.rb'
-    - 'modules/vba_documents/lib/vba_documents/object_store.rb'
-
-# Offense count: 31
-# Cop supports --auto-correct.
-Style/RedundantFileExtensionInRequire:
-  Enabled: false
-
-# Offense count: 1
-# Cop supports --auto-correct.
-Style/RedundantParentheses:
-  Exclude:
-    - 'modules/vba_documents/app/workers/vba_documents/report_unsuccessful_submissions.rb'
-
-# Offense count: 15
-# Cop supports --auto-correct.
-Style/RedundantRegexpCharacterClass:
-  Exclude:
-    - 'app/models/vso_appointment.rb'
-    - 'app/workers/education_form/forms/base.rb'
-    - 'lib/common/client/middleware/response/facility_parser.rb'
-    - 'lib/common/client/middleware/response/facility_validator.rb'
-    - 'spec/jobs/cypress_viewport_updater/github_service_spec.rb'
-    - 'spec/jobs/cypress_viewport_updater/google_analytics_reports_spec.rb'
-    - 'spec/lib/vsopdf/vso_appointment_form_spec.rb'
-
-# Offense count: 63
-# Cop supports --auto-correct.
-Style/RedundantRegexpEscape:
-  Enabled: false
-
 # Offense count: 4
 # Cop supports --auto-correct.
 Style/RedundantSelfAssignmentBranch:
@@ -519,42 +242,6 @@ Style/RedundantSelfAssignmentBranch:
     - 'app/controllers/v0/prescriptions_controller.rb'
     - 'modules/mobile/app/controllers/mobile/v0/messages_controller.rb'
     - 'spec/support/authenticated_session_helper.rb'
-
-# Offense count: 134
-# Cop supports --auto-correct.
-Style/SingleArgumentDig:
-  Enabled: false
-
-# Offense count: 6
-# Cop supports --auto-correct.
-Style/SlicingWithRange:
-  Exclude:
-    - 'app/models/form_profile.rb'
-    - 'app/models/user.rb'
-    - 'lib/common/models/collection.rb'
-    - 'lib/pdf_fill/forms/va21p527ez.rb'
-    - 'rakelib/mvi.rake'
-    - 'spec/lib/hca/service_spec.rb'
-
-# Offense count: 8
-# Cop supports --auto-correct.
-# Configuration parameters: AllowModifier.
-Style/SoleNestedConditional:
-  Exclude:
-    - 'app/controllers/openid_application_controller.rb'
-    - 'config/initializers/filter_parameter_logging.rb'
-    - 'lib/emis/responses/response.rb'
-    - 'lib/generators/module_component/module_component_generator.rb'
-    - 'lib/va_profile/models/base.rb'
-    - 'spec/jobs/cypress_viewport_updater/google_analytics_reports_spec.rb'
-    - 'spec/jobs/cypress_viewport_updater/viewport_spec.rb'
-    - 'spec/jobs/cypress_viewport_updater/viewports_spec.rb'
-
-# Offense count: 135
-# Cop supports --auto-correct.
-# Configuration parameters: Mode.
-Style/StringConcatenation:
-  Enabled: false
 
 # Offense count: 55
 ThreadSafety/InstanceVariableInClassMethod:

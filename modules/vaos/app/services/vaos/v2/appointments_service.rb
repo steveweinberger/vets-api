@@ -7,6 +7,8 @@ require 'json'
 module VAOS
   module V2
     class AppointmentsService < VAOS::SessionService
+      DIRECT_SCHEDULE_ERROR_KEY = 'DirectScheduleError'
+
       def get_appointments(start_date, end_date, statuses = nil, pagination_params = {})
         params = date_params(start_date, end_date)
                  .merge(page_params(pagination_params))
@@ -36,6 +38,9 @@ module VAOS
         with_monitoring do
           response = perform(:post, appointments_base_url, params, headers)
           OpenStruct.new(response.body)
+        rescue Common::Exceptions::BackendServiceException => e
+          log_direct_schedule_submission_errors(e) if params[:status] == 'booked'
+          raise e
         end
       end
 
@@ -49,6 +54,18 @@ module VAOS
       end
 
       private
+
+      def log_direct_schedule_submission_errors(e)
+        error_entry = { DIRECT_SCHEDULE_ERROR_KEY => ds_error_details(e) }
+        Rails.logger.warn('Direct schedule submission error', error_entry.to_json)
+      end
+
+      def ds_error_details(e)
+        {
+          status: e.status_code,
+          message: e.message
+        }
+      end
 
       def deserialized_appointments(appointment_list)
         return [] unless appointment_list

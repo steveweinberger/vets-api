@@ -13,7 +13,8 @@ namespace :login do
           User.find(@args[:uuid])
         else
           # Find last logged in user by looking at most recently updated AccountLoginStat
-          User.find(AccountLoginStat.last&.account&.idme_uuid)
+          User.find(AccountLoginStat.last&.account&.idme_uuid) ||
+            User.find(AccountLoginStat.last&.account&.logingov_uuid)
         end
     end
 
@@ -47,9 +48,15 @@ namespace :login do
     )
 
     validate(
-      user.loa.dig(:current) == 1,
+      user.logingov_uuid == user.account&.logingov_uuid,
+      'User Login.gov UUID matches user account Login.gov UUID',
+      'User Login.gov UUID does not match user account Login.gov UUID'
+    )
+
+    validate(
+      user.loa[:current] == 1,
       'User has an LOA level of 1',
-      "This user is LOA1 but has an LOA level of #{user.loa.dig(:current)}"
+      "This user is LOA1 but has an LOA level of #{user.loa[:current]}"
     )
 
     validate(

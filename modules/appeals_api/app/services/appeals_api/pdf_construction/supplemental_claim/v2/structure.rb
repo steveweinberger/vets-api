@@ -12,6 +12,7 @@ module AppealsApi
             @supplemental_claim = supplemental_claim
           end
 
+          # rubocop:disable Metrics/MethodLength
           def form_fill
             # Section I: Identifying Information
             # Name, address and email filled out through autosize text box, not pdf fields
@@ -43,14 +44,15 @@ module AppealsApi
               # Section III: New and Relevant Evidence
               # Name and Location, and Date text filled out through autosize text boxes
 
-              # Section IV: 5103 Notice Acknowledgement (only applies if compensation benefit type)
-              # TODO
+              # Section IV: 5103 Notice Acknowledgement
+              form_fields.notice_acknowledgement => form_data.notice_acknowledgement,
 
               # Section V: Signatures
               # Signatures filled out through autosize text box, not pdf fields
               form_fields.date_signed => form_data.date_signed
             }
           end
+          # rubocop:enable Metrics/MethodLength
 
           def insert_overlaid_pages(form_fill_path)
             pdftk = PdfForms.new(Settings.binaries.pdftk)
@@ -187,9 +189,13 @@ module AppealsApi
             evidence_dates = form_data.new_evidence_dates.take(MAX_NUMBER_OF_EVIDENCE_LOCATIONS_FORM)
 
             evidence_dates.first(MAX_NUMBER_OF_EVIDENCE_LOCATIONS_FORM).each_with_index do |dates, i|
-              date_text = dates.map(&:to_s).join('    ')
+              dates.each_with_index do |date, date_index|
+                x, y = form_fields.boxes[:new_evidence_dates][i][:at]
+                y_offset = y - date_index * 9
+                date_opts = form_fields.boxes[:new_evidence_dates][i].merge({ at: [x, y_offset], size: 8 })
 
-              pdf.text_box date_text, default_text_opts.merge(form_fields.boxes[:new_evidence_dates][i])
+                pdf.text_box date, default_text_opts.merge(date_opts)
+              end
             end
           end
 

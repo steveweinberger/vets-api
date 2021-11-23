@@ -845,9 +845,10 @@ RSpec.describe FormProfile, type: :model do
     def expect_prefilled(form_id)
       prefilled_data = Oj.load(described_class.for(form_id: form_id, user: user).prefill.to_json)['form_data']
 
-      if form_id == '1010ez'
+      case form_id
+      when '1010ez'
         '10-10EZ'
-      elsif form_id == '21-526EZ'
+      when '21-526EZ'
         '21-526EZ-ALLCLAIMS'
       else
         form_id
@@ -858,8 +859,7 @@ RSpec.describe FormProfile, type: :model do
 
         errors = JSON::Validator.fully_validate(
           schema,
-          schema_data.deep_transform_keys { |key| key.camelize(:lower) },
-          validate_schema: true
+          schema_data.deep_transform_keys { |key| key.camelize(:lower) }, validate_schema: true
         )
         expect(errors.empty?).to eq(true), "schema errors: #{errors}"
       end
@@ -1116,7 +1116,7 @@ RSpec.describe FormProfile, type: :model do
         end
 
         context 'with a user that can prefill evss' do
-          # Note: `increase only` and `all claims` use the same form prefilling
+          # NOTE: `increase only` and `all claims` use the same form prefilling
           context 'when Vet360 prefill is disabled' do
             before do
               expect(user).to receive(:authorize).with(:ppiu, :access?).and_return(true).at_least(:once)
@@ -1249,7 +1249,7 @@ RSpec.describe FormProfile, type: :model do
     context 'with a notice of disagreement (NOD) form' do
       let(:schema_name) { '10182' }
       let(:schema) do
-        DecisionReview::Schemas::NOD_CREATE_REQUEST.merge "$schema": 'http://json-schema.org/draft-04/schema#'
+        DecisionReview::Schemas::NOD_CREATE_REQUEST.merge '$schema': 'http://json-schema.org/draft-04/schema#'
       end
 
       let(:form_profile) { described_class.for(form_id: schema_name, user: user) }

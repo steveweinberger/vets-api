@@ -40,6 +40,7 @@ module BGSDependents
     attribute :reason_marriage_ended, String
     attribute :family_relationship_type, String
     attribute :child_income, String
+    attribute :not_self_sufficient, String
 
     CHILD_STATUS = {
       'stepchild' => 'Stepchild',
@@ -47,7 +48,6 @@ module BGSDependents
       'adopted' => 'Adopted Child',
       'disabled' => 'Other',
       'child_under18' => 'Other',
-      'not_capable' => 'Other',
       'child_over18_in_school' => 'Other'
     }.freeze
 
@@ -76,7 +76,7 @@ module BGSDependents
     def address(dependents_application)
       dependent_address(
         dependents_application: dependents_application,
-        lives_with_vet: @child_info.dig('does_child_live_with_you'),
+        lives_with_vet: @child_info['does_child_live_with_you'],
         alt_address: @child_info.dig('child_address_info', 'address')
       )
     end
@@ -93,16 +93,17 @@ module BGSDependents
         place_of_birth_city: @child_info.dig('place_of_birth', 'city'),
         reason_marriage_ended: @child_info.dig('previous_marriage_details', 'reason_marriage_ended'),
         ever_married_ind: marriage_indicator,
-        child_income: formatted_boolean(@child_info['child_income'])
+        child_income: formatted_boolean(@child_info['child_income']),
+        not_self_sufficient: formatted_boolean(@child_info['not_self_sufficient'])
       }.merge(@child_info['full_name'])
     end
 
     def child_status
-      CHILD_STATUS[@child_info.dig('child_status')&.key(true)]
+      CHILD_STATUS[@child_info['child_status']&.key(true)]
     end
 
     def marriage_indicator
-      @child_info.dig('previously_married') == 'Yes' ? 'Y' : 'N'
+      @child_info['previously_married'] == 'Yes' ? 'Y' : 'N'
     end
   end
 end

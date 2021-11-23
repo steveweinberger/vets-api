@@ -99,7 +99,7 @@ namespace :form526 do
           if unredacted_flag_present?(args_array)
             prnt
           else
-            ->(**fields) { prnt.call(**fields.merge(p_id: '*****' + fields[:p_id].to_s[5..])) }
+            ->(**fields) { prnt.call(**fields.merge(p_id: "*****#{fields[:p_id].to_s[5..]}")) }
           end
         ),
         print_total: ->(header, total) { puts "#{header.to_s.strip},#{total}" },
@@ -288,14 +288,14 @@ namespace :form526 do
     end
 
     def message_string(msg)
-      return nil if msg.dig('severity') == 'WARN'
+      return nil if msg['severity'] == 'WARN'
 
-      message = msg.dig('key')&.gsub(/\[(\d*)\]|\\/, '')
+      message = msg['key']&.gsub(/\[(\d*)\]|\\/, '')
       # strip the GUID from BGS errors for grouping purposes
 
       # don't show disability names, for better grouping. Can be removed after we fix inflection issue
       unless message == 'form526.treatments.treatedDisabilityNames.isInvalidValue'
-        message += msg.dig('text').gsub(/GUID.*/, '')
+        message += msg['text'].gsub(/GUID.*/, '')
       end
       message
     end
@@ -338,7 +338,7 @@ namespace :form526 do
       unsuccessful_jobs.each do |job_status|
         # Check if its an EVSS error and parse, otherwise store the entire message
         messages = if job_status.error_message.include?('=>') &&
-                      !job_status.error_message.include?('BackendServiceException')
+                      job_status.error_message.exclude?('BackendServiceException')
                      JSON.parse(job_status.error_message.gsub('=>', ':')).collect { |message| message_string(message) }
                    else
                      [job_status.error_message]
@@ -445,7 +445,7 @@ namespace :form526 do
         ssn = fs.auth_headers['va_eauth_pnid']
         birls_id = fs.auth_headers['va_eauth_birlsfilenumber']
         edipi = fs.auth_headers['va_eauth_dodedipnid']
-        vname = fs.auth_headers['va_eauth_firstName'] + ' ' + fs.auth_headers['va_eauth_lastName']
+        vname = "#{fs.auth_headers['va_eauth_firstName']} #{fs.auth_headers['va_eauth_lastName']}"
 
         diff =  StringHelpers.levenshtein_distance(birls_id, ssn)
         csv << [vname, edipi, birls_id, ssn] if diff.positive? && diff < 3
@@ -478,7 +478,7 @@ namespace :form526 do
         user_identity = OpenStruct.new(mhv_icn: '', edipi: edipi)
         response = MPI::Service.new.find_profile(user_identity).profile
         active_corp_ids = response.full_mvi_ids.select { |id| id.match?(/\d*\^PI\^200CORP\^USVBA\^A/) }
-        vname = fs.auth_headers['va_eauth_firstName'] + ' ' + fs.auth_headers['va_eauth_lastName']
+        vname = "#{fs.auth_headers['va_eauth_firstName']} #{fs.auth_headers['va_eauth_lastName']}"
         csv << [vname, edipi, active_corp_ids] if active_corp_ids.count > 1
       end
     end
@@ -504,8 +504,8 @@ namespace :form526 do
           ssns << ssn
         end
 
-        vname = fs.auth_headers['va_eauth_firstName'] + ' ' + fs.auth_headers['va_eauth_lastName']
-        icn = Account.where(idme_uuid: fs.user_uuid).first&.icn
+        vname = "#{fs.auth_headers['va_eauth_firstName']} #{fs.auth_headers['va_eauth_lastName']}"
+        icn = Account.where(idme_uuid: fs.user_uuid).or(Account.where(logingov_uuid: fs.user_uuid)).first&.icn
         if icn.blank?
           # TODO: make this work for blank icn's
           puts "icn blank #{fs.id}"
@@ -570,7 +570,7 @@ namespace :form526 do
     end
 
     def get_disability_array(form_data_hash)
-      new_conditions = form_data_hash['newDisabilities']&.collect { |d| d.dig('condition') } || []
+      new_conditions = form_data_hash['newDisabilities']&.collect { |d| d['condition'] } || []
       rated_disabilities = form_data_hash['ratedDisabilities']&.collect { |rd| rd['name'] } || []
       new_conditions + rated_disabilities
     end

@@ -9,19 +9,19 @@ module Form1010cg
     LOGGER_FILTER_KEYS  = [:veteran_name].freeze
 
     def self.metrics
-      submission_prefix = STATSD_KEY_PREFIX + '.submission'
+      submission_prefix = "#{STATSD_KEY_PREFIX}.submission"
       OpenStruct.new(
         submission: OpenStruct.new(
-          attempt: submission_prefix + '.attempt',
-          success: submission_prefix + '.success',
+          attempt: "#{submission_prefix}.attempt",
+          success: "#{submission_prefix}.success",
           failure: OpenStruct.new(
             client: OpenStruct.new(
-              data: submission_prefix + '.failure.client.data',
-              qualification: submission_prefix + '.failure.client.qualification'
+              data: "#{submission_prefix}.failure.client.data",
+              qualification: "#{submission_prefix}.failure.client.qualification"
             )
           )
         ),
-        pdf_download: STATSD_KEY_PREFIX + '.pdf_download'
+        pdf_download: "#{STATSD_KEY_PREFIX}.pdf_download"
       )
     end
 
@@ -97,9 +97,10 @@ module Form1010cg
     end
 
     def deep_apply_filter(value)
-      if value.is_a?(Array)
+      case value
+      when Array
         value.map { |v| deep_apply_filter(v) }
-      elsif value.is_a?(Hash)
+      when Hash
         value.each_with_object({}) do |(key, v), result|
           result[key] = if LOGGER_FILTER_KEYS.include?(key.to_s) || LOGGER_FILTER_KEYS.include?(key.to_sym)
                           ActiveSupport::ParameterFilter::FILTERED
