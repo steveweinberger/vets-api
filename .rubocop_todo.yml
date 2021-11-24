@@ -179,7 +179,6 @@ Style/ExplicitBlockArgument:
     - 'lib/evss/reference_data/response_strategy.rb'
     - 'lib/evss/service.rb'
     - 'lib/mdot/client.rb'
-    - 'lib/mpi/attr_service.rb'
     - 'lib/mpi/orch_search_service.rb'
     - 'lib/mpi/service.rb'
     - 'spec/lib/debt_management_center/debt_letter_downloader_spec.rb'

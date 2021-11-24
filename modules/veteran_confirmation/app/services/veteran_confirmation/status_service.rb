@@ -10,7 +10,7 @@ module VeteranConfirmation
 
     def get_by_attributes(user_attributes)
       attrs = OpenStruct.new(user_attributes)
-      mvi_resp = AttrService.new.find_profile(attrs)
+      mvi_resp = Service.new.find_profile(attrs)
       return NOT_CONFIRMED if mvi_resp.not_found?
       raise mvi_resp.error unless mvi_resp.ok?
 

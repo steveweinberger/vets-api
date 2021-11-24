@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require 'mpi/attr_service'
+require 'mpi/service'
 require 'mpi/configuration'
 
 module VeteranConfirmation
-  class AttrService < MPI::AttrService
+  class Service < MPI::Service
     configuration MPI::Configuration
   end
 end
