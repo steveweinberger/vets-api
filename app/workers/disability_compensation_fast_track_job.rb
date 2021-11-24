@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'prawn'
+require 'prawn/table'
 require 'lighthouse/veterans_health/client'
 
 class DisabilityCompensationFastTrackJob
@@ -13,15 +14,20 @@ class DisabilityCompensationFastTrackJob
     # icn = Account.where(idme_uuid: submission.user_uuid).first.icn
     # temporary below
     icn = 2000163
-    client = Lighthouse::VeteransHealth::Client.new
+    client = Lighthouse::VeteransHealth::Client.new(icn)
     # TODO: rescue !=200 responses with an appropriate action
-    condition_response = client.get_request('conditions', icn)
+    condition_response = client.get_resource('conditions')
     return unless hypertension?(condition_response)
 
     # TODO: rescue !=200 responses with an appropriate action
-    observations_response = client.get_request('observations', icn)
-    medicationrequest_response = client.get_request('medications', icn)
-    results = HypertensionObservationData.new(observations_response).transform
+    observations_response = client.get_resource('observations')
+    medicationrequest_response = client.get_resource('medications')
+    # patient_info = client.get_resource('patient')
+    bpreadings = HypertensionObservationData.new(observations_response).transform
+    medications = HypertensionMedicationRequestData.new(medicationrequest_response).transform
+    patient = nil  # TODO: change when we know how to get patient
+    pdf = HypertensionPDFGenerator.new(patient, bpreadings, medications).generate
+    binding.pry
     # entries = observations_response.body.dig('entry')
     # results = entries.map {|entry| transform_entry(entry)}
 
@@ -153,7 +159,8 @@ class HypertensionMedicationRequestData
 
   def transform
     entries = response.body['entry']
-    entries.map { |entry| transform_entry(entry) }
+    mapped = entries.map { |entry| transform_entry(entry) }
+    return mapped
   end
 
   private
@@ -178,5 +185,166 @@ class HypertensionMedicationRequestData
 
   def get_text_from_dosage_instruction(dosage_instructions)
     { 'dosageInstructions': dosage_instructions.map { |instr| instr['text'] } }
+  end
+end
+
+class HypertensionPDFGenerator
+  attr_accessor :patient
+  attr_accessor :bp_data
+  attr_accessor :medications
+
+  def initialize(patient, bp_data, medications)
+    @patient = patient
+    @bp_data = bp_data
+    @medications = medications
+  end
+
+  def generate
+    pdf = Prawn::Document.new
+    patient_name = 'FAKE PATIENT NAME'  # TODO: fix when LH client can do calls to Patient endpoint
+    gen_stamp = '09/01/2021 at 10:23am EST'  # TODO: fix when I figure out how to do Ruby time manipulation
+    search_window = 'VHA records searched from 09/01/2020 to 09/01/2021'  # TODO: fix when I figure out how to get those dates
+
+
+    intro_lines = [
+      "<b><font size='8'>Hypertension Rapid Ready for Decision | Claim for Increase</font></b>\n",
+      "<font size='16'>VHA Hypertension Data Summary for</font>",
+      "<font size='16'>#{patient_name}</font>\n",
+      "<font size='8'><i>#{gen_stamp}<i>\n",
+      "<font size='14'>One Year of Blood Pressure History</font>",
+      "<font size='8'><i>#{search_window}<i></font>",
+      "<font size='8'><i>All VAMC locations using VistA/CAPRI were checked.<i></font>",
+      "<font size='8'>Blood pressure is shown as systolic/diastolic.\n</font>"
+    ]
+
+    for line in intro_lines
+      pdf.text line, :inline_format => true
+    end
+
+    for bp in @bp_data
+#      issued_date = bp[:issued][0,10]
+#      org = bp[:organization]
+#      bpr = "#{bp[:systolic]['value']}/#{bp[:diastolic]['value']} #{bp[:systolic]['unit']}"
+#      pdf.text "\n", :size => 12
+#      pdf.text "Blood pressure: #{bpr}", :size => 8
+#      pdf.text "Taken on: #{issued_date}", :size => 8
+#      org = org || 'unknown'
+#      pdf.text "Location: #{org}", :size => 8
+    end
+
+    pdf.text "\n", :size => 12
+
+    bp_rows = [['<b>Blood pressure</b>', '<b>Date</b>', '<b>Location</b>']]
+    for bp in @bp_data
+      bp_rows.append([
+        "#{bp[:systolic]['value']}/#{bp[:diastolic]['value']} #{bp[:systolic]['unit']}",
+        bp[:issued][0,10],
+        bp[:organization] || 'unknown'
+      ])
+    end
+    pdf.table(bp_rows, :cell_style=> { :size=>8, :inline_format => true})
+
+    pdf.text "\n", :size => 12
+
+    pdf.text 'Hypertension Rating Schedule', :size => 12
+
+    pdf.table([
+      [
+        '10%',
+        'Systolic pressure predominantly 160 or more; or diastolic pressure predominantly 100 or more; or minimum evaluation for an individual with a history of diastolic pressure predominantly 100 or more who requires continuous medication for control.'
+      ],
+      [
+        '20%', 'Systolic pressure predominantly 200 or more; or diastolic pressure predominantly 110 or more.'
+      ],
+      [
+        '40%', 'Diastolic pressure 120 or more.'
+      ],
+      [
+        '60%', 'Diastolic pressure 130 or more.'
+      ]
+    ], :cell_style => { :size => 8})
+
+    pdf.text "\n"
+    pdf.text "<link href='https://www.ecfr.gov/current/title-38/chapter-I/part-4'>View rating schedule</link>", :inline_format=>true, :color=> "0000ff", :size=>7
+
+    schedule_lines = [
+      'Hypertension Rating Schedule',
+      '10%: Systolic pressure predominantly 160 or more; or diastolic pressure predominantly 100 or more; or minimum evaluation for an individual with a history of diastolic pressure predominantly 100 or more who requires continuous medication for control.',
+      '20%: Systolic pressure predominantly 200 or more; or diastolic pressure predominantly 110 or more.',
+      '40%: Diastolic pressure 120 or more.',
+      '60%: Diastolic pressure 130 or more.',
+      'View rating schedule: https://www.ecfr.gov/current/title-38/chapter-I/part-4'
+    ]
+
+    for line in schedule_lines
+      # pdf.text line
+    end
+
+    pdf.text "\n", :size=>12
+    pdf.text 'Active Prescriptions', :size=>14
+
+    med_search_window = 'VHA records searched for medication prescriptions active as of 09/01/2021'
+    prescription_lines = [
+      med_search_window,
+      'All VAMC locations using VistA/CAPRI were checked',
+      "\n"
+    ]
+
+    for line in prescription_lines
+      pdf.text line, :size=>8, :style => :italic
+    end
+
+    med_rows = [[
+        '<b>Medication</b>',
+        '<b>Prescribed on</b>',
+        '<b>Dosage instructions</b>',
+      ]]
+
+    for medication in @medications
+      issued_date = medication['authoredOn'][0,10]
+      instructions = medication['dosageInstructions'].join('; ')
+      med_rows.append([medication['description'], issued_date, instructions])
+    end
+    pdf.table(med_rows, :cell_style=> { :size=>8, :inline_format => true})
+
+    for medication in [] # @medications
+      issued_date = medication['authoredOn'][0,10]
+      instructions = medication['dosageInstructions'].join('; ')
+      # message = "#{issued_date} #{medication['description']}. #{medication['dosageInstructions']}"
+      pdf.text "\n", :size=>8
+      pdf.text medication['description'], :size=>8
+      # pdf.text "Prescribed on: #{issued_date}", :size=>8
+      # pdf.text "Dosage instruction(s): #{instructions}", :size=>8
+      pdf.text "Prescribed on: #{issued_date}. Dosage instruction(s): #{instructions}", :size=>8
+    end
+
+    about_lines = [
+      "\n",
+      'About this document',
+      'The Hypertension Rapid Ready for Decision system retrieves and summarizes VHA medical records related to hypertension claims for increase submitted on va.gov. VSRs and RVSRs can develop and rate this claim without ordering an exam if there is sufficient existing evidence to show predominance according to DC 7101 (Hypertension) Rating Criteria. This is not new guidance, but rather a way to operationalize existing statutory rules in 38 U.S.C § 5103a(d).',
+      'Not included in this document:',
+      ' -  Private medical records',
+      ' -  VAMC data for clinics using CERNER Electronic Health Record system (Replacing VistA, but currently only used at Mann-Grandstaff VA Medical Center in Spokane, Washington)',
+      ' -  JLV/Department of Defense medical records'
+    ]
+
+    for line in about_lines
+      pdf.text line, :size=>6
+    end
+
+    # binding.pry
+    pdf.render_file 'htn-example.pdf'
+
+#    Prawn::Document.generate('htn_test_example.pdf') do
+#      binding.pry
+#      for medication in @medications
+#          text medication[:description]
+#      end
+#      for reading in @bp_data
+#        text reading[:systolic]
+#        text reading[:diastolic]
+#      end
+#    end
+
   end
 end
