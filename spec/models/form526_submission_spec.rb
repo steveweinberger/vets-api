@@ -21,14 +21,76 @@ RSpec.describe Form526Submission do
     File.read('spec/support/disability_compensation_form/submissions/only_526.json')
   end
 
-  describe '#start' do
-    before { Sidekiq::Worker.clear_all }
+  let(:hypertension_form_json) do
+    File.read('spec/support/disability_compensation_form/submissions/only_526_hypertension.json')
+  end
+
+  shared_examples '#start_evss_submission' do
+    before do
+      Sidekiq::Worker.clear_all
+    end
 
     context 'when it is all claims' do
       it 'queues an all claims job' do
-        expect { subject.start }.to change(EVSS::DisabilityCompensationForm::SubmitForm526AllClaim.jobs, :size).by(1)
+        expect do
+          subject.start_evss_submission(nil,
+                                        { 'submission_id' => subject.id })
+        end.to change(EVSS::DisabilityCompensationForm::SubmitForm526AllClaim.jobs, :size).by(1)
       end
     end
+  end
+
+  describe '#start' do
+    context 'the submission is for hypertension' do
+      subject do
+        Form526Submission.create(
+          user_uuid: user.uuid,
+          saved_claim_id: saved_claim.id,
+          auth_headers_json: auth_headers.to_json,
+          form_json: hypertension_form_json
+        )
+      end
+
+      context 'Flipper is enabled' do
+        before do
+          Flipper.enable :disability_hypertension_compensation_fast_track
+          Sidekiq::Worker.clear_all
+        end
+
+        it 'queues a new DisabilityCompensationFastTrackJob worker' do
+          expect { subject.start }.to change(DisabilityCompensationFastTrackJob.jobs, :size).by(1)
+        end
+
+        it_behaves_like '#start_evss_submission'
+      end
+
+      context 'Flipper is disabled' do
+        before do
+          Flipper.disable :disability_hypertension_compensation_fast_track
+          Sidekiq::Worker.clear_all
+        end
+
+        it 'does NOT queue a new DisabilityCompensationFastTrackJob worker' do
+          expect { subject.start }.to change(DisabilityCompensationFastTrackJob.jobs, :size).by(0)
+        end
+
+        it_behaves_like '#start_evss_submission'
+      end
+    end
+
+    context 'the submission is NOT for hypertension' do
+      before { Sidekiq::Worker.clear_all }
+
+      it 'Does NOT queue a new DisabilityCompensationFastTrackJob' do
+        expect { subject.start }.to change(DisabilityCompensationFastTrackJob.jobs, :size).by(0)
+      end
+
+      it_behaves_like '#start_evss_submission'
+    end
+  end
+
+  describe '#start_evss_submission' do
+    it_behaves_like '#start_evss_submission'
   end
 
   describe '#start_but_use_a_birls_id_that_hasnt_been_tried_yet!' do

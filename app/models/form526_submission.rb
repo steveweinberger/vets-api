@@ -57,10 +57,8 @@ class Form526Submission < ApplicationRecord
         'submission_id' => id,
       )
       jids = workflow_batch.jobs do
-        # EVSS::DisabilityCompensationForm::SubmitForm526AllClaim.perform_async(id)
         submit_disability_compensation_fast_track
       end
-
       jids.first
     else
       start_evss_submission(nil, 'submission_id' => id)
@@ -74,7 +72,6 @@ class Form526Submission < ApplicationRecord
   # @return [String] the job id of the first job in the batch, i.e the 526 submit job
   #
   def start_evss_submission(_status, options)
-  # def start
     submission = Form526Submission.find(options['submission_id'])
     id = submission.id
     workflow_batch = Sidekiq::Batch.new
