@@ -31,7 +31,9 @@ class DisabilityCompensationFastTrackJob
   end
 
   def hypertension?(condition_response)
-    condition_response.body['entry'].each { |e| return true if e['resource']['code']['text'].downcase == 'hypertension' }
+    condition_response.body['entry'].each do |e|
+      return e['resource']['code']['text'].downcase == 'hypertension'
+    end
   end
 
   def generate_pdf(_condition_response)

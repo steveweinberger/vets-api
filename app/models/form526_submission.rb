@@ -126,9 +126,11 @@ class Form526Submission < ApplicationRecord
     user&.first_name&.upcase
   end
 
+  # @return [Hash] of the user's full name (first, middle, last, suffix)
+  #
   def get_full_name
     user = User.find(user_uuid)
-    user&.full_name
+    user&.full_name_normalized
   end
 
   # @return [Hash] parsed version of the form json
@@ -277,7 +279,7 @@ class Form526Submission < ApplicationRecord
       submit_form_4142 if form[FORM_4142].present?
       submit_form_0781 if form[FORM_0781].present?
       submit_form_8940 if form[FORM_8940].present?
-      if single_issue_hypertension_claim? && Feature.enabled(:disability_compensation_fast_track)
+      if single_issue_hypertension_claim? && Flipper.enabled?(:disability_hypertension_compensation_fast_track)
         submit_disability_compensation_fast_track
       end
       upload_bdd_instructions if bdd?

@@ -2,14 +2,14 @@
 
 require 'rails_helper'
 
-RSpec.describe DisabilityCompensationFastTrackJob, type: :job do
+RSpec.describe DisabilityCompensationFastTrackJob, type: :worker do
   subject { described_class }
 
   before do
     Sidekiq::Worker.clear_all
   end
 
-  let!(:user) { FactoryBot.create(:user, :loa3) }
+  let!(:user) { FactoryBot.create(:disabilities_compensation_user) }
   # let!(:account) { FactoryBot.create(:account, icn: user.icn, idme_uuid: user.uuid) }
   let(:auth_headers) do
     EVSS::DisabilityCompensationAuthHeaders.new(user).add_headers(EVSS::AuthHeaders.new(user).to_h)
@@ -39,38 +39,65 @@ RSpec.describe DisabilityCompensationFastTrackJob, type: :job do
     context 'success' do
       context 'the claim is NOT for hypertension' do
         it 'does nothing' do
+          raise 'not implemented'
+        end
+      end
+
+      context 'the claim IS for hypertension' do
+        it 'calls #new on Lighthouse::ClinicalHealth::Client' do
+        end
+
+        it 'parses the response from Lighthouse::ClinicalHelth::Client' do
+          ########
+        end
+
+        it 'generates a pdf' do
+          raise 'not implemented'
+        end
+
+        it 'includes the neccesary information in the pdf' do
+          raise 'not implemented'
+        end
+
+        it 'calls #upload on EVSS::DocumentsService with the expected argumnets' do
+          raise 'not implemented'
+        end
+      end
+
+      context 'failure' do
+        it 'raises a helpful error' do
+          allow(Lighthouse::VeteransHealth::Client).to receive(:new).and_return nil
           subject.perform_async(submission.id)
           raise 'not implemented'
         end
       end
     end
+  end
 
-    #      context 'the claim IS for hypertension' do
-    #        it 'calls #new on Lighthouse::ClinicalHealth::Client' do
-    #        end
-    #
-    #        it 'parses the response from Lighthouse::ClinicalHelth::Client' do
-    #          ########
-    #        end
-    #
-    #        it 'generates a pdf' do
-    #          raise 'not implemented'
-    #        end
-    #
-    #        it 'includes the neccesary information in the pdf' do
-    #          raise 'not implemented'
-    #        end
-    #
-    #        it 'calls #upload on EVSS::DocumentsService with the expected argumnets' do
-    #          raise 'not implemented'
-    #        end
-    #      end
+  describe '#hypertension?' do
+    let(:condition_response) do
+      double(
+        'condition response',
+        body: HashWithIndifferentAccess.new(
+          { 'entry':
+            [{ 'resource': { 'code': { 'text': text_string } } }] }
+        )
+      )
+    end
 
-    context 'failure' do
-      it 'raises a helpful error' do
-        allow(Lighthouse::VeteransHealth::Client).to receive(:new).and_return nil
-        subject.perform_async(submission.id)
-        raise 'not implemented'
+    context 'when hypertension is a condition assigned to the user' do
+      let(:text_string) { 'Hypertension' }
+
+      it 'returns true' do
+        expect(subject.new.hypertension?(condition_response)).to eq true
+      end
+    end
+
+    context 'when hypertension is NOT a condition assigned to the user' do
+      let(:text_string) { 'something' }
+
+      it 'returns false' do
+        expect(subject.new.hypertension?(condition_response)).to eq false
       end
     end
   end
