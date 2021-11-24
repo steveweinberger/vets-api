@@ -44,14 +44,15 @@ class DisabilityCompensationFastTrackJob
     condition_response.body['entry'].filter {|e| e['resource']['code']['text'].downcase == 'hypertension'}.length.positive?
   end
 
-
   def create_document_data(submission)
     # 'L048' => 'Medical Treatment Record - Government Facility',
+    # TODO: determine whether or not there's a 'subject' field we can set and
+    # what it should be.
     EVSSClaimDocument.new(
       evss_claim_id: submission.submitted_claim_id,
-      file_name: 'hypertension_evidence.pdf',
+      file_name: 'hypertension_evidence.pdf', # TODO: change this to what Emily wants the filename to be.
       tracked_item_id: nil,
-      document_type: 'L048'
+      document_type: 'L048' # Double-check with Zach (and/or Emily) as to what this should be.
     )
   end
 end
@@ -362,8 +363,12 @@ class HypertensionSpecialIssueManager
     disabilities = data['form526']['form526']['disabilities']
     added = add_rrd_to_disabilities(disabilities)
     data['form526']['form526']['disabilities'] = disabilities
+    # TODO: do we need to also add the special issue to secondary disabilities?
+    # This code currently does not do that, but some disabilities have a
+    # secondaryDisabilities property within the disability.
     submission.form_json = JSON.dump(data)
-    return JSON.dump(data)
+    submission.save
+    return JSON.dump(data) # TODO: update tests so that this return value is unnecessary
   end
 
   def add_rrd_to_disabilities(disabilities)
@@ -378,7 +383,7 @@ class HypertensionSpecialIssueManager
     rrd_hash = {'code'=> 'RRD', 'name'=> 'Rapid Ready for Decision'}
     if disability['specialIssues'].blank?
       disability['specialIssues'] = [rrd_hash]
-    elsif !disabilities['specialIssues'].include? rrd_hash
+    elsif !disability['specialIssues'].include? rrd_hash
       disability['specialIssues'].append(rrd_hash)
     end
     return disability

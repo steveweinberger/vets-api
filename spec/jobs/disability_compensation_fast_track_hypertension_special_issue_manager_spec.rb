@@ -27,7 +27,6 @@ RSpec.describe HypertensionSpecialIssueManager do
       expect(JSON.parse(form526_submission.form_json)['form526']['form526']['veteran']['emailAddress']).to match "test@email.com"
     end
 
-    # it 'adds rrd to the disabilities list' do
     it 'matches the email address after manipulation' do
       expect(JSON.parse(HypertensionSpecialIssueManager.new(form526_submission).add_special_issue)['form526']['form526']['veteran']['emailAddress']).to match "test@email.com"
     end
@@ -45,5 +44,21 @@ RSpec.describe HypertensionSpecialIssueManager do
       expect(filtered).to all( include 'specialIssues')
       expect(filtered.any? { |el| el['specialIssues'].include? rrd_hash }).to be true
     end
+
+    it 'adds rrd to the disabilities list only once' do
+      disabilities = JSON.parse(HypertensionSpecialIssueManager.new(form526_submission).add_special_issue)['form526']['form526']['disabilities']
+      filtered = disabilities.filter { |item| item['diagnosticCode'] == 7101 }
+      expect(filtered[0]['specialIssues']).to match [{'code'=> 'RRD', 'name'=> 'Rapid Ready for Decision'}]
+      jform = JSON.parse(form526_submission.form_json)
+      jform['form526']['form526']['disabilities'] = disabilities
+      form526_submission.form_json = JSON.dump(jform)
+      second_pass = JSON.parse(HypertensionSpecialIssueManager.new(form526_submission).add_special_issue)['form526']['form526']['disabilities']
+      filtered = second_pass.filter { |item| item['diagnosticCode'] == 7101 }
+      expect(filtered[0]['specialIssues']).to match [{'code'=> 'RRD', 'name'=> 'Rapid Ready for Decision'}]
+    end
+
+    # TODO: need tests for cases where more than one disability is present.
+    # TODO: need tests for cases where hypertension is not one of the disabilities.
+    # TODO: maybe need tests for cases where hypertension is present and already has a non-RRD special issue attached to it.
   end
 end
