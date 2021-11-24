@@ -11,7 +11,7 @@ class DisabilityCompensationFastTrackJob
 
   def perform(form526_submission_id, full_name)
 
-    #icn = Account.where(idme_uuid: submission.user_uuid).first.icn
+    # icn = Account.where(idme_uuid: submission.user_uuid).first.icn
     icn = '2000163'
 
     client = Lighthouse::VeteransHealth::Client.new(icn)
@@ -23,7 +23,6 @@ class DisabilityCompensationFastTrackJob
     observations_response = client.get_resource('observations')
     medicationrequest_response = client.get_resource('medications')
 
-    # patient_info = client.get_resource('patient')
     bpreadings = HypertensionObservationData.new(observations_response).transform
     medications = HypertensionMedicationRequestData.new(medicationrequest_response).transform
 
@@ -31,16 +30,13 @@ class DisabilityCompensationFastTrackJob
     bpreadings = bpreadings.filter { |reading| reading[:issued].to_date > 1.year.ago }
     bpreadings = bpreadings.sort_by { |reading| reading[:issued].to_date }.reverse!
     medications = medications.sort_by { |med| med[:authoredOn].to_date }.reverse!
-    pdf = HypertensionPDFGenerator.new(patient, bpreadings, medications, Date.today).generate
-    # entries = observations_response.body.dig('entry')
-    # results = entries.map {|entry| transform_entry(entry)}
+    pdf = HypertensionPDFGenerator.new(full_name, bpreadings, medications, Date.today).generate
+    # pdf_body = pdf.render #???? hopefully calling .render works here like in line 51
 
-    pdf_body = pdf.render #???? hopefully calling .render works here like in line 51
+    # submission = Form526Submission.find(form526_submission_id)
 
-    submission = Form526Submission.find(form526_submission_id)
-
-    client = EVSS::DocumentsService.new(submission.auth_headers)
-    client.upload(pdf, create_document_data(upload_data))
+    # client = EVSS::DocumentsService.new(submission.auth_headers)
+    # client.upload(pdf, create_document_data(upload_data))
   end
 
   def hypertension?(condition_response)
@@ -227,9 +223,25 @@ class HypertensionPDFGenerator
     pdf.render_file 'htn-example.pdf'
   end
 
+  def stringify_patient
+    suffix = @patient[:suffix].present? ? ", #{patient[:suffix]}" : ""
+    stringified = ""
+    [:first, :middle, :last].each do |name|
+      if @patient[name].present?
+        stringified = "#{stringified} #{@patient[name]}"
+      end
+    end
+
+    stringified = "#{stringified}#{suffix}"
+    stringified
+  end
+
   def add_intro(pdf)
-    patient_name = 'FAKE PATIENT NAME' # TODO: fix when LH client can do calls to Patient endpoint
-    gen_stamp = '09/01/2021 at 10:23am EST' # TODO: fix when I figure out how to do Ruby time manipulation
+    # patient_name = 'FAKE PATIENT NAME' # TODO: fix when LH client can do calls to Patient endpoint
+    patient_name = stringify_patient
+    #gen_stamp = '09/01/2021 at 10:23am EST' # TODO: fix when I figure out how to do Ruby time manipulation
+    gen_time = Time.now
+    gen_stamp = "#{gen_time.strftime("%m/%d/%Y")} at #{gen_time.strftime("%I:%M %p")}"
 
     intro_lines = [
       "<b><font size='8'>Hypertension Rapid Ready for Decision | Claim for Increase</font></b>\n",
@@ -311,7 +323,7 @@ class HypertensionPDFGenerator
     pdf.text "\n", size: 12
     pdf.text 'Active Prescriptions', size: 14
 
-    med_search_window = 'VHA records searched for medication prescriptions active as of 09/01/2021'
+    med_search_window = "VHA records searched for medication prescriptions active as of #{Date.today.strftime('%m/%d/%Y')}."
     prescription_lines = [
       med_search_window,
       'All VAMC locations using VistA/CAPRI were checked',
