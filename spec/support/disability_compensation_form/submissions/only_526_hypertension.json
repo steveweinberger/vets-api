@@ -82,26 +82,12 @@
       },
       "disabilities": [
         {
-          "name": "Diabetes mellitus",
+          "name": "Hypertension",
           "classificationCode": "string",
           "disabilityActionType": "INCREASE",
           "ratedDisabilityId": "0",
           "diagnosticCode": 7101,
-          "secondaryDisabilities": [
-            {
-              "name": "Diabetes mellitus",
-              "classificationCode": "",
-              "disabilityActionType": "NONE",
-              "specialIssues": [
-                {
-                  "code": "TRM",
-                  "name": "Personal Trauma PTSD"
-                }
-              ],
-              "ratedDisabilityId": "",
-              "diagnosticCode": 5235
-            }
-          ]
+          "secondaryDisabilities": []
         }
       ],
       "treatments": [
@@ -142,3 +128,4 @@
   "form8940": null,
   "flashes": []
 }
+
