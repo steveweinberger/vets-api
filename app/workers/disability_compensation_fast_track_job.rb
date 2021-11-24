@@ -7,14 +7,16 @@ require 'lighthouse/veterans_health/client'
 class DisabilityCompensationFastTrackJob
   include Sidekiq::Worker
   extend SentryLogging
+  #TODO this needs to be thought about more. How many retries and how long do we want this to attempt.
   sidekiq_options retry: 14
 
   def perform(form526_submission_id, full_name)
-
     # icn = Account.where(idme_uuid: submission.user_uuid).first.icn
     icn = '2000163'
 
     client = Lighthouse::VeteransHealth::Client.new(icn)
+    # Do we have access to the Sentry errors
+    # I kinda prefer that we silently fail rhen can we commit the error to the Form526Status?
     # TODO: rescue !=200 responses with an appropriate action
     condition_response = client.get_resource('conditions')
     return unless hypertension?(condition_response)
@@ -39,6 +41,8 @@ class DisabilityCompensationFastTrackJob
 
     HypertensionSpecialIssueManager.new(submission).add_special_issue
   end
+
+  private
 
   def hypertension?(condition_response)
     condition_response.body['entry'].filter {|e| e['resource']['code']['text'].downcase == 'hypertension'}.length.positive?

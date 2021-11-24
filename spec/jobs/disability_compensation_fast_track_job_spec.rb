@@ -9,8 +9,9 @@ RSpec.describe DisabilityCompensationFastTrackJob, type: :worker do
     Sidekiq::Worker.clear_all
   end
 
-  let!(:user) { FactoryBot.create(:disabilities_compensation_user) }
+  let!(:user) { FactoryBot.create(:disabilities_compensation_user, icn: '2000163') }
   # let!(:account) { FactoryBot.create(:account, icn: user.icn, idme_uuid: user.uuid) }
+  let(:icn_for_user_without_hypertension) { 17000151 }
   let(:auth_headers) do
     EVSS::DisabilityCompensationAuthHeaders.new(user).add_headers(EVSS::AuthHeaders.new(user).to_h)
   end
@@ -23,70 +24,44 @@ RSpec.describe DisabilityCompensationFastTrackJob, type: :worker do
            submitted_claim_id: '600130094')
   end
 
-  describe '#perform' do
+  let(:user_full_name) { user.first_name + user.last_name }
+
+  describe '#perform', :vcr  do
     context 'success' do
       context 'the claim is NOT for hypertension' do
-        it 'does nothing' do
-          raise 'not implemented'
+        it 'does returns from the class and does NOT continue' do
+          expect(HypertensionObservationData).not_to receive(:new)
+          subject.new.perform(icn_for_user_without_hypertension, user_full_name)
         end
       end
 
       context 'the claim IS for hypertension' do
         it 'calls #new on Lighthouse::ClinicalHealth::Client' do
-          raise 'not implemented'
-        end
-
-        it 'parses the response from Lighthouse::ClinicalHelth::Client' do
-          raise 'not implemented'
+          expect(Lighthouse::VeteransHealth::Client).to receive(:new).with(user.icn)
+          DisabilityCompensationFastTrackJob.new.perform(submission.id, user.full_name)
         end
 
         it 'generates a pdf' do
-          raise 'not implemented'
+          expect(HypertensionPDFGenerator).to receive(:new).with(user_full_name, "", "", Date.today)
+          DisabilityCompensationFastTrackJob.new.perform(submission.id, user.full_name)
         end
 
         it 'includes the neccesary information in the pdf' do
           raise 'not implemented'
         end
 
-        it 'posts the pdf to S3 in the expected location' do
+        it 'calls new on EVSS::DocumentsService with the expected arguments' do
           raise 'not implemented'
         end
       end
 
       context 'failure' do
         it 'raises a helpful error' do
+          #maybe use this error from Michel's work: https://github.com/department-of-veterans-affairs/vets-api/pull/8494/files#diff-cdcaa26c5cfce0d1bda78201f27a4c6eb554d5d45ff50d92eec5f393d3d44f6dR110
           allow(Lighthouse::VeteransHealth::Client).to receive(:new).and_return nil
           subject.perform_async(submission.id)
           raise 'not implemented'
         end
-      end
-    end
-  end
-
-  describe '#hypertension?' do
-    let(:condition_response) do
-      double(
-        'condition response',
-        body: HashWithIndifferentAccess.new(
-          { 'entry':
-            [{ 'resource': { 'code': { 'text': text_string } } }] }
-        )
-      )
-    end
-
-    context 'when hypertension is a condition assigned to the user' do
-      let(:text_string) { 'Hypertension' }
-
-      it 'returns true' do
-        expect(subject.new.hypertension?(condition_response)).to eq true
-      end
-    end
-
-    context 'when hypertension is NOT a condition assigned to the user' do
-      let(:text_string) { 'something' }
-
-      it 'returns false' do
-        expect(subject.new.hypertension?(condition_response)).to eq false
       end
     end
   end
