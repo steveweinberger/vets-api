@@ -53,7 +53,7 @@ class Form526Submission < ApplicationRecord
       workflow_batch = Sidekiq::Batch.new
       workflow_batch.on(
         :complete,
-        'Form526Submission#start_evss_submission',
+        'Form526Submission#add_rrd',
         'submission_id' => id,
       )
       jids = workflow_batch.jobs do
@@ -71,6 +71,12 @@ class Form526Submission < ApplicationRecord
   #
   # @return [String] the job id of the first job in the batch, i.e the 526 submit job
   #
+
+  def add_rrd(id)
+    #- adds RRD to the Form526Submission.find(id).form_json.update!
+    #- calls start_evss_submission(id)
+  end
+
   def start_evss_submission(_status, options)
     submission = Form526Submission.find(options['submission_id'])
     id = submission.id

@@ -10,10 +10,10 @@ class DisabilityCompensationFastTrackJob
   sidekiq_options retry: 14
 
   def perform(form526_submission_id, full_name)
-    # submission = Form526Submission.find(form526_submission_id)
-    # icn = Account.where(idme_uuid: submission.user_uuid).first.icn
-    # temporary below
+
+    #icn = Account.where(idme_uuid: submission.user_uuid).first.icn
     icn = '2000163'
+
     client = Lighthouse::VeteransHealth::Client.new(icn)
     # TODO: rescue !=200 responses with an appropriate action
     condition_response = client.get_resource('conditions')
@@ -22,21 +22,25 @@ class DisabilityCompensationFastTrackJob
     # TODO: rescue !=200 responses with an appropriate action
     observations_response = client.get_resource('observations')
     medicationrequest_response = client.get_resource('medications')
+
     # patient_info = client.get_resource('patient')
     bpreadings = HypertensionObservationData.new(observations_response).transform
     medications = HypertensionMedicationRequestData.new(medicationrequest_response).transform
+
     patient = nil # TODO: change when we know how to get patient
     bpreadings = bpreadings.filter { |reading| reading[:issued].to_date > 1.year.ago }
     bpreadings = bpreadings.sort_by { |reading| reading[:issued].to_date }.reverse!
     medications = medications.sort_by { |med| med[:authoredOn].to_date }.reverse!
     pdf = HypertensionPDFGenerator.new(patient, bpreadings, medications, Date.today).generate
-    binding.pry
     # entries = observations_response.body.dig('entry')
     # results = entries.map {|entry| transform_entry(entry)}
 
-    # pdf_body = generate_pdf(condition_response)
-    # client = EVSS::DocumentsService.new(submission.auth_headers)
-    # client.upload(pdf_body, create_document_data(upload_data))
+    pdf_body = pdf.render #???? hopefully calling .render works here like in line 51
+
+    submission = Form526Submission.find(form526_submission_id)
+
+    client = EVSS::DocumentsService.new(submission.auth_headers)
+    client.upload(pdf, create_document_data(upload_data))
   end
 
   def hypertension?(condition_response)

@@ -24,18 +24,6 @@ RSpec.describe DisabilityCompensationFastTrackJob, type: :worker do
   end
 
   describe '#perform' do
-    # Once we have the logic for pinging lighthouse merged into our class, we
-    # should have our own cassette for the query in question 🤷<200d>♀️ OR do we
-    # KNOW that this 'lighthouse/clinical_health/condition_success' includes
-    # hypertension?
-    #
-    # it 'soemthing' do
-    #  VCR.use_cassette('lighthouse/clinical_health/condition_success') do
-    #    subject.perform_async(submission.id)
-    #    described_class.drain
-    #  end
-    # end
-
     context 'success' do
       context 'the claim is NOT for hypertension' do
         it 'does nothing' do
@@ -45,10 +33,11 @@ RSpec.describe DisabilityCompensationFastTrackJob, type: :worker do
 
       context 'the claim IS for hypertension' do
         it 'calls #new on Lighthouse::ClinicalHealth::Client' do
+          raise 'not implemented'
         end
 
         it 'parses the response from Lighthouse::ClinicalHelth::Client' do
-          ########
+          raise 'not implemented'
         end
 
         it 'generates a pdf' do
@@ -59,7 +48,7 @@ RSpec.describe DisabilityCompensationFastTrackJob, type: :worker do
           raise 'not implemented'
         end
 
-        it 'calls #upload on EVSS::DocumentsService with the expected argumnets' do
+        it 'posts the pdf to S3 in the expected location' do
           raise 'not implemented'
         end
       end
