@@ -46,16 +46,16 @@ module Mobile
       def update_vaccine_records(aggregate, results)
         aggregate.each_pair do |cvx_code, vaccine_data|
           vaccine = Mobile::V0::Vaccine.find_by(cvx_code: cvx_code)
+          group_names = vaccine_data[:group_names].join(', ')
 
           unless vaccine
-            group_names = vaccine_data[:group_names].join(', ')
             Mobile::V0::Vaccine.create!(cvx_code: cvx_code, group_name: group_names,
                                         manufacturer: vaccine_data[:manufacturer])
             results[:created] += 1
             next
           end
 
-          vaccine.group_name = vaccine_data[:group_names].join(', ')
+          vaccine.group_name = group_names
           vaccine.manufacturer = vaccine_data[:manufacturer]
           if vaccine.changed?
             vaccine.save!
