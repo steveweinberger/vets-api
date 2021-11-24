@@ -29,7 +29,7 @@ class DisabilityCompensationFastTrackJob
     bpreadings = bpreadings.filter { |reading| reading[:issued].to_date > 1.year.ago }
     bpreadings = bpreadings.sort_by { |reading| reading[:issued].to_date }.reverse!
     medications = medications.sort_by { |med| med[:authoredOn].to_date }.reverse!
-    pdf = HypertensionPDFGenerator.new(patient, bpreadings, medications).generate
+    pdf = HypertensionPDFGenerator.new(patient, bpreadings, medications, Date.today).generate
     binding.pry
     # entries = observations_response.body.dig('entry')
     # results = entries.map {|entry| transform_entry(entry)}
@@ -207,23 +207,17 @@ end
 class HypertensionPDFGenerator
   attr_accessor :patient, :bp_data, :medications
 
-  def initialize(patient, bp_data, medications)
+  def initialize(patient, bp_data, medications, date)
     @patient = patient
     @bp_data = bp_data
     @medications = medications
+    @date = date
   end
 
   def generate
     pdf = Prawn::Document.new
     pdf = add_intro(pdf)
-    if bp_data.length > 1
-      pdf = add_blood_pressure(pdf)
-    else
-      search_window = 'VHA records searched from 09/01/2020 to 09/01/2021' # TODO: fix when I figure out how to get those dates
-      pdf.text "\n<font size='14'><b>No blood pressure records found.</b></font>", inline_format: true
-      pdf.text "<font size='8'><i>#{search_window}<i></font>\n", inline_format: true
-      pdf.text "<font size='8'><i>All VAMC locations using VistA/CAPRI were checked.<i></font>", inline_format: true
-    end
+    pdf = add_blood_pressure(pdf)
     pdf = add_medications(pdf) if medications.length > 1
     pdf = add_about(pdf)
     pdf.render_file 'htn-example.pdf'
@@ -244,37 +238,39 @@ class HypertensionPDFGenerator
       pdf.text line, inline_format: true
     end
 
+    pdf.text "\n", size: 12
+
     pdf
   end
 
   def add_blood_pressure(pdf)
-    search_window = 'VHA records searched from 09/01/2020 to 09/01/2021' # TODO: fix when I figure out how to get those dates
+    header = bp_data.length.positive? ? 'One Year of Blood Pressure History' : 'No blood pressure records found'
+    bp_note = bp_data.length.positive? ? "<font size='8'>Blood pressure is shown as systolic/diastolic.\n</font>" : ''
+    end_date= @date.strftime("%m/%d/%Y")
+    start_date = (@date - 1.year).strftime("%m/%d/%Y")
+    search_window = "VHA records searched from #{start_date} to #{end_date}"
     bp_intro_lines = [
-      "<font size='14'>One Year of Blood Pressure History</font>",
+      "<font size='14'>#{header}</font>",
       "<font size='8'><i>#{search_window}<i></font>",
       "<font size='8'><i>All VAMC locations using VistA/CAPRI were checked.<i></font>",
-      "<font size='8'>Blood pressure is shown as systolic/diastolic.\n</font>"
+      bp_note
     ]
 
-    @bp_data.each do |bp|
-      #      issued_date = bp[:issued][0,10]
-      #      org = bp[:organization]
-      #      bpr = "#{bp[:systolic]['value']}/#{bp[:diastolic]['value']} #{bp[:systolic]['unit']}"
-      #      pdf.text "\n", :size => 12
-      #      pdf.text "Blood pressure: #{bpr}", :size => 8
-      #      pdf.text "Taken on: #{issued_date}", :size => 8
-      #      org = org || 'unknown'
-      #      pdf.text "Location: #{org}", :size => 8
+    bp_intro_lines.each do |line|
+      pdf.text line, inline_format: true
+    end
+
+    if !bp_data.length.positive?
+      return pdf
     end
 
     pdf.text "\n", size: 12
-
     bp_rows = [['<b>Blood pressure</b>', '<b>Date</b>', '<b>Location</b>']]
     @bp_data.each do |bp|
       bp_rows.append([
                        "#{bp[:systolic]['value']}/#{bp[:diastolic]['value']} #{bp[:systolic]['unit']}",
-                       bp[:issued][0, 10],
-                       bp[:organization] || 'unknown'
+                       bp[:issued][0, 10].to_date.strftime("%m/%d/%Y"),
+                       bp[:organization] || 'Unknown'
                      ])
     end
     pdf.table(bp_rows, cell_style: { size: 8, inline_format: true })
@@ -303,20 +299,8 @@ class HypertensionPDFGenerator
     pdf.text "<link href='https://www.ecfr.gov/current/title-38/chapter-I/part-4'>View rating schedule</link>",
              inline_format: true, color: '0000ff', size: 7
 
-    return pdf
+    pdf
 
-    schedule_lines = [
-      'Hypertension Rating Schedule',
-      '10%: Systolic pressure predominantly 160 or more; or diastolic pressure predominantly 100 or more; or minimum evaluation for an individual with a history of diastolic pressure predominantly 100 or more who requires continuous medication for control.',
-      '20%: Systolic pressure predominantly 200 or more; or diastolic pressure predominantly 110 or more.',
-      '40%: Diastolic pressure 120 or more.',
-      '60%: Diastolic pressure 130 or more.',
-      'View rating schedule: https://www.ecfr.gov/current/title-38/chapter-I/part-4'
-    ]
-
-    schedule_lines.each do |line|
-      # pdf.text line
-    end
   end
 
   def add_medications(pdf)
@@ -341,23 +325,12 @@ class HypertensionPDFGenerator
     ]]
 
     @medications.each do |medication|
-      issued_date = medication['authoredOn'][0, 10]
+      issued_date = medication['authoredOn'][0, 10].to_date.strftime("%m/%d/%Y")
       instructions = medication['dosageInstructions'].join('; ')
       med_rows.append([medication['description'], issued_date, instructions])
     end
 
     pdf.table(med_rows, cell_style: { size: 8, inline_format: true })
-
-    [].each do |medication| # @medications
-      issued_date = medication['authoredOn'][0, 10]
-      instructions = medication['dosageInstructions'].join('; ')
-      # message = "#{issued_date} #{medication['description']}. #{medication['dosageInstructions']}"
-      pdf.text "\n", size: 8
-      pdf.text medication['description'], size: 8
-      # pdf.text "Prescribed on: #{issued_date}", :size=>8
-      # pdf.text "Dosage instruction(s): #{instructions}", :size=>8
-      pdf.text "Prescribed on: #{issued_date}. Dosage instruction(s): #{instructions}", size: 8
-    end
 
     pdf
   end
