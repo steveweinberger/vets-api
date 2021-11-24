@@ -276,9 +276,6 @@ class Form526Submission < ApplicationRecord
       submit_form_4142 if form[FORM_4142].present?
       submit_form_0781 if form[FORM_0781].present?
       submit_form_8940 if form[FORM_8940].present?
-      if single_issue_hypertension_claim? && Flipper.enabled?(:disability_hypertension_compensation_fast_track)
-        submit_disability_compensation_fast_track
-      end
       upload_bdd_instructions if bdd?
       submit_flashes if form[FLASHES].present?
       cleanup
@@ -351,10 +348,6 @@ class Form526Submission < ApplicationRecord
   def submit_flashes
     user = User.find(user_uuid)
     BGS::FlashUpdater.perform_async(id) if user && Flipper.enabled?(:disability_compensation_flashes, user)
-  end
-
-  def submit_disability_compensation_fast_track
-    DisabilityCompensationFastTrackJob.perform_in(60.seconds, id)
   end
 
   def submit_disability_compensation_fast_track
