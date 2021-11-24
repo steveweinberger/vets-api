@@ -26,6 +26,9 @@ class DisabilityCompensationFastTrackJob
     bpreadings = HypertensionObservationData.new(observations_response).transform
     medications = HypertensionMedicationRequestData.new(medicationrequest_response).transform
     patient = nil  # TODO: change when we know how to get patient
+    bpreadings = bpreadings.filter { |reading| reading[:issued].to_date > 1.year.ago }
+    bpreadings = bpreadings.sort_by { |reading| reading[:issued].to_date }.reverse!
+    medications = medications.sort_by { |med| med[:authoredOn].to_date }.reverse!
     pdf = HypertensionPDFGenerator.new(patient, bpreadings, medications).generate
     binding.pry
     # entries = observations_response.body.dig('entry')
@@ -188,6 +191,21 @@ class HypertensionMedicationRequestData
   end
 end
 
+class HypertensionFilterer
+
+  def initialize(bp_data, medications)
+    @bp_data = bp_data
+    @medications = medications
+  end
+
+  def filter
+    # filter bp medications to the previous year
+    # sort bp readings by most-recent-first
+    # sort medications by most-recent-first
+    binding.pry
+  end
+end
+
 class HypertensionPDFGenerator
   attr_accessor :patient
   attr_accessor :bp_data
@@ -201,25 +219,49 @@ class HypertensionPDFGenerator
 
   def generate
     pdf = Prawn::Document.new
+    pdf = add_intro(pdf)
+    if bp_data.length > 1
+      pdf = add_blood_pressure(pdf)
+    else
+      search_window = 'VHA records searched from 09/01/2020 to 09/01/2021'  # TODO: fix when I figure out how to get those dates
+      pdf.text "\n<font size='14'><b>No blood pressure records found.</b></font>", :inline_format => true
+      pdf.text "<font size='8'><i>#{search_window}<i></font>\n", :inline_format => true
+      pdf.text "<font size='8'><i>All VAMC locations using VistA/CAPRI were checked.<i></font>", :inline_format => true
+    end
+    if medications.length > 1
+      pdf = add_medications(pdf)
+    end
+    pdf = add_about(pdf)
+    pdf.render_file 'htn-example.pdf'
+  end
+
+
+  def add_intro(pdf)
     patient_name = 'FAKE PATIENT NAME'  # TODO: fix when LH client can do calls to Patient endpoint
     gen_stamp = '09/01/2021 at 10:23am EST'  # TODO: fix when I figure out how to do Ruby time manipulation
-    search_window = 'VHA records searched from 09/01/2020 to 09/01/2021'  # TODO: fix when I figure out how to get those dates
-
 
     intro_lines = [
       "<b><font size='8'>Hypertension Rapid Ready for Decision | Claim for Increase</font></b>\n",
       "<font size='16'>VHA Hypertension Data Summary for</font>",
       "<font size='16'>#{patient_name}</font>\n",
-      "<font size='8'><i>#{gen_stamp}<i>\n",
-      "<font size='14'>One Year of Blood Pressure History</font>",
-      "<font size='8'><i>#{search_window}<i></font>",
-      "<font size='8'><i>All VAMC locations using VistA/CAPRI were checked.<i></font>",
-      "<font size='8'>Blood pressure is shown as systolic/diastolic.\n</font>"
+      "<font size='8'><i>#{gen_stamp}<i>\n"
     ]
 
     for line in intro_lines
       pdf.text line, :inline_format => true
     end
+
+    return pdf
+  end
+
+  def add_blood_pressure(pdf)
+    search_window = 'VHA records searched from 09/01/2020 to 09/01/2021'  # TODO: fix when I figure out how to get those dates
+    bp_intro_lines = [
+      "<font size='14'>One Year of Blood Pressure History</font>",
+      "<font size='8'><i>#{search_window}<i></font>",
+      "<font size='8'><i>All VAMC locations using VistA/CAPRI were checked.<i></font>",
+      "<font size='8'>Blood pressure is shown as systolic/diastolic.\n</font>"
+    ]
 
     for bp in @bp_data
 #      issued_date = bp[:issued][0,10]
@@ -267,6 +309,8 @@ class HypertensionPDFGenerator
     pdf.text "\n"
     pdf.text "<link href='https://www.ecfr.gov/current/title-38/chapter-I/part-4'>View rating schedule</link>", :inline_format=>true, :color=> "0000ff", :size=>7
 
+    return pdf
+
     schedule_lines = [
       'Hypertension Rating Schedule',
       '10%: Systolic pressure predominantly 160 or more; or diastolic pressure predominantly 100 or more; or minimum evaluation for an individual with a history of diastolic pressure predominantly 100 or more who requires continuous medication for control.',
@@ -279,7 +323,9 @@ class HypertensionPDFGenerator
     for line in schedule_lines
       # pdf.text line
     end
+  end
 
+  def add_medications(pdf)
     pdf.text "\n", :size=>12
     pdf.text 'Active Prescriptions', :size=>14
 
@@ -318,6 +364,12 @@ class HypertensionPDFGenerator
       pdf.text "Prescribed on: #{issued_date}. Dosage instruction(s): #{instructions}", :size=>8
     end
 
+    return pdf
+
+  end
+
+  def add_about(pdf)
+
     about_lines = [
       "\n",
       'About this document',
@@ -332,8 +384,8 @@ class HypertensionPDFGenerator
       pdf.text line, :size=>6
     end
 
+    return pdf
     # binding.pry
-    pdf.render_file 'htn-example.pdf'
 
 #    Prawn::Document.generate('htn_test_example.pdf') do
 #      binding.pry
