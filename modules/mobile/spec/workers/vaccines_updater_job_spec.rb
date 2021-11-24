@@ -18,51 +18,49 @@ RSpec.describe Mobile::V0::VaccinesUpdaterJob, type: :job do
           service.perform
         end.to change { Mobile::V0::Vaccine.count }.from(0).to(3)
 
-        no_manufacturer = Mobile::V0::Vaccine.find_by(cvx_code: 1)
-        expect(no_manufacturer.group_name).to eq('DTAP')
-        covid_vaccine = Mobile::V0::Vaccine.find_by(cvx_code: 207)
-        expect(covid_vaccine.group_name).to eq('COVID-19')
-        non_covid_vaccine = Mobile::V0::Vaccine.find_by(cvx_code: 110)
-        expect(non_covid_vaccine.group_name).to eq('DTAP, HepB')
+        covid_no_manufacturer = Mobile::V0::Vaccine.find_by(cvx_code: 503)
+        expect(covid_no_manufacturer.group_name).to eq('COVID-19')
+        covid_with_manufacturer = Mobile::V0::Vaccine.find_by(cvx_code: 207)
+        expect(covid_with_manufacturer.group_name).to eq('COVID-19')
+        non_covid_multiple_groups = Mobile::V0::Vaccine.find_by(cvx_code: 110)
+        expect(non_covid_multiple_groups.group_name).to eq('DTAP, HepB')
       end
     end
   end
 
-  it 'sets manufacturer when manufacturer data is available and group name is COVID-19' do
+  it 'only sets manufacturer when group name is COVID-19 and manufacturer is available' do
     VCR.use_cassette('vaccines/group_names') do
       VCR.use_cassette('vaccines/manufacturers') do
         service = described_class.new
         service.perform
 
-        # no manufacturer data is present in the xml for this record
-        no_manufacturer = Mobile::V0::Vaccine.find_by(cvx_code: 1)
-        expect(no_manufacturer.manufacturer).to be_nil
-        covid_vaccine = Mobile::V0::Vaccine.find_by(cvx_code: 207)
-        expect(covid_vaccine.manufacturer).to eq('Moderna US, Inc.')
-        # manufacturer data is present but it is not a covid-19 vaccine
-        non_covid_vaccine = Mobile::V0::Vaccine.find_by(cvx_code: 110)
-        expect(non_covid_vaccine.manufacturer).to be_nil
+        covid_no_manufacturer = Mobile::V0::Vaccine.find_by(cvx_code: 503)
+        expect(covid_no_manufacturer.manufacturer).to be_nil
+        covid_with_manufacturer = Mobile::V0::Vaccine.find_by(cvx_code: 207)
+        expect(covid_with_manufacturer.manufacturer).to eq('Moderna US, Inc.')
+        non_covid_multiple_groups = Mobile::V0::Vaccine.find_by(cvx_code: 110)
+        expect(non_covid_multiple_groups.manufacturer).to be_nil
       end
     end
   end
 
   context 'when vaccine record exists' do
-    it 'updates the vaccine' do
+    let!(:covid_no_manufacturer) { create(:vaccine, cvx_code: 503, group_name: 'FLU', manufacturer: 'Bayer') }
+    let!(:covid_with_manufacturer) { create(:vaccine, cvx_code: 207, group_name: 'FLU', manufacturer: 'Bayer') }
+    let!(:non_covid_multiple_groups) { create(:vaccine, cvx_code: 110, group_name: 'FLU', manufacturer: 'Bayer') }
+
+    it 'updates the record' do
       VCR.use_cassette('vaccines/group_names') do
         VCR.use_cassette('vaccines/manufacturers') do
-          no_manufacturer = create(:vaccine, cvx_code: 1, group_name: 'FLU', manufacturer: 'Bayer')
-          covid_vaccine = create(:vaccine, cvx_code: 207, group_name: 'COVID-19', manufacturer: 'Bayer')
-          multiple_groups = create(:vaccine, cvx_code: 110, group_name: 'POLIO', manufacturer: 'Bayer')
-
           service = described_class.new
           service.perform
 
-          expect(no_manufacturer.reload.manufacturer).to be_nil
-          expect(no_manufacturer.group_name).to eq('DTAP')
-          expect(covid_vaccine.reload.manufacturer).to eq('Moderna US, Inc.')
-          expect(covid_vaccine.group_name).to eq('COVID-19')
-          expect(multiple_groups.reload.manufacturer).to be_nil
-          expect(multiple_groups.group_name).to eq('DTAP, HepB')
+          expect(covid_no_manufacturer.reload.manufacturer).to be_nil
+          expect(covid_no_manufacturer.group_name).to eq('COVID-19')
+          expect(covid_with_manufacturer.reload.manufacturer).to eq('Moderna US, Inc.')
+          expect(covid_with_manufacturer.group_name).to eq('COVID-19')
+          expect(non_covid_multiple_groups.reload.manufacturer).to be_nil
+          expect(non_covid_multiple_groups.group_name).to eq('DTAP, HepB')
         end
       end
     end

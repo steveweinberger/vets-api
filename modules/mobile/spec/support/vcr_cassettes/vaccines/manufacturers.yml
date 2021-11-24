@@ -39,7 +39,7 @@ http_interactions:
       COVID-19 Vaccine (non-US Spikevax)</Value>\r\n <Name>Short Description</Name>\r\n
       <Value>COVID-19, mRNA, LNP-S, PF, 100 mcg or 50 mcg dose</Value>\r\n <Name>CVXCode</Name>\r\n
       <Value>207       </Value>\r\n <Name>Manufacturer</Name>\r\n <Value>Moderna US, Inc.</Value>\r\n
-      <Name>MVX Code</Name>\r\n <Value>MOD       </Value>\r\n <Name>MVX Status</Name>\r\n 
+      <Name>MVX Code</Name>\r\n <Value>MOD       </Value>\r\n <Name>MVX Status</Name>\r\n
       <Value>Active</Value>\r\n <Name>Product name Status</Name>\r\n <Value>Active</Value>\r\n
       <Name>Last Updated</Name>\r\n <Value>7/13/2021</Value>\r\n </prodInfo>\r\n
       <prodInfo>\r\n<Name>CDC Product Name</Name>\r\n <Value>PEDIARIX</Value>\r\n

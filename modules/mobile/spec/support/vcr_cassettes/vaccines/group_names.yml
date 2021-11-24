@@ -35,9 +35,9 @@ http_interactions:
     body:
       encoding: UTF-8
       string: "<?xml version=\"1.0\"?>\r\n<VGCodes>\r\n <CVXVGInfo>\r\n <Name>ShortDescription</Name>\r\n
-        <Value>DTP</Value>\r\n <Name>CVXCode</Name>\r\n <Value>01        </Value>\r\n
-        <Name>Status</Name>\r\n <Value>Inactive</Value>\r\n <Name>Vaccine Group Name</Name>\r\n
-        <Value>DTAP</Value>\r\n <Name>CVX for Vaccine Group</Name>\r\n <Value>107</Value>\r\n
+        <Value>COVID-19 LAV Non-US Vaccine (COVIVAC)</Value>\r\n <Name>CVXCode</Name>\r\n <Value>503 </Value>\r\n
+        <Name>Status</Name>\r\n <Value>Non-US</Value>\r\n <Name>Vaccine Group Name</Name>\r\n
+        <Value>COVID-19</Value>\r\n <Name>CVX for Vaccine Group</Name>\r\n <Value>213</Value>\r\n
         </CVXVGInfo>\r\n
         <CVXVGInfo>\r\n <Name>ShortDescription</Name>\r\n <Value>DTaP-Hep B-IPV</Value>\r\n
         <Name>CVXCode</Name>\r\n <Value>110        </Value>\r\n <Name>Status</Name>\r\n
