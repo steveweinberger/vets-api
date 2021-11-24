@@ -53,8 +53,6 @@ module Lighthouse
         params = {
           'patient' => @icn,
           'clinical-status' => 'http://terminology.hl7.org/CodeSystem/condition-clinical|active',
-          'page' => 1,
-          '_count' => 30
         }
 
         perform_get('services/fhir/v0/r4/Condition', params)
