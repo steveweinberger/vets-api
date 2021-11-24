@@ -9,11 +9,11 @@ class DisabilityCompensationFastTrackJob
   extend SentryLogging
   sidekiq_options retry: 14
 
-  def perform(form526_submission_id)
+  def perform(form526_submission_id, full_name)
     # submission = Form526Submission.find(form526_submission_id)
     # icn = Account.where(idme_uuid: submission.user_uuid).first.icn
     # temporary below
-    icn = 2_000_163
+    icn = '2000163'
     client = Lighthouse::VeteransHealth::Client.new(icn)
     # TODO: rescue !=200 responses with an appropriate action
     condition_response = client.get_resource('conditions')
@@ -40,7 +40,7 @@ class DisabilityCompensationFastTrackJob
   end
 
   def hypertension?(condition_response)
-    condition_response.body['entry'].each { |e| true if e['resource']['code']['text'].downcase == 'hypertension' }
+    condition_response.body['entry'].filter {|e| e['resource']['code']['text'].downcase == 'hypertension'}.length.positive?
   end
 
   def generate_pdf(_condition_response)

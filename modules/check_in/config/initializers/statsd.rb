@@ -7,8 +7,8 @@ unless Rails.env.test?
     CheckIn::V2::SessionsController.extend(StatsD::Instrument)
     CheckIn::V2::PatientCheckInsController.extend(StatsD::Instrument)
     %i[show create].each do |method|
-      CheckIn::V2::SessionsController.statsd_measure method, "api.check_in.v2.sessions.#{method}.measure"
-      CheckIn::V2::SessionsController.statsd_count_success method, "api.check_in.v2.sessions.#{method}.count"
+      # CheckIn::V2::SessionsController.statsd_measure method, "api.check_in.v2.sessions.#{method}.measure"
+      # CheckIn::V2::SessionsController.statsd_count_success method, "api.check_in.v2.sessions.#{method}.count"
       CheckIn::V2::PatientCheckInsController.statsd_measure method, "api.check_in.v2.checkins.#{method}.measure"
       CheckIn::V2::PatientCheckInsController.statsd_count_success method, "api.check_in.v2.checkins.#{method}.count"
     end

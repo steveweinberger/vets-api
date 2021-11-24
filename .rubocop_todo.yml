@@ -40,18 +40,6 @@ Lint/StructNewOverride:
   Exclude:
     - 'spec/requests/authentication/standard_authentication_spec.rb'
 
-# Offense count: 6
-# Cop supports --auto-correct.
-# Configuration parameters: AllowComments.
-Lint/UselessMethodDefinition:
-  Exclude:
-    - 'lib/common/client/middleware/request/camelcase.rb'
-    - 'lib/common/client/middleware/request/multipart_request.rb'
-    - 'lib/evss/gi_bill_status/external_service_unavailable.rb'
-    - 'lib/evss/gi_bill_status/outside_working_hours.rb'
-    - 'modules/health_quest/app/services/health_quest/middleware/health_quest_logging.rb'
-    - 'modules/vaos/app/services/vaos/middleware/vaos_logging.rb'
-
 # Offense count: 505
 # Configuration parameters: IgnoredMethods, CountRepeatedAttributes.
 Metrics/AbcSize:
@@ -138,18 +126,6 @@ Rails/MatchRoute:
     - 'modules/va_forms/config/routes.rb'
     - 'modules/vba_documents/config/routes.rb'
 
-# Offense count: 7
-# Cop supports --auto-correct.
-Rails/Pluck:
-  Exclude:
-    - 'app/serializers/evss_claim_detail_serializer.rb'
-    - 'app/workers/pager_duty/poll_maintenance_windows.rb'
-    - 'lib/bb/client.rb'
-    - 'modules/appeals_api/spec/services/appeals_api/central_mail_updater_spec.rb'
-    - 'modules/claims_api/app/workers/claims_api/special_issue_updater.rb'
-    - 'modules/vaos/spec/services/systems_service_spec.rb'
-    - 'spec/lib/common/exceptions/detailed_schema_errors_spec.rb'
-
 # Offense count: 1
 # Cop supports --auto-correct.
 Rails/RedundantForeignKey:
@@ -164,13 +140,6 @@ Rails/SkipsModelValidations:
     - 'app/workers/evss/disability_compensation_form/job_status.rb'
     - 'spec/jobs/evss/disability_compensation_form/submit_form526_all_claim_spec.rb'
     - 'spec/models/form526_job_status_spec.rb'
-
-# Offense count: 2
-# Cop supports --auto-correct.
-Rails/SquishedSQLHeredocs:
-  Exclude:
-    - 'app/models/facilities_query/radial_query.rb'
-    - 'modules/vba_documents/app/workers/vba_documents/upload_remover.rb'
 
 # Offense count: 6
 # Configuration parameters: Include.

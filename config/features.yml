@@ -144,9 +144,10 @@ features:
   direct_deposit_vanotify:
     actor_type: user
     description: Send direct deposit emails using VaNotify service
-  disability_compensation_fast_track:
+  disability_hypertension_compensation_fast_track:
     actor_type: user
     description: Fast tracks 526 disability compensation claims by submitting additional health data
+    enable_in_development: true
   disability_compensation_flashes:
     actor_type: user
     description: enables sending flashes to BGS for disability_compensation submissions.
@@ -223,6 +224,11 @@ features:
     description: >
       On https://www.va.gov/find-locations/ enable veterans to search for Community care by showing that option
       in the "Search for" box.
+    enable_in_development: true
+  facility_locator_show_health_connect_number:
+    actor_type: user
+    description: >
+      On https://www.va.gov/find-locations/ enable the health connect phone number display
     enable_in_development: true
   facility_locator_show_operational_hours_special_instructions:
     actor_type: user
@@ -310,6 +316,10 @@ features:
     description: >
       [Front-end only] When enabled, the 10-10EZ will collect a home and mailing address for the veteran
       vs only collecting a single, "permanent" address.
+  omni_channel_link:
+    actor_type: user
+    description: This determines the visibility of the OmniChannel link in the claim status tool
+    enable_in_development: true
   pre_entry_covid19_screener:
     actor_type: user
     description: >

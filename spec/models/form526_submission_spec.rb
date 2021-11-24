@@ -533,6 +533,21 @@ RSpec.describe Form526Submission do
     end
   end
 
+  describe '#get_full_name' do
+    let(:full_name_hash) do
+      {
+        first: 'Beyonce',
+        middle: nil,
+        last: 'Knowles',
+        suffix: user.normalized_suffix
+      }
+    end
+
+    it 'returns the full name of the user' do
+      expect(subject.get_full_name).to eql(full_name_hash)
+    end
+  end
+
   describe '#workflow_complete_handler' do
     let(:options) do
       {
