@@ -4,81 +4,64 @@ require 'rails_helper'
 require 'ostruct'
 require 'disability_compensation_fast_track_job'
 
-RSpec.describe HypertensionMedicationRequestData do
+RSpec.describe HypertensionMedicationRequestData, :vcr do
   subject { described_class }
 
-  describe '#transform' do
-    #      it 'returns the expected hash' do
-    #        expect(described_class.new(long expected input list here).transform)
-    #          .to eq(
-    #          long expected results list here
-    #          )
-    #      end
+  let(:response) do
+    # Using specific test ICN below:
+    client = Lighthouse::VeteransHealth::Client.new(2_000_163)
+    client.get_resource('medications')
+  end
 
+  describe '#transform' do
+    empty_response = OpenStruct.new
+    empty_response.body = { 'entry' => [] }
     it 'returns the expected hash from an empty list' do
-      res = OpenStruct.new
-      res.body = { 'entry' => [] }
-      expect(described_class.new(res).transform)
+      expect(described_class.new(empty_response).transform)
         .to eq([])
     end
 
     it 'returns the expected hash from a single-entry list' do
-      res = OpenStruct.new
-      res.body = {
-        'entry' => [
-          {
-            'fullUrl' => 'https://sandbox-api.va.gov/services/fhir/v0/r4/MedicationRequest/I2-3TCBV3RAFLJW5X23X24CVL4YQE000000',
-            'resource' => {
-              'resourceType' => 'MedicationRequest',
-              'id' => 'I2-3TCBV3RAFLJW5X23X24CVL4YQE000000',
-              'status' => 'active',
-              'intent' => 'plan',
-              'reportedBoolean' => true,
-              'medicationReference' => {
-                'reference' => 'https://sandbox-api.va.gov/services/fhir/v0/r4/Medication/I2-3KI3RMYAJXTO5ZA6PNEZMJOQMA000000',
-                'display' => 'Hydrocortisone 10 MG/ML Topical Cream'
-              },
-              'subject' => {
-                'reference' => 'https://sandbox-api.va.gov/services/fhir/v0/r4/Patient/2000163',
-                'display' => 'Mr. Aurelio227 Cruickshank494'
-              },
-              'authoredOn' => '2009-03-25T01:15:52Z',
-              '_requester' => {
-                'extension' => [{
-                  'url' => 'https://hl7.org/fhir/extension-data-absent-reason.html',
-                  'valueCode' => 'unknown'
-                }]
-              },
-              'note' => [{ 'text' => 'Hydrocortisone 10 MG/ML Topical Cream [from note]' }],
-              'dosageInstruction' => [{
-                'text' => 'Once per day.',
-                'timing' => {
-                  'repeat' => {
-                    'boundsPeriod' => {
-                      'start' => '2009-03-25T01:15:52Z'
-                    }
-                  },
-                  'code' => { 'text' => 'As directed by physician.' }
-                },
-                'route' => { 'text' => 'As directed by physician.' }
-              }]
-            },
-            'search' => { 'mode' => 'match' }
-          }
-        ]
-      }
-      expect(described_class.new(res).transform)
-        .to match(
-          [
-            {
-              'status': 'active',
-              'authoredOn': '2009-03-25T01:15:52Z',
-              'description': 'Hydrocortisone 10 MG/ML Topical Cream',
-              'notes': ['Hydrocortisone 10 MG/ML Topical Cream [from note]'],
-              'dosageInstructions': ['Once per day.']
-            }
-          ]
-        )
+      expect(described_class.new(response).transform).to match([{ 'status' => 'active',
+                                                                  'authoredOn' => '1995-02-06T02:15:52Z',
+                                                                  'description' => 'Hydrochlorothiazide 6.25 MG',
+                                                                  'notes' => ['Hydrochlorothiazide 6.25 MG'],
+                                                                  'dosageInstructions' => ['Once per day.'] },
+                                                                { 'status' => 'active',
+                                                                  'authoredOn' => '1995-04-30T01:15:52Z',
+                                                                  'description' => 'Loratadine 5 MG Chewable Tablet',
+                                                                  'notes' => ['Loratadine 5 MG Chewable Tablet'],
+                                                                  'dosageInstructions' => ['Once per day.'] },
+                                                                { 'status' => 'active',
+                                                                  'authoredOn' => '1995-04-30T01:15:52Z',
+                                                                  'description' => '0.3 ML EPINEPHrine 0.5 MG/ML Auto-Injector',
+                                                                  'notes' => ['0.3 ML EPINEPHrine 0.5 MG/ML Auto-Injector'],
+                                                                  'dosageInstructions' => ['Once per day.'] },
+                                                                { 'status' => 'active',
+                                                                  'authoredOn' => '1998-02-12T02:15:52Z',
+                                                                  'description' => '120 ACTUAT Fluticasone propionate 0.044 MG/ACTUAT Metered Dose Inhaler',
+                                                                  'notes' => ['120 ACTUAT Fluticasone propionate 0.044 MG/ACTUAT Metered Dose Inhaler'],
+                                                                  'dosageInstructions' => ['Once per day.'] },
+                                                                { 'status' => 'active',
+                                                                  'authoredOn' => '1998-02-12T02:15:52Z',
+                                                                  'description' => '200 ACTUAT Albuterol 0.09 MG/ACTUAT Metered Dose Inhaler',
+                                                                  'notes' => ['200 ACTUAT Albuterol 0.09 MG/ACTUAT Metered Dose Inhaler'],
+                                                                  'dosageInstructions' => ['Once per day.'] },
+                                                                { 'status' => 'active',
+                                                                  'authoredOn' => '2009-03-25T01:15:52Z',
+                                                                  'description' => 'Hydrocortisone 10 MG/ML Topical Cream',
+                                                                  'notes' => ['Hydrocortisone 10 MG/ML Topical Cream'],
+                                                                  'dosageInstructions' => ['Once per day.'] },
+                                                                { 'status' => 'active',
+                                                                  'authoredOn' => '2012-08-18T06:15:52Z',
+                                                                  'description' => 'predniSONE 5 MG Oral Tablet',
+                                                                  'notes' => ['predniSONE 5 MG Oral Tablet'],
+                                                                  'dosageInstructions' => ['1 dose(s) 1 time(s) per 1 days'] },
+                                                                { 'status' => 'active',
+                                                                  'authoredOn' => '2013-04-15T01:15:52Z',
+                                                                  'description' => 'Hydrochlorothiazide 25 MG',
+                                                                  'notes' => ['Hydrochlorothiazide 25 MG'],
+                                                                  'dosageInstructions' => ['Once per day.'] }])
     end
   end
 end
