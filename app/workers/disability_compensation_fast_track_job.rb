@@ -7,14 +7,16 @@ require 'lighthouse/veterans_health/client'
 class DisabilityCompensationFastTrackJob
   include Sidekiq::Worker
   extend SentryLogging
+  #TODO this needs to be thought about more. How many retries and how long do we want this to attempt.
   sidekiq_options retry: 14
 
   def perform(form526_submission_id, full_name)
-
     # icn = Account.where(idme_uuid: submission.user_uuid).first.icn
     icn = '2000163'
 
     client = Lighthouse::VeteransHealth::Client.new(icn)
+    # Do we have access to the Sentry errors
+    # I kinda prefer that we silently fail rhen can we commit the error to the Form526Status?
     # TODO: rescue !=200 responses with an appropriate action
     condition_response = client.get_resource('conditions')
     return unless hypertension?(condition_response)
@@ -31,34 +33,30 @@ class DisabilityCompensationFastTrackJob
     bpreadings = bpreadings.sort_by { |reading| reading[:issued].to_date }.reverse!
     medications = medications.sort_by { |med| med[:authoredOn].to_date }.reverse!
     pdf = HypertensionPDFGenerator.new(full_name, bpreadings, medications, Date.today).generate
-    # pdf_body = pdf.render #???? hopefully calling .render works here like in line 51
+    pdf_body = pdf.render
+    submission = Form526Submission.find(form526_submission_id)
 
-    # submission = Form526Submission.find(form526_submission_id)
+    evss_client = EVSS::DocumentsService.new(submission.auth_headers)
+    evss_client.upload(pdf_body, create_document_data(submission))
 
-    # client = EVSS::DocumentsService.new(submission.auth_headers)
-    # client.upload(pdf, create_document_data(upload_data))
+    HypertensionSpecialIssueManager.new(submission).add_special_issue
   end
+
+  private
 
   def hypertension?(condition_response)
     condition_response.body['entry'].filter {|e| e['resource']['code']['text'].downcase == 'hypertension'}.length.positive?
   end
 
-  def generate_pdf(_condition_response)
-    # Prawn documentation - https://prawnpdf.org/manual.pdf
-    # todo: do something with lighthouse response to put in PDF
-    pdf = Prawn::Document.new
-    pdf.text 'Hello World!'
-    pdf.define_grid(columns: 5, rows: 8, gutter: 10)
-    pdf.render
-  end
-
   def create_document_data(submission)
     # 'L048' => 'Medical Treatment Record - Government Facility',
+    # TODO: determine whether or not there's a 'subject' field we can set and
+    # what it should be.
     EVSSClaimDocument.new(
       evss_claim_id: submission.submitted_claim_id,
-      file_name: 'hypertension_evidence.pdf',
+      file_name: 'hypertension_evidence.pdf', # TODO: change this to what Emily wants the filename to be.
       tracked_item_id: nil,
-      document_type: 'L048'
+      document_type: 'L048' # Double-check with Zach (and/or Emily) as to what this should be.
     )
   end
 end
@@ -190,20 +188,6 @@ class HypertensionMedicationRequestData
   end
 end
 
-class HypertensionFilterer
-  def initialize(bp_data, medications)
-    @bp_data = bp_data
-    @medications = medications
-  end
-
-  def filter
-    # filter bp medications to the previous year
-    # sort bp readings by most-recent-first
-    # sort medications by most-recent-first
-    binding.pry
-  end
-end
-
 class HypertensionPDFGenerator
   attr_accessor :patient, :bp_data, :medications
 
@@ -220,7 +204,7 @@ class HypertensionPDFGenerator
     pdf = add_blood_pressure(pdf)
     pdf = add_medications(pdf) if medications.length > 1
     pdf = add_about(pdf)
-    pdf.render_file 'htn-example.pdf'
+    pdf
   end
 
   def stringify_patient
@@ -367,5 +351,45 @@ class HypertensionPDFGenerator
     end
 
     pdf
+  end
+end
+
+
+class HypertensionSpecialIssueManager
+  attr_accessor :submission
+
+  def initialize(submission)
+    @submission = submission
+  end
+
+  def add_special_issue
+    data = JSON.parse(submission.form_json)
+    disabilities = data['form526']['form526']['disabilities']
+    added = add_rrd_to_disabilities(disabilities)
+    data['form526']['form526']['disabilities'] = disabilities
+    # TODO: do we need to also add the special issue to secondary disabilities?
+    # This code currently does not do that, but some disabilities have a
+    # secondaryDisabilities property within the disability.
+    submission.form_json = JSON.dump(data)
+    submission.save
+    return JSON.dump(data) # TODO: update tests so that this return value is unnecessary
+  end
+
+  def add_rrd_to_disabilities(disabilities)
+    disabilities.each do |da|
+      if da['diagnosticCode'] == 7101 && da['disabilityActionType'].downcase == 'increase'
+        ad = add_rrd(da)
+      end
+    end
+  end
+
+  def add_rrd(disability)
+    rrd_hash = {'code'=> 'RRD', 'name'=> 'Rapid Ready for Decision'}
+    if disability['specialIssues'].blank?
+      disability['specialIssues'] = [rrd_hash]
+    elsif !disability['specialIssues'].include? rrd_hash
+      disability['specialIssues'].append(rrd_hash)
+    end
+    return disability
   end
 end
