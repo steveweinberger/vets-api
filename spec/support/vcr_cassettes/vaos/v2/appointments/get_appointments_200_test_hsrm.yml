@@ -1,0 +1,66 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://veteran.apps.va.gov/vaos/v1/patients/1012845331V153043/appointments?end=2021-12-16T19:45:00Z&pageSize=0&start=2021-12-01T19:25:00Z&statuses=booked
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - application/json
+      Content-Type:
+      - application/json
+      User-Agent:
+      - Vets.gov Agent
+      Referer:
+      - https://review-instance.va.gov
+      X-Vamf-Jwt:
+      - eyJhbGciOiJSUzUxMiJ9.eyJhdXRoZW50aWNhdGVkIjp0cnVlLCJsYXN0TmFtZSI6Ik1vcnJpc29uIiwic3ViIjoiMTAxMjg0NTMzMVYxNTMwNDMiLCJhdXRoZW50aWNhdGlvbkF1dGhvcml0eSI6Imdvdi52YS52YW9zIiwiZ2VuZGVyIjoiRkVNQUxFIiwiaXNzIjoiZ292LnZhLnZhbWYudXNlcnNlcnZpY2UudjIiLCJ2YW1mLmF1dGgucmVzb3VyY2VzIjpbIl4uKihcLyk_c2l0ZVtzXT9cLyhkZm4tKT85ODRcL3BhdGllbnRbc10_XC81NTIxNjEwNTBcL2FwcG9pbnRtZW50cyhcLy4qKT8kIiwiXi4qKFwvKT9zaXRlW3NdP1wvKGRmbi0pPzk4M1wvcGF0aWVudFtzXT9cLzcyMTY2OTFcL2FwcG9pbnRtZW50cyhcLy4qKT8kIiwiXi4qKFwvKT9wYXRpZW50W3NdP1wvKElDTlwvKT8xMDEyODQ1MzMxVjE1MzA0MyhcLy4qKT8kIl0sInNzbiI6Ijc5NjA2MTk3NiIsInNzdCI6MTYzNzk1MDE5OCwicGF0aWVudCI6eyJmaXJzdE5hbWUiOiJKdWR5IiwibGFzdE5hbWUiOiJNb3JyaXNvbiIsImdlbmRlciI6IkZFTUFMRSIsImljbiI6IjEwMTI4NDUzMzFWMTUzMDQzIiwiZG9iIjoiMTk1My0wNC0wMSIsImRhdGVPZkJpcnRoIjoiMTk1My0wNC0wMSIsInNzbiI6Ijc5NjA2MTk3NiJ9LCJ2YW1mLmF1dGgucm9sZXMiOlsidmV0ZXJhbiJdLCJyaWdodE9mQWNjZXNzQWNjZXB0ZWQiOnRydWUsImV4cCI6MTYzNzk1MTA5OSwianRpIjoiMjcyOTZlNGUtZDE0MC00YzRjLWIwYWQtN2EzMGM3MjcwOWNkIiwiaWRUeXBlIjoiSUNOIiwiZGF0ZU9mQmlydGgiOiIxOTUzMDQwMSIsInZlcnNpb24iOjIuNiwiZWRpcGlkIjoiMTI1OTg5Nzk3OCIsInZpc3RhSWRzIjpbeyJwYXRpZW50SWQiOiI1NTIxNjEwNTAiLCJzaXRlSWQiOiI5ODQifSx7InBhdGllbnRJZCI6IjcyMTY2OTEiLCJzaXRlSWQiOiI5ODMifV0sImZpcnN0TmFtZSI6Ikp1ZHkiLCJzdGFmZkRpc2NsYWltZXJBY2NlcHRlZCI6dHJ1ZSwibmJmIjoxNjM3OTUwMDE5LCJkb2IiOiIxOTUzMDQwMSIsImxvYSI6Mn0.sN0X6KDitPW6Hm9O7gx6TFIUNxsDj5Ulm9AU_61xqBPWUV5nsBMbKqBXJSbzNQpK5nL_35AmLZA2XuHrHaGxjisv7E2ujfzU-pG35RnSTn3jbYd-4CUb4PtN4GoqvRAwh3611lVRR7uqEwm53rAsubknLWeWnjXaZ_mgOKQMLvP7mSyMo27GBUtAjdBz73As1bzpCimavs6lnwWIxWd1lrHew2EJLk_8kTU0mTBKf5Su-EYtejunXppMttIVLibiQvS36pYOdyD_pmLKUnB3YX2CpewC2QRn2D6mING7_NnzRyUC5OHCNKGxKm3_Zf-rrUZms_y0zuVcPB9AA8o8Bw
+      X-Request-Id:
+      - ''
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Fri, 26 Nov 2021 18:10:01 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '2329'
+      Server:
+      - openresty
+      X-Vamf-Version:
+      - 1.14.1
+      B3:
+      - a83a39eae479e8f89e48358a68eecbb4-e3e20117e58d5cdf-0
+      Access-Control-Allow-Headers:
+      - x-vamf-jwt
+      X-Vamf-Build:
+      - 20a82ca
+      X-Vamf-Timestamp:
+      - '2021-11-26T16:29:10+0000'
+      Access-Control-Allow-Origin:
+      - "*"
+      Access-Control-Allow-Methods:
+      - GET,OPTIONS
+      Access-Control-Max-Age:
+      - '3600'
+      X-Envoy-Upstream-Service-Time:
+      - '2234'
+      Strict-Transport-Security:
+      - max-age=63072000; includeSubDomains; preload
+    body:
+      encoding: UTF-8
+      string: '{"data":[{"id":"64078","identifier":[{"system":"http://med.va.gov/fhir/urn/vaos/vista/983/appointment/id","value":"707;20211203.105000"}],"kind":"clinic","status":"booked","serviceType":"foodAndNutrition","patientIcn":"1012845331V153043","locationId":"983","clinic":"707","start":"2021-12-03T17:50:00Z","end":"2021-12-03T18:50:00Z","minutesDuration":60,"slot":{"id":"3230323131323033313735303A323032313132303331383530","start":"2021-12-03T17:50:00Z","end":"2021-12-03T18:50:00Z"},"cancellationReason":{"code":"other"},"cancellable":true,"extension":{"ccLocation":{"address":{}}}},{"id":"67990","identifier":[{"system":"http://med.va.gov/fhir/urn/vaos/vvs/id","value":"aab5388a-8951-42ae-9280-7f726e46e68c"}],"kind":"telehealth","status":"booked","patientIcn":"1012845331V153043","locationId":"983","practitionerIds":[{"system":"dfn-983","value":"520647742"}],"practitioners":[{"identifier":[{"system":"dfn-983","value":"520647742"}],"name":{"family":"Lawyer","given":["Katherine"]},"practiceName":"CHEYENNE
+        VAMC"}],"start":"2021-12-03T20:00:00Z","end":"2021-12-03T20:20:00Z","minutesDuration":20,"cancellationReason":{"code":"other"},"cancellable":true,"patientInstruction":"","telehealth":{"url":"https://dev.care.va.gov/vvc-app/?join=1&media=1&escalate=1&conference=VAC000417560@dev.care.va.gov&pin=128396&aid=aab5388a-8951-42ae-9280-7f726e46e68c#","group":false,"vvsKind":"ADHOC"},"extension":{"ccLocation":{"address":{}}}},{"id":"67993","identifier":[{"system":"http://med.va.gov/fhir/urn/vaos/vista/983/appointment/id","value":"981;20211213.124500"}],"kind":"clinic","status":"booked","serviceType":"ophthalmology","patientIcn":"1012845331V153043","locationId":"983","clinic":"981","start":"2021-12-13T19:45:00Z","end":"2021-12-13T20:15:00Z","minutesDuration":30,"slot":{"id":"3230323131323133313934353A323032313132313332303135","start":"2021-12-13T19:45:00Z","end":"2021-12-13T20:15:00Z"},"cancellationReason":{"code":"other"},"comment":"New
+        issue: test","cancellable":true,"extension":{"ccLocation":{"address":{}}}}],"failures":[{"system":"984","status":"500","code":3003,"message":"Could
+        not retrieve appointment slots from VistA Scheduling Service (7e200dfe-c287-47cf-a851-707b6089cec5)","detail":"siteId=984,
+        patientDfn=552161050, patientIcn=1012845331V153043, startDate=2021-12-01T19:25Z,
+        endDate=2021-12-16T19:45Z"}]}'
+  recorded_at: Fri, 26 Nov 2021 18:10:01 GMT
+recorded_with: VCR 6.0.0

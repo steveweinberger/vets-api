@@ -10,6 +10,8 @@ describe VAOS::V2::AppointmentsService do
   let(:end_date) { Time.zone.parse('2022-07-03T04:00:00.000Z') }
   let(:start_date2) { Time.zone.parse('2021-09-01T19:25:00Z') }
   let(:end_date2) { Time.zone.parse('2021-09-16T19:45:00Z') }
+  let(:start_date3) { Time.zone.parse('2021-12-01T19:25:00Z') }
+  let(:end_date3) { Time.zone.parse('2021-12-16T19:45:00Z') }
   let(:id) { '202006031600983000030800000000000000' }
   let(:appointment_id) { 123 }
 
@@ -92,6 +94,15 @@ describe VAOS::V2::AppointmentsService do
                                                                       tag: :force_utf8) do
           response = subject.get_appointments(start_date2, end_date2)
           expect(response[:data].size).to eq(23)
+        end
+      end
+
+      it 'returns a 200 status with list of appointments with HSRM unique identifier' do
+        VCR.use_cassette('vaos/v2/appointments/get_appointments_200_test_hsrm', match_requests_on: %i[method uri],
+                                                                      tag: :force_utf8) do
+          response = subject.get_appointments(start_date3, end_date3, 'booked')
+          expect(response[:data].size).to eq(3)
+          expect(response[:data][0][:identifier][0][:value]).to eq("707;20211203.105000")
         end
       end
     end
