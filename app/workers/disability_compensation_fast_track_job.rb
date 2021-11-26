@@ -11,9 +11,8 @@ class DisabilityCompensationFastTrackJob
   sidekiq_options retry: 14
 
   def perform(form526_submission_id, full_name)
-    # TODO we need to dynamically get the ICN still.
-    # icn = Account.where(idme_uuid: submission.user_uuid).first.icn
-    icn = '2000163'
+    submission = Form526Submission.find(form526_submission_id)
+    icn = Account.where(idme_uuid: submission.user_uuid).first.icn
 
     client = Lighthouse::VeteransHealth::Client.new(icn)
     observations_response = client.get_resource('observations')
@@ -30,7 +29,6 @@ class DisabilityCompensationFastTrackJob
     medications = medications.sort_by { |med| med[:authoredOn].to_date }.reverse!
     pdf = HypertensionPDFGenerator.new(full_name, bpreadings, medications, Date.today).generate
     pdf_body = pdf.render
-    submission = Form526Submission.find(form526_submission_id)
 
     evss_client = EVSS::DocumentsService.new(submission.auth_headers)
     evss_client.upload(pdf_body, create_document_data(submission))
@@ -113,8 +111,10 @@ class HypertensionObservationData
 
   def get_display_hash_from_performer(term, entry)
     result = {}
-    performer = entry['performer'].select { |item| item['reference'].include? term }.first
-    result[term.downcase.to_sym] = performer['display'] if performer.present?
+    if entry['performer'].present?
+      performer_with_term = entry['performer'].select { |item| item['reference'].include? term }
+      result[term.downcase.to_sym] = performer_with_term.first['display'] if performer_with_term.present?
+    end
     result
   end
 

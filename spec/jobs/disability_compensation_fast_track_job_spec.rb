@@ -11,7 +11,6 @@ RSpec.describe DisabilityCompensationFastTrackJob, type: :worker do
 
   let!(:user) { FactoryBot.create(:disabilities_compensation_user, icn: '2000163') }
   # let!(:account) { FactoryBot.create(:account, icn: user.icn, idme_uuid: user.uuid) }
-  let(:icn_for_user_without_bp_reading_within_one_year) { 17000151 }
   let(:auth_headers) do
     EVSS::DisabilityCompensationAuthHeaders.new(user).add_headers(EVSS::AuthHeaders.new(user).to_h)
   end
@@ -29,9 +28,21 @@ RSpec.describe DisabilityCompensationFastTrackJob, type: :worker do
   describe '#perform', :vcr  do
     context 'success' do
       context 'the claim is NOT for hypertension' do
+        let(:icn_for_user_without_bp_reading_within_one_year) { 17000151 }
+        let!(:user) do
+          FactoryBot.create(:disabilities_compensation_user, icn: icn_for_user_without_bp_reading_within_one_year)
+        end
+        let!(:submission_for_user_wo_bp) do
+          create(:form526_submission, :with_uploads,
+                 user_uuid: user.uuid,                           
+                 auth_headers_json: auth_headers.to_json,
+                 saved_claim_id: saved_claim.id,                 
+                 submitted_claim_id: '600130094')                  
+        end
+
         it 'returns from the class if the claim observations does NOT include bp readings from the past year' do
           expect(HypertensionMedicationRequestData).not_to receive(:new)
-          subject.new.perform(icn_for_user_without_bp_reading_within_one_year, user_full_name)
+          subject.new.perform(submission_for_user_wo_bp.id, user_full_name)
         end
       end
 
