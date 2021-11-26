@@ -45,7 +45,10 @@ class DisabilityCompensationFastTrackJob
   private
 
   def hypertension?(condition_response)
-    condition_response.body['entry'].filter {|e| e['resource']['code']['text'].downcase == 'hypertension'}.length.positive?
+    condition_response.body['entry'].filter do |entry| 
+      entry['resource']['code']['text'].downcase == 'hypertension' &&
+        entry['resource']['clinicalStatus']['text'].downcase == 'active'
+    end.length.positive?
   end
 
   def create_document_data(submission)
