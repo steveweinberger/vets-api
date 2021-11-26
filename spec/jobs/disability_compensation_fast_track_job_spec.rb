@@ -11,7 +11,7 @@ RSpec.describe DisabilityCompensationFastTrackJob, type: :worker do
 
   let!(:user) { FactoryBot.create(:disabilities_compensation_user, icn: '2000163') }
   # let!(:account) { FactoryBot.create(:account, icn: user.icn, idme_uuid: user.uuid) }
-  let(:icn_for_user_without_hypertension) { 17000151 } #TODO this icn is for someone with hypertension :-(
+  let(:icn_for_user_without_bp_reading_within_one_year) { 17000151 }
   let(:auth_headers) do
     EVSS::DisabilityCompensationAuthHeaders.new(user).add_headers(EVSS::AuthHeaders.new(user).to_h)
   end
@@ -29,17 +29,16 @@ RSpec.describe DisabilityCompensationFastTrackJob, type: :worker do
   describe '#perform', :vcr  do
     context 'success' do
       context 'the claim is NOT for hypertension' do
-        it 'does returns from the class and does NOT continue' do
-          #TODO the sample icn includes active hypertention :-( we need one without.
-          expect(HypertensionObservationData).not_to receive(:new)
-          subject.new.perform(icn_for_user_without_hypertension, user_full_name)
+        it 'returns from the class if the claim observations does NOT include bp readings from the past year' do
+          expect(HypertensionMedicationRequestData).not_to receive(:new)
+          subject.new.perform(icn_for_user_without_bp_reading_within_one_year, user_full_name)
         end
       end
 
       context 'the claim IS for hypertension' do
         it 'calls #new on Lighthouse::ClinicalHealth::Client' do
-          expect(Lighthouse::VeteransHealth::Client).to receive(:new).with(user.icn)
-          DisabilityCompensationFastTrackJob.new.perform(submission.id, user_full_name)
+         expect(Lighthouse::VeteransHealth::Client).to receive(:new).with(user.icn)
+         DisabilityCompensationFastTrackJob.new.perform(submission.id, user_full_name)
         end
 
         it 'generates a pdf' do

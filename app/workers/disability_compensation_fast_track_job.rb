@@ -11,21 +11,17 @@ class DisabilityCompensationFastTrackJob
   sidekiq_options retry: 14
 
   def perform(form526_submission_id, full_name)
+    # TODO we need to dynamically get the ICN still.
     # icn = Account.where(idme_uuid: submission.user_uuid).first.icn
     icn = '2000163'
 
     client = Lighthouse::VeteransHealth::Client.new(icn)
-    # Do we have access to the Sentry errors
-    # I kinda prefer that we silently fail rhen can we commit the error to the Form526Status?
-    # TODO: rescue !=200 responses with an appropriate action
-    condition_response = client.get_resource('conditions')
-    return unless hypertension?(condition_response)
-
-    # TODO: rescue !=200 responses with an appropriate action
     observations_response = client.get_resource('observations')
     medicationrequest_response = client.get_resource('medications')
 
     bpreadings = HypertensionObservationData.new(observations_response).transform
+    return if no_recent_bp_readings(bpreadings)
+
     medications = HypertensionMedicationRequestData.new(medicationrequest_response).transform
 
     patient = nil # TODO: change when we know how to get patient
@@ -44,7 +40,14 @@ class DisabilityCompensationFastTrackJob
 
   private
 
+  def no_recent_bp_readings(bp_readings)
+    last_reading = bp_readings.map { |reading| reading[:issued] }.sort.last
+    last_reading < 1.year.ago
+  end
+
   def hypertension?(condition_response)
+    #TODO this is not how this should work
+    #We need to check for ANY bp readings in the last year regardless of the presence of hypertension as the condition in lh.
     condition_response.body['entry'].filter do |entry| 
       entry['resource']['code']['text'].downcase == 'hypertension' &&
         entry['resource']['clinicalStatus']['text'].downcase == 'active'
@@ -55,6 +58,8 @@ class DisabilityCompensationFastTrackJob
     # 'L048' => 'Medical Treatment Record - Government Facility',
     # TODO: determine whether or not there's a 'subject' field we can set and
     # what it should be.
+    # file name should be this text and dynamic date range 'VAMC Hypertension Rapid Decision Evidence [date range]'
+    # Date range format = 11/08/202 - 11/08/2021
     EVSSClaimDocument.new(
       evss_claim_id: submission.submitted_claim_id,
       file_name: 'hypertension_evidence.pdf', # TODO: change this to what Emily wants the filename to be.
