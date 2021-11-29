@@ -8,7 +8,7 @@ class DisabilityCompensationFastTrackJob
   include Sidekiq::Worker
 
   extend SentryLogging
-  #TODO this needs to be thought about more. How many retries and how long do we want this to attempt.
+  # TODO: This needs to be thought about more. How many retries and how long do we want this to attempt.
   sidekiq_options retry: 14
 
   sidekiq_retries_exhausted do |msg, _ex|
@@ -30,15 +30,12 @@ class DisabilityCompensationFastTrackJob
 
     medications = HypertensionMedicationRequestData.new(medicationrequest_response).transform
 
-    patient = nil # TODO: change when we know how to get patient
-
     bpreadings = bpreadings.filter { |reading| reading[:issued].to_date > 1.year.ago }
 
     bpreadings = bpreadings.sort_by { |reading| reading[:issued].to_date }.reverse!
     medications = medications.sort_by { |med| med[:authoredOn].to_date }.reverse!
-    pdf = HypertensionPDFGenerator.new(full_name, bpreadings, medications, Date.today).generate
+    pdf = HypertensionPDFGenerator.new(full_name, bpreadings, medications, Time.zone.today).generate
     pdf_body = pdf.render
-
 
     # Upload the file to S3 through the SupportingEvidenceAttachment class
     supporting_evidence_attachment = SupportingEvidenceAttachment.new
@@ -61,17 +58,8 @@ class DisabilityCompensationFastTrackJob
   private
 
   def no_recent_bp_readings(bp_readings)
-    last_reading = bp_readings.map { |reading| reading[:issued] }.sort.last
+    last_reading = bp_readings.map { |reading| reading[:issued] }.max
     last_reading < 1.year.ago
-  end
-
-  def hypertension?(condition_response)
-    #TODO this is not how this should work
-    #We need to check for ANY bp readings in the last year regardless of the presence of hypertension as the condition in lh.
-    condition_response.body['entry'].filter do |entry| 
-      entry['resource']['code']['text'].downcase == 'hypertension' &&
-        entry['resource']['clinicalStatus']['text'].downcase == 'active'
-    end.length.positive?
   end
 
   def create_document_data(submission)
