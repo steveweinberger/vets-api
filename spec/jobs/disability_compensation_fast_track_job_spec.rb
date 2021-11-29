@@ -81,4 +81,3 @@ RSpec.describe DisabilityCompensationFastTrackJob, type: :worker do
       end
     end
   end
-end
