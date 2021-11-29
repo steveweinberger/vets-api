@@ -8,6 +8,10 @@ module V0
       render json: vbs_service.get_copays
     end
 
+    def show
+      render json: vbs_service.get_copays_by_id(params[:statement_id])
+    end
+
     def get_pdf_statement_by_id
       send_data(
         vbs_service.get_pdf_statement_by_id(params[:statement_id]),

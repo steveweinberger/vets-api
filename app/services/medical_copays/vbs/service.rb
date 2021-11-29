@@ -48,6 +48,20 @@ module MedicalCopays
         ResponseData.build(response: response).handle
       end
 
+      def get_statements_by_id(_statement_id)
+        raise InvalidVBSRequestError, request_data.errors unless request_data.valid?
+
+        response = request.post("#{settings.base_path}/GetStatementsByEDIPIAndVistaAccountNumber", request_data.to_hash)
+
+        zero_balance_statements = MedicalCopays::ZeroBalanceStatements.build(
+          statements: response.body,
+          facility_hash: user.vha_facility_hash
+        )
+        response.body.concat(zero_balance_statements.list)
+
+        ResponseData.build(response: response).handle
+      end
+
       ##
       # Gets the PDF medical copay statment by statment_id
       #
