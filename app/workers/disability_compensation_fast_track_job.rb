@@ -11,6 +11,12 @@ class DisabilityCompensationFastTrackJob
   #TODO this needs to be thought about more. How many retries and how long do we want this to attempt.
   sidekiq_options retry: 14
 
+  sidekiq_retries_exhausted do |msg, _ex|
+    submission_id = msg['args'].first
+    submission = Form526Submission.new
+    submission.start_evss_submission(_status, submission_id: submission_id)
+  end
+
   def perform(form526_submission_id, full_name)
     submission = Form526Submission.find(form526_submission_id)
     icn = Account.where(idme_uuid: submission.user_uuid).first.icn

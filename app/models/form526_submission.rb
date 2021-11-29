@@ -52,8 +52,8 @@ class Form526Submission < ApplicationRecord
     if single_issue_hypertension_claim? && Flipper.enabled?(:disability_hypertension_compensation_fast_track)
       workflow_batch = Sidekiq::Batch.new
       workflow_batch.on(
-        :complete,
-        'Form526Submission#add_rrd',
+        :success,
+        'Form526Submission#start_evss_submission',
         'submission_id' => id,
       )
       jids = workflow_batch.jobs do
@@ -71,11 +71,6 @@ class Form526Submission < ApplicationRecord
   #
   # @return [String] the job id of the first job in the batch, i.e the 526 submit job
   #
-
-  def add_rrd(id)
-    #- adds RRD to the Form526Submission.find(id).form_json.update!
-    #- calls start_evss_submission(id)
-  end
 
   def start_evss_submission(_status, options)
     submission = Form526Submission.find(options['submission_id'])
