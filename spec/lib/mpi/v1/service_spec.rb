@@ -174,11 +174,11 @@ describe MPI::V1::Service do
 
       it 'raises a service error', :aggregate_failures do
         allow_any_instance_of(Faraday::Connection).to receive(:post).and_raise(Faraday::TimeoutError)
-        expect(subject).to receive(:log_message_to_sentry).with(
+        expect(service).to receive(:log_message_to_sentry).with(
           'MVI add_person error: timeout',
           :warn
         )
-        response = subject.add_person(user)
+        response = service.add_person(user)
 
         exception = response.error.errors.first
 
