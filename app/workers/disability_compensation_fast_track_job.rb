@@ -25,7 +25,9 @@ class DisabilityCompensationFastTrackJob
     medications = HypertensionMedicationRequestData.new(medicationrequest_response).transform
 
     patient = nil # TODO: change when we know how to get patient
+
     bpreadings = bpreadings.filter { |reading| reading[:issued].to_date > 1.year.ago }
+
     bpreadings = bpreadings.sort_by { |reading| reading[:issued].to_date }.reverse!
     medications = medications.sort_by { |med| med[:authoredOn].to_date }.reverse!
     pdf = HypertensionPDFGenerator.new(full_name, bpreadings, medications, Date.today).generate
@@ -237,11 +239,11 @@ class HypertensionPDFGenerator
   end
 
   def stringify_patient
-    suffix = @patient[:suffix].present? ? ", #{patient[:suffix]}" : ""
+    suffix = patient[:suffix].present? ? ", #{patient[:suffix]}" : ""
     stringified = ""
     [:first, :middle, :last].each do |name|
-      if @patient[name].present?
-        stringified = "#{stringified} #{@patient[name]}"
+      if patient[name].present?
+        stringified = "#{stringified} #{patient[name]}"
       end
     end
 

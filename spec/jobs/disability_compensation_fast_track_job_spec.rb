@@ -23,7 +23,7 @@ RSpec.describe DisabilityCompensationFastTrackJob, type: :worker do
            submitted_claim_id: '600130094')
   end
 
-  let(:user_full_name) { user.first_name + user.last_name }
+  let(:user_full_name) { user.full_name_normalized }
   let(:mocked_observation_data) do
     [{:issued=>"{Date.today.year}-03-23T01:15:52Z",
       :practitioner=>"DR. THOMAS359 REYNOLDS206 PHD",
@@ -60,7 +60,9 @@ RSpec.describe DisabilityCompensationFastTrackJob, type: :worker do
         end
 
         it 'generates a pdf' do
-          #TODO this doesn't work. The HypertensionPDFGenerator is being passed a name string but the class expects it to be an array that may or may not include suffix on line 219.
+          expect(HypertensionPDFGenerator).to reveive(:new).with(user_full_name)
+          DisabilityCompensationFastTrackJob.new.perform(submission.id, user_full_name)
+        end
         end
 
         it 'calls new on EVSS::DocumentsService with the expected arguments' do
