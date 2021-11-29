@@ -1,3 +1,16 @@
+FROM ruby:2.7.4-slim-buster AS poppler_build
+RUN apt update && \
+    apt --yes install wget xz-utils cmake gcc build-essential libfontconfig1-dev pkg-config libjpeg-dev gnome-common libglib2.0-dev gtk-doc-tools libyelp-dev yelp-tools gobject-introspection libsecret-1-dev libnautilus-extension-dev libopenjp2-7 libopenjp2-7-dev libboost-all-dev && \
+    wget https://poppler.freedesktop.org/poppler-21.11.0.tar.xz && \
+    unxz poppler-21.11.0.tar.xz && \
+    tar xf poppler-21.11.0.tar && \
+    cd poppler-21.11.0 && \
+    cmake  -DCMAKE_BUILD_TYPE=Release   \
+           -DCMAKE_INSTALL_PREFIX=/srv/vets-api/src/util \
+           -DENABLE_XPDF_HEADERS=ON && \
+    make install
+RUN  tar -zcvf /poppler_utils_21_11_0.tar.gz /srv/vets-api/src/util/
+
 # XXX: using stretch here for pdftk dep, which is not availible after
 #      stretch (or in alpine) and is switched automatically to pdftk-java in buster
 #      https://github.com/department-of-veterans-affairs/va.gov-team/issues/3032
@@ -25,6 +38,8 @@ COPY config/ca-trust/* /usr/local/share/ca-certificates/
 RUN cd /usr/local/share/ca-certificates ; for i in *.pem ; do mv $i ${i/pem/crt} ; done ; update-ca-certificates
 # Relax ImageMagick PDF security. See https://stackoverflow.com/a/59193253.
 RUN sed -i '/rights="none" pattern="PDF"/d' /etc/ImageMagick-6/policy.xml
+COPY --from=poppler_build /poppler_utils_21_11_0.tar.gz /
+RUN tar xvf /poppler_utils_21_11_0.tar.gz && rm poppler_utils_21_11_0.tar.gz
 WORKDIR /srv/vets-api/src
 
 ###

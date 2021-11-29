@@ -45,6 +45,7 @@ services:
       POSTGRES_PORT: "${POSTGRES_PORT:-5432}"
       POSTGRES_USER: "${POSTGRES_USER:-postgres}"
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-password}"
+      LD_LIBRARY_PATH: /srv/vets-api/src/util
     depends_on:
       - postgres
       - redis
