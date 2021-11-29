@@ -6,6 +6,7 @@ require 'lighthouse/veterans_health/client'
 
 class DisabilityCompensationFastTrackJob
   include Sidekiq::Worker
+
   extend SentryLogging
   #TODO this needs to be thought about more. How many retries and how long do we want this to attempt.
   sidekiq_options retry: 14
@@ -30,8 +31,17 @@ class DisabilityCompensationFastTrackJob
     pdf = HypertensionPDFGenerator.new(full_name, bpreadings, medications, Date.today).generate
     pdf_body = pdf.render
 
-    evss_client = EVSS::DocumentsService.new(submission.auth_headers)
-    evss_client.upload(pdf_body, create_document_data(submission))
+
+    # Upload the file to S3 through the SupportingEvidenceAttachment class
+    supporting_evidence_attachment = SupportingEvidenceAttachment.new
+    file = FileIO.new(pdf_body, 'hypertension_evidence.pdf')
+    supporting_evidence_attachment.set_file_data!(file)
+
+    # TODO: move below two lines and the HypertensionSpecialIssueManager class
+    # so that the pdf is being uploaded within the submission model instance,
+    # wherever the rest of the EVSS Document Service uploads are being done.
+    # evss_client = EVSS::DocumentsService.new(submission.auth_headers)
+    # evss_client.upload(pdf_body, create_document_data(submission))
 
     HypertensionSpecialIssueManager.new(submission).add_special_issue
   end
@@ -65,6 +75,17 @@ class DisabilityCompensationFastTrackJob
       document_type: 'L048' # Double-check with Zach (and/or Emily) as to what this should be.
     )
   end
+end
+
+class FileIO < StringIO
+  def initialize(stream, filename)
+    super(stream)
+    @original_filename = filename
+    @fast_track = true
+    @content_type = 'application/pdf'
+  end
+
+  attr_reader :content_type, :original_filename, :fast_track
 end
 
 # What should the DisabilityCompensationFastTrackJob class do, as opposed to helper class(es).

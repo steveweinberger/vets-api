@@ -950,12 +950,12 @@ lighthouse:
         - "patient/Condition.read"
         - "patient/Observation.read"
         - "patient/Practitioner.read"
-        - "patient/Medication.read"
+        - "patient/MedicationRequest.read"
         - "system/Endpoint.read"
       aud_claim_url: "https://deptva-eval.okta.com/oauth2/aus8nm1q0f7VQ0a482p7/v1/token"
       client_id: "0oaaxkp0aeXEJkMFw2p7"
       grant_type: "client_credentials"
-      api_key: ~/private.pem
+      api_key: /private.pem
   facilities:
     url: https://sandbox-api.va.gov
     api_key: fake_key
