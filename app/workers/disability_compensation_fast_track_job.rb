@@ -45,9 +45,9 @@ class DisabilityCompensationFastTrackJob
     file = FileIO.new(pdf_body, 'hypertension_evidence.pdf')
     supporting_evidence_attachment.set_file_data!(file)
     supporting_evidence_attachmen.save!
-    conf_code = supporting_evidence_attachment.guid
+    confirmation_code = supporting_evidence_attachment.guid
 
-    submission = HypertensionUploadManager.new(submission, conf_code).add_upload
+    submission = HypertensionUploadManager.new(submission, confirmation_code).add_upload
 
     # TODO: move below two lines and the HypertensionSpecialIssueManager class
     # so that the pdf is being uploaded within the submission model instance,
@@ -435,13 +435,13 @@ class HypertensionSpecialIssueManager
   end
 end
 
-class HypertensionSpecialIssueManager
+class HypertensionUploadManager
   attr_accessor :submission
-  attr_accessor :conf_code
+  attr_accessor :confirmation_code
 
-  def initialize(submission)
+  def initialize(submission, confirmation_code)
     @submission = submission
-    @conf_code = conf_code
+    @confirmation_code = confirmation_code
   end
 
   def add_upload
@@ -449,7 +449,7 @@ class HypertensionSpecialIssueManager
     uploads = data['form526_uploads'] || []
     new_upload = {
       "name": "hypertension_evidence.pdf",
-      "confirmationCode": @conf_code,
+      "confirmationCode": confirmation_code,
       "attachmentId": "1489"
       # Note: 1489 per Zach, awaiting info as to whether it should be L1489
     }
