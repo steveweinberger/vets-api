@@ -47,14 +47,13 @@ class Form526Submission < ApplicationRecord
   BIRLS_KEY = 'va_eauth_birlsfilenumber'
   SUBMIT_FORM_526_JOB_CLASSES = %w[SubmitForm526AllClaim SubmitForm526].freeze
 
-
   def start
     if single_issue_hypertension_claim? && Flipper.enabled?(:disability_hypertension_compensation_fast_track)
       workflow_batch = Sidekiq::Batch.new
       workflow_batch.on(
         :success,
         'Form526Submission#start_evss_submission',
-        'submission_id' => id,
+        'submission_id' => id
       )
       jids = workflow_batch.jobs do
         submit_disability_compensation_fast_track
