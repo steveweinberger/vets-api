@@ -25,7 +25,7 @@ RSpec.describe DisabilityCompensationFastTrackJob, type: :worker do
 
   let(:user_full_name) { user.full_name_normalized }
   let(:mocked_observation_data) do
-    [{:issued=>"{Date.today.year}-03-23T01:15:52Z",
+    [{:issued=>"#{Date.today.year}-03-23T01:15:52Z",
       :practitioner=>"DR. THOMAS359 REYNOLDS206 PHD",
       :organization=>"LYONS VA MEDICAL CENTER",
       :systolic=>{"code"=>"8480-6", "display"=>"Systolic blood pressure", "value"=>115.0, "unit"=>"mm[Hg]"},
@@ -55,29 +55,23 @@ RSpec.describe DisabilityCompensationFastTrackJob, type: :worker do
 
       context 'the claim IS for hypertension', :vcr do
         before do
-          #TODO the bp reading needs to be 1 year or less old so actual API data will not test if this code is working.
+          #The bp reading needs to be 1 year or less old so actual API data will not test if this code is working.
           allow_any_instance_of(HypertensionObservationData).to receive(:transform).and_return(mocked_observation_data)
         end
 
-        it 'generates a pdf' do
-          expect(HypertensionPDFGenerator).to reveive(:new).with(user_full_name)
-          DisabilityCompensationFastTrackJob.new.perform(submission.id, user_full_name)
-        end
+        it 'finishes successfully' do
+          expect(DisabilityCompensationFastTrackJob.new.perform(submission.id, user_full_name)).to eq true
         end
 
-        it 'calls new on EVSS::DocumentsService with the expected arguments' do
-          expect(EVSS::DocumentsService).to receive(:new).with("")
-          DisabilityCompensationFastTrackJob.new.perform(submission.id, user_full_name)
-        end
-      end
+        context 'failure' do
+          it 'raises a helpful error if the failure is after the api call' do
+            allow_any_instance_of(SupportingEvidenceAttachment).to receive(:save!).and_raise(ActiveRecord::RecordInvalid)
 
-      context 'failure' do
-        it 'raises a helpful error' do
-          #maybe use this error from Michel's work: https://github.com/department-of-veterans-affairs/vets-api/pull/8494/files#diff-cdcaa26c5cfce0d1bda78201f27a4c6eb554d5d45ff50d92eec5f393d3d44f6dR110
-          allow(Lighthouse::VeteransHealth::Client).to receive(:new).and_return nil
-          subject.perform_async(submission.id)
-          raise 'not implemented'
+            expect(Rails.logger).to receive(:error)
+            DisabilityCompensationFastTrackJob.new.perform(submission.id, user_full_name)
+          end
         end
       end
     end
   end
+end
