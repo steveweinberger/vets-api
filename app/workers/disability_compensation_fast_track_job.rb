@@ -383,7 +383,6 @@ class HypertensionPDFGenerator
   end
 end
 
-
 class HypertensionSpecialIssueManager
   attr_accessor :submission
 
@@ -399,9 +398,7 @@ class HypertensionSpecialIssueManager
     # TODO: do we need to also add the special issue to secondary disabilities?
     # This code currently does not do that, but some disabilities have a
     # secondaryDisabilities property within the disability.
-    submission.form_json = JSON.dump(data)
-    submission.save
-    return JSON.dump(data) # TODO: update tests so that this return value is unnecessary
+    submission.update(form_json: JSON.dump(data))
   end
 
   def add_rrd_to_disabilities(disabilities)

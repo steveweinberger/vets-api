@@ -60,8 +60,7 @@ RSpec.describe DisabilityCompensationFastTrackJob, type: :worker do
         end
 
         it 'finishes successfully' do
-          #this doesn't need to return JSON
-          expect(DisabilityCompensationFastTrackJob.new.perform(submission.id, user_full_name)).to eq :success
+          expect(DisabilityCompensationFastTrackJob.new.perform(submission.id, user_full_name)).to eq true
         end
       end
 
