@@ -42,6 +42,10 @@ module SAML
         safe_attr('va_eauth_commonname')
       end
 
+      def suffix
+        safe_attr('va_eauth_suffix')
+      end
+
       def participant_id
         sanitize_id(mvi_ids[:vba_corp_id])
       end
@@ -52,6 +56,16 @@ module SAML
 
       def icn
         mvi_ids[:icn]
+      end
+
+      def address
+        {
+          street: safe_attr('va_eauth_street'),
+          city: safe_attr('va_eauth_city'),
+          state: safe_attr('va_eauth_state'),
+          country: safe_attr('va_eauth_country'),
+          postal_code: zip
+        }
       end
 
       def zip
@@ -80,6 +94,10 @@ module SAML
 
       def email
         safe_attr('va_eauth_emailaddress')
+      end
+
+      def phone
+        safe_attr('va_eauth_phone')
       end
 
       # Returns an array because a person can have multipe types.
@@ -204,6 +222,22 @@ module SAML
 
       def transactionid
         safe_attr('va_eauth_transactionid')
+      end
+
+      def cerner_id
+        mvi_ids[:cerner_id]
+      end
+
+      def cerner_facility_ids
+        mvi_ids[:cerner_facility_ids]
+      end
+
+      def vha_facility_ids
+        mvi_ids[:vha_facility_ids]
+      end
+
+      def vha_facility_hash
+        mvi_ids[:vha_facility_hash]
       end
 
       def sign_in
