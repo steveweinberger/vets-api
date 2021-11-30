@@ -25,34 +25,38 @@ class DisabilityCompensationFastTrackJob
     observations_response = client.get_resource('observations')
     medicationrequest_response = client.get_resource('medications')
 
-    bpreadings = HypertensionObservationData.new(observations_response).transform
-    return if no_recent_bp_readings(bpreadings)
+    begin
+      bpreadings = HypertensionObservationData.new(observations_response).transform
+      return if no_recent_bp_readings(bpreadings)
 
-    medications = HypertensionMedicationRequestData.new(medicationrequest_response).transform
+      medications = HypertensionMedicationRequestData.new(medicationrequest_response).transform
 
-    bpreadings = bpreadings.filter { |reading| reading[:issued].to_date > 1.year.ago }
+      bpreadings = bpreadings.filter { |reading| reading[:issued].to_date > 1.year.ago }
 
-    bpreadings = bpreadings.sort_by { |reading| reading[:issued].to_date }.reverse!
-    medications = medications.sort_by { |med| med[:authoredOn].to_date }.reverse!
-    pdf = HypertensionPDFGenerator.new(full_name, bpreadings, medications, Time.zone.today).generate
-    pdf_body = pdf.render
+      bpreadings = bpreadings.sort_by { |reading| reading[:issued].to_date }.reverse!
+      medications = medications.sort_by { |med| med[:authoredOn].to_date }.reverse!
+      pdf = HypertensionPDFGenerator.new(full_name, bpreadings, medications, Time.zone.today).generate
+      pdf_body = pdf.render
 
-    # Upload the file to S3 through the SupportingEvidenceAttachment class
-    supporting_evidence_attachment = SupportingEvidenceAttachment.new
-    file = FileIO.new(pdf_body, 'hypertension_evidence.pdf')
-    supporting_evidence_attachment.set_file_data!(file)
-    supporting_evidence_attachment.save!
-    confirmation_code = supporting_evidence_attachment.guid
+      # Upload the file to S3 through the SupportingEvidenceAttachment class
+      supporting_evidence_attachment = SupportingEvidenceAttachment.new
+      file = FileIO.new(pdf_body, 'hypertension_evidence.pdf')
+      supporting_evidence_attachment.set_file_data!(file)
+      supporting_evidence_attachment.save!
+      confirmation_code = supporting_evidence_attachment.guid
 
-    HypertensionUploadManager.new(form526_submission, confirmation_code).add_upload
+      HypertensionUploadManager.new(form526_submission, confirmation_code).add_upload
 
-    # TODO: move below two lines and the HypertensionSpecialIssueManager class
-    # so that the pdf is being uploaded within the submission model instance,
-    # wherever the rest of the EVSS Document Service uploads are being done.
-    # evss_client = EVSS::DocumentsService.new(submission.auth_headers)
-    # evss_client.upload(pdf_body, create_document_data(submission))
+      # TODO: move below two lines and the HypertensionSpecialIssueManager class
+      # so that the pdf is being uploaded within the submission model instance,
+      # wherever the rest of the EVSS Document Service uploads are being done.
+      # evss_client = EVSS::DocumentsService.new(submission.auth_headers)
+      # evss_client.upload(pdf_body, create_document_data(submission))
 
-    HypertensionSpecialIssueManager.new(form526_submission).add_special_issue
+      HypertensionSpecialIssueManager.new(form526_submission).add_special_issue
+    rescue => e
+      Rails.logger.error "Disability Compensation Fast Track Job failing for form id:#{form526_submission.id}. With error: #{e}"
+    end
   end
 
   private
