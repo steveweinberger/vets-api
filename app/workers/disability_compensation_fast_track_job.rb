@@ -40,10 +40,9 @@ class DisabilityCompensationFastTrackJob
       pdf_body = pdf.render
       form526_submission = HypertensionUploadManager(form526_submission).handle_attachment(pdf_body)
       HypertensionSpecialIssueManager.new(form526_submission).add_special_issue
-
     rescue => e
       Rails.logger.error "Disability Compensation Fast Track Job failing for form id:#{form526_submission.id}. With error: #{e}"
-      return e
+      e
     end
   end
 
@@ -53,9 +52,6 @@ class DisabilityCompensationFastTrackJob
     last_reading = bp_readings.map { |reading| reading[:issued] }.max
     last_reading < 1.year.ago
   end
-
-
-
 end
 
 class FileIO < StringIO
@@ -213,29 +209,25 @@ class HypertensionPDFGenerator
     pdf = add_intro(pdf)
     pdf = add_blood_pressure(pdf)
     pdf = add_medications(pdf) if medications.length > 1
-    pdf = add_about(pdf)
-    pdf
+    add_about(pdf)
   end
 
   def stringify_patient
-    suffix = patient[:suffix].present? ? ", #{patient[:suffix]}" : ""
-    stringified = ""
-    [:first, :middle, :last].each do |name|
-      if patient[name].present?
-        stringified = "#{stringified} #{patient[name]}"
-      end
+    suffix = patient[:suffix].present? ? ", #{patient[:suffix]}" : ''
+    stringified = ''
+    %i[first middle last].each do |name|
+      stringified = "#{stringified} #{patient[name]}" if patient[name].present?
     end
 
-    stringified = "#{stringified}#{suffix}"
-    stringified
+    "#{stringified}#{suffix}"
   end
 
   def add_intro(pdf)
     # patient_name = 'FAKE PATIENT NAME' # TODO: fix when LH client can do calls to Patient endpoint
     patient_name = stringify_patient
-    #gen_stamp = '09/01/2021 at 10:23am EST' # TODO: fix when I figure out how to do Ruby time manipulation
-    gen_time = Time.now
-    gen_stamp = "#{gen_time.strftime("%m/%d/%Y")} at #{gen_time.strftime("%l:%M %p %Z")}"
+    # gen_stamp = '09/01/2021 at 10:23am EST' # TODO: fix when I figure out how to do Ruby time manipulation
+    gen_time = Time.now.getlocal
+    gen_stamp = "#{gen_time.strftime('%m/%d/%Y')} at #{gen_time.strftime('%l:%M %p %Z')}"
 
     intro_lines = [
       "<font size='11'>Hypertension Rapid Ready for Decision | Claim for Increase</font>\n",
@@ -256,15 +248,15 @@ class HypertensionPDFGenerator
   def add_blood_pressure(pdf)
     with_intro = add_blood_pressure_intro(pdf)
     with_bp = add_blood_pressure_list(with_intro)
-    with_outro = add_blood_pressure_outro(with_bp)
-    with_outro
+    with_bp.text "\n", size: 12
+    add_blood_pressure_outro(with_bp)
   end
 
   def add_blood_pressure_intro(pdf)
     header = bp_data.length.positive? ? 'One Year of Blood Pressure History' : 'No blood pressure records found'
     bp_note = bp_data.length.positive? ? "<font size='11'>Blood pressure is shown as systolic/diastolic.\n</font>" : ''
-    end_date= @date.strftime("%m/%d/%Y")
-    start_date = (@date - 1.year).strftime("%m/%d/%Y")
+    end_date = @date.strftime('%m/%d/%Y')
+    start_date = (@date - 1.year).strftime('%m/%d/%Y')
     search_window = "VHA records searched from #{start_date} to #{end_date}"
     bp_intro_lines = [
       "<font size='16'>#{header}</font>",
@@ -278,9 +270,7 @@ class HypertensionPDFGenerator
       pdf.text line, inline_format: true
     end
 
-    if !bp_data.length.positive?
-      return pdf
-    end
+    return pdf unless bp_data.length.positive?
 
     pdf.text "\n", size: 10
 
@@ -289,7 +279,8 @@ class HypertensionPDFGenerator
 
   def add_blood_pressure_list(pdf)
     @bp_data.each do |bp|
-      pdf.text "<b>Blood pressure: #{bp[:systolic]['value']}/#{bp[:diastolic]['value']} #{bp[:systolic]['unit']}", inline_format: true, size: 11
+      pdf.text "<b>Blood pressure: #{bp[:systolic]['value']}/#{bp[:diastolic]['value']} #{bp[:systolic]['unit']}",
+               inline_format: true, size: 11
       pdf.text "Taken on: #{bp[:issued][0, 10].to_date.strftime('%m/%d/%Y')}", size: 11
       pdf.text "Location: #{bp[:organization] || 'Unknown'}", size: 11
       pdf.text "\n", size: 8
@@ -307,7 +298,7 @@ class HypertensionPDFGenerator
     @bp_data.each do |bp|
       bp_rows.append([
                        "#{bp[:systolic]['value']}/#{bp[:diastolic]['value']} #{bp[:systolic]['unit']}",
-                       bp[:issued][0, 10].to_date.strftime("%m/%d/%Y"),
+                       bp[:issued][0, 10].to_date.strftime('%m/%d/%Y'),
                        bp[:organization] || 'Unknown'
                      ])
     end
@@ -317,10 +308,7 @@ class HypertensionPDFGenerator
   end
 
   def add_blood_pressure_outro(pdf)
-    pdf.text "\n", size: 12
-
     pdf.text 'Hypertension Rating Schedule', size: 14
-
     pdf.table([
                 [
                   '10%',
@@ -335,27 +323,24 @@ class HypertensionPDFGenerator
                 [
                   '60%', 'Diastolic pressure 130 or more'
                 ]
-              ], width: 350, column_widths: [30, 320], cell_style: { size: 10, border_width: 0, background_color: "f3f3f3" })
+              ], width: 350, column_widths: [30, 320], cell_style: { size: 10, border_width: 0, background_color: 'f3f3f3' })
 
     pdf.text "\n"
     pdf.text "<link href='https://www.ecfr.gov/current/title-38/chapter-I/part-4'>View rating schedule</link>",
              inline_format: true, color: '0000ff', size: 11
-
     pdf
-
   end
 
   def add_medications(pdf)
     pdf = add_medications_intro(pdf)
-    pdf = add_medications_list(pdf)
-    pdf
+    add_medications_list(pdf)
   end
 
   def add_medications_intro(pdf)
     pdf.text "\n", size: 11
     pdf.text 'Active Prescriptions', size: 16
 
-    med_search_window = "VHA records searched for medication prescriptions active as of #{Date.today.strftime('%m/%d/%Y')}"
+    med_search_window = "VHA records searched for medication prescriptions active as of #{Time.zone.today.strftime('%m/%d/%Y')}"
     prescription_lines = [
       med_search_window,
       'All VAMC locations using VistA/CAPRI were checked',
@@ -390,7 +375,7 @@ class HypertensionPDFGenerator
     ]]
 
     @medications.each do |medication|
-      issued_date = medication['authoredOn'][0, 10].to_date.strftime("%m/%d/%Y")
+      issued_date = medication['authoredOn'][0, 10].to_date.strftime('%m/%d/%Y')
       instructions = medication['dosageInstructions'].join('; ')
       med_rows.append([medication['description'], issued_date, instructions])
     end
@@ -431,7 +416,7 @@ class HypertensionSpecialIssueManager
     data = JSON.parse(submission.form_json)
     disabilities = data['form526']['form526']['disabilities']
     added = add_rrd_to_disabilities(disabilities)
-    data['form526']['form526']['disabilities'] = disabilities
+    data['form526']['form526']['disabilities'] = added
     # TODO: do we need to also add the special issue to secondary disabilities?
     # This code currently does not do that, but some disabilities have a
     # secondaryDisabilities property within the disability.
@@ -440,20 +425,19 @@ class HypertensionSpecialIssueManager
 
   def add_rrd_to_disabilities(disabilities)
     disabilities.each do |da|
-      if da['diagnosticCode'] == 7101 && da['disabilityActionType'].downcase == 'increase'
-        ad = add_rrd(da)
-      end
+      add_rrd(da) if da['diagnosticCode'] == 7101 && da['disabilityActionType'].downcase == 'increase'
     end
+    disabilities
   end
 
   def add_rrd(disability)
-    rrd_hash = {'code'=> 'RRD', 'name'=> 'Rapid Ready for Decision'}
+    rrd_hash = { 'code' => 'RRD', 'name' => 'Rapid Ready for Decision' }
     if disability['specialIssues'].blank?
       disability['specialIssues'] = [rrd_hash]
     elsif !disability['specialIssues'].include? rrd_hash
       disability['specialIssues'].append(rrd_hash)
     end
-    return disability
+    disability
   end
 end
 
@@ -468,9 +452,9 @@ class HypertensionUploadManager
     data = JSON.parse(submission.form_json)
     uploads = data['form526_uploads'] || []
     new_upload = {
-      "name": "VAMC_Hypertension_Rapid_Decision_Evidence.pdf",
+      "name": 'VAMC_Hypertension_Rapid_Decision_Evidence.pdf',
       "confirmationCode": confirmation_code,
-      "attachmentId": "1489"
+      "attachmentId": '1489'
     }
     uploads.append(new_upload)
     data['form526_uploads'] = uploads
@@ -483,16 +467,14 @@ class HypertensionUploadManager
     uploads = data['form526_uploads'] || []
     existing_summary = false
     uploads.each do |upload|
-      if upload['name'][0,41] == 'VAMC_Hypertension_Rapid_Decision_Evidence'
-        existing_summary = true
-      end
+      existing_summary = true if upload['name'][0, 41] == 'VAMC_Hypertension_Rapid_Decision_Evidence'
     end
     existing_summary
   end
 
   def handle_attachment(pdf_body)
     existing_summary = already_has_summary_file
-    if !existing_summary
+    unless existing_summary
       supporting_evidence_attachment = SupportingEvidenceAttachment.new
       file = FileIO.new(pdf_body, 'VAMC_Hypertension_Rapid_Decision_Evidence.pdf')
       supporting_evidence_attachment.set_file_data!(file)
@@ -500,12 +482,8 @@ class HypertensionUploadManager
       confirmation_code = supporting_evidence_attachment.guid
 
       # TODO: Make sure confirmation_code exists before running this:
-      if !confirmation_code.nil?
-        form526_submission = add_upload(confirmation_code)
-      end
+      form526_submission = add_upload(confirmation_code) unless confirmation_code.nil?
     end
     form526_submission
   end
-
-
 end
