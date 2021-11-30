@@ -48,18 +48,23 @@ class Form526Submission < ApplicationRecord
   SUBMIT_FORM_526_JOB_CLASSES = %w[SubmitForm526AllClaim SubmitForm526].freeze
 
   def start
-    if single_issue_hypertension_claim? && Flipper.enabled?(:disability_hypertension_compensation_fast_track)
-      workflow_batch = Sidekiq::Batch.new
-      workflow_batch.on(
-        :success,
-        'Form526Submission#start_evss_submission',
-        'submission_id' => id
-      )
-      jids = workflow_batch.jobs do
-        submit_disability_compensation_fast_track
+    begin
+      if single_issue_hypertension_claim? && Flipper.enabled?(:disability_hypertension_compensation_fast_track)
+        workflow_batch = Sidekiq::Batch.new
+        workflow_batch.on(
+          :success,
+          'Form526Submission#start_evss_submission',
+          'submission_id' => id
+        )
+        jids = workflow_batch.jobs do
+          DisabilityCompensationFastTrackJob.perform(id, get_full_name)
+        end
+        jids.first
+      else
+        start_evss_submission(nil, 'submission_id' => id)
       end
-      jids.first
-    else
+    rescue => e
+      Rails.logger.error "The fast track was skipped due to the following error and start_evss_submission wass called: #{e}"
       start_evss_submission(nil, 'submission_id' => id)
     end
   end
@@ -348,10 +353,6 @@ class Form526Submission < ApplicationRecord
   def submit_flashes
     user = User.find(user_uuid)
     BGS::FlashUpdater.perform_async(id) if user && Flipper.enabled?(:disability_compensation_flashes, user)
-  end
-
-  def submit_disability_compensation_fast_track
-    DisabilityCompensationFastTrackJob.perform_in(60.seconds, id, get_full_name)
   end
 
   def cleanup
