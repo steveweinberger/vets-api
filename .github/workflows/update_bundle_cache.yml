@@ -51,3 +51,11 @@ jobs:
       - name: Copy out bundle cache
         run: |
           docker cp $(docker create --rm vets-api:latest --no-create):/usr/local/bundle/cache/ - | bzip2 > tmp/bundle_cache.tar.bz2
+
+      - name: Upload to S3
+        run: |
+          aws s3 cp tmp/bundle_cache.tar.bz2 s3://vets-api-build-artifacts/bundle_cache.tar.bz2
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-gov-west-1
