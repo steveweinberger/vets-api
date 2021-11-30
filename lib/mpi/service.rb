@@ -153,6 +153,8 @@ module MPI
     end
 
     def logging_context(user_identity)
+      return {} unless user_identity.respond_to?(:uuid)
+
       {
         uuid: user_identity.uuid,
         authn_context: user_identity.authn_context
@@ -166,11 +168,19 @@ module MPI
     end
 
     def create_profile_message(user_identity, search_type: MPI::Constants::CORRELATION_WITH_RELATIONSHIP_DATA)
-      return message_icn(user_identity, search_type) if user_identity.mhv_icn.present?
-      return message_edipi(user_identity, search_type) if user_identity.edipi.present? && Settings.mvi.edipi_search
+      return message_icn(user_identity, search_type) if mhv_icn_present?(user_identity)
+      return message_edipi(user_identity, search_type) if edipi_present?(user_identity)
       raise Common::Exceptions::ValidationErrors, user_identity unless user_identity.valid?
 
       message_user_attributes(user_identity, search_type)
+    end
+
+    def mhv_icn_present?(user_identity)
+      user_identity.respond_to?(:mhv_icn) && user_identity.mhv_icn.present?
+    end
+
+    def edipi_present?(user_identity)
+      user_identity.respond_to?(:edipi) && user_identity.edipi.present? && Settings.mvi.edipi_search
     end
 
     def message_icn(user_identity, search_type)
