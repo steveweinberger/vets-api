@@ -51,12 +51,6 @@ class DisabilityCompensationFastTrackJob
       # TODO: Make sure confirmation_code exists before running this:
       HypertensionUploadManager.new(form526_submission, confirmation_code).add_upload
 
-      # TODO: move below two lines and the HypertensionSpecialIssueManager class
-      # so that the pdf is being uploaded within the submission model instance,
-      # wherever the rest of the EVSS Document Service uploads are being done.
-      # evss_client = EVSS::DocumentsService.new(submission.auth_headers)
-      # evss_client.upload(pdf_body, create_document_data(submission))
-
       HypertensionSpecialIssueManager.new(form526_submission).add_special_issue
     rescue => e
       Rails.logger.error "Disability Compensation Fast Track Job failing for form id:#{form526_submission.id}. With error: #{e}"
@@ -71,19 +65,6 @@ class DisabilityCompensationFastTrackJob
     last_reading < 1.year.ago
   end
 
-  def create_document_data(submission)
-    # 'L048' => 'Medical Treatment Record - Government Facility',
-    # TODO: determine whether or not there's a 'subject' field we can set and
-    # what it should be.
-    # file name should be this text and dynamic date range 'VAMC Hypertension Rapid Decision Evidence [date range]'
-    # Date range format = 11/08/202 - 11/08/2021
-    EVSSClaimDocument.new(
-      evss_claim_id: submission.submitted_claim_id,
-      file_name: 'hypertension_evidence.pdf', # TODO: change this to what Emily wants the filename to be.
-      tracked_item_id: nil,
-      document_type: 'L048' # Double-check with Zach (and/or Emily) as to what this should be.
-    )
-  end
 end
 
 class FileIO < StringIO
