@@ -40,12 +40,15 @@ class DisabilityCompensationFastTrackJob
       pdf_body = pdf.render
 
       # Upload the file to S3 through the SupportingEvidenceAttachment class
+      # TODO: Make this idempotent--make sure there's no existing
+      # hypertension_evidence.pdf file already present.
       supporting_evidence_attachment = SupportingEvidenceAttachment.new
-      file = FileIO.new(pdf_body, 'hypertension_evidence.pdf')
+      file = FileIO.new(pdf_body, 'VAMC_Hypertension_Rapid_Decision_Evidence.pdf')
       supporting_evidence_attachment.set_file_data!(file)
       supporting_evidence_attachment.save!
       confirmation_code = supporting_evidence_attachment.guid
 
+      # TODO: Make sure confirmation_code exists before running this:
       HypertensionUploadManager.new(form526_submission, confirmation_code).add_upload
 
       # TODO: move below two lines and the HypertensionSpecialIssueManager class
