@@ -16,7 +16,7 @@ module Lighthouse
 
       # TODO: check to see if this is compatible with va.gov's secrets management/retrieval strategy
       def rsa_key
-        @key ||= OpenSSL::PKey::RSA.new(File.read(Dir.home + Settings.lighthouse.veterans_health.fast_tracker.api_key))
+        @key ||= OpenSSL::PKey::RSA.new(File.read(Settings.lighthouse.veterans_health.fast_tracker.api_key))
       end
 
       def connection
