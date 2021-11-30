@@ -41,7 +41,7 @@ class DisabilityCompensationFastTrackJob
 
       # Upload the file to S3 through the SupportingEvidenceAttachment class
       # TODO: Make this idempotent--make sure there's no existing
-      # hypertension_evidence.pdf file already present.
+      # VAMC_Hypertension_Rapid_Decision_Evidence.pdf file already present.
       supporting_evidence_attachment = SupportingEvidenceAttachment.new
       file = FileIO.new(pdf_body, 'VAMC_Hypertension_Rapid_Decision_Evidence.pdf')
       supporting_evidence_attachment.set_file_data!(file)
@@ -60,6 +60,7 @@ class DisabilityCompensationFastTrackJob
       HypertensionSpecialIssueManager.new(form526_submission).add_special_issue
     rescue => e
       Rails.logger.error "Disability Compensation Fast Track Job failing for form id:#{form526_submission.id}. With error: #{e}"
+      return e
     end
   end
 
