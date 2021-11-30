@@ -74,6 +74,10 @@ describe PdfFill::Filler, type: :model do
       {
         form_id: '686C-674',
         factory: :dependency_claim
+      },
+      {
+        form_id: '21-526EZ',
+        factory: :disability_claim
       }
     ].each do |form_id:, factory:, **options|
       context "form #{form_id}" do
