@@ -18,8 +18,8 @@ class DisabilityCompensationFastTrackJob
   end
 
   def perform(form526_submission_id, full_name)
-    submission = Form526Submission.find(form526_submission_id)
-    icn = Account.where(idme_uuid: submission.user_uuid).first.icn
+    form526_submission = Form526Submission.find(form526_submission_id)
+    icn = Account.where(idme_uuid: form526_submission.user_uuid).first.icn
 
     client = Lighthouse::VeteransHealth::Client.new(icn)
     observations_response = client.get_resource('observations')
@@ -41,10 +41,10 @@ class DisabilityCompensationFastTrackJob
     supporting_evidence_attachment = SupportingEvidenceAttachment.new
     file = FileIO.new(pdf_body, 'hypertension_evidence.pdf')
     supporting_evidence_attachment.set_file_data!(file)
-    supporting_evidence_attachmen.save!
+    supporting_evidence_attachment.save!
     confirmation_code = supporting_evidence_attachment.guid
 
-    submission = HypertensionUploadManager.new(submission, confirmation_code).add_upload
+    HypertensionUploadManager.new(form526_submission, confirmation_code).add_upload
 
     # TODO: move below two lines and the HypertensionSpecialIssueManager class
     # so that the pdf is being uploaded within the submission model instance,
@@ -52,7 +52,7 @@ class DisabilityCompensationFastTrackJob
     # evss_client = EVSS::DocumentsService.new(submission.auth_headers)
     # evss_client.upload(pdf_body, create_document_data(submission))
 
-    HypertensionSpecialIssueManager.new(submission).add_special_issue
+    HypertensionSpecialIssueManager.new(form526_submission).add_special_issue
   end
 
   private
@@ -444,9 +444,7 @@ class HypertensionUploadManager
     uploads.append(new_upload)
     
     data['form526_uploads'] = uploads
-    submission.form_json = JSON.dump(data)
-    submission.save
-    return JSON.dump(data) # TODO: update tests so that this return value is unnecessary
+    submission.update(form_json: JSON.dump(data))
   end
 
 end
