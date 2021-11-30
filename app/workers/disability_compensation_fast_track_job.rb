@@ -38,20 +38,9 @@ class DisabilityCompensationFastTrackJob
       medications = medications.sort_by { |med| med[:authoredOn].to_date }.reverse!
       pdf = HypertensionPDFGenerator.new(full_name, bpreadings, medications, Time.zone.today).generate
       pdf_body = pdf.render
-
-      # Upload the file to S3 through the SupportingEvidenceAttachment class
-      # TODO: Make this idempotent--make sure there's no existing
-      # VAMC_Hypertension_Rapid_Decision_Evidence.pdf file already present.
-      supporting_evidence_attachment = SupportingEvidenceAttachment.new
-      file = FileIO.new(pdf_body, 'VAMC_Hypertension_Rapid_Decision_Evidence.pdf')
-      supporting_evidence_attachment.set_file_data!(file)
-      supporting_evidence_attachment.save!
-      confirmation_code = supporting_evidence_attachment.guid
-
-      # TODO: Make sure confirmation_code exists before running this:
-      HypertensionUploadManager.new(form526_submission, confirmation_code).add_upload
-
+      form526_submission = HypertensionUploadManager(form526_submission).handle_attachment(pdf_body)
       HypertensionSpecialIssueManager.new(form526_submission).add_special_issue
+
     rescue => e
       Rails.logger.error "Disability Compensation Fast Track Job failing for form id:#{form526_submission.id}. With error: #{e}"
       return e
@@ -64,6 +53,8 @@ class DisabilityCompensationFastTrackJob
     last_reading = bp_readings.map { |reading| reading[:issued] }.max
     last_reading < 1.year.ago
   end
+
+
 
 end
 
@@ -468,26 +459,53 @@ end
 
 class HypertensionUploadManager
   attr_accessor :submission
-  attr_accessor :confirmation_code
 
-  def initialize(submission, confirmation_code)
+  def initialize(submission)
     @submission = submission
-    @confirmation_code = confirmation_code
   end
 
-  def add_upload
+  def add_upload(confirmation_code)
     data = JSON.parse(submission.form_json)
     uploads = data['form526_uploads'] || []
     new_upload = {
-      "name": "hypertension_evidence.pdf",
+      "name": "VAMC_Hypertension_Rapid_Decision_Evidence.pdf",
       "confirmationCode": confirmation_code,
       "attachmentId": "1489"
-      # Note: 1489 per Zach, awaiting info as to whether it should be L1489
     }
     uploads.append(new_upload)
-    
     data['form526_uploads'] = uploads
     submission.update(form_json: JSON.dump(data))
+    submission
   end
+
+  def already_has_summary_file
+    data = JSON.parse(submission.form_json)
+    uploads = data['form526_uploads'] || []
+    existing_summary = false
+    uploads.each do |upload|
+      if upload['name'][0,41] == 'VAMC_Hypertension_Rapid_Decision_Evidence'
+        existing_summary = true
+      end
+    end
+    existing_summary
+  end
+
+  def handle_attachment(pdf_body)
+    existing_summary = already_has_summary_file
+    if !existing_summary
+      supporting_evidence_attachment = SupportingEvidenceAttachment.new
+      file = FileIO.new(pdf_body, 'VAMC_Hypertension_Rapid_Decision_Evidence.pdf')
+      supporting_evidence_attachment.set_file_data!(file)
+      supporting_evidence_attachment.save!
+      confirmation_code = supporting_evidence_attachment.guid
+
+      # TODO: Make sure confirmation_code exists before running this:
+      if !confirmation_code.nil?
+        form526_submission = add_upload(confirmation_code)
+      end
+    end
+    form526_submission
+  end
+
 
 end
