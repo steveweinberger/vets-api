@@ -29,6 +29,7 @@ jobs:
       - name: Setup Environment
         run: |
           echo "DOCKER_USER_ID=$(id -u)" >> $GITHUB_ENV
+
       - name: Build Docker Image
         uses: docker/build-push-action@v2
         with:
@@ -46,3 +47,7 @@ jobs:
         run: |
           rm -rf /tmp/.buildx-cache
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+
+      - name: Copy out bundle cache
+        run: |
+          docker cp $(docker create --rm vets-api:latest --no-create):/usr/local/bundle/cache/ - | bzip2 > tmp/bundle_cache.tar.bz2
