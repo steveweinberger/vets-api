@@ -40,21 +40,16 @@ class DisabilityCompensationFastTrackJob
       pdf_body = pdf.render
 
       # Upload the file to S3 through the SupportingEvidenceAttachment class
-      #Search against SupportingEvidenceAttachment to make sure this object doesn't already exist
-
+      # TODO: Make this idempotent--make sure there's no existing
+      # VAMC_Hypertension_Rapid_Decision_Evidence.pdf file already present.
       supporting_evidence_attachment = SupportingEvidenceAttachment.new
-      file = FileIO.new(pdf_body, 'hypertension_evidence.pdf')
+      file = FileIO.new(pdf_body, 'VAMC_Hypertension_Rapid_Decision_Evidence.pdf')
       supporting_evidence_attachment.set_file_data!(file)
       supporting_evidence_attachment.save!
       confirmation_code = supporting_evidence_attachment.guid
 
+      # TODO: Make sure confirmation_code exists before running this:
       HypertensionUploadManager.new(form526_submission, confirmation_code).add_upload
-
-      # TODO: move below two lines and the HypertensionSpecialIssueManager class
-      # so that the pdf is being uploaded within the submission model instance,
-      # wherever the rest of the EVSS Document Service uploads are being done.
-      # evss_client = EVSS::DocumentsService.new(submission.auth_headers)
-      # evss_client.upload(pdf_body, create_document_data(submission))
 
       HypertensionSpecialIssueManager.new(form526_submission).add_special_issue
     rescue => e
@@ -70,19 +65,6 @@ class DisabilityCompensationFastTrackJob
     last_reading < 1.year.ago
   end
 
-  def create_document_data(submission)
-    # 'L048' => 'Medical Treatment Record - Government Facility',
-    # TODO: determine whether or not there's a 'subject' field we can set and
-    # what it should be.
-    # file name should be this text and dynamic date range 'VAMC Hypertension Rapid Decision Evidence [date range]'
-    # Date range format = 11/08/202 - 11/08/2021
-    EVSSClaimDocument.new(
-      evss_claim_id: submission.submitted_claim_id,
-      file_name: 'hypertension_evidence.pdf', # TODO: change this to what Emily wants the filename to be.
-      tracked_item_id: nil,
-      document_type: 'L048' # Double-check with Zach (and/or Emily) as to what this should be.
-    )
-  end
 end
 
 class FileIO < StringIO
