@@ -1,8 +1,8 @@
 name: Update Bundle Cache
 on: [push]
 jobs:
-  build_docker_image_and_upload_cache:
-    name: Build Docker Image And Upload Bundle Cache
+  build_and_upload_cache:
+    name: Build and Upload Cache
     env:
       BUNDLE_ENTERPRISE__CONTRIBSYS__COM: ${{ secrets.BUNDLE_ENTERPRISE__CONTRIBSYS__COM }}
       CI: true
