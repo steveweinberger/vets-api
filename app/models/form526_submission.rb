@@ -48,25 +48,24 @@ class Form526Submission < ApplicationRecord
   SUBMIT_FORM_526_JOB_CLASSES = %w[SubmitForm526AllClaim SubmitForm526].freeze
 
   def start
-    begin
-      if single_issue_hypertension_claim? && Flipper.enabled?(:disability_hypertension_compensation_fast_track)
-        workflow_batch = Sidekiq::Batch.new
-        workflow_batch.on(
-          :success,
-          'Form526Submission#start_evss_submission',
-          'submission_id' => id
-        )
-        jids = workflow_batch.jobs do
-          DisabilityCompensationFastTrackJob.perform(id, get_full_name)
-        end
-        jids.first
-      else
-        start_evss_submission(nil, 'submission_id' => id)
+    if single_issue_hypertension_claim? && Flipper.enabled?(:disability_hypertension_compensation_fast_track)
+      workflow_batch = Sidekiq::Batch.new
+      workflow_batch.on(
+        :success,
+        'Form526Submission#start_evss_submission',
+        'submission_id' => id
+      )
+      jids = workflow_batch.jobs do
+        DisabilityCompensationFastTrackJob.perform(id, get_full_name)
       end
-    rescue => e
-      Rails.logger.error "The fast track was skipped due to the following error and start_evss_submission wass called: #{e}"
+      jids.first
+    else
       start_evss_submission(nil, 'submission_id' => id)
     end
+  rescue => e
+    Rails.logger.error 'The fast track was skipped due to the following error ' \
+                       " and start_evss_submission wass called: #{e}"
+    start_evss_submission(nil, 'submission_id' => id)
   end
 
   # Kicks off a 526 submit workflow batch. The first step in a submission workflow is to submit
