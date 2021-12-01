@@ -65,7 +65,7 @@ RSpec.describe Form526Submission do
 
         context 'an exception is raised in the start method' do
           it 'runs start_evss_submission' do
-            allow_any_instance_of(DisabilityCompensationFastTrackJob).to receive(:perform).with(any_args).and_raise(NoMethodError)
+            allow(Sidekiq::Batch).to receive(:new).and_raise(NoMethodError)
 
             expect(Rails.logger).to receive(:error)
             expect(subject).to receive(:start_evss_submission)
