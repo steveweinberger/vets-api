@@ -37,11 +37,11 @@ class DisabilityCompensationFastTrackJob
       bpreadings = bpreadings.sort_by { |reading| reading[:issued].to_date }.reverse!
       medications = medications.sort_by { |med| med[:authoredOn].to_date }.reverse!
       pdf = HypertensionPDFGenerator.new(full_name, bpreadings, medications, Time.zone.today).generate
-      pdf_body = pdf.render
-      form526_submission = HypertensionUploadManager(form526_submission).handle_attachment(pdf_body)
+      form526_submission = HypertensionUploadManager(form526_submission).handle_attachment(pdf.render)
       HypertensionSpecialIssueManager.new(form526_submission).add_special_issue
     rescue => e
-      Rails.logger.error "Disability Compensation Fast Track Job failing for form id:#{form526_submission.id}. With error: #{e}"
+      Rails.logger.error 'Disability Compensation Fast Track Job failing for form' \
+                         "id:#{form526_submission.id}. With error: #{e}"
       e
     end
   end
@@ -307,26 +307,42 @@ class HypertensionPDFGenerator
     pdf
   end
 
+  @rating_schedule = [
+    [
+      '10%',
+      'Systolic pressure predominantly 160 or more; ' \
+      'or diastolic pressure predominantly 100 or more; ' \
+      'or minimum evaluation for an individual with a history of ' \
+      'diastolic pressure predominantly 100 or more who requires ' \
+      'continuous medication for control'
+    ],
+    [
+      '20%',
+      'Systolic pressure predominantly 200 or more; ' \
+      'or diastolic pressure predominantly 110 or more'
+    ],
+    [
+      '40%', 'Diastolic pressure 120 or more'
+    ],
+    [
+      '60%', 'Diastolic pressure 130 or more'
+    ]
+  ].freeze
+
+  @rating_schedule_link = "<link href='" \
+                          'https://www.ecfr.gov/current/title-38/' \
+                          "chapter-I/part-4'>View rating schedule</link>"
+
   def add_blood_pressure_outro(pdf)
     pdf.text 'Hypertension Rating Schedule', size: 14
-    pdf.table([
-                [
-                  '10%',
-                  'Systolic pressure predominantly 160 or more; or diastolic pressure predominantly 100 or more; or minimum evaluation for an individual with a history of diastolic pressure predominantly 100 or more who requires continuous medication for control'
-                ],
-                [
-                  '20%', 'Systolic pressure predominantly 200 or more; or diastolic pressure predominantly 110 or more'
-                ],
-                [
-                  '40%', 'Diastolic pressure 120 or more'
-                ],
-                [
-                  '60%', 'Diastolic pressure 130 or more'
-                ]
-              ], width: 350, column_widths: [30, 320], cell_style: { size: 10, border_width: 0, background_color: 'f3f3f3' })
+    pdf.table(
+      @rating_schedule, width: 350, column_widths: [30, 320], cell_style: {
+        size: 10, border_width: 0, background_color: 'f3f3f3'
+      }
+    )
 
     pdf.text "\n"
-    pdf.text "<link href='https://www.ecfr.gov/current/title-38/chapter-I/part-4'>View rating schedule</link>",
+    pdf.text @rating_schedule_link,
              inline_format: true, color: '0000ff', size: 11
     pdf
   end
@@ -340,7 +356,8 @@ class HypertensionPDFGenerator
     pdf.text "\n", size: 11
     pdf.text 'Active Prescriptions', size: 16
 
-    med_search_window = "VHA records searched for medication prescriptions active as of #{Time.zone.today.strftime('%m/%d/%Y')}"
+    med_search_window = 'VHA records searched for medication prescriptions active as of' \
+                        "#{Time.zone.today.strftime('%m/%d/%Y')}"
     prescription_lines = [
       med_search_window,
       'All VAMC locations using VistA/CAPRI were checked',
@@ -385,19 +402,29 @@ class HypertensionPDFGenerator
     pdf
   end
 
+  @about_lines = [
+    'The Hypertension Rapid Ready for Decision system retrieves and summarizes ' \
+    'VHA medical records related to hypertension claims for increase submitted on va.gov. ' \
+    'VSRs and RVSRs can develop and rate this claim without ordering an exam if there is '\
+    'sufficient existing evidence to show predominance according to ' \
+    '<link href="https://www.ecfr.gov/current/title-38/part-4">' \
+    '<color rgb="0000ff">DC 7101 (Hypertension) Rating Criteria</color></link>. ' \
+    'This is not new guidance, but rather a way to ' \
+    '<link href="https://www.ecfr.gov/current/title-38/chapter-I/part-3/' \
+    'subpart-A/subject-group-ECFR7629a1b1e9bf6f8/section-3.159"><color rgb="0000ff">' \
+    'operationalize existing statutory rules</color><link> in 38 U.S.C § 5103a(d).',
+    "\n",
+    'Not included in this document:',
+    ' •  Private medical records',
+    ' •  VAMC data for clinics using CERNER Electronic Health Record system ' \
+    '(Replacing VistA, but currently only used at Mann-Grandstaff VA Medical Center in Spokane, Washington)',
+    ' •  JLV/Department of Defense medical records'
+  ].freeze
+
   def add_about(pdf)
     pdf.text  "\n"
     pdf.text  'About this Document', size: 14
-    about_lines = [
-      'The Hypertension Rapid Ready for Decision system retrieves and summarizes VHA medical records related to hypertension claims for increase submitted on va.gov. VSRs and RVSRs can develop and rate this claim without ordering an exam if there is sufficient existing evidence to show predominance according to <link href="https://www.ecfr.gov/current/title-38/part-4"><color rgb="0000ff">DC 7101 (Hypertension) Rating Criteria</color></link>. This is not new guidance, but rather a way to <link href="https://www.ecfr.gov/current/title-38/chapter-I/part-3/subpart-A/subject-group-ECFR7629a1b1e9bf6f8/section-3.159"><color rgb="0000ff">operationalize existing statutory rules</color><link> in 38 U.S.C § 5103a(d).',
-      "\n",
-      'Not included in this document:',
-      ' •  Private medical records',
-      ' •  VAMC data for clinics using CERNER Electronic Health Record system (Replacing VistA, but currently only used at Mann-Grandstaff VA Medical Center in Spokane, Washington)',
-      ' •  JLV/Department of Defense medical records'
-    ]
-
-    about_lines.each do |line|
+    @about_lines.each do |line|
       pdf.text line, size: 11, inline_format: true
     end
 
