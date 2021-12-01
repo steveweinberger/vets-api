@@ -95,6 +95,7 @@ PATH
       dry-validation
     openid_auth (0.0.1)
     test_user_dashboard (0.1.0)
+      activeresource
       google-cloud-bigquery
       rails (~> 6.1.4.1)
     va_forms (0.0.1)
@@ -161,6 +162,10 @@ GEM
       globalid (>= 0.3.6)
     activemodel (6.1.4.1)
       activesupport (= 6.1.4.1)
+    activemodel-serializers-xml (1.0.2)
+      activemodel (> 5.x)
+      activesupport (> 5.x)
+      builder (~> 3.1)
     activerecord (6.1.4.1)
       activemodel (= 6.1.4.1)
       activesupport (= 6.1.4.1)
@@ -169,6 +174,10 @@ GEM
     activerecord-postgis-adapter (7.1.1)
       activerecord (~> 6.1)
       rgeo-activerecord (~> 7.0.0)
+    activeresource (5.1.1)
+      activemodel (>= 5.0, < 7)
+      activemodel-serializers-xml (~> 1.0)
+      activesupport (>= 5.0, < 7)
     activestorage (6.1.4.1)
       actionpack (= 6.1.4.1)
       activejob (= 6.1.4.1)
