@@ -404,7 +404,6 @@ class HypertensionPDFGenerator
       med_rows.append([medication['description'], issued_date, instructions])
     end
 
-    binding.pry
     pdf.table(med_rows, cell_style: { size: 8, inline_format: true })
 
     pdf
@@ -457,6 +456,7 @@ class HypertensionSpecialIssueManager
     # This code currently does not do that, but some disabilities have a
     # secondaryDisabilities property within the disability.
     submission.update(form_json: JSON.dump(data))
+    submission
   end
 
   def add_rrd_to_disabilities(disabilities)
