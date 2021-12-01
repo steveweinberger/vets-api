@@ -69,17 +69,5 @@ module TestUserDashboard
       RequestStore.store['additional_request_attributes'] = { 'source' => 'test-user-dashboard' }
       Raven.tags_context(source: 'test-user-dashboard')
     end
-
-    def session_cookie?
-      cookies[:api_session]
-    end
-
-    # the following doesn't work but illustrates an idea
-    def override_session_cookie
-      cookies[:api_session] = {
-        value: cookies[:api_session],
-        domain: 'va.gov'
-      }
-    end
   end
 end
