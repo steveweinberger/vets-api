@@ -154,7 +154,6 @@ class User < Common::RedisStore
 
   def address
     address = identity&.address || mpi_profile&.address
-    require 'pry'; binding.pry
     {
       street: address&.street,
       city: address&.city,
