@@ -161,6 +161,7 @@ group :test do
   gem 'pact', require: false
   gem 'pact-mock_service', require: false
   gem 'pdf-inspector'
+  gem 'rotp', require: false
   gem 'rspec_junit_formatter'
   gem 'rspec-retry'
   gem 'rubocop-junit-formatter'
