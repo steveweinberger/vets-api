@@ -52,7 +52,7 @@ module Lighthouse
       def get_conditions
         params = {
           'patient' => @icn,
-          'clinical-status' => 'http://terminology.hl7.org/CodeSystem/condition-clinical|active',
+          'clinical-status' => 'http://terminology.hl7.org/CodeSystem/condition-clinical|active'
         }
 
         perform_get('services/fhir/v0/r4/Condition', params)

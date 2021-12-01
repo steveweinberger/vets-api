@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require 'lighthouse/veterans_health/client'
 
@@ -6,25 +8,24 @@ RSpec.describe Lighthouse::VeteransHealth::Client do
   # used in the Sidekiq worker disability_compensation_fast_track_job.rb
 
   before(:all) do
-    @client = Lighthouse::VeteransHealth::Client.new(12345)
+    @client = Lighthouse::VeteransHealth::Client.new(12_345)
   end
 
   context 'initialization' do
     describe 'when the caller passes a valid icn' do
-
       it 'initializes the client with the icn set' do
-        expect(@client.instance_variable_get(:@icn)).to eq 12345
+        expect(@client.instance_variable_get(:@icn)).to eq 12_345
       end
     end
   end
 
-  context '#get_resource' do
+  describe '#get_resource' do
     let(:jwt) { 'fake_client_assurance_token' }
-    let(:jwt_double) { double("JWT Wrapper", :token => jwt) }
-    let(:bearer_token_object) { double("bearer response", :body => { 'access_token': 'blah' }) }
+    let(:jwt_double) { double('JWT Wrapper', token: jwt) }
+    let(:bearer_token_object) { double('bearer response', body: { 'access_token': 'blah' }) }
 
     context 'valid requests' do
-      let(:generic_response) { {'status': 200, 'body': {'generic': 'response'}} }
+      let(:generic_response) { { 'status': 200, 'body': { 'generic': 'response' } } }
 
       before do
         allow(@client).to receive(:perform).and_return generic_response
@@ -34,7 +35,7 @@ RSpec.describe Lighthouse::VeteransHealth::Client do
 
       describe 'when requesting any valid resource' do
         let(:random_resource_str) do
-          ['conditions', 'observations', 'medications', 'Conditions', 'OBSERVATIONS', 'MeDICATions'].sample
+          %w[conditions observations medications Conditions OBSERVATIONS MeDICATions].sample
         end
 
         it 'authenticates to Lighthouse and retrieves a bearer token' do
@@ -44,9 +45,9 @@ RSpec.describe Lighthouse::VeteransHealth::Client do
 
         it 'sets the headers to include the bearer token' do
           headers = {
-            "Accept" => "application/json",
-            "Content-Type" => "application/json",
-            "User-Agent" => "Vets.gov Agent",
+            'Accept' => 'application/json',
+            'Content-Type' => 'application/json',
+            'User-Agent' => 'Vets.gov Agent',
             'Authorization': 'Bearer blah'
           }
 
@@ -66,7 +67,9 @@ RSpec.describe Lighthouse::VeteransHealth::Client do
         end
 
         it 'invokes the Lighthouse Veterans Health API Observation endpoint' do
-          expect_any_instance_of(Lighthouse::VeteransHealth::Client).to receive(:perform_get).with(observations_api_path, params_hash)
+          expect_any_instance_of(Lighthouse::VeteransHealth::Client).to receive(
+            :perform_get
+          ).with(observations_api_path, params_hash)
           @client.get_resource('observations')
         end
 
@@ -79,12 +82,13 @@ RSpec.describe Lighthouse::VeteransHealth::Client do
         let(:conditions_api_path) { 'services/fhir/v0/r4/Condition' }
         let(:params_hash) do
           { 'patient' => @client.instance_variable_get(:@icn),
-            'clinical-status' => 'http://terminology.hl7.org/CodeSystem/condition-clinical|active',
-            'page' => 1,
-            '_count' => 30 }
+            'clinical-status' => 'http://terminology.hl7.org/CodeSystem/condition-clinical|active' }
         end
+
         it 'invokes the Lighthouse Veterans Health API Condition endpoint' do
-          expect_any_instance_of(Lighthouse::VeteransHealth::Client).to receive(:perform_get).with(conditions_api_path, params_hash)
+          expect_any_instance_of(
+            Lighthouse::VeteransHealth::Client
+          ).to receive(:perform_get).with(conditions_api_path, params_hash)
           @client.get_resource('conditions')
         end
       end
@@ -92,8 +96,11 @@ RSpec.describe Lighthouse::VeteransHealth::Client do
       describe 'when the caller requests the MedicationRequest resource' do
         let(:medications_api_path) { 'services/fhir/v0/r4/MedicationRequest' }
         let(:params_hash) { { 'patient': @client.instance_variable_get(:@icn) } }
+
         it 'invokes the Lighthouse Veterans Health API MedicationRequest endpoint' do
-          expect_any_instance_of(Lighthouse::VeteransHealth::Client).to receive(:perform_get).with(medications_api_path, params_hash)
+          expect_any_instance_of(
+            Lighthouse::VeteransHealth::Client
+          ).to receive(:perform_get).with(medications_api_path, params_hash)
           @client.get_resource('medications')
         end
       end
@@ -112,8 +119,9 @@ RSpec.describe Lighthouse::VeteransHealth::Client do
           allow(Lighthouse::VeteransHealth::JwtWrapper).to receive(:new).and_return(jwt_double)
           allow(@client).to receive(:authenticate).and_return bearer_token_object
         end
+
         it 'raises an exception and message' do
-          expect { @client.get_resource('medications') }.to raise_exception(Faraday::TimeoutError, "timeout")
+          expect { @client.get_resource('medications') }.to raise_exception(Faraday::TimeoutError, 'timeout')
         end
       end
     end
