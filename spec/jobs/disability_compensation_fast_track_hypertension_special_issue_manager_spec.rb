@@ -28,17 +28,20 @@ RSpec.describe HypertensionSpecialIssueManager do
     end
 
     it 'matches the email address after manipulation' do
-      expect(JSON.parse(HypertensionSpecialIssueManager.new(form526_submission).add_special_issue.form_json)['form526']['form526']['veteran']['emailAddress']).to match "test@email.com"
+      HypertensionSpecialIssueManager.new(form526_submission).add_special_issue
+      expect(JSON.parse(form526_submission.form_json)['form526']['form526']['veteran']['emailAddress']).to match "test@email.com"
     end
 
     it 'adds rrd to the disabilities list' do
-      disabilities = JSON.parse(HypertensionSpecialIssueManager.new(form526_submission).add_special_issue.form_json)['form526']['form526']['disabilities']
+      HypertensionSpecialIssueManager.new(form526_submission).add_special_issue
+      disabilities = JSON.parse(form526_submission.form_json)['form526']['form526']['disabilities']
       filtered = disabilities.filter { |item| item['diagnosticCode'] == 7101 }
       expect(filtered[0]['specialIssues']).to match [{'code'=> 'RRD', 'name'=> 'Rapid Ready for Decision'}]
     end
 
     it 'adds rrd to each relevant item in the disabilities list' do
-      disabilities = JSON.parse(HypertensionSpecialIssueManager.new(form526_submission).add_special_issue.form_json)['form526']['form526']['disabilities']
+      HypertensionSpecialIssueManager.new(form526_submission).add_special_issue
+      disabilities = JSON.parse(form526_submission.form_json)['form526']['form526']['disabilities']
       rrd_hash = { 'code'=> 'RRD', 'name'=> 'Rapid Ready for Decision'}
       filtered = disabilities.filter { |item| item['diagnosticCode'] == 7101 }
       expect(filtered).to all( include 'specialIssues')
@@ -46,13 +49,16 @@ RSpec.describe HypertensionSpecialIssueManager do
     end
 
     it 'adds rrd to the disabilities list only once' do
-      disabilities = JSON.parse(HypertensionSpecialIssueManager.new(form526_submission).add_special_issue.form_json)['form526']['form526']['disabilities']
+      HypertensionSpecialIssueManager.new(form526_submission).add_special_issue
+      disabilities = JSON.parse(form526_submission.form_json)['form526']['form526']['disabilities']
       filtered = disabilities.filter { |item| item['diagnosticCode'] == 7101 }
       expect(filtered[0]['specialIssues']).to match [{'code'=> 'RRD', 'name'=> 'Rapid Ready for Decision'}]
       jform = JSON.parse(form526_submission.form_json)
       jform['form526']['form526']['disabilities'] = disabilities
       form526_submission.form_json = JSON.dump(jform)
-      second_pass = JSON.parse(HypertensionSpecialIssueManager.new(form526_submission).add_special_issue.form_json)['form526']['form526']['disabilities']
+
+      HypertensionSpecialIssueManager.new(form526_submission).add_special_issue
+      second_pass = JSON.parse(form526_submission.form_json)['form526']['form526']['disabilities']
       filtered = second_pass.filter { |item| item['diagnosticCode'] == 7101 }
       expect(filtered[0]['specialIssues']).to match [{'code'=> 'RRD', 'name'=> 'Rapid Ready for Decision'}]
     end

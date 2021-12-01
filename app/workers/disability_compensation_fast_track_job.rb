@@ -456,7 +456,6 @@ class HypertensionSpecialIssueManager
     # This code currently does not do that, but some disabilities have a
     # secondaryDisabilities property within the disability.
     submission.update(form_json: JSON.dump(data))
-    submission
   end
 
   def add_rrd_to_disabilities(disabilities)
