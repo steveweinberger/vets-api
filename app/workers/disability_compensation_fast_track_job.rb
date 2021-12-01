@@ -45,7 +45,7 @@ class DisabilityCompensationFastTrackJob
     rescue => e
       Rails.logger.error 'Disability Compensation Fast Track Job failing for form' \
                          "id:#{form526_submission.id}. With error: #{e}"
-      return e
+      e
     end
   end
 
@@ -314,11 +314,9 @@ class HypertensionPDFGenerator
     [
       [
         '10%',
-        'Systolic pressure predominantly 160 or more; ' \
-        'or diastolic pressure predominantly 100 or more; ' \
-        'or minimum evaluation for an individual with a history of ' \
-        'diastolic pressure predominantly 100 or more who requires ' \
-        'continuous medication for control'
+        'Systolic pressure predominantly 160 or more; or diastolic pressure predominantly 100 or more; ' \
+        'or minimum evaluation for an individual with a history of diastolic pressure predominantly 100 or more who ' \
+        'requires continuous medication for control'
       ],
       [
         '20%',
@@ -410,23 +408,22 @@ class HypertensionPDFGenerator
   end
 
   def about_lines
-    [ 'The Hypertension Rapid Ready for Decision system retrieves and summarizes ' \
-      'VHA medical records related to hypertension claims for increase submitted on va.gov. ' \
-      'VSRs and RVSRs can develop and rate this claim without ordering an exam if there is '\
-      'sufficient existing evidence to show predominance according to ' \
-      '<link href="https://www.ecfr.gov/current/title-38/part-4">' \
-      '<color rgb="0000ff">DC 7101 (Hypertension) Rating Criteria</color></link>. ' \
-      'This is not new guidance, but rather a way to ' \
-      '<link href="https://www.ecfr.gov/current/title-38/chapter-I/part-3/' \
-      'subpart-A/subject-group-ECFR7629a1b1e9bf6f8/section-3.159"><color rgb="0000ff">' \
-      'operationalize existing statutory rules</color><link> in 38 U.S.C § 5103a(d).',
-      "\n",
-      'Not included in this document:',
-      ' •  Private medical records',
-      ' •  VAMC data for clinics using CERNER Electronic Health Record system ' \
-      '(Replacing VistA, but currently only used at Mann-Grandstaff VA Medical Center in Spokane, Washington)',
-      ' •  JLV/Department of Defense medical records'
-    ].freeze
+    ['The Hypertension Rapid Ready for Decision system retrieves and summarizes ' \
+     'VHA medical records related to hypertension claims for increase submitted on va.gov. ' \
+     'VSRs and RVSRs can develop and rate this claim without ordering an exam if there is '\
+     'sufficient existing evidence to show predominance according to ' \
+     '<link href="https://www.ecfr.gov/current/title-38/part-4">' \
+     '<color rgb="0000ff">DC 7101 (Hypertension) Rating Criteria</color></link>. ' \
+     'This is not new guidance, but rather a way to ' \
+     '<link href="https://www.ecfr.gov/current/title-38/chapter-I/part-3/' \
+     'subpart-A/subject-group-ECFR7629a1b1e9bf6f8/section-3.159"><color rgb="0000ff">' \
+     'operationalize existing statutory rules</color><link> in 38 U.S.C § 5103a(d).',
+     "\n",
+     'Not included in this document:',
+     ' •  Private medical records',
+     ' •  VAMC data for clinics using CERNER Electronic Health Record system ' \
+     '(Replacing VistA, but currently only used at Mann-Grandstaff VA Medical Center in Spokane, Washington)',
+     ' •  JLV/Department of Defense medical records'].freeze
   end
 
   def add_about(pdf)
