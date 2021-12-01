@@ -5,4 +5,5 @@ TestUserDashboard::Engine.routes.draw do
   get '/oauth/logout', to: 'oauth#logout'
   resources :oauth, only: [:index]
   resources :tud_accounts, only: %i[index update]
+  resources :accounts_api, only: %i[index update]
 end
