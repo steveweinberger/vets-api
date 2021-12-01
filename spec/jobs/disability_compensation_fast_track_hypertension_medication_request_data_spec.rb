@@ -34,29 +34,42 @@ RSpec.describe HypertensionMedicationRequestData, :vcr do
                                                                   'dosageInstructions' => ['Once per day.'] },
                                                                 { 'status' => 'active',
                                                                   'authoredOn' => '1995-04-30T01:15:52Z',
-                                                                  'description' => '0.3 ML EPINEPHrine 0.5 MG/ML Auto-Injector',
-                                                                  'notes' => ['0.3 ML EPINEPHrine 0.5 MG/ML Auto-Injector'],
+                                                                  'description' => '0.3 ML EPINEPHrine 0.5 '\
+                                                                                   'MG/ML Auto-Injector',
+                                                                  'notes' => [
+                                                                    '0.3 ML EPINEPHrine 0.5 MG/ML Auto-Injector'
+                                                                  ],
                                                                   'dosageInstructions' => ['Once per day.'] },
                                                                 { 'status' => 'active',
                                                                   'authoredOn' => '1998-02-12T02:15:52Z',
-                                                                  'description' => '120 ACTUAT Fluticasone propionate 0.044 MG/ACTUAT Metered Dose Inhaler',
-                                                                  'notes' => ['120 ACTUAT Fluticasone propionate 0.044 MG/ACTUAT Metered Dose Inhaler'],
+                                                                  'description' => '120 ACTUAT Fluticasone ' \
+                                                                                   'propionate 0.044 MG/ACTUAT ' \
+                                                                                   'Metered Dose Inhaler',
+                                                                  'notes' => [
+                                                                    '120 ACTUAT Fluticasone propionate 0.044 ' \
+                                                                    'MG/ACTUAT Metered Dose Inhaler'
+                                                                  ],
                                                                   'dosageInstructions' => ['Once per day.'] },
                                                                 { 'status' => 'active',
                                                                   'authoredOn' => '1998-02-12T02:15:52Z',
-                                                                  'description' => '200 ACTUAT Albuterol 0.09 MG/ACTUAT Metered Dose Inhaler',
-                                                                  'notes' => ['200 ACTUAT Albuterol 0.09 MG/ACTUAT Metered Dose Inhaler'],
+                                                                  'description' => '200 ACTUAT Albuterol 0.09 ' \
+                                                                                   'MG/ACTUAT Metered Dose Inhaler',
+                                                                  'notes' => ['200 ACTUAT Albuterol 0.09 MG/ACTUAT ' \
+                                                                              'Metered Dose Inhaler'],
                                                                   'dosageInstructions' => ['Once per day.'] },
                                                                 { 'status' => 'active',
                                                                   'authoredOn' => '2009-03-25T01:15:52Z',
-                                                                  'description' => 'Hydrocortisone 10 MG/ML Topical Cream',
+                                                                  'description' => 'Hydrocortisone 10 MG/ML ' \
+                                                                                   'Topical Cream',
                                                                   'notes' => ['Hydrocortisone 10 MG/ML Topical Cream'],
                                                                   'dosageInstructions' => ['Once per day.'] },
                                                                 { 'status' => 'active',
                                                                   'authoredOn' => '2012-08-18T06:15:52Z',
                                                                   'description' => 'predniSONE 5 MG Oral Tablet',
                                                                   'notes' => ['predniSONE 5 MG Oral Tablet'],
-                                                                  'dosageInstructions' => ['1 dose(s) 1 time(s) per 1 days'] },
+                                                                  'dosageInstructions' => [
+                                                                    '1 dose(s) 1 time(s) per 1 days'
+                                                                  ] },
                                                                 { 'status' => 'active',
                                                                   'authoredOn' => '2013-04-15T01:15:52Z',
                                                                   'description' => 'Hydrochlorothiazide 25 MG',
