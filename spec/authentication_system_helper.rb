@@ -52,6 +52,18 @@ def idme_login_steps(email, password)
   click_button 'Continue' if has_content?('COMPLETE YOUR SIGN IN')
 end
 
+def logingov_login_steps(email, password, mfa_key)
+  fill_in 'Email address', with: email
+  fill_in 'Password', with: password
+  click_button 'Sign in'
+
+  # We're using ROTP library to generate MFA security code using the
+  # key we received when creating the account
+  totp = ROTP::TOTP.new(mfa_key)
+  fill_in 'One-time security code', with: totp.now
+  click_button 'Submit'
+end
+
 def dslogon_login_steps(username, password)
   fill_in 'userName', with: username
   find_field('password-clear').click
