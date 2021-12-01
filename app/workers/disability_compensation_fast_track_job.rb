@@ -68,19 +68,6 @@ class FileIO < StringIO
   attr_reader :content_type, :original_filename, :fast_track
 end
 
-# What should the DisabilityCompensationFastTrackJob class do, as opposed to helper class(es).
-# 1. Get the conditions data about the claim.
-# 2. If conditions data does not match hypertension, do nothing.
-# 3. Otherwise: call LH for more data to get BP and medication data;
-#    parse that data;
-#    shape that data;
-#    generate a PDF from that data;
-#    attach PDF to EVSS;
-#    attach special issue (RRD) to EVSS claim;
-#    submit EVSS claim. (Not in that order necessarily)
-# Helper classes to:
-# - parse LH API call, shape, return it.
-
 class HypertensionObservationData
   attr_accessor :response
 
@@ -100,8 +87,6 @@ class HypertensionObservationData
   end
 
   def transform_entry(raw_entry)
-    # TODO: DO we need to verify LOINC code 85354-9 here as well?
-    # TODO: I'm using issued here over effectiveDateTime, is that correct?
     entry = pick(%w[issued component performer], raw_entry['resource'])
     result = { issued: entry['issued'] }
     practitioner_hash = get_display_hash_from_performer('Practitioner', entry)
@@ -126,16 +111,14 @@ class HypertensionObservationData
     diastolic = filter_components_by_code('8462-4', entry['component']).first
 
     if systolic.blank? || diastolic.blank?
-      # TODO: unlike the above error, I do think we need this one, because if
-      # either are missing from the entry I don't think we can use it.
-      # However, it's possible that there may be entire entries that we could
-      # skip if we still got some valid entries, so again I'm not certain that
-      # raising an error here is correct.
+      # TODO: if either are missing from the entry I don't think we can use
+      # it. However, it's possible that there may be entire entries that we
+      # could skip if we still got some valid entries, so again I'm not certain
+      # that raising an error here is correct.
       raise 'missing systolic or diastolic'
     else
       result[:systolic] = extract_bp_data_from_component(systolic)
       result[:diastolic] = extract_bp_data_from_component(diastolic)
-      # result[:diastolic] = diastolic
     end
 
     result
@@ -179,7 +162,6 @@ class HypertensionMedicationRequestData
   end
 
   def transform_entry(raw_entry)
-    # TODO: I'm using authoredOn here over boundsPeriod.start, is that correct?
     entry = pick(%w[status medicationReference subject authoredOn note dosageInstruction], raw_entry['resource'])
     result = pick(%w[status authoredOn], entry)
     description_hash = { description: entry['medicationReference']['display'] }
@@ -226,9 +208,7 @@ class HypertensionPDFGenerator
   end
 
   def add_intro(pdf)
-    # patient_name = 'FAKE PATIENT NAME' # TODO: fix when LH client can do calls to Patient endpoint
     patient_name = stringify_patient
-    # gen_stamp = '09/01/2021 at 10:23am EST' # TODO: fix when I figure out how to do Ruby time manipulation
     gen_time = Time.now.getlocal
     gen_stamp = "#{gen_time.strftime('%m/%d/%Y')} at #{gen_time.strftime('%l:%M %p %Z')}"
 
@@ -449,9 +429,6 @@ class HypertensionSpecialIssueManager
     disabilities = data['form526']['form526']['disabilities']
     added = add_rrd_to_disabilities(disabilities)
     data['form526']['form526']['disabilities'] = added
-    # TODO: do we need to also add the special issue to secondary disabilities?
-    # This code currently does not do that, but some disabilities have a
-    # secondaryDisabilities property within the disability.
     submission.update(form_json: JSON.dump(data))
   end
 
@@ -513,7 +490,6 @@ class HypertensionUploadManager
       supporting_evidence_attachment.save!
       confirmation_code = supporting_evidence_attachment.guid
 
-      # TODO: Make sure confirmation_code exists before running this:
       form526_submission = add_upload(confirmation_code) unless confirmation_code.nil?
     end
     form526_submission
