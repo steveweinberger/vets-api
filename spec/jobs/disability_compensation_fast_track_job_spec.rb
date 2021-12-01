@@ -10,7 +10,6 @@ RSpec.describe DisabilityCompensationFastTrackJob, type: :worker do
   end
 
   let!(:user) { FactoryBot.create(:disabilities_compensation_user, icn: '2000163') }
-  # let!(:account) { FactoryBot.create(:account, icn: user.icn, idme_uuid: user.uuid) }
   let(:auth_headers) do
     EVSS::DisabilityCompensationAuthHeaders.new(user).add_headers(EVSS::AuthHeaders.new(user).to_h)
   end

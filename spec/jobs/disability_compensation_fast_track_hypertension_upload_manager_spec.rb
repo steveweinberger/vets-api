@@ -69,4 +69,6 @@ RSpec.describe HypertensionUploadManager do
       end
     end
   end
+
+  # TODO: add test to explicitly exercise #handle_attachment
 end
