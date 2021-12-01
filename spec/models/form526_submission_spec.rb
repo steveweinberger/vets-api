@@ -42,7 +42,7 @@ RSpec.describe Form526Submission do
 
   describe '#start' do
     context 'the submission is for hypertension' do
-      subject do
+      let(:form_for_hypertension) do
         Form526Submission.create(
           user_uuid: user.uuid,
           saved_claim_id: saved_claim.id,
@@ -58,7 +58,7 @@ RSpec.describe Form526Submission do
         end
 
         it 'queues a new DisabilityCompensationFastTrackJob worker' do
-          expect { subject.start }.to change(DisabilityCompensationFastTrackJob.jobs, :size).by(1)
+          expect { form_for_hypertension.start }.to change(DisabilityCompensationFastTrackJob.jobs, :size).by(1)
         end
 
         it_behaves_like '#start_evss_submission'
@@ -68,8 +68,8 @@ RSpec.describe Form526Submission do
             allow(Sidekiq::Batch).to receive(:new).and_raise(NoMethodError)
 
             expect(Rails.logger).to receive(:error)
-            expect(subject).to receive(:start_evss_submission)
-            subject.start
+            expect(form_for_hypertension).to receive(:start_evss_submission)
+            form_for_hypertension.start
           end
         end
       end
