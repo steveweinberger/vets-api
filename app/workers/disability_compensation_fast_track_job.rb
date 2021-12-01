@@ -39,7 +39,8 @@ class DisabilityCompensationFastTrackJob
 
       pdf = HypertensionPDFGenerator.new(full_name, bpreadings, medications, Time.zone.today).generate
 
-      form526_submission = HypertensionUploadManager(form526_submission).handle_attachment(pdf.render)
+      HypertensionUploadManager.new(form526_submission).handle_attachment(pdf.render)
+
       HypertensionSpecialIssueManager.new(form526_submission).add_special_issue
     rescue => e
       Rails.logger.error 'Disability Compensation Fast Track Job failing for form' \
