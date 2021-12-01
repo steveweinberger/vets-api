@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_11_18_205345) do
+ActiveRecord::Schema.define(version: 2021_11_23_181757) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -610,6 +610,15 @@ ActiveRecord::Schema.define(version: 2021_11_18_205345) do
     t.index ["icn"], name: "index_mobile_users_on_icn", unique: true
   end
 
+  create_table "mobile_vaccines", force: :cascade do |t|
+    t.integer "cvx_code", null: false
+    t.string "group_name", null: false
+    t.string "manufacturer"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["cvx_code"], name: "index_mobile_vaccines_on_cvx_code", unique: true
+  end
+
   create_table "notifications", id: :serial, force: :cascade do |t|
     t.integer "account_id", null: false
     t.integer "subject", null: false
@@ -904,6 +913,7 @@ ActiveRecord::Schema.define(version: 2021_11_18_205345) do
     t.text "dob_ciphertext"
     t.text "encrypted_kms_key"
     t.index ["representative_id", "first_name", "last_name"], name: "index_vso_grp", unique: true
+    t.check_constraint "representative_id IS NOT NULL", name: "veteran_representatives_representative_id_null"
   end
 
   create_table "vic_submissions", id: :serial, force: :cascade do |t|
