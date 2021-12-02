@@ -36,7 +36,7 @@ module FastTrack
       existing_summary = already_has_summary_file
       unless existing_summary
         supporting_evidence_attachment = SupportingEvidenceAttachment.new
-        file = FileIO.new(pdf_body, 'VAMC_Hypertension_Rapid_Decision_Evidence.pdf')
+        file = FastTrackPDF.new(pdf_body, 'VAMC_Hypertension_Rapid_Decision_Evidence.pdf')
         supporting_evidence_attachment.set_file_data!(file)
         supporting_evidence_attachment.save!
         confirmation_code = supporting_evidence_attachment.guid
@@ -45,16 +45,26 @@ module FastTrack
       end
       form526_submission
     end
-  end
 
-  class FileIO < StringIO
-    def initialize(stream, filename)
-      super(stream)
-      @original_filename = filename
-      @fast_track = true
-      @content_type = 'application/pdf'
+    # sets up attributes which the SupportingEvidenceAttachment class
+    # and CarrierWave will expect in order to upload our PDF to S3
+    #
+    FastTrackPDF = Struct.new(:stream, :filename) do
+      def original_filename
+        filename
+      end
+
+      def fast_track
+        true
+      end
+
+      def content_type
+        'application/pdf'
+      end
+
+      def read
+        stream
+      end
     end
-
-    attr_reader :content_type, :original_filename, :fast_track
   end
 end
