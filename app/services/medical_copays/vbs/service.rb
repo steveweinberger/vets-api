@@ -36,6 +36,7 @@ module MedicalCopays
       # @return [Hash]
       #
       def get_copays
+        return { data: { message: 'Deceased' }, status: 403 } if user.account.notifications.any?(&:deceased?)
         raise InvalidVBSRequestError, request_data.errors unless request_data.valid?
 
         response = request.post("#{settings.base_path}/GetStatementsByEDIPIAndVistaAccountNumber", request_data.to_hash)
@@ -46,6 +47,17 @@ module MedicalCopays
         response.body.concat(zero_balance_statements.list)
 
         ResponseData.build(response: response).handle
+      end
+
+      ##
+      # Gets the PDF medical copay statment by statment_id
+      #
+      # @return [Hash]
+      #
+      def get_pdf_statement_by_id(statement_id)
+        response = request.get("#{settings.base_path}/GetPDFStatementById/#{statement_id}")
+
+        Base64.decode64(response.body['statement'])
       end
 
       def settings
