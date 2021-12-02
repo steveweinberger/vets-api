@@ -46,7 +46,7 @@ module FastTrack
       rescue => e
         Rails.logger.error 'Disability Compensation Fast Track Job failing for form' \
                            "id:#{form526_submission.id}. With error: #{e}"
-        e
+        raise
       end
     end
 
