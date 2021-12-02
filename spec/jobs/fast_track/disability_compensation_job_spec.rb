@@ -69,10 +69,11 @@ RSpec.describe FastTrack::DisabilityCompensationJob, type: :worker do
           it 'raises a helpful error if the failure is after the api call' do
             allow_any_instance_of(
               SupportingEvidenceAttachment
-            ).to receive(:save!).and_raise(ActiveRecord::RecordInvalid)
+            ).to receive(:save!).and_raise(StandardError)
 
-            expect(Rails.logger).to receive(:error)
-            FastTrack::DisabilityCompensationJob.new.perform(submission.id, user_full_name)
+            expect do
+              FastTrack::DisabilityCompensationJob.new.perform(submission.id, user_full_name)
+            end.to raise_error(StandardError)
           end
         end
       end
