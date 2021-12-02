@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-require 'disability_compensation_fast_track_job'
+require 'fast_track/disability_compensation_job'
 
-RSpec.describe HypertensionUploadManager do
+RSpec.describe FastTrack::HypertensionUploadManager do
   let(:user) { create(:disabilities_compensation_user) }
   let(:auth_headers) do
     EVSS::DisabilityCompensationAuthHeaders.new(user).add_headers(EVSS::AuthHeaders.new(user).to_h)
@@ -29,7 +29,7 @@ RSpec.describe HypertensionUploadManager do
   describe '#add_upload(confirmation_code)' do
     context 'success' do
       it 'appends the new upload and saves the expected JSON' do
-        HypertensionUploadManager.new(form526_submission).add_upload('fake_confirmation_code')
+        FastTrack::HypertensionUploadManager.new(form526_submission).add_upload('fake_confirmation_code')
         parsed_json = JSON.parse(form526_submission.form_json)['form526_uploads']
         expect(parsed_json).to match original_form_json_uploads + [
           { 'name' => 'VAMC_Hypertension_Rapid_Decision_Evidence.pdf',
@@ -44,7 +44,7 @@ RSpec.describe HypertensionUploadManager do
         end
 
         it 'adds the new upload' do
-          HypertensionUploadManager.new(form526_submission).add_upload('fake_confirmation_code')
+          FastTrack::HypertensionUploadManager.new(form526_submission).add_upload('fake_confirmation_code')
           parsed_json = JSON.parse(form526_submission.form_json)['form526_uploads']
 
           expect(parsed_json).to match [
@@ -60,12 +60,12 @@ RSpec.describe HypertensionUploadManager do
   describe '#already_has_summary_files' do
     context 'success' do
       it 'returns false if no summary file is present' do
-        expect(HypertensionUploadManager.new(form526_submission).already_has_summary_file).to eq false
+        expect(FastTrack::HypertensionUploadManager.new(form526_submission).already_has_summary_file).to eq false
       end
 
       it 'returns true after a summary file is added' do
-        HypertensionUploadManager.new(form526_submission).add_upload('fake_confirmation_code')
-        expect(HypertensionUploadManager.new(form526_submission).already_has_summary_file).to eq true
+        FastTrack::HypertensionUploadManager.new(form526_submission).add_upload('fake_confirmation_code')
+        expect(FastTrack::HypertensionUploadManager.new(form526_submission).already_has_summary_file).to eq true
       end
     end
   end

@@ -55,7 +55,7 @@ class Form526Submission < ApplicationRecord
         'submission_id' => id
       )
       jids = workflow_batch.jobs do
-        DisabilityCompensationFastTrackJob.perform_async(id, get_full_name)
+        FastTrack::DisabilityCompensationJob.perform_async(id, get_full_name)
       end
       jids.first
     else

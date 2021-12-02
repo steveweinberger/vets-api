@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-require 'disability_compensation_fast_track_job'
+require 'fast_track/disability_compensation_job'
 
-RSpec.describe HypertensionSpecialIssueManager do
+RSpec.describe FastTrack::HypertensionSpecialIssueManager do
   let(:form526_submission) do
     Form526Submission.create(
       user_uuid: user.uuid,
@@ -29,20 +29,20 @@ RSpec.describe HypertensionSpecialIssueManager do
     end
 
     it 'matches the email address after manipulation' do
-      HypertensionSpecialIssueManager.new(form526_submission).add_special_issue
+      FastTrack::HypertensionSpecialIssueManager.new(form526_submission).add_special_issue
       address = JSON.parse(form526_submission.form_json)['form526']['form526']['veteran']['emailAddress']
       expect(address).to match 'test@email.com'
     end
 
     it 'adds rrd to the disabilities list' do
-      HypertensionSpecialIssueManager.new(form526_submission).add_special_issue
+      FastTrack::HypertensionSpecialIssueManager.new(form526_submission).add_special_issue
       disabilities = JSON.parse(form526_submission.form_json)['form526']['form526']['disabilities']
       filtered = disabilities.filter { |item| item['diagnosticCode'] == 7101 }
       expect(filtered[0]['specialIssues']).to match [{ 'code' => 'RRD', 'name' => 'Rapid Ready for Decision' }]
     end
 
     it 'adds rrd to each relevant item in the disabilities list' do
-      HypertensionSpecialIssueManager.new(form526_submission).add_special_issue
+      FastTrack::HypertensionSpecialIssueManager.new(form526_submission).add_special_issue
       disabilities = JSON.parse(form526_submission.form_json)['form526']['form526']['disabilities']
       rrd_hash = { 'code' => 'RRD', 'name' => 'Rapid Ready for Decision' }
       filtered = disabilities.filter { |item| item['diagnosticCode'] == 7101 }
@@ -51,7 +51,7 @@ RSpec.describe HypertensionSpecialIssueManager do
     end
 
     it 'adds rrd to the disabilities list only once' do
-      HypertensionSpecialIssueManager.new(form526_submission).add_special_issue
+      FastTrack::HypertensionSpecialIssueManager.new(form526_submission).add_special_issue
       disabilities = JSON.parse(form526_submission.form_json)['form526']['form526']['disabilities']
       filtered = disabilities.filter { |item| item['diagnosticCode'] == 7101 }
       expect(filtered[0]['specialIssues']).to match [{ 'code' => 'RRD', 'name' => 'Rapid Ready for Decision' }]
@@ -59,7 +59,7 @@ RSpec.describe HypertensionSpecialIssueManager do
       jform['form526']['form526']['disabilities'] = disabilities
       form526_submission.form_json = JSON.dump(jform)
 
-      HypertensionSpecialIssueManager.new(form526_submission).add_special_issue
+      FastTrack::HypertensionSpecialIssueManager.new(form526_submission).add_special_issue
       second_pass = JSON.parse(form526_submission.form_json)['form526']['form526']['disabilities']
       filtered = second_pass.filter { |item| item['diagnosticCode'] == 7101 }
       expect(filtered[0]['specialIssues']).to match [{ 'code' => 'RRD', 'name' => 'Rapid Ready for Decision' }]

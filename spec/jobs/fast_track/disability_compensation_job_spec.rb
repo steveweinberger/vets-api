@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe DisabilityCompensationFastTrackJob, type: :worker do
+RSpec.describe FastTrack::DisabilityCompensationJob, type: :worker do
   subject { described_class }
 
   before do
@@ -49,7 +49,7 @@ RSpec.describe DisabilityCompensationFastTrackJob, type: :worker do
         end
 
         it 'returns from the class if the claim observations does NOT include bp readings from the past year' do
-          expect(HypertensionMedicationRequestData).not_to receive(:new)
+          expect(FastTrack::HypertensionMedicationRequestData).not_to receive(:new)
           subject.new.perform(submission_for_user_wo_bp.id, user_full_name)
         end
       end
@@ -57,11 +57,12 @@ RSpec.describe DisabilityCompensationFastTrackJob, type: :worker do
       context 'the claim IS for hypertension', :vcr do
         before do
           # The bp reading needs to be 1 year or less old so actual API data will not test if this code is working.
-          allow_any_instance_of(HypertensionObservationData).to receive(:transform).and_return(mocked_observation_data)
+          allow_any_instance_of(FastTrack::HypertensionObservationData)
+            .to receive(:transform).and_return(mocked_observation_data)
         end
 
         it 'finishes successfully' do
-          expect(DisabilityCompensationFastTrackJob.new.perform(submission.id, user_full_name)).to eq true
+          expect(FastTrack::DisabilityCompensationJob.new.perform(submission.id, user_full_name)).to eq true
         end
 
         context 'failure' do
@@ -71,7 +72,7 @@ RSpec.describe DisabilityCompensationFastTrackJob, type: :worker do
             ).to receive(:save!).and_raise(ActiveRecord::RecordInvalid)
 
             expect(Rails.logger).to receive(:error)
-            DisabilityCompensationFastTrackJob.new.perform(submission.id, user_full_name)
+            FastTrack::DisabilityCompensationJob.new.perform(submission.id, user_full_name)
           end
         end
       end

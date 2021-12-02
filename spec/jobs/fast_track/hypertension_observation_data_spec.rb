@@ -2,9 +2,9 @@
 
 require 'rails_helper'
 require 'ostruct'
-require 'disability_compensation_fast_track_job'
+require 'fast_track/disability_compensation_job'
 
-RSpec.describe HypertensionObservationData, :vcr do
+RSpec.describe FastTrack::HypertensionObservationData, :vcr do
   subject { described_class }
 
   let(:response) do
