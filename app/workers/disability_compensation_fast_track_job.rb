@@ -22,22 +22,23 @@ class DisabilityCompensationFastTrackJob
     form526_submission = Form526Submission.find(form526_submission_id)
     icn = Account.where(idme_uuid: form526_submission.user_uuid).first.icn
 
-    client = Lighthouse::VeteransHealth::Client.new(icn)
-    observations_response = client.get_resource('observations')
-    medicationrequest_response = client.get_resource('medications')
+    # client = Lighthouse::VeteransHealth::Client.new(icn)
+    # observations_response = client.get_resource('observations')
+    # medicationrequest_response = client.get_resource('medications')
 
     begin
-      bpreadings = HypertensionObservationData.new(observations_response).transform
-      return if no_recent_bp_readings(bpreadings)
+      # bpreadings = HypertensionObservationData.new(observations_response).transform
+      # return if no_recent_bp_readings(bpreadings)
 
-      medications = HypertensionMedicationRequestData.new(medicationrequest_response).transform
+      # medications = HypertensionMedicationRequestData.new(medicationrequest_response).transform
 
-      bpreadings = bpreadings.filter { |reading| reading[:issued].to_date > 1.year.ago }
+      # bpreadings = bpreadings.filter { |reading| reading[:issued].to_date > 1.year.ago }
 
-      bpreadings = bpreadings.sort_by { |reading| reading[:issued].to_date }.reverse!
-      medications = medications.sort_by { |med| med[:authoredOn].to_date }.reverse!
+      # bpreadings = bpreadings.sort_by { |reading| reading[:issued].to_date }.reverse!
+      # medications = medications.sort_by { |med| med[:authoredOn].to_date }.reverse!
 
-      pdf = HypertensionPDFGenerator.new(full_name, bpreadings, medications, Time.zone.today).generate
+      #pdf = HypertensionPDFGenerator.new(full_name, bpreadings, medications, Time.zone.today).generate
+      pdf = HypertensionPDFGenerator.new(full_name, nil, nil, Time.zone.today).generate
 
       HypertensionUploadManager.new(form526_submission).handle_attachment(pdf.render)
 
@@ -192,8 +193,8 @@ class HypertensionPDFGenerator
   def generate
     pdf = Prawn::Document.new
     pdf = add_intro(pdf)
-    pdf = add_blood_pressure(pdf)
-    pdf = add_medications(pdf) if medications.length > 1
+    #pdf = add_blood_pressure(pdf)
+    #pdf = add_medications(pdf) if medications.length > 1
     add_about(pdf)
   end
 
