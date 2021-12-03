@@ -316,7 +316,9 @@ class Form526Submission < ApplicationRecord
 
   def single_issue_hypertension_claim?
     disabilities = form.dig('form526', 'form526', 'disabilities')
-    disabilities.count == 1 && disabilities.first['disabilityActionType'] == 'INCREASE' && disabilities.first['diagnosticCode'] == 7101
+    disabilities.count == 1 &&
+      disabilities.first['disabilityActionType'] == 'INCREASE' &&
+      disabilities.first['diagnosticCode'] == 7101
   end
 
   private
