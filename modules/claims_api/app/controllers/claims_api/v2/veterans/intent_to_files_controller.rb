@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'claims_api/v2/params_validation/intent_to_file'
+
 module ClaimsApi
   module V2
     module Veterans
@@ -35,6 +37,7 @@ module ClaimsApi
         end
 
         def submit
+          validate_request!(ClaimsApi::V2::ParamsValidation::IntentToFile)
           render json: { message: 'Hello World!' }
         end
 

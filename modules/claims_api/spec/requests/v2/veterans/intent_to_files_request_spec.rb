@@ -295,12 +295,17 @@ RSpec.describe 'IntentToFiles', type: :request do
     describe 'submit' do
       let(:itf_submit_path) { "/services/benefits/v2/veterans/#{veteran_id}/intent-to-files" }
       let(:scopes) { %w[claim.write] }
+      let(:data) do
+        {
+          type: 'compensation'
+        }
+      end
 
       describe 'auth header' do
         context 'when provided' do
           it 'returns a 200' do
             with_okta_user(scopes) do |auth_header|
-              post itf_submit_path, headers: auth_header
+              post itf_submit_path, params: data, headers: auth_header
               expect(response.status).to eq(200)
             end
           end
@@ -309,8 +314,59 @@ RSpec.describe 'IntentToFiles', type: :request do
         context 'when not provided' do
           it 'returns a 401 error code' do
             with_okta_user(scopes) do
-              post itf_submit_path
+              post itf_submit_path, params: data
               expect(response.status).to eq(401)
+            end
+          end
+        end
+      end
+
+      describe 'submitting a payload' do
+        context 'when payload is valid' do
+          it 'returns a 200' do
+            with_okta_user(scopes) do |auth_header|
+              post itf_submit_path, params: data, headers: auth_header
+              expect(response.status).to eq(200)
+            end
+          end
+        end
+
+        context 'when payload is invalid' do
+          context "when 'type' is invalid" do
+            context "when 'type' is blank" do
+              it 'returns a 400' do
+                with_okta_user(scopes) do |auth_header|
+                  invalid_data = data
+                  invalid_data[:type] = ''
+
+                  post itf_submit_path, params: invalid_data, headers: auth_header
+                  expect(response.status).to eq(400)
+                end
+              end
+            end
+
+            context "when 'type' is nil" do
+              it 'returns a 400' do
+                with_okta_user(scopes) do |auth_header|
+                  invalid_data = data
+                  invalid_data[:type] = nil
+
+                  post itf_submit_path, params: invalid_data, headers: auth_header
+                  expect(response.status).to eq(400)
+                end
+              end
+            end
+
+            context "when 'type' is not an accepted value" do
+              it 'returns a 400' do
+                with_okta_user(scopes) do |auth_header|
+                  invalid_data = data
+                  invalid_data[:type] = 'foo'
+
+                  post itf_submit_path, params: invalid_data, headers: auth_header
+                  expect(response.status).to eq(400)
+                end
+              end
             end
           end
         end
