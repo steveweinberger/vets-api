@@ -32,7 +32,7 @@ module Common
     end
     delegate :redis_namespace_key, to: 'self.class'
 
-    def initialize(attributes = {}, persisted = false)
+    def initialize(attributes = {}, persisted: false)
       undefined = REQ_CLASS_INSTANCE_VARS.select { |class_var| send(class_var).nil? }
       raise NoMethodError, "Required class methods #{undefined.join(', ')} are not defined" if undefined.any?
 

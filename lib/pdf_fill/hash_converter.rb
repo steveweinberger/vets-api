@@ -17,7 +17,7 @@ module PdfFill
       @extras_generator = ExtrasGenerator.new
     end
 
-    def convert_value(v, key_data, is_overflow = false)
+    def convert_value(v, key_data, is_overflow: false)
       if [true, false].include?(v) && !is_overflow
         v ? 1 : 0
       elsif key_data.try(:[], :format) == 'date'

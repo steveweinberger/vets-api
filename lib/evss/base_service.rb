@@ -11,7 +11,7 @@ module EVSS
     SYSTEM_NAME = 'vets.gov'
     DEFAULT_TIMEOUT = 15 # in seconds
 
-    def initialize(headers, use_mock = false)
+    def initialize(headers, use_mock: false)
       @headers = headers
       @use_mock = use_mock
     end

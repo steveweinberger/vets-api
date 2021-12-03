@@ -2,7 +2,7 @@
 
 module AuthenticatedSessionHelper
   # rubocop:disable Metrics/ParameterLists
-  def sign_in(user = FactoryBot.build(:user, :loa3), token = nil, raw = false, pact = false)
+  def sign_in(user = FactoryBot.build(:user, :loa3), token = nil, raw: false, pact: false)
     user = user.persisted? ? user : User.create(user)
     token ||= 'abracadabra'
     session_object = Session.create(uuid: user.uuid, token: token)

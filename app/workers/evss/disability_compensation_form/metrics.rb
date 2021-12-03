@@ -19,19 +19,19 @@ module EVSS
 
       # Increments a job success
       #
-      def increment_success(is_bdd = false)
+      def increment_success(is_bdd: false)
         StatsD.increment("#{@prefix}.success", tags: ["is_bdd:#{is_bdd}"])
       end
 
       # Increments a non retryable error with a tag for the specific error
       #
-      def increment_non_retryable(error, is_bdd = false)
+      def increment_non_retryable(error, is_bdd: false)
         StatsD.increment("#{@prefix}.non_retryable_error", tags: error_tags(error, is_bdd))
       end
 
       # Increments a retryable error with a tag for the specific error
       #
-      def increment_retryable(error, is_bdd = false)
+      def increment_retryable(error, is_bdd: false)
         StatsD.increment("#{@prefix}.retryable_error", tags: error_tags(error, is_bdd))
       end
 

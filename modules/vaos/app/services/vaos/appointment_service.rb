@@ -158,7 +158,7 @@ module VAOS
       end
     end
 
-    def other_params(use_cache = false)
+    def other_params(use_cache: false)
       { useCache: use_cache }
     end
 

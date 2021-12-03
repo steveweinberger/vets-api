@@ -24,7 +24,7 @@ module EducationForm::Forms
       end
     end
 
-    def ssn_gender_dob(veteran = true)
+    def ssn_gender_dob(veteran: true)
       prefix = veteran ? 'veteran' : 'relative'
       ssn = @applicant.public_send("#{prefix}SocialSecurityNumber")
       gender = @applicant.gender

@@ -6,7 +6,7 @@ module OktaRedis
     REDIS_CONFIG_KEY = :okta_response_app
     attr_accessor :grants
 
-    def initialize(attributes = {}, persisted = false)
+    def initialize(attributes = {}, persisted: false)
       super(attributes, persisted)
       @grants = []
     end

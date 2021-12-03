@@ -112,22 +112,6 @@ Style/HashLikeCase:
     - 'lib/identity/parsers/gc_ids.rb'
     - 'spec/controllers/v1/sessions_controller_spec.rb'
 
-# Offense count: 13
-# Configuration parameters: AllowedMethods.
-# AllowedMethods: respond_to_missing?
-Style/OptionalBooleanParameter:
-  Exclude:
-    - 'app/controllers/v1/sessions_controller.rb'
-    - 'app/models/okta_redis/app.rb'
-    - 'app/workers/education_form/forms/base.rb'
-    - 'app/workers/evss/disability_compensation_form/metrics.rb'
-    - 'lib/common/models/redis_store.rb'
-    - 'lib/evss/base_service.rb'
-    - 'lib/evss/gi_bill_status/gi_bill_status_response.rb'
-    - 'lib/pdf_fill/hash_converter.rb'
-    - 'modules/vaos/app/services/vaos/appointment_service.rb'
-    - 'spec/support/authenticated_session_helper.rb'
-
 # Offense count: 4
 # Cop supports --auto-correct.
 Style/RedundantSelfAssignmentBranch:
