@@ -55,10 +55,7 @@ module FastTrack
 
     def filter_components_by_code(code, components)
       # Filter the components to only those that have at least one code.coding element with the code:
-      matches = components.filter { |item| item['code']['coding'].filter { |el| el['code'] == code }.length.positive? }
-      # Filter the code.coding list to only have elements matching the code:
-      matches.map { |match| match['code']['coding'] = match['code']['coding'].filter { |el| el['code'] == code } }
-      matches
+      components.filter { |item| item['code']['coding'].filter { |el| el['code'] == code }.length.positive? }
     end
 
     def extract_bp_data_from_component(component)
