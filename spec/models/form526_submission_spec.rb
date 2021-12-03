@@ -605,7 +605,7 @@ RSpec.describe Form526Submission do
     end
   end
 
-  describe '#get_full_name' do
+  describe '#full_name' do
     let(:full_name_hash) do
       {
         first: 'Beyonce',
@@ -616,7 +616,7 @@ RSpec.describe Form526Submission do
     end
 
     it 'returns the full name of the user' do
-      expect(subject.get_full_name).to eql(full_name_hash)
+      expect(subject.full_name).to eql(full_name_hash)
     end
   end
 

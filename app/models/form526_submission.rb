@@ -55,7 +55,7 @@ class Form526Submission < ApplicationRecord
         'submission_id' => id
       )
       jids = workflow_batch.jobs do
-        FastTrack::DisabilityCompensationJob.perform_async(id, get_full_name)
+        FastTrack::DisabilityCompensationJob.perform_async(id, full_name)
       end
       jids.first
     else
@@ -128,7 +128,7 @@ class Form526Submission < ApplicationRecord
 
   # @return [Hash] of the user's full name (first, middle, last, suffix)
   #
-  def get_full_name
+  def full_name
     user = User.find(user_uuid)
     user&.full_name_normalized
   end
@@ -315,8 +315,8 @@ class Form526Submission < ApplicationRecord
   end
 
   def single_issue_hypertension_claim?
-    dis = form.dig('form526', 'form526', 'disabilities')
-    dis.count == 1 && dis.first['disabilityActionType'] == 'INCREASE' && dis.first['diagnosticCode'] == 7101
+    disabilities = form.dig('form526', 'form526', 'disabilities')
+    disabilities.count == 1 && disabilities.first['disabilityActionType'] == 'INCREASE' && disabilities.first['diagnosticCode'] == 7101
   end
 
   private
