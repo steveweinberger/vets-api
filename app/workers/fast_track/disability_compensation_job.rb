@@ -9,7 +9,7 @@ module FastTrack
     include Sidekiq::Worker
 
     extend SentryLogging
-    # TODO: This is apparently at most about 4.5 hours.
+    # Note: This is apparently at most about 4.5 hours.
     # https://github.com/mperham/sidekiq/issues/2168#issuecomment-72079636
     sidekiq_options retry: 8
 
