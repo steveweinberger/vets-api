@@ -93,7 +93,7 @@ module Lighthouse
       end
 
       def headers_hash
-        @headers_hash ||= Configuration.base_request_headers.merge({ "Authorization": "Bearer #{bearer_token}" })
+        @headers_hash ||= Configuration.base_request_headers.merge({ Authorization: "Bearer #{bearer_token}" })
       end
 
       def retrieve_bearer_token
