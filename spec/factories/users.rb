@@ -31,6 +31,13 @@ FactoryBot.define do
       icn_with_aaid { nil }
       common_name { nil }
       person_types { ['VET'] }
+      phone { nil }
+      suffix { nil }
+      address { nil }
+      cerner_id { nil }
+      cerner_facility_ids { nil }
+      vha_facility_hash { nil }
+      vha_facility_ids { nil }
 
       sign_in do
         {
@@ -70,7 +77,14 @@ FactoryBot.define do
                              mhv_account_type: t.mhv_account_type,
                              edipi: t.edipi,
                              sign_in: t.sign_in,
-                             common_name: t.common_name)
+                             common_name: t.common_name,
+                             phone: t.phone,
+                             suffix: t.suffix,
+                             address: t.address,
+                             cerner_id: t.cerner_id,
+                             cerner_facility_ids: t.cerner_facility_ids,
+                             vha_facility_hash: t.vha_facility_hash,
+                             vha_facility_ids: t.vha_facility_ids)
       user.instance_variable_set(:@identity, user_identity)
     end
 
