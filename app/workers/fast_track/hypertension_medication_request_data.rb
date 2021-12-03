@@ -10,7 +10,8 @@ module FastTrack
 
     def transform
       entries = response.body['entry']
-      entries.map { |entry| transform_entry(entry) }
+      filtered = entries.filter { |entry| entry['resource']['status'] == 'active' }
+      filtered.map { |entry| transform_entry(entry) }
     end
 
     private
@@ -23,8 +24,8 @@ module FastTrack
       entry = pick(%w[status medicationReference subject authoredOn note dosageInstruction], raw_entry['resource'])
       result = pick(%w[status authoredOn], entry)
       description_hash = { description: entry['medicationReference']['display'] }
-      notes_hash = get_notes_from_note(entry['note'])
-      dosage_hash = get_text_from_dosage_instruction(entry['dosageInstruction'])
+      notes_hash = get_notes_from_note(entry['note'] || [])
+      dosage_hash = get_text_from_dosage_instruction(entry['dosageInstruction'] || [])
       result.merge(description_hash, notes_hash, dosage_hash).with_indifferent_access
     end
 
@@ -33,7 +34,9 @@ module FastTrack
     end
 
     def get_text_from_dosage_instruction(dosage_instructions)
-      { 'dosageInstructions': dosage_instructions.map { |instr| instr['text'] } }
+      toplevel_texts = dosage_instructions.map { |instr| instr['text'] }
+      code_texts = dosage_instructions.map { |instr| instr['timing']['code']['text'] }
+      { 'dosageInstructions': toplevel_texts + code_texts }
     end
   end
 end

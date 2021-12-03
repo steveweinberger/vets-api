@@ -164,7 +164,7 @@ module FastTrack
       pdf.text "\n", size: 11
       pdf.text 'Active Prescriptions', size: 16
 
-      med_search_window = 'VHA records searched for medication prescriptions active as of' \
+      med_search_window = 'VHA records searched for medication prescriptions active as of ' \
                           "#{Time.zone.today.strftime('%m/%d/%Y')}"
       prescription_lines = [
         med_search_window,
@@ -183,7 +183,9 @@ module FastTrack
       @medications.each do |medication|
         pdf.text medication['description'], size: 11, style: :bold
         pdf.text "Prescribed on: #{medication['authoredOn'][0, 10].to_date.strftime('%m/%d/%Y')}"
-        pdf.text "Dosages instructions: #{medication['dosageInstructions'].join('; ')}"
+        if medication['dosageInstructions'].present?
+          pdf.text "Dosage instructions: #{medication['dosageInstructions'].join('; ')}"
+        end
         pdf.text "\n", size: 8
       end
 
