@@ -336,9 +336,6 @@ gids:
   open_timeout: 1
   read_timeout: 1
 
-mvi_hca:
-  url: http://example.com
-
 # Settings for Healthcare Application
 # This CA chain is nonsense but allows local development to work with pre-prod environment.
 hca:
