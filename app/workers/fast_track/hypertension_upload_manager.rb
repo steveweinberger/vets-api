@@ -25,11 +25,7 @@ module FastTrack
     def already_has_summary_file
       data = JSON.parse(submission.form_json)
       uploads = data['form526_uploads'] || []
-      existing_summary = false
-      uploads.each do |upload|
-        existing_summary = true if upload['name'][0, 41] == 'VAMC_Hypertension_Rapid_Decision_Evidence'
-      end
-      existing_summary
+      uploads.any? { |upload| upload['name'].start_with? 'VAMC_Hypertension_Rapid_Decision_Evidence' }
     end
 
     def handle_attachment(pdf_body)
