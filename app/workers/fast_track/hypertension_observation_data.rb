@@ -16,7 +16,7 @@ module FastTrack
     private
 
     def transform_entry(raw_entry)
-      entry = raw_entry['resource'].slice("issued", "component", "performer")
+      entry = raw_entry['resource'].slice('issued', 'component', 'performer')
       practitioner_hash = get_display_hash_from_performer('Practitioner', entry)
       organization_hash = get_display_hash_from_performer('Organization', entry)
       bp_hash = get_bp_readings_from_entry(entry)
@@ -65,9 +65,9 @@ module FastTrack
       # component.code.coding, since we've filtered it down in filter_components_by_code,
       # should only the coding we expect, and since if there were multiples for some odd
       # reason the values in them would all be the same, we can just take the first one.
-      coding = component['code']['coding'].first.slice("code", "display")
+      coding = component['code']['coding'].first.slice('code', 'display')
       # The values we want are all in component.valueQuantity
-      values = component['valueQuantity'].slice("unit", "value")
+      values = component['valueQuantity'].slice('unit', 'value')
       coding.merge(values)
     end
   end
