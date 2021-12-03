@@ -31,8 +31,6 @@ module MedicalCopays
     def list
       return default if data.blank?
 
-      Rails.logger.debug("User facility hash: #{data.inspect}")
-
       data.each_with_object([]) do |(key, values), accumulator|
         next if values.blank?
 
@@ -51,7 +49,7 @@ module MedicalCopays
     #
     def vista_account_id(key, id)
       offset = 16 - (key + id).length
-      padding = '0' * offset
+      padding = '0' * offset if offset >= 0
 
       "#{key}#{padding}#{id}".to_i
     end
