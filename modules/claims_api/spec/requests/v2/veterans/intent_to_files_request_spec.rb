@@ -291,5 +291,30 @@ RSpec.describe 'IntentToFiles', type: :request do
         end
       end
     end
+
+    describe 'submit' do
+      let(:itf_submit_path) { "/services/benefits/v2/veterans/#{veteran_id}/intent-to-files" }
+      let(:scopes) { %w[claim.write] }
+
+      describe 'auth header' do
+        context 'when provided' do
+          it 'returns a 200' do
+            with_okta_user(scopes) do |auth_header|
+              post itf_submit_path, headers: auth_header
+              expect(response.status).to eq(200)
+            end
+          end
+        end
+
+        context 'when not provided' do
+          it 'returns a 401 error code' do
+            with_okta_user(scopes) do
+              post itf_submit_path
+              expect(response.status).to eq(401)
+            end
+          end
+        end
+      end
+    end
   end
 end

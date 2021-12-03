@@ -34,6 +34,10 @@ module ClaimsApi
           render json: ClaimsApi::V2::Blueprints::IntentToFileBlueprint.render(active_itf)
         end
 
+        def submit
+          render json: { message: 'Hello World!' }
+        end
+
         private
 
         def bgs_service
