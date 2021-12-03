@@ -31,14 +31,14 @@ module FastTrack
 
     def add_intro(pdf)
       patient_name = stringify_patient
-      gen_time = Time.now.getlocal
-      gen_stamp = "#{gen_time.strftime('%m/%d/%Y')} at #{gen_time.strftime('%l:%M %p %Z')}"
+      generated_time = Time.now.getlocal
+      generated_at = "#{generated_time.strftime('%m/%d/%Y')} at #{generated_time.strftime('%l:%M %p %Z')}"
 
       intro_lines = [
         "<font size='11'>Hypertension Rapid Ready for Decision | Claim for Increase</font>\n",
         "<font size='22'>VHA Hypertension Data Summary for</font>",
         "<font size='22'>#{patient_name}</font>\n",
-        "<font size='10'><i>Generated automatically on #{gen_stamp}<i>\n"
+        "<font size='10'><i>Generated automatically on #{generated_at}<i>\n"
       ]
 
       intro_lines.each do |line|

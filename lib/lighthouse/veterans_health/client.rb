@@ -51,8 +51,8 @@ module Lighthouse
 
       def get_conditions
         params = {
-          'patient' => @icn,
-          'clinical-status' => 'http://terminology.hl7.org/CodeSystem/condition-clinical|active'
+          patient: @icn,
+          'clinical-status': 'http://terminology.hl7.org/CodeSystem/condition-clinical|active'
         }
 
         perform_get('services/fhir/v0/r4/Condition', params)
@@ -60,9 +60,9 @@ module Lighthouse
 
       def get_observations
         params = {
-          'patient': @icn,
-          'category': 'vital-signs',
-          'code': '85354-9'
+          patient: @icn,
+          category: 'vital-signs',
+          code: '85354-9'
         }
 
         perform_get('services/fhir/v0/r4/Observation', params)
@@ -70,7 +70,7 @@ module Lighthouse
 
       def get_medications
         params = {
-          'patient': @icn
+          patient: @icn
         }
         perform_get('services/fhir/v0/r4/MedicationRequest', params)
       end

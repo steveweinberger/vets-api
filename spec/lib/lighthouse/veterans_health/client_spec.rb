@@ -81,8 +81,8 @@ RSpec.describe Lighthouse::VeteransHealth::Client do
       describe 'when the caller requests the Conditions resource' do
         let(:conditions_api_path) { 'services/fhir/v0/r4/Condition' }
         let(:params_hash) do
-          { 'patient' => @client.instance_variable_get(:@icn),
-            'clinical-status' => 'http://terminology.hl7.org/CodeSystem/condition-clinical|active' }
+          { patient: @client.instance_variable_get(:@icn),
+            'clinical-status': 'http://terminology.hl7.org/CodeSystem/condition-clinical|active' }
         end
 
         it 'invokes the Lighthouse Veterans Health API Condition endpoint' do
