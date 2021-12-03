@@ -7,11 +7,36 @@ module MebApi
   module V0
     class EducationBenefitsController < MebApi::V0::BaseController
       # disabling checks while we serve big mock JSON objects. Check will be reinstated when we integrate with DGIB
+      # rubocop:disable Metrics/MethodLength
       def claimant_info
-        response = automation_service.get_claimant_info
-
-        render json: response, serializer: AutomationSerializer
+        render json:
+          {
+            data:
+              {
+                'claimant':
+                  { 'claimantId': '1000000000000246', 'suffix': '', 'dateOfBirth': '1970-01-01', 'firstName': 'Herbert',
+                    'lastName': 'Hoover', 'middleName': '',
+                    'contactInfo':
+                        { 'addressLine1': '123 Martin Luther King Blvd', 'addressLine2': '', 'city': 'New Orleans',
+                          'zipcode': '70115', 'effectiveDate': '', 'zipCodeExtension': '',
+                          'emailAddress': 'test@test.com',
+                          'addressType': 'MILITARY_OVERSEAS', 'mobilePhoneNumber': '512-825-5445',
+                          'homePhoneNumber': '222-333-3333', 'countryCode': 'US', 'stateCode': 'ME' },
+                    'dobChanged': false, 'firstAndLastNameChanged': false, 'contactInfoChanged': false,
+                    'notificationMethod': 'email', 'preferredContact': 'mail' }
+              },
+            'serviceData': {
+              'beginDate': '2010-10-26T18:00:54.302Z', 'endDate': '2021-10-26T18:00:54.302Z',
+              'branchOfService': 'Army',
+              'trainingPeriods': [
+                { 'beginDate': '2018-10-26T18:00:54.302Z', 'endDate': '2019-10-26T18:00:54.302Z' }
+              ],
+              'exclusionPeriods': [{ 'beginDate': '2012-10-26T18:00:54.302Z', 'endDate': '2013-10-26T18:00:54.302Z' }],
+              'characterOfService': 'Honorable', 'reasonForSeparation': 'Expiration Term Of Service'
+            }
+          }
       end
+      # rubocop:enable all
 
       def service_history
         render json:
@@ -31,17 +56,37 @@ module MebApi
         } }
       end
 
-      def eligibility
-        response = eligibility_service.get_eligibility
+      def claim_status
+        render json:
+        { data: {
+          'claimantId': 0,
+          'claimServiceId': '0',
+          'claimStatus': 'ELIGIBLE',
+          'receivedDate': '2021-11-30'
+        } }
+      end
 
-        render json: response, serializer: EligibilitySerializer
+      # def eligibility
+      #   response = eligibility_service.get_eligibility
+
+      #   render json: response, serializer: EligibilitySerializer
+      # end
+
+      def eligibility
+        render json:
+        { data: {
+          'veteranIsEligible': false,
+          'chapter': [ ]
+        } }
       end
 
       def claim_status
         render json:
         { data: {
-          'claimId': 0,
-          'status': 'InProgress'
+          'claimantId': 0,
+          'claimServiceId': '0',
+          'claimStatus': 'ELIGIBLE',
+          'receivedDate': '2021-11-30'
         } }
       end
 
@@ -61,6 +106,7 @@ module MebApi
       def automation_service
         MebApi::DGI::Automation::Service.new(@current_user)
       end
+
     end
   end
 end
