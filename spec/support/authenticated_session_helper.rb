@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 module AuthenticatedSessionHelper
-  # rubocop:disable Metrics/ParameterLists
   def sign_in(user = FactoryBot.build(:user, :loa3), token = nil, raw: false, pact: false)
     user = user.persisted? ? user : User.create(user)
     token ||= 'abracadabra'
@@ -19,7 +18,6 @@ module AuthenticatedSessionHelper
       raw_session_cookie
     end
   end
-  # rubocop:enable Metrics/ParameterLists
 
   def sign_in_as(user, token = nil)
     sign_in(user, token)

@@ -81,7 +81,7 @@ module EVSS
       # @param timeout [Boolean] If the response timed out
       # @param content_type [String] The content type
       #
-      def initialize(status, response = nil, timeout: false, content_type = 'application/json')
+      def initialize(status, response = nil, content_type = 'application/json', timeout: false)
         @timeout = timeout
         @response = response
         @content_type = content_type
