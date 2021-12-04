@@ -16,13 +16,11 @@ module FastTrack
 
     private
 
-    def pick(keys, hash)
-      hash.select { |k, _| keys.include? k }.with_indifferent_access
-    end
-
     def transform_entry(raw_entry)
-      entry = pick(%w[status medicationReference subject authoredOn note dosageInstruction], raw_entry['resource'])
-      result = pick(%w[status authoredOn], entry)
+      entry = raw_entry['resource'].slice(
+        'status', 'medicationReference', 'subject', 'authoredOn', 'note', 'dosageInstruction'
+      )
+      result = entry.slice('status', 'authoredOn', entry)
       description_hash = { description: entry['medicationReference']['display'] }
       notes_hash = get_notes_from_note(entry['note'] || [])
       dosage_hash = get_text_from_dosage_instruction(entry['dosageInstruction'] || [])
