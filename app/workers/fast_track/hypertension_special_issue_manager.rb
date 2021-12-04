@@ -11,8 +11,7 @@ module FastTrack
     def add_special_issue
       data = JSON.parse(submission.form_json)
       disabilities = data['form526']['form526']['disabilities']
-      added = add_rrd_to_disabilities(disabilities)
-      data['form526']['form526']['disabilities'] = added
+      data['form526']['form526']['disabilities'] = add_rrd_to_disabilities(disabilities)
       submission.update(form_json: JSON.dump(data))
     end
 
