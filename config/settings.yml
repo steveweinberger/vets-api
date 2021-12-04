@@ -946,7 +946,6 @@ lighthouse:
       api_scope:
         - "launch launch/patient"
         - "patient/Patient.read"
-        - "patient/Condition.read"
         - "patient/Observation.read"
         - "patient/Practitioner.read"
         - "patient/MedicationRequest.read"

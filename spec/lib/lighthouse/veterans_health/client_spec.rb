@@ -22,7 +22,7 @@ RSpec.describe Lighthouse::VeteransHealth::Client do
   describe '#get_resource' do
     let(:jwt) { 'fake_client_assurance_token' }
     let(:jwt_double) { double('JWT Wrapper', token: jwt) }
-    let(:bearer_token_object) { double('bearer response', body: { 'access_token': 'blah' }) }
+    let(:bearer_token_object) { double('bearer response', body: { 'access_token' => 'blah' }) }
 
     context 'valid requests' do
       let(:generic_response) { { 'status': 200, 'body': { 'generic': 'response' } } }
@@ -35,7 +35,7 @@ RSpec.describe Lighthouse::VeteransHealth::Client do
 
       describe 'when requesting any valid resource' do
         let(:random_resource_str) do
-          %w[conditions observations medications Conditions OBSERVATIONS MeDICATions].sample
+          %w[observations medications OBSERVATIONS MeDICATions].sample
         end
 
         it 'authenticates to Lighthouse and retrieves a bearer token' do
@@ -75,21 +75,6 @@ RSpec.describe Lighthouse::VeteransHealth::Client do
 
         it 'returns the api response' do
           expect(@client.get_resource('observations')).to eq generic_response
-        end
-      end
-
-      describe 'when the caller requests the Conditions resource' do
-        let(:conditions_api_path) { 'services/fhir/v0/r4/Condition' }
-        let(:params_hash) do
-          { patient: @client.instance_variable_get(:@icn),
-            'clinical-status': 'http://terminology.hl7.org/CodeSystem/condition-clinical|active' }
-        end
-
-        it 'invokes the Lighthouse Veterans Health API Condition endpoint' do
-          expect_any_instance_of(
-            Lighthouse::VeteransHealth::Client
-          ).to receive(:perform_get).with(conditions_api_path, params_hash)
-          @client.get_resource('conditions')
         end
       end
 

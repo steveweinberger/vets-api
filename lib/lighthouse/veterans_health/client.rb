@@ -20,7 +20,7 @@ module Lighthouse
       #
       # @example
       #
-      # Lighthouse::VeteransHealth::Client.new(12345)
+      # Lighthouse::VeteransHealth::Client.new('12345')
       #
       # @param [String] icn The ICN of the veteran filing the 526 claim for increase
       #
@@ -33,30 +33,19 @@ module Lighthouse
       #
       # @example
       #
-      # get_resource('conditions')
+      # get_resource('observations')
       #
       # @param [String] resource The Lighthouse resource being requested
       #
       # @return Faraday::Env response
       def get_resource(resource)
         resource = resource.downcase
-        unless %w[conditions medications observations].include?(resource)
-          raise ArgumentError, 'unsupported resource type'
-        end
+        raise ArgumentError, 'unsupported resource type' unless %w[medications observations].include?(resource)
 
         send("get_#{resource}")
       end
 
       private
-
-      def get_conditions
-        params = {
-          patient: @icn,
-          'clinical-status': 'http://terminology.hl7.org/CodeSystem/condition-clinical|active'
-        }
-
-        perform_get('services/fhir/v0/r4/Condition', params)
-      end
 
       def get_observations
         params = {
@@ -101,7 +90,7 @@ module Lighthouse
       end
 
       def authenticate_as_system(json_web_token)
-        authenticate(payload(json_web_token)).body.with_indifferent_access['access_token']
+        authenticate(payload(json_web_token)).body['access_token']
       end
 
       def payload(json_web_token)
