@@ -23,7 +23,7 @@ module FastTrack
     end
 
     def add_rrd(disability)
-      rrd_hash = { 'code' => 'RRD', 'name' => 'Rapid Ready for Decision' }
+      rrd_hash = { code: 'RRD', name: 'Rapid Ready for Decision' }
       if disability['specialIssues'].blank?
         disability['specialIssues'] = [rrd_hash]
       elsif !disability['specialIssues'].include? rrd_hash
