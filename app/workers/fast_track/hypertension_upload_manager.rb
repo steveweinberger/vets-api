@@ -29,8 +29,7 @@ module FastTrack
     end
 
     def handle_attachment(pdf_body)
-      existing_summary = already_has_summary_file
-      unless existing_summary
+      unless already_has_summary_file
         supporting_evidence_attachment = SupportingEvidenceAttachment.new
         file = FastTrackPDF.new(pdf_body, 'VAMC_Hypertension_Rapid_Decision_Evidence.pdf')
         supporting_evidence_attachment.set_file_data!(file)
