@@ -22,47 +22,51 @@ RSpec.describe FastTrack::HypertensionSpecialIssueManager do
     File.read('spec/support/disability_compensation_form/submissions/only_526_hypertension.json')
   end
 
+  def form526_hash(form)
+    JSON.parse(form, symbolize_names: true)[:form526][:form526]
+  end
+
+  def filter_disabilities(form)
+    form[:disabilities].filter { |item| item[:diagnosticCode] == 7101 }
+  end
+
   describe '#add_special_issue' do
-    it 'matches the email address' do
-      address = JSON.parse(form526_submission.form_json)['form526']['form526']['veteran']['emailAddress']
-      expect(address).to match 'test@email.com'
-    end
+    let(:special_issues_list) { [{ code: 'RRD', name: 'Rapid Ready for Decision' }] }
 
     it 'matches the email address after manipulation' do
+      address_before = form526_hash(form526_submission.form_json)[:veteran][:emailAddress]
+      expect(address_before).to be_present
       FastTrack::HypertensionSpecialIssueManager.new(form526_submission).add_special_issue
-      address = JSON.parse(form526_submission.form_json)['form526']['form526']['veteran']['emailAddress']
-      expect(address).to match 'test@email.com'
+
+      address_reloaded = form526_hash(form526_submission.reload.form_json)[:veteran][:emailAddress]
+      expect(address_reloaded).to match address_before
     end
 
     it 'adds rrd to the disabilities list' do
       FastTrack::HypertensionSpecialIssueManager.new(form526_submission).add_special_issue
-      disabilities = JSON.parse(form526_submission.form_json)['form526']['form526']['disabilities']
-      filtered = disabilities.filter { |item| item['diagnosticCode'] == 7101 }
-      expect(filtered[0]['specialIssues']).to match [{ 'code' => 'RRD', 'name' => 'Rapid Ready for Decision' }]
+      filtered_disabilities = filter_disabilities(form526_hash(form526_submission.reload.form_json))
+      expect(filtered_disabilities[0][:specialIssues]).to match special_issues_list
     end
 
     it 'adds rrd to each relevant item in the disabilities list' do
       FastTrack::HypertensionSpecialIssueManager.new(form526_submission).add_special_issue
-      disabilities = JSON.parse(form526_submission.form_json)['form526']['form526']['disabilities']
-      rrd_hash = { 'code' => 'RRD', 'name' => 'Rapid Ready for Decision' }
-      filtered = disabilities.filter { |item| item['diagnosticCode'] == 7101 }
-      expect(filtered).to all(include 'specialIssues')
-      expect(filtered.any? { |el| el['specialIssues'].include? rrd_hash }).to be true
+      filtered_disabilities = filter_disabilities(form526_hash(form526_submission.reload.form_json))
+      expect(filtered_disabilities).to all(include :specialIssues)
+      expect(filtered_disabilities.any? { |el| el[:specialIssues].include? special_issues_list.first }).to be true
     end
 
-    it 'adds rrd to the disabilities list only once' do
-      FastTrack::HypertensionSpecialIssueManager.new(form526_submission).add_special_issue
-      disabilities = JSON.parse(form526_submission.form_json)['form526']['form526']['disabilities']
-      filtered = disabilities.filter { |item| item['diagnosticCode'] == 7101 }
-      expect(filtered[0]['specialIssues']).to match [{ 'code' => 'RRD', 'name' => 'Rapid Ready for Decision' }]
-      jform = JSON.parse(form526_submission.form_json)
-      jform['form526']['form526']['disabilities'] = disabilities
-      form526_submission.form_json = JSON.dump(jform)
+    context 'when the fast track worker has been triggered twice for the same submission' do
+      before { expect(form526_submission).to receive(:update).twice.and_call_original }
 
-      FastTrack::HypertensionSpecialIssueManager.new(form526_submission).add_special_issue
-      second_pass = JSON.parse(form526_submission.form_json)['form526']['form526']['disabilities']
-      filtered = second_pass.filter { |item| item['diagnosticCode'] == 7101 }
-      expect(filtered[0]['specialIssues']).to match [{ 'code' => 'RRD', 'name' => 'Rapid Ready for Decision' }]
+      it 'adds rrd to the disabilities list only once' do
+        FastTrack::HypertensionSpecialIssueManager.new(form526_submission).add_special_issue
+        filtered_disabilities = filter_disabilities(form526_hash(form526_submission.form_json))
+        expect(filtered_disabilities[0][:specialIssues]).to match special_issues_list
+
+        FastTrack::HypertensionSpecialIssueManager.new(form526_submission).add_special_issue
+        second_pass_filtered_disabilities = filter_disabilities(form526_hash(form526_submission.form_json))
+        expect(second_pass_filtered_disabilities[0][:specialIssues]).to match filtered_disabilities[0][:specialIssues]
+      end
     end
 
     # TODO: need tests for cases where more than one disability is present.
