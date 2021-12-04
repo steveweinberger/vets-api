@@ -25,7 +25,7 @@ RSpec.describe Lighthouse::VeteransHealth::Client do
     let(:bearer_token_object) { double('bearer response', body: { 'access_token' => 'blah' }) }
 
     context 'valid requests' do
-      let(:generic_response) { { 'status': 200, 'body': { 'generic': 'response' } } }
+      let(:generic_response) { { status: 200, body: { generic: 'response' } } }
 
       before do
         allow(@client).to receive(:perform).and_return generic_response
@@ -60,9 +60,9 @@ RSpec.describe Lighthouse::VeteransHealth::Client do
         let(:observations_api_path) { 'services/fhir/v0/r4/Observation' }
         let(:params_hash) do
           {
-            'patient': @client.instance_variable_get(:@icn),
-            'category': 'vital-signs',
-            'code': '85354-9'
+            patient: @client.instance_variable_get(:@icn),
+            category: 'vital-signs',
+            code: '85354-9'
           }
         end
 
