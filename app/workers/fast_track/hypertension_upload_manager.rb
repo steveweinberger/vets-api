@@ -12,9 +12,9 @@ module FastTrack
       data = JSON.parse(submission.form_json)
       uploads = data['form526_uploads'] || []
       new_upload = {
-        "name": 'VAMC_Hypertension_Rapid_Decision_Evidence.pdf',
-        "confirmationCode": confirmation_code,
-        "attachmentId": '1489'
+        name: 'VAMC_Hypertension_Rapid_Decision_Evidence.pdf',
+        confirmationCode: confirmation_code,
+        attachmentId: '1489'
       }
       uploads.append(new_upload)
       data['form526_uploads'] = uploads

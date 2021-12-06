@@ -59,12 +59,12 @@ class Form526Submission < ApplicationRecord
       end
       jids.first
     else
-      start_evss_submission(nil, submission_id: id)
+      start_evss_submission(nil, { submission_id: id })
     end
   rescue => e
     Rails.logger.error 'The fast track was skipped due to the following error ' \
                        " and start_evss_submission wass called: #{e}"
-    start_evss_submission(nil, submission_id: id)
+    start_evss_submission(nil, { submission_id: id })
   end
 
   # Kicks off a 526 submit workflow batch. The first step in a submission workflow is to submit
