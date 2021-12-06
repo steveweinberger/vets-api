@@ -27,7 +27,7 @@ describe 'Supplemental Claims', swagger_doc: 'modules/appeals_api/app/swagger/ap
 
       parameter in: :body, examples: {
         'minimum fields used' => {
-          value: JSON.parse(File.read(AppealsApi::Engine.root.join('spec', 'fixtures', 'valid_200995.json')))
+          value: JSON.parse(File.read(AppealsApi::Engine.root.join('spec', 'fixtures', 'valid_200995_minimum.json')))
         },
         'all fields used' => {
           value: JSON.parse(File.read(AppealsApi::Engine.root.join('spec', 'fixtures', 'valid_200995_extra.json')))
