@@ -12,20 +12,9 @@
 Lint/ConstantDefinitionInBlock:
   Enabled: false
 
-# Offense count: 1
-# Cop supports --auto-correct.
-Lint/DeprecatedOpenSSLConstant:
-  Exclude:
-    - 'lib/vic/url_helper.rb'
-
 # Offense count: 96
 Lint/MissingSuper:
   Enabled: false
-
-# Offense count: 1
-Lint/StructNewOverride:
-  Exclude:
-    - 'spec/requests/authentication/standard_authentication_spec.rb'
 
 # Offense count: 505
 # Configuration parameters: IgnoredMethods, CountRepeatedAttributes.
@@ -54,35 +43,10 @@ Metrics/PerceivedComplexity:
 Naming/FileName:
   Enabled: false
 
-# Offense count: 3
-RSpec/IdenticalEqualityAssertion:
-  Exclude:
-    - 'modules/vba_documents/spec/models/git_items_spec.rb'
-    - 'spec/lib/search/service_spec.rb'
-    - 'spec/models/user_spec.rb'
-
 # Offense count: 1098
 # Configuration parameters: AllowSubject.
 RSpec/MultipleMemoizedHelpers:
   Max: 37
-
-# Offense count: 6
-RSpec/RepeatedExampleGroupBody:
-  Exclude:
-    - 'spec/lib/pdf_fill/forms/common_ptsd_spec.rb'
-    - 'spec/models/va_profile_redis/contact_information_spec.rb'
-
-# Offense count: 18
-RSpec/RepeatedExampleGroupDescription:
-  Exclude:
-    - 'modules/vaos/spec/request/systems_request_spec.rb'
-    - 'modules/vaos/spec/services/systems_service_spec.rb'
-    - 'spec/lib/evss/disability_compensation_form/form0781_spec.rb'
-    - 'spec/lib/hca/service_spec.rb'
-    - 'spec/lib/pdf_fill/forms/common_ptsd_spec.rb'
-    - 'spec/lib/pdf_fill/forms/va218940_spec.rb'
-    - 'spec/models/form_profile_spec.rb'
-    - 'spec/models/mhv_account_spec.rb'
 
 # Offense count: 538
 RSpec/StubbedMock:
@@ -108,38 +72,12 @@ Rails/UniqueValidationWithoutIndex:
     - 'modules/claims_api/app/models/claims_api/auto_established_claim.rb'
     - 'modules/va_forms/app/models/va_forms/form.rb'
 
-# Offense count: 10
-# Cop supports --auto-correct.
-# Configuration parameters: IgnoredMethods.
-# IgnoredMethods: ==, equal?, eql?
-Style/ClassEqualityComparison:
-  Exclude:
-    - 'app/controllers/appeals_base_controller.rb'
-    - 'app/controllers/appeals_base_controller_v1.rb'
-    - 'app/serializers/dependents_serializer.rb'
-    - 'app/serializers/dependents_verifications_serializer.rb'
-    - 'app/serializers/vet_payment_history_serializer.rb'
-    - 'app/workers/education_form/forms/base.rb'
-    - 'modules/appeals_api/app/controllers/concerns/appeals_api/json_format_validation.rb'
-    - 'modules/claims_api/app/controllers/concerns/claims_api/json_format_validation.rb'
-    - 'modules/covid_research/app/serializers/covid_research/genisis_serializer.rb'
-    - 'modules/va_forms/app/workers/va_forms/form_reloader.rb'
-
 # Offense count: 1
 # Cop supports --auto-correct.
 # Configuration parameters: AllowedReceivers.
 Style/HashEachMethods:
   Exclude:
     - 'lib/common/hash_helpers.rb'
-
-# Offense count: 4
-# Configuration parameters: MinBranchesCount.
-Style/HashLikeCase:
-  Exclude:
-    - 'app/services/form1010cg/auditor.rb'
-    - 'app/workers/education_form/forms/base.rb'
-    - 'lib/identity/parsers/gc_ids.rb'
-    - 'spec/controllers/v1/sessions_controller_spec.rb'
 
 # Offense count: 13
 # Configuration parameters: AllowedMethods.
