@@ -165,7 +165,6 @@ FactoryBot.define do
     end
     va_eauth_csid { ['LOGINGOV'] }
     va_eauth_lastname { ['NOT_FOUND'] }
-    va_eauth_credentialassurancelevel { ['1'] }
     va_eauth_ial { ['1'] }
     va_eauth_firstname { ['NOT_FOUND'] }
     va_eauth_csponly { ['true'] }
@@ -210,7 +209,6 @@ FactoryBot.define do
     va_eauth_proofingAuthority { ['FICAM'] }
     va_eauth_pid { ['NOT_FOUND'] }
     va_eauth_csid { ['LOGINGOV'] }
-    va_eauth_credentialassurancelevel { ['3'] }
     va_eauth_pnidtype { ['SSN'] }
     va_eauth_mcid { ['WSSOE2111101347520361419017657'] }
     va_eauth_firstname { ['ROBERT'] }
@@ -221,12 +219,13 @@ FactoryBot.define do
     va_eauth_commonname { ['vets.gov.user+1000@example.com'] }
     va_eauth_transactionid { ['abcd1234xyz'] }
     va_eauth_suffix { ['NOT_FOUND'] }
-    va_eauth_uid { ['67f687a8ecd3448fbed4e5489b7eafc9'] }
+    va_eauth_uid { ['aa478abc-e494-4af1-9f87-d002f8fe1cda'] }
     va_eauth_isDelegate { ['false'] }
     va_eauth_secid { ['1200049153'] }
     va_eauth_gcIds {
       ['1200049153V217987^NI^200M^USVHA^P|' \
        '65f9f3b5-5449-47a6-b272-9d6019e7c2e3^PN^200VLGN^USDVA^A|' \
+       'aa478abc-e494-4af1-9f87-d002f8fe1cda^PN^200VLGN^USDVA^A|' \
        '1200049153^PN^200PROV^USDVA^A|']
     }
     va_eauth_persontype { ['NOT_FOUND'] }
@@ -1021,6 +1020,7 @@ FactoryBot.define do
        '666271151^PI^200BRLS^USVBA^A|'\
        '1320002060^NI^200DOD^USDOD^A|'\
        '20381^PI^200VETS^USDVA^A|'\
+       'aa478abc-e494-4ae1-8f87-d002f8fe1bbd^PN^200VLGN^USDVA^A|'\
        '54e78de6140d473f87960f211be49c08^PN^200VIDM^USDVA^A|'\
        '1012827134^PN^200PROV^USDVA^A|'\
        '600152411^PI^200CORP^USVBA^A']

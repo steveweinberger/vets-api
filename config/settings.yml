@@ -21,7 +21,6 @@ saml_ssoe:
   relay: ~
   response_signing: false
   response_encryption: false
-  authn_context_comparison: 'exact'
 
 ssoe_eauth_cookie:
   name: vagov_saml_request_localhost
@@ -370,7 +369,8 @@ ppms:
   apim_url: https://some.other.fakesite.com
   open_timeout: 15
   read_timeout: 55
-  api_keys: fakekey
+  api_keys:
+    fakekey: fakevalue
 
 # Settings for MyHealthEVet
 mhv:
@@ -807,6 +807,7 @@ flipper:
     - kenneth.santiago2010@gmail.com
     - kevin.musiorski@gcio.com # Kevin Musiorski (GCIO), Engineer
     - kmircovich@governmentcio.com
+    - kyle.woolley@oddball.io # VSP Identity Engineer
     - lauren.alexanderson@va.gov
     - lauren.ernest@adhocteam.us
     - lihan@adhocteam.us
@@ -849,7 +850,6 @@ flipper:
     - zach.morel@gcio.com
     - abelardo.blanco@va.gov
     - eugenia.gina.ronat@accenturefederal.com
-    - morgan.whaley@accenturefederal.com
     - m.c.shah@accenturefederal.com
     - patrick.arthur@accenturefederal.com
     - adam.freemer@accenturefederal.com
@@ -859,6 +859,10 @@ flipper:
     - nick.barthelemy@accenturefederal.com
     - bradley.bergeron@accenturefederal.com
     - adam.whitlock@adhocteam.us
+    - d.a.barnes@accenturefederal.com
+    - hocine.halli@accenturefederal.com
+    - jacob.finnern@accenturefederal.com
+    - brandon.clapp@accenturefederal.com
 
 bgs:
   application: ~
@@ -1028,7 +1032,7 @@ dgi:
     public_key_path: modules/meb_api/spec/fixtures/dgi_public_test.pem
     private_key_path: modules/meb_api/spec/fixtures/dgi_private_test.pem
   vets:
-    url: "https://dgi-afs002-apigw.np.afsp.io/vets-service/v1/" # Docker setup for microservice
+    url: "http://localhost:8070/vets-service/v1/" # Docker setup for microservice
     mock: false
 
 # Settings for the VEText integration (mobile push notifications)

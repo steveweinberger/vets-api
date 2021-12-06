@@ -26,13 +26,9 @@ module FacilitiesApi
           qparams = facility_service_locator_params(params)
           response = perform(:get, facility_service_locator_url, qparams)
 
-          return [] if response.body.nil?
+          return [] if response.body.nil? || response.body['value'].nil?
 
-          flatten_and_normalize_attributes!(response)
-          trim_response_attributes!(response)
-          deduplicate_response_arrays!(response)
-
-          FacilitiesApi::V1::PPMS::Response.new(response.body, params).providers(paginated: true)
+          FacilitiesApi::V1::PPMS::Response.new(response, params).providers
         end
 
         # https://dev.dws.ppms.va.gov/swagger/ui/index#!/GlobalFunctions/GlobalFunctions_ProviderLocator
@@ -40,12 +36,9 @@ module FacilitiesApi
           qparams = provider_locator_params(params)
           response = perform(:get, provider_locator_url, qparams)
 
-          return [] if response.body.nil?
+          return [] if response.body.nil? || response.body['value'].nil?
 
-          trim_response_attributes!(response)
-          deduplicate_response_arrays!(response)
-
-          FacilitiesApi::V1::PPMS::Response.new(response.body, params).providers
+          FacilitiesApi::V1::PPMS::Response.new(response, params).providers
         end
 
         def pos_locator(params)
@@ -53,18 +46,16 @@ module FacilitiesApi
 
           response = perform(:get, place_of_service_locator_url, qparams)
 
-          return [] if response.body.nil?
+          return [] if response.body.nil? || response.body['value'].nil?
 
-          trim_response_attributes!(response)
-          deduplicate_response_arrays!(response)
-
-          FacilitiesApi::V1::PPMS::Response.new(response.body, params).places_of_service
+          FacilitiesApi::V1::PPMS::Response.new(response, params).places_of_service
         end
 
         # https://dev.dws.ppms.va.gov/swagger/ui/index#!/Specialties/Specialties_Get_0
         def specialties
           response = perform(:get, specialties_url, {})
-          response.body
+
+          FacilitiesApi::V1::PPMS::Response.new(response).specialties
         end
 
         private
@@ -101,38 +92,6 @@ module FacilitiesApi
           end
         end
 
-        def flatten_and_normalize_attributes!(response)
-          response.body.collect! do |hsh|
-            hsh['ProviderServices'].first
-          end
-        end
-
-        def trim_response_attributes!(response)
-          response.body.collect! do |hsh|
-            hsh.each_pair.collect do |attr, value|
-              if value.is_a? String
-                [attr, value.gsub(/ +/, ' ').strip]
-              else
-                [attr, value]
-              end
-            end.to_h
-          end
-          response
-        end
-
-        def deduplicate_response_arrays!(response)
-          response.body.collect! do |hsh|
-            hsh.each_pair.collect do |attr, value|
-              if value.is_a? Array
-                [attr, value.uniq]
-              else
-                [attr, value]
-              end
-            end.to_h
-          end
-          response
-        end
-
         def fetch_lat_long_and_radius(params)
           latitude = Float(params.values_at(:lat, :latitude).compact.first).round(DEGREES_OF_ACCURACY)
           longitude = Float(params.values_at(:long, :longitude).compact.first).round(DEGREES_OF_ACCURACY)
@@ -157,7 +116,9 @@ module FacilitiesApi
             radius: radius,
             maxResults: per_page,
             pageNumber: page,
-            pageSize: per_page
+            pageSize: per_page,
+            telehealthSearch: 0,
+            homeHealthSearch: 0
           }.merge(specialty_codes)
         end
 
@@ -172,7 +133,9 @@ module FacilitiesApi
           {
             address: [latitude, longitude].join(','),
             radius: radius,
-            maxResults: max_results
+            maxResults: max_results,
+            telehealthSearch: 0,
+            homeHealthSearch: 0
           }
         end
 

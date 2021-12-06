@@ -4,13 +4,14 @@ require 'rails_helper'
 require 'facilities/ppms/v1/client'
 
 vcr_options = {
-  cassette_name: 'facilities/ppms/ppms',
+  cassette_name: 'facilities/ppms/ppms_old',
   match_requests_on: %i[path query],
   allow_playback_repeats: true
 }
 
 RSpec.describe 'Community Care Providers', team: :facilities, vcr: vcr_options do
   before do
+    get v1_facilities_ccp_index_url
     Flipper.enable(:facility_locator_ppms_skip_additional_round_trips, true)
   end
 
@@ -83,7 +84,10 @@ RSpec.describe 'Community Care Providers', team: :facilities, vcr: vcr_options d
       end
     end
 
-    context 'Empty Results', vcr: vcr_options.merge(cassette_name: 'facilities/ppms/ppms_empty_search') do
+    context 'Empty Results', vcr: vcr_options.merge(
+      cassette_name: 'facilities/ppms/ppms_empty_search',
+      match_requests_on: [:method]
+    ) do
       it 'responds to GET #index with success even if no providers are found' do
         get '/v1/facilities/ccp', params: params
 

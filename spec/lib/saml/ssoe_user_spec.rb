@@ -116,7 +116,7 @@ RSpec.describe SAML::User do
             service_name: 'logingov',
             account_type: 'N/A'
           },
-          multifactor: false,
+          multifactor: true,
           participant_id: nil,
           birls_id: nil,
           icn: nil,
@@ -152,10 +152,10 @@ RSpec.describe SAML::User do
           mhv_correlation_id: '65f9f3b5-5449-47a6-b272-9d6019e7c2e3',
           mhv_account_type: nil,
           edipi: nil,
-          uuid: '67f687a8ecd3448fbed4e5489b7eafc9',
+          uuid: 'aa478abc-e494-4af1-9f87-d002f8fe1cda',
           email: 'vets.gov.user+1000@example.com',
           idme_uuid: nil,
-          logingov_uuid: '67f687a8ecd3448fbed4e5489b7eafc9',
+          logingov_uuid: 'aa478abc-e494-4af1-9f87-d002f8fe1cda',
           verified_at: '2021-10-28T23:54:46Z',
           loa: { current: 3, highest: 3 },
           sign_in: { service_name: 'logingov', account_type: 'N/A' },
@@ -164,7 +164,7 @@ RSpec.describe SAML::User do
           birls_id: nil,
           icn: '1200049153V217987',
           person_types: [],
-          multifactor: false,
+          multifactor: true,
           authn_context: authn_context
         )
       end
@@ -1033,7 +1033,7 @@ RSpec.describe SAML::User do
       it 'does not validate' do
         expect { subject.validate! }.to raise_error { |error|
           expect(error).to be_a(SAML::UserAttributeError)
-          expect(error.message).to eq('User attributes is missing an ID.me UUID')
+          expect(error.message).to eq('User attributes is missing an ID.me and Login.gov UUID')
           expect(error.identifier).to eq('1012740600V714187')
         }
       end
@@ -1088,15 +1088,12 @@ RSpec.describe SAML::User do
                 va_eauth_uid: ['NOT_FOUND'])
         end
         let(:expected_log_params) { { sec_id_identifier: subject.user_attributes.uuid } }
-        let(:expected_log_message) { 'Inbound Authentication without ID.me UUID' }
+        let(:icn) { subject.user_attributes.icn }
+        let(:expected_error) { SAML::UserAttributeError }
+        let(:expected_error_message) { 'User attributes is missing an ID.me and Login.gov UUID' }
 
-        it 'validates' do
-          expect { subject.validate! }.not_to raise_error
-        end
-
-        it 'logs to rails logger' do
-          expect(Rails.logger).to receive(:info).with(expected_log_message, expected_log_params)
-          subject.validate!
+        it 'raises an error during validation' do
+          expect { subject.validate! }.to raise_error(expected_error, expected_error_message)
         end
       end
     end
@@ -1145,7 +1142,7 @@ RSpec.describe SAML::User do
       end
     end
 
-    context 'IDME LOA3 inbound user' do
+    context 'IDME LOA3 inbound user with logingov_uuid in GCIDs' do
       let(:authn_context) { LOA::IDME_LOA3 }
       let(:highest_attained_loa) { '3' }
       let(:multifactor) { true }
@@ -1171,7 +1168,7 @@ RSpec.describe SAML::User do
           uuid: '54e78de6140d473f87960f211be49c08',
           email: 'vets.gov.user+262@gmail.com',
           idme_uuid: '54e78de6140d473f87960f211be49c08',
-          logingov_uuid: nil,
+          logingov_uuid: 'aa478abc-e494-4ae1-8f87-d002f8fe1bbd',
           verified_at: nil,
           loa: { current: 3, highest: 3 },
           sign_in: {

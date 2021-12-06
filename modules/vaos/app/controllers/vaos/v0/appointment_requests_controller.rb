@@ -12,21 +12,21 @@ module VAOS
         phone_number facility
       ].freeze
 
-      BASE_PARAMS_WHITELIST = [
+      BASE_PARAMS_ALLOWLIST = [
         :type, :option_date1, :option_time1, :option_date2, :option_time2, :option_date3, :option_time3, :status,
         :appointment_type, :visit_type, :phone_number, :email, :purpose_of_visit, :other_purpose_of_visit,
         :provider_id, :provider_name, :second_request, :second_request_submitted, :requested_phone_call,
         :type_of_care_id, :additional_information, :address, :city, :state, :zip_code, :distance_willing_to_travel,
         :new_message, :office_hours, :preferred_city, :preferred_state, :preferred_zip_code, :provider_option,
         :preferred_language, :reason_for_visit, :additional_information, :service,
-        best_timeto_call: [],
-        appointment_request_detail_code: [], preferred_providers: [
-          :id, :first_name, :last_name, :practice_name, :provider_street, :provider_city, :provider_state,
-          :provider_zip_code1, address: %i[street city state zip_code]
-        ], facility: [
-          :name, :type, :facility_code, :state, :city, :address, :parent_site_code, :supports_v_a_r,
-          children: %i[name type facility_code state city address parent_site_code]
-        ], patient: %i[inpatient text_messaging_allowed]
+        { best_timeto_call: [],
+          appointment_request_detail_code: [], preferred_providers: [
+            :id, :first_name, :last_name, :practice_name, :provider_street, :provider_city, :provider_state,
+            :provider_zip_code1, { address: %i[street city state zip_code] }
+          ], facility: [
+            :name, :type, :facility_code, :state, :city, :address, :parent_site_code, :supports_v_a_r,
+            { children: %i[name type facility_code state city address parent_site_code] }
+          ], patient: %i[inpatient text_messaging_allowed] }
       ].freeze
 
       def index
@@ -70,13 +70,13 @@ module VAOS
       def params_for_update
         params.require(BASE_REQUIRED_PARAMS + [:created_date])
         params[:facility].require(%i[name facility_code parent_site_code])
-        params.permit(*(BASE_PARAMS_WHITELIST + [:created_date]))
+        params.permit(*(BASE_PARAMS_ALLOWLIST + [:created_date]))
       end
 
       def params_for_create
         params.require(BASE_REQUIRED_PARAMS)
         params[:facility].require(%i[name facility_code parent_site_code])
-        params.permit(*BASE_PARAMS_WHITELIST)
+        params.permit(*BASE_PARAMS_ALLOWLIST)
       end
 
       def appointment_requests_service

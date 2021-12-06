@@ -103,13 +103,15 @@ module SAML
       end
 
       def idme_uuid
-        return safe_attr('va_eauth_uid') if csid == 'idme'
+        return safe_attr('va_eauth_uid') if csid == SAML::User::IDME_CSID
 
         mvi_ids[:idme_id]
       end
 
       def logingov_uuid
-        return safe_attr('va_eauth_uid') if csid == 'logingov'
+        return safe_attr('va_eauth_uid') if csid == SAML::User::LOGINGOV_CSID
+
+        mvi_ids[:logingov_id]
       end
 
       # only applies to Login.gov IAL2 verification
@@ -151,7 +153,12 @@ module SAML
       # It is currently returning a value of "2" for DSLogon level 2
       # so we are interpreting any value greater than 1 as "LOA 3".
       def loa_current
-        assurance = safe_attr('va_eauth_credentialassurancelevel')&.to_i
+        assurance =
+          if csid == 'logingov'
+            safe_attr('va_eauth_ial')&.to_i
+          else
+            safe_attr('va_eauth_credentialassurancelevel')&.to_i
+          end
         @loa_current ||= assurance.present? && assurance > 1 ? 3 : 1
       rescue NoMethodError, KeyError => e
         @warnings << "loa_current error: #{e.message}"
@@ -177,7 +184,11 @@ module SAML
       end
 
       def multifactor
-        safe_attr('va_eauth_multifactor')&.downcase == 'true'
+        if csid == SAML::User::LOGINGOV_CSID
+          safe_attr('va_eauth_aal') == AAL::TWO
+        else
+          safe_attr('va_eauth_multifactor')&.downcase == 'true'
+        end
       end
 
       def account_type
@@ -197,7 +208,7 @@ module SAML
 
       def sign_in
         sign_in = if @authn_context == INBOUND_AUTHN_CONTEXT
-                    { service_name: csid == 'mhv' ? 'myhealthevet' : csid }
+                    { service_name: csid == SAML::User::MHV_ORIGINAL_CSID ? SAML::User::MHV_MAPPED_CSID : csid }
                   else
                     SAML::User::AUTHN_CONTEXTS.fetch(@authn_context).fetch(:sign_in)
                   end
@@ -210,8 +221,8 @@ module SAML
 
       # Raise any fatal exceptions due to validation issues
       def validate!
-        if should_raise_idme_uuid_error
-          data = SAML::UserAttributeError::ERRORS[:idme_uuid_missing].merge({ identifier: mhv_icn })
+        if should_raise_missing_uuid_error
+          data = SAML::UserAttributeError::ERRORS[:uuid_missing].merge({ identifier: mhv_icn })
           raise SAML::UserAttributeError, data
         end
 
@@ -247,19 +258,8 @@ module SAML
         end
       end
 
-      def should_raise_idme_uuid_error
-        return false if idme_uuid || logingov_uuid
-
-        if auth_context_is_inbound
-          Rails.logger.info('Inbound Authentication without ID.me UUID', sec_id_identifier: uuid)
-          return false
-        end
-
-        true
-      end
-
-      def auth_context_is_inbound
-        @authn_context == INBOUND_AUTHN_CONTEXT
+      def should_raise_missing_uuid_error
+        idme_uuid.blank? && logingov_uuid.blank?
       end
 
       def mvi_ids

@@ -4,8 +4,8 @@ module Accountable
   extend ActiveSupport::Concern
   include SentryLogging
 
-  def update_account_login_stats
-    return unless account_login_stats.present? && login_type.in?(AccountLoginStat::LOGIN_TYPES)
+  def update_account_login_stats(login_type)
+    return unless account_login_stats.present? && login_type.in?(SAML::User::LOGIN_TYPES)
 
     account_login_stats.update!("#{login_type}_at" => Time.zone.now, current_verification: verification_level)
   rescue => e
@@ -22,10 +22,6 @@ module Accountable
         no_account_log_message
         nil
       end
-  end
-
-  def login_type
-    @login_type ||= @current_user.identity.sign_in[:service_name]
   end
 
   def verification_level
@@ -50,7 +46,8 @@ module Accountable
     log_message_to_sentry(
       'No account found for user',
       :warn,
-      { idme_uuid: @current_user.uuid },
+      { idme_uuid: @current_user.idme_uuid,
+        logingov_uuid: @current_user.logingov_uuid },
       account_login_stats: 'no_account_found'
     )
   end
