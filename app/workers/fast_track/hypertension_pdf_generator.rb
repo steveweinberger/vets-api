@@ -20,13 +20,8 @@ module FastTrack
     end
 
     def stringify_patient
-      suffix = patient[:suffix].present? ? ", #{patient[:suffix]}" : ''
-      stringified = ''
-      %i[first middle last].each do |name|
-        stringified = "#{stringified} #{patient[name]}" if patient[name].present?
-      end
-
-      "#{stringified}#{suffix}"
+      full_name = [patient[:first], patient[:middle], patient[:last]].reject(&:blank?).join ' '
+      [full_name, patient[:suffix]].reject(&:blank?).join ', '
     end
 
     def add_intro(pdf)
