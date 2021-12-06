@@ -29,8 +29,9 @@ describe VAProfile::ContactInformation::Service, skip_vet360: true do
         let(:vet360_id) { '487745' }
 
         it 'returns the bad address indicator' do
-          VCR.use_cassette('va_profile/contact_information/person_bad_address', record: :once) do
+          VCR.use_cassette('va_profile/contact_information/person_bad_address') do
             response = subject.get_person
+            binding.pry; fail
           end
         end
       end

@@ -1,0 +1,71 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://int.vet360.va.gov/contact-information-hub/cuf/contact-information/v1/487745
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - application/json
+      Content-Type:
+      - application/json
+      User-Agent:
+      - Vets.gov Agent
+      Cufsystemname:
+      - VETSGOV
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Transfer-Encoding:
+      - chunked
+      X-Oneagent-Js-Injection:
+      - 'true'
+      Server-Timing:
+      - dtRpid;desc="-1060548758", dtSInfo;desc="0"
+      Vaprofiletxauditid:
+      - 3961178e-2bd1-4e85-bdbf-7a774a10c2af
+      X-Content-Type-Options:
+      - nosniff
+      X-Xss-Protection:
+      - 1; mode=block
+      Cache-Control:
+      - no-cache, no-store, max-age=0, must-revalidate
+      Pragma:
+      - no-cache
+      Expires:
+      - '0'
+      Strict-Transport-Security:
+      - max-age=31536000 ; includeSubDomains
+      X-Frame-Options:
+      - DENY
+      Content-Security-Policy:
+      - 'default-src ''self'' ''unsafe-eval'' ''unsafe-inline'' data: filesystem:
+        about: blob: ws: wss:'
+      Content-Type:
+      - application/json
+      Date:
+      - Mon, 06 Dec 2021 23:20:02 GMT
+      Referrer-Policy:
+      - no-referrer
+    body:
+      encoding: UTF-8
+      string: '{"txAuditId":"3961178e-2bd1-4e85-bdbf-7a774a10c2af","status":"COMPLETED_SUCCESS","bio":{"createDate":"2021-11-30T22:26:08Z","updateDate":"2021-11-30T22:26:08Z","txAuditId":"a388c879-66e7-4699-9da6-45178e82da3e","sourceSystem":"VHAES","sourceDate":"2021-11-30T22:34:23Z","originatingSourceSystem":"VAMC-983","sourceSystemUser":"RICHARDSON,LYNNE
+        (520646674)","vet360Id":487745,"addresses":[{"createDate":"2021-11-30T22:26:08Z","updateDate":"2021-11-30T22:26:08Z","txAuditId":"a388c879-66e7-4699-9da6-45178e82da3e","sourceSystem":"VHAES","sourceDate":"2021-11-30T22:25:05Z","originatingSourceSystem":"VAMC-983","sourceSystemUser":"RICHARDSON,LYNNE
+        (520646674)","effectiveStartDate":"2021-11-30T22:25:05Z","vet360Id":487745,"addressId":292519,"addressType":"Domestic","addressPOU":"RESIDENCE/CHOICE","badAddress":false,"addressLine1":"13514
+        Avista Dr","cityName":"Tampa","stateCode":"FL","zipCode5":"33624","zipCode4":"4348","county":{"countyName":"Hillsborough
+        County","countyCode":"12057"},"countryName":"United States","countryCodeFIPS":"US","countryCodeISO2":"US","countryCodeISO3":"USA","confidenceScore":"100","latitude":"28.0719","longitude":"-82.5281","geocodePrecision":"31","geocodeDate":"2021-11-30T22:26:08Z","overrideIndicator":false},{"createDate":"2021-11-30T22:26:08Z","updateDate":"2021-11-30T22:26:08Z","txAuditId":"a388c879-66e7-4699-9da6-45178e82da3e","sourceSystem":"VHAES","sourceDate":"2021-11-30T22:35:23Z","originatingSourceSystem":"VAMC-983","sourceSystemUser":"RICHARDSON,LYNNE
+        (520646674)","effectiveStartDate":"2021-11-30T22:35:23Z","vet360Id":487745,"addressId":292520,"addressType":"Domestic","addressPOU":"CORRESPONDENCE","badAddress":true,"addressLine1":"PO
+        Box 1","cityName":"Tampa","stateCode":"FL","zipCode5":"33601","zipCode4":"0001","county":{"countyName":"Hillsborough
+        County","countyCode":"12057"},"countryName":"United States","countryCodeFIPS":"US","countryCodeISO2":"US","countryCodeISO3":"USA","confidenceScore":"100","latitude":"27.9962","longitude":"-82.4433","geocodePrecision":"33","geocodeDate":"2021-11-30T22:26:08Z","overrideIndicator":false}],"telephones":[{"createDate":"2021-11-30T22:26:08Z","updateDate":"2021-11-30T22:26:08Z","txAuditId":"a388c879-66e7-4699-9da6-45178e82da3e","sourceSystem":"VHAES","sourceDate":"2021-11-30T22:25:05Z","originatingSourceSystem":"VAMC-983","sourceSystemUser":"RICHARDSON,LYNNE
+        (520646674)","effectiveStartDate":"2021-11-30T22:25:05Z","vet360Id":487745,"telephoneId":263243,"internationalIndicator":false,"phoneType":"HOME","countryCode":"1","areaCode":"813","phoneNumber":"4441217"},{"createDate":"2021-11-30T22:26:08Z","updateDate":"2021-11-30T22:26:08Z","txAuditId":"a388c879-66e7-4699-9da6-45178e82da3e","sourceSystem":"VHAES","sourceDate":"2021-11-30T22:25:05Z","originatingSourceSystem":"VAMC-983","sourceSystemUser":"RICHARDSON,LYNNE
+        (520646674)","effectiveStartDate":"2021-11-30T22:25:05Z","vet360Id":487745,"telephoneId":263244,"internationalIndicator":false,"phoneType":"WORK","countryCode":"1","areaCode":"813","phoneNumber":"4441216"},{"createDate":"2021-11-30T22:26:08Z","updateDate":"2021-11-30T22:26:08Z","txAuditId":"a388c879-66e7-4699-9da6-45178e82da3e","sourceSystem":"VHAES","sourceDate":"2021-11-30T22:25:05Z","originatingSourceSystem":"VAMC-983","sourceSystemUser":"RICHARDSON,LYNNE
+        (520646674)","effectiveStartDate":"2021-11-30T22:25:05Z","vet360Id":487745,"telephoneId":263245,"internationalIndicator":false,"phoneType":"MOBILE","countryCode":"1","areaCode":"813","phoneNumber":"4441218"}],"emails":[{"createDate":"2021-11-30T22:26:08Z","updateDate":"2021-11-30T22:26:08Z","txAuditId":"a388c879-66e7-4699-9da6-45178e82da3e","sourceSystem":"VHAES","sourceDate":"2021-11-30T22:25:05Z","originatingSourceSystem":"VAMC-983","sourceSystemUser":"RICHARDSON,LYNNE
+        (520646674)","effectiveStartDate":"2021-11-30T22:25:05Z","vet360Id":487745,"emailId":198665,"emailAddressText":"VERIFY@VA.GOV"}]}}'
+  recorded_at: Mon, 06 Dec 2021 23:20:03 GMT
+recorded_with: VCR 6.0.0
