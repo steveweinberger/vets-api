@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-
+# Force diff for PR staging review instance
 module V1
   class HigherLevelReviewsController < AppealsBaseControllerV1
     def show
