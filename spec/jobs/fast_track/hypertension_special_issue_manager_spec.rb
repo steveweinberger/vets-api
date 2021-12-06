@@ -31,41 +31,51 @@ RSpec.describe FastTrack::HypertensionSpecialIssueManager do
   end
 
   describe '#add_special_issue' do
+    subject(:special_issue_manager) { FastTrack::HypertensionSpecialIssueManager.new(form526_submission) }
+
     let(:special_issues_list) { [{ code: 'RRD', name: 'Rapid Ready for Decision' }] }
 
     it 'matches the email address after manipulation' do
       address_before = form526_hash(form526_submission.form_json)[:veteran][:emailAddress]
       expect(address_before).to be_present
-      FastTrack::HypertensionSpecialIssueManager.new(form526_submission).add_special_issue
+      subject.add_special_issue
 
       address_reloaded = form526_hash(form526_submission.reload.form_json)[:veteran][:emailAddress]
       expect(address_reloaded).to match address_before
     end
 
     it 'adds rrd to the disabilities list' do
-      FastTrack::HypertensionSpecialIssueManager.new(form526_submission).add_special_issue
+      subject.add_special_issue
       filtered_disabilities = filter_disabilities(form526_hash(form526_submission.reload.form_json))
       expect(filtered_disabilities[0][:specialIssues]).to match special_issues_list
     end
 
     it 'adds rrd to each relevant item in the disabilities list' do
-      FastTrack::HypertensionSpecialIssueManager.new(form526_submission).add_special_issue
+      subject.add_special_issue
       filtered_disabilities = filter_disabilities(form526_hash(form526_submission.reload.form_json))
       expect(filtered_disabilities).to all(include :specialIssues)
       expect(filtered_disabilities.any? { |el| el[:specialIssues].include? special_issues_list.first }).to be true
     end
 
     context 'when the fast track worker has been triggered twice for the same submission' do
-      before { expect(form526_submission).to receive(:update).twice.and_call_original }
+      before { expect(form526_submission).to receive(:update!).twice.and_call_original }
 
       it 'adds rrd to the disabilities list only once' do
-        FastTrack::HypertensionSpecialIssueManager.new(form526_submission).add_special_issue
+        subject.add_special_issue
         filtered_disabilities = filter_disabilities(form526_hash(form526_submission.form_json))
         expect(filtered_disabilities[0][:specialIssues]).to match special_issues_list
 
-        FastTrack::HypertensionSpecialIssueManager.new(form526_submission).add_special_issue
+        subject.add_special_issue
         second_pass_filtered_disabilities = filter_disabilities(form526_hash(form526_submission.form_json))
         expect(second_pass_filtered_disabilities[0][:specialIssues]).to match filtered_disabilities[0][:specialIssues]
+      end
+    end
+
+    context 'when the update to the Form526Submission record fails' do
+      before { allow(form526_submission).to receive(:update!).and_raise(ActiveRecord::RecordInvalid) }
+
+      it 'raises the exception' do
+        expect { subject.add_special_issue }.to raise_exception(ActiveRecord::RecordInvalid)
       end
     end
 

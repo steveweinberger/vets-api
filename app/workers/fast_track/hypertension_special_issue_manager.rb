@@ -12,7 +12,7 @@ module FastTrack
       data = JSON.parse(submission.form_json, symbolize_names: true)
       disabilities = data[:form526][:form526][:disabilities]
       data[:form526][:form526][:disabilities] = add_rrd_to_disabilities(disabilities)
-      submission.update(form_json: JSON.dump(data))
+      submission.update!(form_json: JSON.dump(data))
     end
 
     def add_rrd_to_disabilities(disabilities)
