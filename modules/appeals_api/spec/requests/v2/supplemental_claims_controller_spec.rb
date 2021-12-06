@@ -9,7 +9,7 @@ describe AppealsApi::V2::DecisionReviews::SupplementalClaimsController, type: :r
   def base_path(path)
     "/services/appeals/v2/decision_reviews/#{path}"
   end
-  
+
   let(:minimum_data) { fixture_to_s 'valid_200995_minimum.json' }
   let(:data) { fixture_to_s 'valid_200995.json' }
   let(:headers) { fixture_as_json 'valid_200995_headers.json' }
