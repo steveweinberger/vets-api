@@ -97,14 +97,14 @@ module AppealsApi
           def benefit_type_form_codes
             {
               'compensation' => 1,
-              'pension_survivors_benefits' => 2,
+              'pensionSurvivorsBenefits' => 2,
               'fiduciary' => 3,
-              'insurance' => 4,
+              'lifeInsurance' => 4,
               'education' => 5,
-              'readiness_and_employment' => 6,
-              'loan guaranty' => 7,
-              'vha' => 8,
-              'nca' => 9
+              'readinessAndEmployment' => 6,
+              'loanGuaranty' => 7,
+              'veteransHealthAdministration' => 8,
+              'nationalCemeteryAdministration' => 9
             }
           end
         end
