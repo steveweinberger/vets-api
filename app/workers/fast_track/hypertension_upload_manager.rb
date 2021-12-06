@@ -38,7 +38,7 @@ module FastTrack
         supporting_evidence_attachment.save!
         confirmation_code = supporting_evidence_attachment.guid
 
-        form526_submission = add_upload(confirmation_code) unless confirmation_code.nil?
+        add_upload(confirmation_code) unless confirmation_code.nil?
       end
     end
 

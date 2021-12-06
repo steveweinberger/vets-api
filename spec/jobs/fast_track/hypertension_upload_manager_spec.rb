@@ -71,16 +71,23 @@ RSpec.describe FastTrack::HypertensionUploadManager do
   end
 
   describe '#handle_attachment' do
-    it "does NOT create a new SupportingEvidenceAttachment" do
-      #add file once to test trying to add it again
+    it 'does NOT create a new SupportingEvidenceAttachment' do
+      # add file once to test trying to add it again
       FastTrack::HypertensionUploadManager.new(form526_submission).add_upload('fake_confirmation_code')
 
-      expect { FastTrack::HypertensionUploadManager.new(form526_submission).handle_attachment("fake file") }.not_to change(SupportingEvidenceAttachment, :count)
+      expect do
+        FastTrack::HypertensionUploadManager.new(form526_submission).handle_attachment('fake file')
+      end.not_to change(
+        SupportingEvidenceAttachment, :count
+      )
     end
 
-    it "creates a new SupportingEvidenceAttachment" do
-      expect { FastTrack::HypertensionUploadManager.new(form526_submission).handle_attachment("fake file") }.to change(SupportingEvidenceAttachment, :count).by 1
+    it 'creates a new SupportingEvidenceAttachment' do
+      expect do
+        FastTrack::HypertensionUploadManager.new(form526_submission).handle_attachment('fake file')
+      end.to change(
+        SupportingEvidenceAttachment, :count
+      ).by 1
     end
-
   end
 end
