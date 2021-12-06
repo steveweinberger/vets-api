@@ -29,7 +29,9 @@ module FastTrack
     end
 
     def handle_attachment(pdf_body)
-      unless already_has_summary_file
+      if already_has_summary_file
+        submission
+      else
         supporting_evidence_attachment = SupportingEvidenceAttachment.new
         file = FastTrackPDF.new(pdf_body, 'VAMC_Hypertension_Rapid_Decision_Evidence.pdf')
         supporting_evidence_attachment.set_file_data!(file)
@@ -38,7 +40,6 @@ module FastTrack
 
         form526_submission = add_upload(confirmation_code) unless confirmation_code.nil?
       end
-      form526_submission
     end
 
     # sets up attributes which the SupportingEvidenceAttachment class
