@@ -29,18 +29,13 @@ describe 'Contestable Issues', swagger_doc: 'modules/appeals_api/app/swagger/app
       parameter name: :decision_review_type, in: :path, required: true, type: :string, description: 'Scoping of appeal type for associated issues'
       let(:decision_review_type) { 'notice_of_disagreements' }
       parameter name: :benefit_type, in: :query, type: :string,
-                description: 'Benefit Type for the appeal. Required if Decision Review is a Higher Level Review.',
-                enum: %w[
-                  compensation
-                  pensionSurvivorsBenefits
-                  fiduciary
-                  lifeInsurance
-                  veteransHealthAdministration
-                  veteranReadinessAndEmployment
-                  loanGuaranty
-                  education
-                  nationalCemeteryAdministration
-                ]
+                description:
+                  'Benefit Type for the appeal.' \
+                  'Required if Decision Review is a Higher Level Review or Supplemental Claim. ' \
+                  'Benefit types include: compensation, pensionSurvivorsBenefits, fiduciary, lifeInsurance ' \
+                  'veteransHealthAdministration, veteranReadinessAndEmployment, loanGuaranty, ' \
+                  'education, nationalCemeteryAdministration'
+
       let(:benefit_type) { '' }
 
       parameter AppealsApi::SwaggerSharedComponents.header_params[:veteran_ssn_header]
