@@ -9,6 +9,7 @@ module CovidResearch
       STATSD_KEY_PREFIX = "#{STATSD_KEY_PREFIX}.volunteer"
 
       def create
+        form_service = FormService.new("intake-schema")
         with_monitoring do
           if form_service.valid?(payload)
             ConfirmationMailerJob.perform_async(payload['email'])
@@ -27,9 +28,13 @@ module CovidResearch
       end
 
       def update
+        form_service = FormService.new("update-schema")
+        puts "Payload in update: "
+        puts payload
         with_monitoring do
           if form_service.valid?(payload)
             ConfirmationMailerJob.perform_async(payload['email'])
+            
             deliver(payload)
 
             render json: { status: 'accepted' }, status: :accepted
@@ -39,7 +44,7 @@ module CovidResearch
             error = {
               errors: form_service.submission_errors(payload)
             }
-            render json: error, status: :unprocessable_entity
+            render json: error, status: :not_found
           end
         end
       end
