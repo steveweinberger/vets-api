@@ -3095,18 +3095,7 @@
           {
             "name": "benefit_type",
             "in": "query",
-            "description": "Benefit Type for the appeal. Required if Decision Review is a Higher Level Review.",
-            "enum": [
-              "compensation",
-              "pensionSurvivorsBenefits",
-              "fiduciary",
-              "lifeInsurance",
-              "veteransHealthAdministration",
-              "veteranReadinessAndEmployment",
-              "loanGuaranty",
-              "education",
-              "nationalCemeteryAdministration"
-            ],
+            "description": "Benefit Type for the appeal. Required if Decision Review is a Higher Level Review or Supplemental Claim. Benefit types include: compensation, pensionSurvivorsBenefits, fiduciary, lifeInsurance veteransHealthAdministration, veteranReadinessAndEmployment, loanGuaranty, education, nationalCemeteryAdministration",
             "schema": {
               "type": "string"
             }
