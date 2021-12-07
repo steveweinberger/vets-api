@@ -6,7 +6,7 @@ module Authentication
       it 'logs in outbound idme user' do
         visit '/'
         click_button 'Sign in'
-        click_button 'Sign in with ID.me'
+        click_button 'ID.me'
 
         idme_login_steps(email, password)
 
@@ -18,7 +18,7 @@ module Authentication
       it 'logs in outbound mhv user' do
         visit '/'
         click_button 'Sign in'
-        click_button 'Sign in with My HealtheVet'
+        click_button 'My HealtheVet'
 
         mhv_login_steps(username, password)
 

@@ -19,7 +19,7 @@ if ENV['LOGIN_SYSTEM_TESTS']
         it 'logs in inbound mhv user from eauth' do
           navigate_through_eauth
 
-          click_on 'Sign in with My HealtheVet'
+          click_on 'My HealtheVet'
           click_on 'Accept'
 
           mhv_login_steps('vets250', ENV['MHV_LOA3_PASSWORD'])

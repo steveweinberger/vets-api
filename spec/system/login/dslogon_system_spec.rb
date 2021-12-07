@@ -9,7 +9,7 @@ if ENV['LOGIN_SYSTEM_TESTS']
         it 'logs in outbound dslogon user' do
           visit '/'
           click_button 'Sign in'
-          click_button 'Sign in with DS Logon'
+          click_button 'DS Logon'
 
           dslogon_login_steps('ace.a.mcghee1', ENV['DSLOGON_LOA2_PASSWORD'])
 
@@ -23,7 +23,7 @@ if ENV['LOGIN_SYSTEM_TESTS']
         it 'logs in inbound dslogon user from eauth' do
           navigate_through_eauth
 
-          click_on 'Sign in with DS Logon'
+          click_on 'DS Logon'
           click_on 'Accept'
 
           dslogon_login_steps('ace.a.mcghee1', ENV['DSLOGON_LOA2_PASSWORD'])
@@ -54,7 +54,7 @@ if ENV['LOGIN_SYSTEM_TESTS']
           visit 'https://mhv-syst.myhealth.va.gov/mhv-portal-web/home'
           click_on 'Sign in'
           click_on 'Try the new Unified VA Login'
-          click_on 'Sign in with DS Logon'
+          click_on 'DS Logon'
 
           dslogon_login_steps('ace.a.mcghee1', ENV['DSLOGON_LOA2_PASSWORD'])
 

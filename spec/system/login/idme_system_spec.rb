@@ -20,7 +20,7 @@ if ENV['LOGIN_SYSTEM_TESTS']
         it 'logs in inbound idme user from eauth' do
           navigate_through_eauth
 
-          click_on 'Sign in with ID.me'
+          click_on 'ID.me'
           click_on 'Accept'
 
           idme_login_steps('vets.gov.user+24@gmail.com', ENV['IDME_LOA3_PASSWORD'])
@@ -36,7 +36,7 @@ if ENV['LOGIN_SYSTEM_TESTS']
           visit 'https://mhv-syst.myhealth.va.gov/mhv-portal-web/home'
           click_on 'Sign in'
           click_on 'Try the new Unified VA Login'
-          click_on 'Sign in with ID.me'
+          click_on 'ID.me'
 
           idme_login_steps('vets.gov.user+24@gmail.com', ENV['IDME_LOA3_PASSWORD'])
 
