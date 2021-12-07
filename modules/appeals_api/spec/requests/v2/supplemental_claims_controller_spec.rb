@@ -9,7 +9,8 @@ describe AppealsApi::V2::DecisionReviews::SupplementalClaimsController, type: :r
   def base_path(path)
     "/services/appeals/v2/decision_reviews/#{path}"
   end
-
+  
+  let(:minimum_data) { fixture_to_s 'valid_200995_minimum.json' }
   let(:data) { fixture_to_s 'valid_200995.json' }
   let(:headers) { fixture_as_json 'valid_200995_headers.json' }
 
@@ -105,6 +106,13 @@ describe AppealsApi::V2::DecisionReviews::SupplementalClaimsController, type: :r
           expect(parsed['errors']).to be_an Array
           expect(response.body).to include('Missing required fields')
           expect(response.body).to include('5103NoticeAcknowledged')
+        end
+      end
+
+      context 'when benefitType is not compensation' do
+        it 'does not fail when 5103NoticeAcknowledged is missing' do
+          post(path, params: minimum_data, headers: headers)
+          expect(response.status).to eq(200)
         end
       end
     end
