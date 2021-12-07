@@ -3,7 +3,7 @@
 require 'rails_helper'
 require 'lgy/service'
 
-RSpec.describe LGY::Service do
+describe LGY::Service do
 
 
 
