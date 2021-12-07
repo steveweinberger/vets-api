@@ -31,7 +31,7 @@ describe VAProfile::ContactInformation::Service, skip_vet360: true do
         it 'returns the bad address indicator' do
           VCR.use_cassette('va_profile/contact_information/person_bad_address') do
             response = subject.get_person
-            binding.pry; fail
+            expect(response.person.addresses[1].bad_address).to eq(true)
           end
         end
       end
