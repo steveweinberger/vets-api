@@ -26,6 +26,25 @@ module CovidResearch
         end
       end
 
+      def update
+        with_monitoring do
+          if form_service.valid?(payload)
+            ConfirmationMailerJob.perform_async(payload['email'])
+            deliver(payload)
+
+            render json: { status: 'accepted' }, status: :accepted
+          else
+            StatsD.increment("#{STATSD_KEY_PREFIX}.create.fail")
+
+            error = {
+              errors: form_service.submission_errors(payload)
+            }
+            render json: error, status: :unprocessable_entity
+          end
+        end
+      end
+
+
       private
 
       def deliver(payload)
