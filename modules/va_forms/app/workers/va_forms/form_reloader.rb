@@ -34,6 +34,29 @@ module VAForms
       Rails.logger.error('VAForms::FormReloader failed to run!', e)
     end
 
+    def test
+      Rails.logger.info('VAForms::FormReloaderTest is being called.')
+      query = File.read(Rails.root.join('modules', 'va_forms', 'config', 'test.txt'))
+      body = { query: query }
+      response = connection.post do |req|
+        req.path = 'graphql'
+        req.body = body.to_json
+        req.options.timeout = 300
+      end
+      forms_data = JSON.parse(response.body)
+      forms_data.dig('data', 'nodeQuery', 'entities').each do |form|
+        Rails.logger.info("Saving #{form['fieldVaFormRowId']}")
+        build_and_save_form(form)
+      rescue => e
+        log_message_to_sentry(
+          "#{form['fieldVaFormNumber']} failed to import into forms database", :error, body: e.message
+        )
+        next
+      end
+    rescue => e
+      Rails.logger.error('VAForms::FormReloader failed to run!', e)
+    end
+
     def connection
       basic_auth_class = Faraday::Request::BasicAuthentication
       @connection ||= Faraday.new(Settings.va_forms.drupal_url, faraday_options) do |faraday|
@@ -115,7 +138,7 @@ module VAForms
     end
 
     def get_sha256(content)
-      if content.class == Tempfile
+      if content.instance_of?(Tempfile)
         Digest::SHA256.file(content).hexdigest
       else
         Digest::SHA256.hexdigest(content.string)

@@ -22,7 +22,7 @@ module FacilitiesApi
           'PPMS'
         end
 
-        def base_request_header
+        def base_request_headers
           if Flipper.enabled?(:facility_locator_ppms_use_secure_api)
             super.merge(Settings.ppms.api_keys.to_h.stringify_keys)
           else
@@ -33,7 +33,7 @@ module FacilitiesApi
         def connection
           Faraday.new(base_path, headers: base_request_headers, request: request_options) do |conn|
             conn.use :breakers
-            conn.use :instrumentation, name: 'facilities.ppms.request.faraday'
+            conn.use :instrumentation, name: 'facilities.ppms.v1.request.faraday'
 
             # Uncomment this if you want curl command equivalent or response output to log
             # conn.request(:curl, ::Logger.new(STDOUT), :warn) unless Rails.env.production?
