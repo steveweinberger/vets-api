@@ -9,7 +9,7 @@ module CovidResearch
       STATSD_KEY_PREFIX = "#{STATSD_KEY_PREFIX}.volunteer"
 
       def create
-        form_service = FormService.new("COVID-VACCINE-TRIAL")
+        form_service = FormService.new('COVID-VACCINE-TRIAL')
         with_monitoring do
           if form_service.valid?(payload)
             ConfirmationMailerJob.perform_async(payload['email'])
@@ -28,13 +28,13 @@ module CovidResearch
       end
 
       def update
-        form_service = FormService.new("COVID-VACCINE-TRIAL-UPDATE")
-        puts "Payload in update: "
+        form_service = FormService.new('COVID-VACCINE-TRIAL-UPDATE')
+        puts 'Payload in update: '
         puts payload
         with_monitoring do
           if form_service.valid?(payload)
             ConfirmationMailerJob.perform_async(payload['email'])
-            
+
             deliver(payload)
 
             render json: { status: 'accepted' }, status: :accepted
@@ -48,7 +48,6 @@ module CovidResearch
           end
         end
       end
-
 
       private
 

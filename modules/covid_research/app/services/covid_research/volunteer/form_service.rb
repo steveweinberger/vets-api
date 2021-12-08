@@ -7,7 +7,7 @@ module CovidResearch
   module Volunteer
     class FormService
       SCHEMA = 'COVID-VACCINE-TRIAL'
-      # TODO pass in correct vets-json-schema name for intake vs update
+      # TODO: pass in correct vets-json-schema name for intake vs update
 
       attr_reader :worker
 
@@ -21,6 +21,7 @@ module CovidResearch
 
       def valid!(json)
         raise SchemaValidationError, submission_errors(json) unless valid?(json)
+
         valid?(json)
       end
 
@@ -42,7 +43,7 @@ module CovidResearch
 
       def queue_delivery(submission)
         redis_format = RedisFormat.new
-        redis_format.form_data = JSON.generate(submission)        
+        redis_format.form_data = JSON.generate(submission)
         worker.perform_async(redis_format.to_json)
       end
 
@@ -64,12 +65,11 @@ module CovidResearch
         end
       end
 
-      # TODO remove before deploy
+      # TODO: remove before deploy
       def dev_schema
         file = File.read("./modules/covid_research/app/services/covid_research/volunteer/temp-#{@schema_name}.json")
         JSONSchemer.schema(file)
       end
-
     end
   end
 end

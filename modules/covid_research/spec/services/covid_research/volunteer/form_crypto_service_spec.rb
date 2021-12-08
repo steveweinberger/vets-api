@@ -4,7 +4,7 @@ require 'rails_helper'
 require CovidResearch::Engine.root.join('spec', 'rails_helper.rb')
 
 RSpec.describe CovidResearch::Volunteer::FormCryptoService do
-  let(:subject)        { described_class.new }
+  let(:subject) { described_class.new }
   let(:raw_intake_form)       { read_fixture('valid-submission.json') }
   let(:raw_update_form)       { read_fixture('valid-update-submission.json') }
 
@@ -19,6 +19,7 @@ RSpec.describe CovidResearch::Volunteer::FormCryptoService do
     it 'encrypts the inital form' do
       expect(subject.encrypt_form(raw_intake_form)[:form_data]).not_to eq(raw_intake_form)
     end
+
     it 'encrypts the update form' do
       expect(subject.encrypt_form(raw_update_form)[:form_data]).not_to eq(raw_update_form)
     end
@@ -31,6 +32,7 @@ RSpec.describe CovidResearch::Volunteer::FormCryptoService do
 
       expect(actual).to eq(expected)
     end
+
     it 'decrypts update form to a known value using the lockbox value' do
       actual = JSON.parse(subject.decrypt_form(encrypted_update_form))
       expected = JSON.parse(raw_update_form)
