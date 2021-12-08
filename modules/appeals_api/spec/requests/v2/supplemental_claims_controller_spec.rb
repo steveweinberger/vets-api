@@ -12,6 +12,7 @@ describe AppealsApi::V2::DecisionReviews::SupplementalClaimsController, type: :r
 
   let(:minimum_data) { fixture_to_s 'valid_200995_minimum.json' }
   let(:data) { fixture_to_s 'valid_200995.json' }
+  let(:extra_data) { fixture_to_s 'valid_200995_extra.json' }
   let(:headers) { fixture_as_json 'valid_200995_headers.json' }
 
   let(:parsed) { JSON.parse(response.body) }
@@ -87,7 +88,7 @@ describe AppealsApi::V2::DecisionReviews::SupplementalClaimsController, type: :r
     context '5103NoticeAcknowledged' do
       context 'when benefitType = compensation' do
         it 'fails if 5103NoticeAcknowledged = false' do
-          mod_data = JSON.parse(data)
+          mod_data = JSON.parse(extra_data)
           mod_data['data']['attributes']['5103NoticeAcknowledged'] = false
 
           post(path, params: mod_data.to_json, headers: headers)
@@ -98,7 +99,7 @@ describe AppealsApi::V2::DecisionReviews::SupplementalClaimsController, type: :r
         end
 
         it 'fails if 5103NoticeAcknowledged is missing' do
-          mod_data = JSON.parse(data)
+          mod_data = JSON.parse(extra_data)
           mod_data['data']['attributes'].delete('5103NoticeAcknowledged')
 
           post(path, params: mod_data.to_json, headers: headers)
