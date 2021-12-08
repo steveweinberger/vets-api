@@ -3881,7 +3881,9 @@
                     },
                     "additionalProperties": false,
                     "required": [
-
+                      "address",
+                      "phone",
+                      "email"
                     ]
                   },
                   "evidenceSubmission": {
@@ -3944,26 +3946,18 @@
                     "required": [
                       "evidenceType"
                     ],
-                    "anyOf": [
-                      {
-                        "not": {
-                          "properties": {
-                            "evidenceType": {
-                              "contains": {
-                                "enum": [
-                                  "retrieval"
-                                ]
-                              }
-                            }
-                          }
+                    "if": {
+                      "properties": {
+                        "evidenceType": {
+                          "const": "retrieval"
                         }
-                      },
-                      {
-                        "required": [
-                          "retrieveFrom"
-                        ]
                       }
-                    ]
+                    },
+                    "then": {
+                      "required": [
+                        "retrieveFrom"
+                      ]
+                    }
                   },
                   "5103NoticeAcknowledged": {
                     "type": "boolean",
@@ -3975,8 +3969,9 @@
                 },
                 "required": [
                   "veteran",
+                  "benefitType",
                   "evidenceSubmission",
-                  "socOptIn",
+                  "socOptIn"
                 ],
                 "if": {
                   "properties": {
