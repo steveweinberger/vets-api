@@ -66,9 +66,10 @@ ClaimsApi::Engine.routes.draw do
     namespace :veterans do
       get '/:veteranId/claims', to: 'claims#index'
       get '/:veteranId/claims/:id', to: 'claims#show'
-      get '/:veteranId/power-of-attorney', to: 'power_of_attorney#show'
-      put '/:veteranId/power-of-attorney:appointIndividual', to: 'power_of_attorney#appoint_individual'
-      get '/:veteranId/intent-to-files/:type',
+      get '/:veteranId/power_of_attorney', to: 'power_of_attorney#show'
+      put '/:veteranId/power_of_attorney/appoint_individual', to: 'power_of_attorney#appoint_individual'
+      put '/:veteranId/power_of_attorney/appoint_organization', to: 'power_of_attorney#appoint_organization'
+      get '/:veteranId/intent_to_files/:type',
           to: 'intent_to_files#type',
           constraints: (lambda do |request|
             ClaimsApi::V2::Veterans::IntentToFilesController::ITF_TYPES.include?(request.path_parameters[:type])

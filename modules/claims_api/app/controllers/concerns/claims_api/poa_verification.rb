@@ -81,11 +81,19 @@ module ClaimsApi
       end
 
       def poa_code_in_organization?(poa_code)
+        organization = ::Veteran::Service::Organization.find_by(poa: poa_code)
         representative = ::Veteran::Service::Representative.where('? = ANY(poa_codes)', poa_code).first
-        raise 'Power of Attorney not found' if representative.blank?
+        
+        organization.present? && representative.user_types.include?('veteran_service_officer')
+      end
+
+      def poa_code_is_individual?(poa_code)
+        return false if ::Veteran::Service::Organization.find_by(poa: poa_code).present?
+        representative = ::Veteran::Service::Representative.where('? = ANY(poa_codes)', poa_code).first
+
         return false if representative.user_types.blank?
 
-        representative.user_types.include?('veteran_service_officer')
+        representative.user_types.include?('attorney') || representative.user_types.include?('claim_agents')
       end
     end
   end

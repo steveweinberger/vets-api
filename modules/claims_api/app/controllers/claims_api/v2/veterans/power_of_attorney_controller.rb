@@ -19,16 +19,25 @@ module ClaimsApi
           )
         end
 
-        def appoint_individual # rubocop:disable Metrics/MethodLength
-          validate_request!(ClaimsApi::V2::ParamsValidation::PowerOfAttorney)
+        def appoint_organization
+          poa_code = parse_and_verify_poa_code
+          unless poa_code_in_organization?(poa_code)
+            raise ::Common::Exceptions::UnprocessableEntity.new(detail: 'POA Code must belong to an organization.')
+          end
 
-          poa_code = params.dig('serviceOrganization', 'poaCode')
-          validate_poa_code!(poa_code)
+          submit_power_of_attorney(poa_code)
+        end
 
-          if poa_code_in_organization?(poa_code)
+        def appoint_individual
+          poa_code = parse_and_verify_poa_code
+          unless poa_code_is_individual?(poa_code)
             raise ::Common::Exceptions::UnprocessableEntity.new(detail: 'POA Code must belong to an individual.')
           end
 
+          submit_power_of_attorney(poa_code)
+        end
+
+        def submit_power_of_attorney(poa_code) # rubocop:disable Metrics/MethodLength
           power_of_attorney = ClaimsApi::PowerOfAttorney.find_using_identifier_and_source(header_md5: header_md5,
                                                                                           source_name: source_name)
           unless power_of_attorney&.status&.in?(%w[submitted pending])
@@ -99,6 +108,15 @@ module ClaimsApi
                                                                     'va_eauth_service_transaction_id',
                                                                     'va_eauth_issueinstant',
                                                                     'Authorization').to_json)
+        end
+
+        def parse_and_verify_poa_code
+          validate_request!(ClaimsApi::V2::ParamsValidation::PowerOfAttorney)
+
+          poa_code = params.dig('serviceOrganization', 'poaCode')
+          validate_poa_code!(poa_code)
+
+          poa_code
         end
 
         def source_data

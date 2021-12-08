@@ -20,14 +20,16 @@ namespace :veteran do
       poa_codes: %w[A1Q 095 074 083 1NY],
       first_name: 'Tamara',
       last_name: 'Ellis',
-      email: 'va.api.user+idme.001@gmail.com'
+      email: 'va.api.user+idme.001@gmail.com',
+      user_types: ['attorney', 'veteran_service_officer']
     )
     Veteran::Service::Representative.create(
       representative_id: '12345',
       poa_codes: %w[A1H 095 074 083 1NY],
       first_name: 'John',
       last_name: 'Doe',
-      email: 'va.api.user+idme.007@gmail.com'
+      email: 'va.api.user+idme.007@gmail.com',
+      user_types: ['attorney', 'veteran_service_officer']
     )
   end
 end
