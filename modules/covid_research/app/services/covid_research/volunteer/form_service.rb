@@ -16,17 +16,11 @@ module CovidResearch
       def initialize(schema_name = SCHEMA, worker = GenisisDeliveryJob)
         @worker = worker
         @schema_name = schema_name
-        puts "in initialize"
         @schema = dev_schema
-        puts @schema
-        puts "end of init"
       end
 
       def valid!(json)
-        # puts "Check if JSON is valid"
-        # puts json
         raise SchemaValidationError, submission_errors(json) unless valid?(json)
-
         valid?(json)
       end
 
@@ -70,9 +64,8 @@ module CovidResearch
         end
       end
 
+      # TODO remove before deploy
       def dev_schema
-        puts "In Dev Schema"
-        puts @schema_name
         file = File.read("./modules/covid_research/app/services/covid_research/volunteer/temp-#{@schema_name}.json")
         JSONSchemer.schema(file)
       end
