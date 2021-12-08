@@ -2978,6 +2978,7 @@
                 "properties": {
                   "benefitType": {
                     "type": "string",
+                    "description": "If the contested issue is a Disability Compensation issue, acknowledgement of form 5103 is required - see 5103NoticeAcknowledged.",
                     "enum": [
                       "compensation",
                       "pensionSurvivorsBenefits",
@@ -3965,10 +3966,8 @@
                     ]
                   },
                   "5103NoticeAcknowledged": {
-                    "enum": [
-                      true,
-                      false
-                    ]
+                    "type": "boolean",
+                    "description": "The 5103 Notice regarding new & relevant evidence must be acknowledged when the issue being contested is a Disability Compensation issue. The notice can be found here: http://www.va.gov/disability/how-to-file-claim/evidence-needed."
                   },
                   "socOptIn": {
                     "type": "boolean"
@@ -3978,7 +3977,6 @@
                   "veteran",
                   "evidenceSubmission",
                   "socOptIn",
-                  "5103NoticeAcknowledged"
                 ],
                 "if": {
                   "properties": {
@@ -3988,9 +3986,14 @@
                   }
                 },
                 "then": {
+                  "required": [
+                    "5103NoticeAcknowledged"
+                  ],
                   "properties": {
                     "5103NoticeAcknowledged": {
-                      "const": true
+                      "enum": [
+                        true
+                      ]
                     }
                   }
                 }
@@ -9732,7 +9735,7 @@
                             "data": {
                               "type": "supplementalClaim",
                               "attributes": {
-                                "benefitType": "compensation",
+                                "benefitType": "fiduciary",
                                 "veteran": {
                                   "address": {
                                     "addressLine1": "123 Main St",
@@ -9748,7 +9751,6 @@
                                   "timezone": "America/Chicago"
                                 },
                                 "socOptIn": false,
-                                "5103NoticeAcknowledged": true,
                                 "evidenceSubmission": {
                                   "evidenceType": [
                                     "upload"
@@ -9783,7 +9785,7 @@
                             "data": {
                               "type": "supplementalClaim",
                               "attributes": {
-                                "benefitType": "fiduciary",
+                                "benefitType": "compensation",
                                 "veteran": {
                                   "address": {
                                     "addressLine1": "123 Main St",

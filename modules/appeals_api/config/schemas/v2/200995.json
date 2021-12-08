@@ -153,7 +153,7 @@
                 },
                 "socOptIn": { "type": "boolean" }
               },
-              "required": ["veteran", "evidenceSubmission", "socOptIn"],
+              "required": ["veteran", "benefitType", "evidenceSubmission", "socOptIn"],
               "if": { "properties": { "benefitType": { "const": "compensation" } } },
               "then": { "required":  ["5103NoticeAcknowledged"], "properties": { "5103NoticeAcknowledged": { "enum": [true] } } }
             }
